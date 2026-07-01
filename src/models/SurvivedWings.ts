@@ -1,5 +1,5 @@
 import type { StructurePoint } from './StructurePoint.js'
 
-export interface SwingStrength extends StructurePoint {
+export interface SurvivedWings extends StructurePoint {
 	strength: number
 }

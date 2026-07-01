@@ -1,8 +1,8 @@
 import type { StructurePoint } from '../models/StructurePoint.js'
-import type { SwingStrength } from '../models/SurvivedWings.js'
+import type { SurvivedWings } from '../models/SurvivedWings.js'
 
-export class SwingStrengthEngine {
-	build(points: StructurePoint[]): SwingStrength[] {
+export class SurvivedWingsEngine {
+	build(points: StructurePoint[]): SurvivedWings[] {
 		return points.map((point, index) => {
 			let strength = 0
 

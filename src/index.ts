@@ -3,9 +3,10 @@ import { PivotDetector } from './core/PivotDetector.js'
 import { SwingEngine } from './core/SwingEngine.js'
 import { StructureEngine } from './core/StructureEngine.js'
 import { MarketStructureEngine } from './core/MarketStructureEngine.js'
-import { LegEngine } from './core/LegEngine.js'
+import { StructuralLegEngine } from './core/StructuralLegEngine.js'
 import { ATREngine } from './core/ATREngine.js'
 import { LegStrengthEngine } from './core/LegStrengthEngine.js'
+import { SwingLegEngine } from './core/SwingLegEngine.js'
 
 async function main() {
 	const service = new BinanceService()
@@ -24,9 +25,10 @@ async function main() {
 	const swings = new SwingEngine().build(pivots)
 	const structure = new StructureEngine().build(swings)
 	const market = new MarketStructureEngine().process(structure)
-	const legs = new LegEngine().build(structure)
+	const structuralLegs = new StructuralLegEngine().build(structure)
+	const swingLegs = new SwingLegEngine().build(structure)
 	const atr = new ATREngine().build(candles)
-	const legStrength = new LegStrengthEngine().build(legs, atr)
+	const legStrength = new LegStrengthEngine().build(swingLegs, atr)
 
 	console.log('\n==============================')
 	console.log('STRUCTURE ENGINE')
@@ -113,7 +115,7 @@ async function main() {
 		'------------------------------------------------------------------------------------------------',
 	)
 
-	for (const leg of legs.slice(-10)) {
+	for (const leg of swingLegs.slice(-10)) {
 		console.log(
 			`${leg.direction.toUpperCase().padEnd(8)} | ${leg.start.label.padEnd(7)} ${leg.start.price.toFixed(2)} (${new Date(leg.start.timestamp).toLocaleString('ru-RU')})`,
 		)
@@ -142,20 +144,73 @@ async function main() {
 
 	console.log()
 	console.log('==============================')
-	console.log('LEG STRENGTH')
+	console.log('SWING LEGS')
 	console.log('==============================')
 
-	for (const item of legStrength.slice(-10)) {
-		console.log('----------------------------------------------------------')
+	for (const leg of swingLegs.slice(-20)) {
+		console.log(
+			'------------------------------------------------------------------------------------------------',
+		)
 
-		console.log(`${item.leg.direction.toUpperCase()}`)
+		console.log(
+			`${leg.direction.toUpperCase()} | ${leg.range.toFixed(
+				2,
+			)} pts | ${leg.candles} candles | ${(leg.duration / 60000).toFixed(0)} min`,
+		)
 
-		console.log(`Range      : ${item.range.toFixed(2)}`)
+		console.log(
+			`${leg.start.label.padEnd(7)} ${leg.start.price.toFixed(2)} | ${new Date(
+				leg.start.timestamp,
+			).toLocaleString('ru-RU')}`,
+		)
 
-		console.log(`AverageATR : ${item.averageAtr.toFixed(2)}`)
+		console.log('        ↓')
 
-		console.log(`Strength   : ${item.strength.toFixed(2)} ATR`)
+		console.log(
+			`${leg.end.label.padEnd(7)} ${leg.end.price.toFixed(2)} | ${new Date(
+				leg.end.timestamp,
+			).toLocaleString('ru-RU')}`,
+		)
 	}
+
+	console.log(
+		'------------------------------------------------------------------------------------------------',
+	)
+
+	console.log()
+	console.log('==============================')
+	console.log('STRUCTURAL LEGS')
+	console.log('==============================')
+
+	for (const leg of structuralLegs.slice(-10)) {
+		console.log(
+			'------------------------------------------------------------------------------------------------',
+		)
+
+		console.log(
+			`${leg.direction.toUpperCase()} | ${leg.range.toFixed(
+				2,
+			)} pts | ${leg.candles} candles | ${(leg.duration / 60000).toFixed(0)} min`,
+		)
+
+		console.log(
+			`${leg.start.label.padEnd(7)} ${leg.start.price.toFixed(2)} | ${new Date(
+				leg.start.timestamp,
+			).toLocaleString('ru-RU')}`,
+		)
+
+		console.log('        ↓')
+
+		console.log(
+			`${leg.end.label.padEnd(7)} ${leg.end.price.toFixed(2)} | ${new Date(
+				leg.end.timestamp,
+			).toLocaleString('ru-RU')}`,
+		)
+	}
+
+	console.log(
+		'------------------------------------------------------------------------------------------------',
+	)
 }
 
 main()
