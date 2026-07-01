@@ -1,7 +1,8 @@
-import type { Leg } from '../models/Leg.js'
+import type { Leg, LegDirection } from '../models/Leg.js'
 import type { StructurePoint } from '../models/StructurePoint.js'
+import { buildLeg } from './legs/buildLeg.js'
 
-export class LegEngine {
+export class StructuralLegEngine {
 	build(points: StructurePoint[]): Leg[] {
 		const legs: Leg[] = []
 
@@ -36,11 +37,7 @@ export class LegEngine {
 				}
 
 				if (end) {
-					legs.push({
-						start,
-						end,
-						direction: 'bearish',
-					})
+					legs.push(buildLeg(start, end, 'bearish'))
 				}
 			}
 
@@ -67,11 +64,7 @@ export class LegEngine {
 				}
 
 				if (end) {
-					legs.push({
-						start,
-						end,
-						direction: 'bullish',
-					})
+					legs.push(buildLeg(start, end, 'bullish'))
 				}
 			}
 		}
