@@ -9,6 +9,11 @@
 		// See also https://aka.ms/tsconfig/module
 		"module": "nodenext",
 		"moduleResolution": "nodenext",
+		"ignoreDeprecations": "6.0",
+		"baseUrl": "./src",
+		"paths": {
+			"@/*": ["./*"]
+		},
 		"target": "esnext",
 		"types": [],
 		// For nodejs:
