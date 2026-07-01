@@ -1,3 +1,5 @@
+// PivotDetector.ts
+
 import type { Candle } from '../models/Candle.js'
 import type { Pivot } from '../models/Pivot.js'
 

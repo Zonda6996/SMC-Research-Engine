@@ -1,3 +1,4 @@
+// Swing.ts
 export interface Swing {
 	index: number
 	timestamp: number

@@ -1,4 +1,5 @@
-import type { Pivot } from '../models/Pivot.js'
+// StructureEngine.ts
+
 import type { Swing } from '../models/Swing.js'
 import type {
 	StructurePoint,

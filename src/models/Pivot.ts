@@ -1,3 +1,5 @@
+// Pivot.ts
+
 export interface Pivot {
 	index: number
 

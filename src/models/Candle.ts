@@ -1,3 +1,5 @@
+// Candle.ts
+
 export interface Candle {
 	timestamp: number
 

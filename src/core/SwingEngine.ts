@@ -1,3 +1,5 @@
+// SwingEngine.ts
+
 import type { Pivot } from '../models/Pivot.js'
 import type { Swing } from '../models/Swing.js'
 
