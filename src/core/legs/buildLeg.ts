@@ -1,5 +1,5 @@
-import type { Leg, LegDirection } from '../../models/Leg.js'
-import type { StructurePoint } from '../../models/StructurePoint.js'
+import type { Leg, LegDirection } from '@/models/Leg.js'
+import type { StructurePoint } from '@/models/StructurePoint.js'
 
 /**
  * Строит Leg из пары StructurePoint.

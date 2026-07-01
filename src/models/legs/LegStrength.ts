@@ -1,4 +1,4 @@
-import type { Leg } from './Leg.js'
+import type { Leg } from '@/models/legs/Leg.js'
 
 export interface LegStrength {
 	leg: Leg

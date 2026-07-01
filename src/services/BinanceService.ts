@@ -1,7 +1,7 @@
 import ccxt from 'ccxt'
 
-import type { Candle } from '../models/Candle.js'
-import type { GetCandlesOptions } from '../models/GetCandleOptions.js'
+import type { Candle } from '@/models/price/Candle.js'
+import type { GetCandlesOptions } from '@/models/price/GetCandleOptions.js'
 
 export class BinanceService {
 	private readonly exchange = new ccxt.binance()

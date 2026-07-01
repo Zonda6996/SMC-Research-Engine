@@ -1,7 +1,7 @@
 // SwingEngine.ts
 
-import type { Pivot } from '../models/Pivot.js'
-import type { Swing } from '../models/Swing.js'
+import type { Pivot } from '@/models/structure/Pivot.js'
+import type { Swing } from '@/models/structure/Swing.js'
 
 export class SwingEngine {
 	public build(pivots: Pivot[]): Swing[] {

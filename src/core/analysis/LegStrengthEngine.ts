@@ -1,6 +1,6 @@
-import type { ATRPoint } from '../models/ATRPoint.js'
-import type { Leg } from '../models/Leg.js'
-import type { LegStrength } from '../models/LegStrength.js'
+import type { ATRPoint } from '@/models/indicators/ATRPoint.js'
+import type { Leg } from '@/models/legs/Leg.js' 
+import type { LegStrength } from '@/models/legs/LegStrength.js'
 
 export class LegStrengthEngine {
 	build(legs: Leg[], atr: ATRPoint[]): LegStrength[] {

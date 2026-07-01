@@ -1,5 +1,5 @@
-import type { Candle } from '../models/Candle.js'
-import type { ATRPoint } from '../models/ATRPoint.js'
+import type { Candle } from '@/models/price/Candle.js'
+import type { ATRPoint } from '@/models/indicators/ATRPoint.js'
 
 export class ATREngine {
 	constructor(private readonly period = 14) {}

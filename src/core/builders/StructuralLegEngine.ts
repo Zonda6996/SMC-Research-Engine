@@ -1,6 +1,6 @@
-import type { Leg, LegDirection } from '../models/Leg.js'
-import type { StructurePoint } from '../models/StructurePoint.js'
-import { buildLeg } from './legs/buildLeg.js'
+import type { Leg, LegDirection } from '@/models/legs/Leg.js'
+import type { StructurePoint } from '@/models/structure/StructurePoint.js'
+import { buildLeg } from '../legs/buildLeg.js'
 
 export class StructuralLegEngine {
 	build(points: StructurePoint[]): Leg[] {

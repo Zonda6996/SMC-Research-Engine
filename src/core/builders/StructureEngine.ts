@@ -1,10 +1,10 @@
 // StructureEngine.ts
 
-import type { Swing } from '../models/Swing.js'
+import type { Swing } from '@/models/structure/Swing.js'
 import type {
 	StructurePoint,
 	StructureLabel,
-} from '../models/StructurePoint.js'
+} from '@/models/structure/StructurePoint.js'
 
 export class StructureEngine {
 	public build(swings: Swing[]): StructurePoint[] {

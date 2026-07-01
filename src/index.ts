@@ -1,12 +1,63 @@
-import { BinanceService } from './services/BinanceService.js'
-import { PivotDetector } from './core/PivotDetector.js'
-import { SwingEngine } from './core/SwingEngine.js'
-import { StructureEngine } from './core/StructureEngine.js'
-import { MarketStructureEngine } from './core/MarketStructureEngine.js'
-import { StructuralLegEngine } from './core/StructuralLegEngine.js'
-import { ATREngine } from './core/ATREngine.js'
-import { LegStrengthEngine } from './core/LegStrengthEngine.js'
-import { SwingLegEngine } from './core/SwingLegEngine.js'
+import { BinanceService } from '@/services/BinanceService.js'
+import { runAnalysis } from '@/core/analysis/runAnalysis.js'
+import type { StructurePoint } from './models/structure/StructurePoint.js'
+import type { Leg } from './models/legs/Leg.js'
+import type { ATRPoint } from '@/models/indicators/ATRPoint.js'
+import type { LegStrength } from './models/legs/LegStrength.js'
+
+// ==========================
+// Форматирование (только представление, никакой аналитики)
+// ==========================
+
+function formatTime(timestamp: number): string {
+	return new Date(timestamp).toLocaleString('ru-RU')
+}
+
+function formatPrice(price: number): string {
+	return price.toFixed(2)
+}
+
+function structureRow(point: StructurePoint) {
+	return {
+		index: point.index,
+		type: point.type.toUpperCase(),
+		label: point.label,
+		time: formatTime(point.timestamp),
+		price: formatPrice(point.price),
+	}
+}
+
+function legRow(leg: Leg) {
+	return {
+		direction: leg.direction.toUpperCase(),
+		range: formatPrice(leg.range),
+		candles: leg.candles,
+		minutes: Math.round(leg.duration / 60000),
+		startLabel: leg.start.label,
+		startPrice: formatPrice(leg.start.price),
+		startTime: formatTime(leg.start.timestamp),
+		endLabel: leg.end.label,
+		endPrice: formatPrice(leg.end.price),
+		endTime: formatTime(leg.end.timestamp),
+	}
+}
+
+function atrRow(point: ATRPoint) {
+	return {
+		time: formatTime(point.timestamp),
+		value: formatPrice(point.value),
+	}
+}
+
+function legStrengthRow(item: LegStrength) {
+	return {
+		direction: item.leg.direction.toUpperCase(),
+		range: formatPrice(item.range),
+		averageAtr: formatPrice(item.averageAtr),
+		strength: `${item.strength.toFixed(2)} ATR`,
+		candles: item.leg.candles,
+	}
+}
 
 async function main() {
 	const service = new BinanceService()
@@ -17,200 +68,34 @@ async function main() {
 		limit: 500,
 	})
 
-	console.log(`Loaded ${candles.length} candles`)
+	const snapshot = runAnalysis(candles)
 
-	const detector = new PivotDetector(2)
-
-	const pivots = detector.detect(candles)
-	const swings = new SwingEngine().build(pivots)
-	const structure = new StructureEngine().build(swings)
-	const market = new MarketStructureEngine().process(structure)
-	const structuralLegs = new StructuralLegEngine().build(structure)
-	const swingLegs = new SwingLegEngine().build(structure)
-	const atr = new ATREngine().build(candles)
-	const legStrength = new LegStrengthEngine().build(swingLegs, atr)
-
-	console.log('\n==============================')
-	console.log('STRUCTURE ENGINE')
-	console.log('==============================')
-
-	console.log(`Candles   : ${candles.length}`)
-	console.log(`Pivots    : ${pivots.length}`)
-	console.log(`Swings    : ${swings.length}`)
-	console.log(`Structure : ${structure.length}`)
-	console.log('')
-
-	console.log('Last structure points:')
+	console.log(`Loaded ${snapshot.candles.length} candles`)
 	console.log(
-		'----------------------------------------------------------------------------',
+		`Pivots: ${snapshot.pivots.length} | Swings: ${snapshot.swings.length} | Structure: ${snapshot.structure.length}`,
 	)
 
-	for (const point of structure.slice(-25)) {
-		console.log(
-			`${String(point.index).padStart(4)} | ${point.type
-				.toUpperCase()
-				.padEnd(4)} | ${point.label.padEnd(7)} | ${new Date(
-				point.timestamp,
-			).toLocaleString('ru-RU')} | ${point.price.toFixed(2)}`,
-		)
-	}
+	console.log('\n=== STRUCTURE (last 25) ===')
+	console.table(snapshot.structure.slice(-25).map(structureRow))
 
-	console.log(
-		'----------------------------------------------------------------------------',
-	)
+	console.log('\n=== MARKET STRUCTURE ===')
+	console.table({
+		protectedHigh: snapshot.market.protectedHigh
+			? `${formatPrice(snapshot.market.protectedHigh.price)} (${snapshot.market.protectedHigh.label})`
+			: '-',
+		protectedLow: snapshot.market.protectedLow
+			? `${formatPrice(snapshot.market.protectedLow.price)} (${snapshot.market.protectedLow.label})`
+			: '-',
+	})
 
-	console.log()
-	console.log('==============================')
-	console.log('MARKET STRUCTURE')
-	console.log('==============================')
+	console.log('\n=== SWING LEGS (last 20) ===')
+	console.table(snapshot.swingLegs.slice(-20).map(legRow))
 
-	console.log(`Trend : ${market.trend}`)
+	console.log('\n=== LEG STRENGTH (last 10) ===')
+	console.table(snapshot.legStrength.slice(-10).map(legStrengthRow))
 
-	if (market.protectedHigh) {
-		console.log(
-			`Protected High : ${market.protectedHigh.price.toFixed(2)} (${market.protectedHigh.label})`,
-		)
-	}
-
-	if (market.protectedLow) {
-		console.log(
-			`Protected Low  : ${market.protectedLow.price.toFixed(2)} (${market.protectedLow.label})`,
-		)
-	}
-
-	console.log()
-	console.log('==============================')
-	console.log('EXTERNAL LEG')
-	console.log('==============================')
-
-	if (market.externalLeg) {
-		console.log(`Direction : ${market.externalLeg.direction}`)
-		console.log(
-			'---------------------------------------------------------------------',
-		)
-
-		console.log(
-			`HIGH | ${market.externalLeg.high.label.padEnd(7)} | ${new Date(
-				market.externalLeg.high.timestamp,
-			).toLocaleString('ru-RU')} | ${market.externalLeg.high.price.toFixed(2)}`,
-		)
-
-		console.log(
-			`LOW  | ${market.externalLeg.low.label.padEnd(7)} | ${new Date(
-				market.externalLeg.low.timestamp,
-			).toLocaleString('ru-RU')} | ${market.externalLeg.low.price.toFixed(2)}`,
-		)
-
-		console.log(
-			'---------------------------------------------------------------------',
-		)
-	}
-
-	console.log()
-	console.log('==============================')
-	console.log('LEGS')
-	console.log('==============================')
-
-	console.log(
-		'------------------------------------------------------------------------------------------------',
-	)
-
-	for (const leg of swingLegs.slice(-10)) {
-		console.log(
-			`${leg.direction.toUpperCase().padEnd(8)} | ${leg.start.label.padEnd(7)} ${leg.start.price.toFixed(2)} (${new Date(leg.start.timestamp).toLocaleString('ru-RU')})`,
-		)
-
-		console.log(`${' '.repeat(10)} ↓`)
-
-		console.log(
-			`${' '.repeat(10)} ${leg.end.label.padEnd(7)} ${leg.end.price.toFixed(2)} (${new Date(leg.end.timestamp).toLocaleString('ru-RU')})`,
-		)
-
-		console.log(
-			'------------------------------------------------------------------------------------------------',
-		)
-	}
-
-	console.log()
-	console.log('==============================')
-	console.log('ATR')
-	console.log('==============================')
-
-	for (const point of atr.slice(-10)) {
-		console.log(
-			`${new Date(point.timestamp).toLocaleString('ru-RU')} | ${point.value.toFixed(2)}`,
-		)
-	}
-
-	console.log()
-	console.log('==============================')
-	console.log('SWING LEGS')
-	console.log('==============================')
-
-	for (const leg of swingLegs.slice(-20)) {
-		console.log(
-			'------------------------------------------------------------------------------------------------',
-		)
-
-		console.log(
-			`${leg.direction.toUpperCase()} | ${leg.range.toFixed(
-				2,
-			)} pts | ${leg.candles} candles | ${(leg.duration / 60000).toFixed(0)} min`,
-		)
-
-		console.log(
-			`${leg.start.label.padEnd(7)} ${leg.start.price.toFixed(2)} | ${new Date(
-				leg.start.timestamp,
-			).toLocaleString('ru-RU')}`,
-		)
-
-		console.log('        ↓')
-
-		console.log(
-			`${leg.end.label.padEnd(7)} ${leg.end.price.toFixed(2)} | ${new Date(
-				leg.end.timestamp,
-			).toLocaleString('ru-RU')}`,
-		)
-	}
-
-	console.log(
-		'------------------------------------------------------------------------------------------------',
-	)
-
-	console.log()
-	console.log('==============================')
-	console.log('STRUCTURAL LEGS')
-	console.log('==============================')
-
-	for (const leg of structuralLegs.slice(-10)) {
-		console.log(
-			'------------------------------------------------------------------------------------------------',
-		)
-
-		console.log(
-			`${leg.direction.toUpperCase()} | ${leg.range.toFixed(
-				2,
-			)} pts | ${leg.candles} candles | ${(leg.duration / 60000).toFixed(0)} min`,
-		)
-
-		console.log(
-			`${leg.start.label.padEnd(7)} ${leg.start.price.toFixed(2)} | ${new Date(
-				leg.start.timestamp,
-			).toLocaleString('ru-RU')}`,
-		)
-
-		console.log('        ↓')
-
-		console.log(
-			`${leg.end.label.padEnd(7)} ${leg.end.price.toFixed(2)} | ${new Date(
-				leg.end.timestamp,
-			).toLocaleString('ru-RU')}`,
-		)
-	}
-
-	console.log(
-		'------------------------------------------------------------------------------------------------',
-	)
+	console.log('\n=== STRUCTURAL LEGS (last 10) ===')
+	console.table(snapshot.structuralLegs.slice(-10).map(legRow))
 }
 
 main()

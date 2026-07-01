@@ -1,6 +1,6 @@
 // StructurePoint.ts
 
-import type { Swing } from './Swing.js'
+import type { Swing } from '@/models/structure/Swing.js'
 
 export type StructureLabel = 'HH' | 'HL' | 'LH' | 'LL'
 

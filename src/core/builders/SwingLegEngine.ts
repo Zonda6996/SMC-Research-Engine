@@ -1,5 +1,5 @@
-import type { Leg, LegDirection } from '../models/Leg.js'
-import type { StructurePoint } from '../models/StructurePoint.js'
+import type { Leg, LegDirection } from '@/models/legs/Leg.js'
+import type { StructurePoint } from '@/models/structure/StructurePoint.js'
 
 export class SwingLegEngine {
 	private createLeg(

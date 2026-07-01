@@ -1,7 +1,7 @@
 // PivotDetector.ts
 
-import type { Candle } from '../models/Candle.js'
-import type { Pivot } from '../models/Pivot.js'
+import type { Candle } from '@/models/price/Candle.js'
+import type { Pivot } from '@/models/structure/Pivot.js'
 
 export class PivotDetector {
 	constructor(private readonly window: number = 2) {
