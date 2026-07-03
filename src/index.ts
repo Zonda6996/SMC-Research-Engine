@@ -96,6 +96,20 @@ async function main() {
 
 	console.log('\n=== STRUCTURAL LEGS (last 10) ===')
 	console.table(snapshot.structuralLegs.slice(-10).map(legRow))
+
+	console.log('\n=== LEG CONTEXT ===')
+
+	console.table(
+		snapshot.legContexts.slice(-10).map(context => ({
+			index: context.index,
+			direction: context.leg.direction,
+			start: context.leg.start.label,
+			end: context.leg.end.label,
+			previous: context.previous?.direction ?? '-',
+			next: context.next?.direction ?? '-',
+			isLast: context.isLast,
+		})),
+	)
 }
 
 main()

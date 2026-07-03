@@ -8,6 +8,7 @@ import { StructuralLegEngine } from '@/core/builders/StructuralLegEngine.js'
 import { SwingLegEngine } from '@/core/builders/SwingLegEngine.js'
 import { ATREngine } from '@/core/analysis/ATREngine.js'
 import { LegStrengthEngine } from '@/core/analysis/LegStrengthEngine.js'
+import { LegContextEngine } from '../legs/LegContextEngine.js'
 
 /**
  * Прогоняет текущий пайплайн анализа над свечами и возвращает
@@ -23,6 +24,7 @@ export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
 	const structure = new StructureEngine().build(swings)
 	const marketEngine = new MarketStructureEngine()
 	const structuralLegs = new StructuralLegEngine().build(structure)
+	const legContexts = new LegContextEngine().build(structuralLegs)
 	const swingLegs = new SwingLegEngine().build(structure)
 	const atr = new ATREngine().build(candles)
 	const legStrength = new LegStrengthEngine().build(swingLegs, atr)
@@ -38,5 +40,6 @@ export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
 		swingLegs,
 		atr,
 		legStrength,
+		legContexts,
 	}
 }

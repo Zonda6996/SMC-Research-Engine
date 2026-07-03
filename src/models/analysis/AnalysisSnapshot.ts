@@ -6,6 +6,7 @@ import type { MarketStructure } from '@/models/structure/MarketStructure.js'
 import type { Leg } from '../legs/Leg.js'
 import type { ATRPoint } from '@/models/indicators/ATRPoint.js'
 import type { LegStrength } from '../legs/LegStrength.js'
+import type { LegContext } from '../legs/LegContext.js'
 
 /**
  * Единый результат одного прогона пайплайна анализа.
@@ -33,4 +34,5 @@ export interface AnalysisSnapshot {
 	swingLegs: Leg[]
 	atr: ATRPoint[]
 	legStrength: LegStrength[]
+	legContexts: LegContext[]
 }

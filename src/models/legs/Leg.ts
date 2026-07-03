@@ -1,4 +1,4 @@
-import type { StructurePoint } from '@/models/legs/StructurePoint.js'
+import type { StructurePoint } from "../structure/StructurePoint.js"
 
 export type LegDirection = 'bullish' | 'bearish'
 
