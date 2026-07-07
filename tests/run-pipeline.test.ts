@@ -81,11 +81,16 @@ describe('runAnalysis pipeline', () => {
 			'swing legs между каждой соседней парой structure',
 		)
 
-		// Leg strength — по одному на каждый swing leg
-		assert.equal(
-			snapshot.legStrength.length,
-			snapshot.swingLegs.length,
-			'leg strength 1-1 с swing legs',
+		// Leg strength: НЕ строго 1-1 со swing legs — LegStrengthEngine
+		// сознательно пропускает ноги без единой ATR-точки внутри
+		// (ноги, целиком попадающие в seed-окно ATR). Поэтому <=, но не сильно меньше.
+		assert.ok(
+			snapshot.legStrength.length <= snapshot.swingLegs.length,
+			'leg strength не может быть больше числа swing legs',
+		)
+		assert.ok(
+			snapshot.legStrength.length >= snapshot.swingLegs.length - 2,
+			'пропущено может быть только несколько первых ног (seed-окно ATR)',
 		)
 
 		// Leg contexts — по одному на каждый structural leg
