@@ -23,12 +23,15 @@ export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
 	const swings = new SwingEngine().build(pivots)
 	const structure = new StructureEngine().build(swings)
 	const marketEngine = new MarketStructureEngine()
+	for (const point of structure) {
+		marketEngine.update(point)
+	}
+	const market = marketEngine.getState()
 	const structuralLegs = new StructuralLegEngine().build(structure)
 	const legContexts = new LegContextEngine().build(structuralLegs)
 	const swingLegs = new SwingLegEngine().build(structure)
 	const atr = new ATREngine().build(candles)
 	const legStrength = new LegStrengthEngine().build(swingLegs, atr)
-	const market = marketEngine.getState()
 
 	return {
 		candles,

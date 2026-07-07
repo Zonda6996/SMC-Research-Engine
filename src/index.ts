@@ -63,8 +63,8 @@ async function main() {
 	const service = new BinanceService()
 
 	const candles = await service.getCandles({
-		symbol: 'BTC/USDT',
-		timeframe: '15m',
+		symbol: 'ETH/USDT',
+		timeframe: '4h',
 		limit: 500,
 	})
 
