@@ -1,6 +1,6 @@
 import type { Candle } from '@/models/price/Candle.js'
 import type { BreachedLevel } from '@/models/structure/BreachedLevel.js'
-import type { MarketStructure } from '@/models/structure/MarketStructure.js'
+import type { MarketStructure, Trend } from '@/models/structure/MarketStructure.js'
 import type { StructurePoint } from '@/models/structure/StructurePoint.js'
 
 /**
@@ -29,9 +29,10 @@ function none(): PendingBreach {
 /**
  * MarketStructureEngine
  *
- * Инкрементально, по одной structure-точке, поддерживает protected-уровни
- * (protectedLow/protectedHigh) и накопительный список подтверждённых сломов
- * (`breached`).
+ * Инкрементально, по одной structure-точке, поддерживает:
+ *  - protected-уровни (protectedLow/protectedHigh) и накопительный список
+ *    подтверждённых сломов (`breached`) — баг №3 v2;
+ *  - тренд (`trend`) с эволюцией по точкам (`trendHistory`) — баг №4.
  *
  * Правило слома (баг №3 v2, по авторской логике со скриншотов): одного
  * закрытия за уровнем недостаточно. Это лишь «свеча пробоя» (кандидат).
@@ -50,18 +51,34 @@ function none(): PendingBreach {
  * Переназначение protected-уровня (новая HH даёт новый protectedLow, новая LL —
  * новый protectedHigh) сбрасывает любой неподтверждённый кандидат: старый уровень
  * больше не защищаемый, его «пробой» не имеет смысла.
+ *
+ * Правило тренда (баг №4): первичный источник — sequence structure-меток
+ * (HH/HL/LH/LL). Гистерезис: вход в новый тренд требует ОБА подтверждения
+ * (bullish = HH+HL, bearish = LH+LL), выход — по первому противоречию (LL в
+ * bullish → range). Реализовано через скользящие `lastHighLabel`/`lastLowLabel`.
+ * Эволюция по точкам сохраняется в `trendHistory` — фундамент для будущего
+ * look-ahead-free BOS/CHoCH (баг №5): каждый момент имеет свой trend.
  */
 export class MarketStructureEngine {
-	private readonly state: MarketStructure = { breached: [] }
+	private readonly state: MarketStructure = {
+		breached: [],
+		trend: 'range',
+		trendHistory: [],
+	}
 	private lastIndex = -1
 	private pendingLow: PendingBreach = none()
 	private pendingHigh: PendingBreach = none()
+	private lastHighLabel: StructurePoint['label'] | null = null
+	private lastLowLabel: StructurePoint['label'] | null = null
 
 	public update(point: StructurePoint, candles: Candle[]): void {
 		// 1. Гоняем автоматы подтверждения по свечам окна (lastIndex, point.index].
 		this.processCandles(point.index, candles)
 
-		// 2. Логика выставления новых protected (без изменений по смыслу):
+		// 2. Эволюция тренда (баг №4) — после пробоев, до выставления protected.
+		this.processTrend(point)
+
+		// 3. Логика выставления новых protected (без изменений по смыслу):
 		//    HH после low → protectedLow = предыдущая low-точка;
 		//    LL после high → protectedHigh = предыдущая high-точка.
 		//    Переназначение сбрасывает неподтверждённый кандидат.
@@ -89,6 +106,52 @@ export class MarketStructureEngine {
 
 		this.state.lastPoint = point
 		this.lastIndex = point.index
+	}
+
+	/**
+	 * Эволюция тренда по structure-меткам с гистерезисом (баг №4).
+	 *
+	 * Скользящие `lastHighLabel`/`lastLowLabel` хранят последние seen метки
+	 * каждого типа. На каждой точке обновляем соответствующую и вычисляем trend:
+	 *  - (HH, HL) → bullish
+	 *  - (LH, LL) → bearish
+	 *  - иначе    → range
+	 *
+	 * Гистерезис: вход в новый тренд требует ОБА подтверждения (одна HH в range
+	 * → остаёмся range, ждём HL); выход — по первому противоречию (LL в bullish
+	 * → (HH, LL) → range). UNKNOWN-метки (первая точка типа) не сбрасывают
+	 * накопленные подтверждения, но и не дают тренда, пока не появится пара.
+	 */
+	private processTrend(point: StructurePoint): void {
+		if (point.type === 'high') {
+			this.lastHighLabel = point.label
+		} else {
+			this.lastLowLabel = point.label
+		}
+
+		const trend = this.computeTrend()
+		this.state.trend = trend
+		this.state.trendHistory.push({
+			index: point.index,
+			label: point.label,
+			trend,
+		})
+	}
+
+	private computeTrend(): Trend {
+		if (
+			this.lastHighLabel === 'HH' &&
+			this.lastLowLabel === 'HL'
+		) {
+			return 'bullish'
+		}
+		if (
+			this.lastHighLabel === 'LH' &&
+			this.lastLowLabel === 'LL'
+		) {
+			return 'bearish'
+		}
+		return 'range'
 	}
 
 	private processCandles(pointIndex: number, candles: Candle[]): void {
@@ -178,6 +241,7 @@ export class MarketStructureEngine {
 		return {
 			...this.state,
 			breached: [...this.state.breached],
+			trendHistory: [...this.state.trendHistory],
 		}
 	}
 }

@@ -264,3 +264,122 @@ describe('MarketStructureEngine — two-candle confirmation (баг №3 v2)', (
 		assert.deepEqual(a.breached, b.breached, 'содержимое одинаковое')
 	})
 })
+
+describe('MarketStructureEngine — trend с гистерезисом (баг №4)', () => {
+	// Для trend нужны только structure-метки, но update() требует candles[].
+	// Передаём минимальный массив — ни одного пробоя не спровоцируем.
+	const candles = [candle(0, 100), candle(1, 100), candle(2, 100), candle(3, 100)]
+
+	it('чистый bullish: HH+HL → bullish, trendHistory монотонный', () => {
+		// Последовательность: H(?) L(?) HH HL HH HL → финал bullish.
+		const points = [
+			pt(0, 100, 'high', 'UNKNOWN'),
+			pt(1, 90, 'low', 'UNKNOWN'),
+			pt(2, 110, 'high', 'HH'),
+			pt(3, 95, 'low', 'HL'),
+			pt(4, 120, 'high', 'HH'),
+			pt(5, 100, 'low', 'HL'),
+		]
+		const state = runEngine(points, candles)
+
+		assert.equal(state.trend, 'bullish', 'финальный trend — bullish')
+		assert.equal(state.trendHistory.length, 6, 'запись на каждую точку')
+		// На HH(2): (HH, UNKNOWN) → range (ждём HL).
+		assert.equal(state.trendHistory[2]!.trend, 'range', 'HH без HL — range')
+		// На HL(3): (HH, HL) → bullish.
+		assert.equal(state.trendHistory[3]!.trend, 'bullish', 'пара HH+HL → bullish')
+		// Дальше держится.
+		assert.equal(state.trendHistory[4]!.trend, 'bullish')
+		assert.equal(state.trendHistory[5]!.trend, 'bullish')
+	})
+
+	it('чистый bearish: LH+LL → bearish', () => {
+		const points = [
+			pt(0, 100, 'high', 'UNKNOWN'),
+			pt(1, 110, 'low', 'UNKNOWN'),
+			pt(2, 95, 'high', 'LH'),
+			pt(3, 105, 'low', 'LL'),
+			pt(4, 90, 'high', 'LH'),
+			pt(5, 100, 'low', 'LL'),
+		]
+		const state = runEngine(points, candles)
+
+		assert.equal(state.trend, 'bearish')
+		assert.equal(state.trendHistory[3]!.trend, 'bearish', 'LH+LL → bearish')
+		assert.equal(state.trendHistory[5]!.trend, 'bearish')
+	})
+
+	it('разворот bullish→range→bearish: LL сбрасывает в range, потом LH+LL = bearish', () => {
+		// bullish установился, затем LL ломает (выход по первому противоречию),
+		// потом LH приходит, но bearish ещё нет (нужны ОБА). Только когда снова
+		// LL — (LH, LL) → bearish.
+		const points = [
+			pt(0, 100, 'high', 'UNKNOWN'),
+			pt(1, 90, 'low', 'UNKNOWN'),
+			pt(2, 110, 'high', 'HH'),
+			pt(3, 95, 'low', 'HL'), // bullish
+			pt(4, 100, 'high', 'LH'), // (LH, HL) → range (выход из bullish)
+			pt(5, 85, 'low', 'LL'), // (LH, LL) → bearish
+		]
+		const state = runEngine(points, candles)
+
+		assert.equal(state.trendHistory[3]!.trend, 'bullish', 'установился bullish')
+		assert.equal(state.trendHistory[4]!.trend, 'range', 'LH при HL → range (выход)')
+		assert.equal(state.trendHistory[5]!.trend, 'bearish', 'LH+LL → bearish (вход через оба)')
+		assert.equal(state.trend, 'bearish')
+	})
+
+	it('range в начале: первые UNKNOWN не дают тренда до пары подтверждений', () => {
+		const points = [
+			pt(0, 100, 'high', 'UNKNOWN'),
+			pt(1, 90, 'low', 'UNKNOWN'),
+			pt(2, 110, 'high', 'HH'), // (HH, UNKNOWN) → range
+		]
+		const state = runEngine(points, candles)
+
+		assert.equal(state.trend, 'range', 'без пары подтверждений — range')
+		assert.equal(state.trendHistory[0]!.trend, 'range')
+		assert.equal(state.trendHistory[1]!.trend, 'range')
+		assert.equal(state.trendHistory[2]!.trend, 'range', 'HH без HL — range')
+	})
+
+	it('симметрия: HH перед HL и HL перед HH — оба дают bullish', () => {
+		// Порядок прихода HH и HL не важен — важна пара.
+		const orderA = [
+			pt(0, 100, 'high', 'UNKNOWN'),
+			pt(1, 90, 'low', 'UNKNOWN'),
+			pt(2, 110, 'high', 'HH'), // (HH, UNKNOWN) → range
+			pt(3, 95, 'low', 'HL'), // (HH, HL) → bullish
+		]
+		const orderB = [
+			pt(0, 100, 'high', 'UNKNOWN'),
+			pt(1, 90, 'low', 'UNKNOWN'),
+			pt(2, 95, 'low', 'HL'), // (UNKNOWN, HL) → range
+			pt(3, 110, 'high', 'HH'), // (HH, HL) → bullish
+		]
+		const stateA = runEngine(orderA, candles)
+		const stateB = runEngine(orderB, candles)
+
+		assert.equal(stateA.trend, 'bullish', 'HH→HL даёт bullish')
+		assert.equal(stateB.trend, 'bullish', 'HL→HH даёт bullish')
+		// Момент входа в bullish — на второй метке пары.
+		assert.equal(stateA.trendHistory[3]!.trend, 'bullish')
+		assert.equal(stateB.trendHistory[3]!.trend, 'bullish')
+	})
+
+	it('getState() возвращает защитную копию trendHistory[]', () => {
+		const points = [
+			pt(0, 100, 'high', 'UNKNOWN'),
+			pt(1, 90, 'low', 'UNKNOWN'),
+			pt(2, 110, 'high', 'HH'),
+			pt(3, 95, 'low', 'HL'),
+		]
+		const engine = new MarketStructureEngine()
+		for (const p of points) engine.update(p, candles)
+
+		const a = engine.getState()
+		const b = engine.getState()
+		assert.notEqual(a.trendHistory, b.trendHistory, 'каждый вызов — новый массив')
+		assert.deepEqual(a.trendHistory, b.trendHistory, 'содержимое одинаковое')
+	})
+})
