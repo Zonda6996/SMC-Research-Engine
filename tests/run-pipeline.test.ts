@@ -19,27 +19,44 @@ function loadFixture(): Candle[] {
 }
 
 describe('runAnalysis pipeline', () => {
-	it('заполняет market.protectedLow и market.protectedHigh на реальных данных (регрессия бага №1)', () => {
+	it('market-движок получает данные на реальных данных (регрессия бага №1)', () => {
 		const candles = loadFixture()
 		const snapshot = runAnalysis(candles)
 
-		assert.ok(
-			snapshot.market.protectedLow !== undefined,
-			'market.protectedLow должен быть заполнен — если undefined, скорее всего ' +
-				'цикл marketEngine.update() по structure[] снова потерян при рефакторинге',
-		)
-		assert.ok(
-			snapshot.market.protectedHigh !== undefined,
-			'market.protectedHigh должен быть заполнен — аналогично',
-		)
+		// Намерение теста: поймать потерю цикла marketEngine.update() по
+		// structure[] при рефакторинге (баг №1). Раньше он проверял
+		// protectedLow/protectedHigh на !== undefined, но после фикса бага №3
+		// (инвалидация по закрытию свечи) эти поля законно могут быть undefined
+		// на финале данных — последний уровень пробит до конца фикстуры, и новая
+		// HH/LL не успела его перевыставить. Поэтому стабильный индикатор того,
+		// что движок вообще отработал — lastPoint (последняя structure-точка) и
+		// аккумулирующий массив breached[].
 		assert.ok(
 			snapshot.market.lastPoint !== undefined,
-			'market.lastPoint должен быть заполнен',
+			'market.lastPoint должен быть заполнен — если undefined, цикл ' +
+				'marketEngine.update() по structure[] снова потерян при рефакторинге',
+		)
+		assert.ok(
+			Array.isArray(snapshot.market.breached),
+			'market.breached должен быть массивом (появился в фиксе бага №3)',
 		)
 
-		// Типы-гаранты: protectedLow — это LOW-точка, protectedHigh — HIGH-точка
-		assert.equal(snapshot.market.protectedLow!.type, 'low')
-		assert.equal(snapshot.market.protectedHigh!.type, 'high')
+		// На 500 реальных свечей движок гарантированно фиксирует хотя бы один
+		// пробой защищаемого уровня — это и есть симптом того, что цикл update()
+		// дёргался и инвалидация работает.
+		assert.ok(
+			snapshot.market.breached.length > 0,
+			'на реальных данных обязаны быть пробитые protected-уровни',
+		)
+
+		// Тип-гаранты для активных уровней (если есть): protectedLow — это
+		// LOW-точка, protectedHigh — HIGH-точка.
+		if (snapshot.market.protectedLow) {
+			assert.equal(snapshot.market.protectedLow.type, 'low')
+		}
+		if (snapshot.market.protectedHigh) {
+			assert.equal(snapshot.market.protectedHigh.type, 'high')
+		}
 	})
 
 	it('пайплайн отрабатывает без ошибок и возвращает ожидаемые топологии', () => {
@@ -102,20 +119,15 @@ describe('runAnalysis pipeline', () => {
 	})
 
 	// ──────────────────────────────────────────────
-	// Characterization-тест: документирует текущее
-	// поведение бага №3 (SPEC, реестр дефектов).
-	// Когда баг будет починен — этот тест нужно
-	// переписать на позитивный ассерт.
+	// Баг №3 (инвалидация protectedHigh/protectedLow
+	// при пробое ценой) закрыт отдельным тест-файлом
+	// tests/market-structure.test.ts — прямой unit-тест
+	// MarketStructureEngine на синтетических данных.
 	// ──────────────────────────────────────────────
-	it.todo(
-		'[SPEC баг №3] protectedLow инвалидируется при пробое цены до следующей LL',
-	)
 
-	// Временный characterization-подход: проверяем,
-	// что на реальных данных protectedLow не содержит
-	// очевидно устаревших значений (цену уже ниже).
-	// Это НЕ полный фикс бага №3 — только минимальная
-	// нижняя граница, которая ловит «market пустой».
+	// На реальных данных активный protected-уровень (если он есть) должен
+	// реально принадлежать массиву structure — это нижняя граница,
+	// гарантирующая, что движок не хранит «висячие» точки.
 	it('на реальных данных protectedLow — это LOW-точка из structure', () => {
 		const candles = loadFixture()
 		const snapshot = runAnalysis(candles)
