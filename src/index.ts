@@ -63,8 +63,8 @@ async function main() {
 	const service = new BinanceService()
 
 	const candles = await service.getCandles({
-		symbol: 'ETH/USDT',
-		timeframe: '4h',
+		symbol: 'BTC/USDT',
+		timeframe: '15m',
 		limit: 500,
 	})
 
@@ -86,6 +86,7 @@ async function main() {
 		protectedLow: snapshot.market.protectedLow
 			? `${formatPrice(snapshot.market.protectedLow.price)} (${snapshot.market.protectedLow.label})`
 			: '-',
+		breached: snapshot.market.breached.length,
 	})
 
 	console.log('\n=== SWING LEGS (last 20) ===')
