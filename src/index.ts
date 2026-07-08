@@ -80,6 +80,7 @@ async function main() {
 
 	console.log('\n=== MARKET STRUCTURE ===')
 	console.table({
+		trend: snapshot.market.trend,
 		protectedHigh: snapshot.market.protectedHigh
 			? `${formatPrice(snapshot.market.protectedHigh.price)} (${snapshot.market.protectedHigh.label})`
 			: '-',

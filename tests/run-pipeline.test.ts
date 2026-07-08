@@ -49,6 +49,23 @@ describe('runAnalysis pipeline', () => {
 			'на реальных данных обязаны быть пробитые protected-уровни',
 		)
 
+		// Баг №4: trend + trendHistory. Эволюция по точкам — фундамент для
+		// будущего look-ahead-free BOS/CHoCH (баг №5). trendHistory должна быть
+		// 1-в-1 со structure (запись на каждую точку), trend — финальное значение.
+		assert.ok(
+			Array.isArray(snapshot.market.trendHistory),
+			'market.trendHistory должен быть массивом (фикс бага №4)',
+		)
+		assert.equal(
+			snapshot.market.trendHistory.length,
+			snapshot.structure.length,
+			'trendHistory 1-1 со structure (запись на каждую точку)',
+		)
+		assert.ok(
+			snapshot.market.trend !== undefined,
+			'market.trend должен быть заполнен финальным значением',
+		)
+
 		// Тип-гаранты для активных уровней (если есть): protectedLow — это
 		// LOW-точка, protectedHigh — HIGH-точка.
 		if (snapshot.market.protectedLow) {
