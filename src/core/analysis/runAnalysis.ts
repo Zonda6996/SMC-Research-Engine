@@ -24,7 +24,7 @@ export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
 	const structure = new StructureEngine().build(swings)
 	const marketEngine = new MarketStructureEngine()
 	for (const point of structure) {
-		marketEngine.update(point)
+		marketEngine.update(point, candles)
 	}
 	const market = marketEngine.getState()
 	const structuralLegs = new StructuralLegEngine().build(structure)
