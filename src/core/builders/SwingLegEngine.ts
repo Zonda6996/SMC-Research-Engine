@@ -1,23 +1,8 @@
 import type { Leg, LegDirection } from '@/models/legs/Leg.js'
 import type { StructurePoint } from '@/models/structure/StructurePoint.js'
+import { buildLeg } from '../legs/buildLeg.js'
 
 export class SwingLegEngine {
-	private createLeg(
-		start: StructurePoint,
-		end: StructurePoint,
-		direction: LegDirection,
-	): Leg {
-		return {
-			start,
-			end,
-			direction,
-
-			range: Math.abs(end.price - start.price),
-			candles: end.index - start.index,
-			duration: end.timestamp - start.timestamp,
-		}
-	}
-
 	build(points: StructurePoint[]): Leg[] {
 		const legs: Leg[] = []
 
@@ -34,7 +19,7 @@ export class SwingLegEngine {
 			const direction: LegDirection =
 				start.type === 'low' ? 'bullish' : 'bearish'
 
-			legs.push(this.createLeg(start, end, direction))
+			legs.push(buildLeg(start, end, direction))
 		}
 
 		return legs
