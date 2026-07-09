@@ -60,6 +60,7 @@ function none(): PendingBreach {
  * look-ahead-free BOS/CHoCH (баг №5): каждый момент имеет свой trend.
  */
 export class MarketStructureEngine {
+	private readonly window: number
 	private readonly state: MarketStructure = {
 		breached: [],
 		trend: 'range',
@@ -70,6 +71,15 @@ export class MarketStructureEngine {
 	private pendingHigh: PendingBreach = none()
 	private lastHighLabel: StructurePoint['label'] | null = null
 	private lastLowLabel: StructurePoint['label'] | null = null
+
+	/**
+	 * @param window PivotDetector window (default 2). Используется только для
+	 *               датировки confirmedAtIndex в trendHistory — логика тренда и
+	 *               пробоев от него не зависит. Передаётся из runAnalysis.
+	 */
+	constructor(window: number = 2) {
+		this.window = window
+	}
 
 	public update(point: StructurePoint, candles: Candle[]): void {
 		// 1. Гоняем автоматы подтверждения по свечам окна (lastIndex, point.index].
@@ -135,6 +145,7 @@ export class MarketStructureEngine {
 			index: point.index,
 			label: point.label,
 			trend,
+			confirmedAtIndex: point.index + this.window,
 		})
 	}
 

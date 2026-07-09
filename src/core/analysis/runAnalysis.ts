@@ -22,7 +22,7 @@ export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
 	const pivots = new PivotDetector(2).detect(candles)
 	const swings = new SwingEngine().build(pivots)
 	const structure = new StructureEngine().build(swings)
-	const marketEngine = new MarketStructureEngine()
+	const marketEngine = new MarketStructureEngine(2)
 	for (const point of structure) {
 		marketEngine.update(point, candles)
 	}
