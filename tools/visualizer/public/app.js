@@ -1,0 +1,246 @@
+// app.js — клиент визуализатора BOS/CHoCH.
+// Загружает данные через /api/analyze, рисует график на lightweight-charts v5.
+
+let chart = null
+let candleSeries = null
+let markersPlugin = null
+let currentData = null
+
+const COLORS = {
+	A: { bos: '#1f6feb', choch: '#f85149', unlabeled: '#8b949e' },
+	B: { bos: '#1f6feb', choch: '#f85149', unlabeled: '#8b949e' },
+	structure: { HH: '#3fb950', HL: '#3fb950', LH: '#f85149', LL: '#f85149', UNKNOWN: '#8b949e' },
+}
+
+function tsToChartTime(ts) { return ts / 1000 }
+
+function initChart() {
+	if (chart) { chart.remove(); chart = null; markersPlugin = null }
+	const container = document.getElementById('chart')
+	chart = LightweightCharts.createChart(container, {
+		width: container.clientWidth,
+		height: container.clientHeight,
+		layout: { background: { color: '#0d1117' }, textColor: '#c9d1d9' },
+		grid: { vertLines: { color: '#21262d' }, horzLines: { color: '#21262d' } },
+		crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+		timeScale: { borderColor: '#30363d', timeVisible: true, secondsVisible: false },
+		rightPriceScale: { borderColor: '#30363d' },
+	})
+	candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+		upColor: '#3fb950', downColor: '#f85149',
+		borderUpColor: '#3fb950', borderDownColor: '#f85149',
+		wickUpColor: '#3fb950', wickDownColor: '#f85149',
+	})
+	markersPlugin = LightweightCharts.createSeriesMarkers(candleSeries, [])
+	window.addEventListener('resize', () => {
+		if (chart) { chart.applyOptions({ width: container.clientWidth, height: container.clientHeight }) }
+	})
+
+	// Tooltip при наведении на маркер.
+	chart.subscribeCrosshairMove((param) => {
+		const tooltip = document.getElementById('tooltip')
+		if (!param.time || !param.seriesData.size) { tooltip.style.display = 'none'; return }
+		// Ищем событие на этой свече.
+		const idx = findCandleIndexByTime(param.time)
+		if (idx === -1) { tooltip.style.display = 'none'; return }
+		const events = findEventsAtCandle(idx)
+		if (events.length === 0) { tooltip.style.display = 'none'; return }
+		const e = events[0]
+		tooltip.innerHTML = `<strong>${e.source.toUpperCase()}: ${e.type.toUpperCase()}</strong><br>` +
+			`Level: ${e.levelPrice.toFixed(2)} (${e.levelType})<br>` +
+			`Breach: #${e.breachIndex} → Confirm: #${e.confirmIndex}<br>` +
+			`Trend: ${e.trend}` +
+			(e.reason ? `<div class="reason">${e.reason}</div>` : '')
+		tooltip.style.left = (param.point.x + 20) + 'px'
+		tooltip.style.top = (param.point.y - 40) + 'px'
+		tooltip.style.display = 'block'
+	})
+}
+
+function findCandleIndexByTime(time) {
+	if (!currentData) return -1
+	for (let i = 0; i < currentData.candles.length; i++) {
+		if (tsToChartTime(currentData.candles[i].timestamp) === time) return i
+	}
+	return -1
+}
+
+function findEventsAtCandle(idx) {
+	if (!currentData) return []
+	const events = []
+	if (document.getElementById('toggleA').checked) {
+		for (const e of currentData.layers.A) {
+			if (e.confirmIndex === idx) events.push(e)
+		}
+	}
+	if (document.getElementById('toggleB').checked) {
+		for (const e of currentData.layers.B) {
+			if (e.confirmIndex === idx) events.push(e)
+		}
+	}
+	// Фильтр unlabeled.
+	const showUnlabeled = document.getElementById('toggleUnlabeled').checked
+	return showUnlabeled ? events : events.filter((e) => e.type !== 'unlabeled')
+}
+
+function renderCandles(candles) {
+	const data = candles.map((c) => ({
+		time: tsToChartTime(c.timestamp),
+		open: c.open, high: c.high, low: c.low, close: c.close,
+	}))
+	candleSeries.setData(data)
+}
+
+function renderProtectedSegments(segments, candles) {
+	if (!document.getElementById('toggleProtected').checked) return
+	for (const seg of segments) {
+		const line = chart.addSeries(LightweightCharts.LineSeries, {
+			color: seg.type === 'high' ? '#3fb950' : '#3fb950',
+			lineWidth: 1,
+			lineStyle: LightweightCharts.LineStyle.Dashed,
+		})
+		const startCandle = candles[seg.startIndex]
+		const endCandle = candles[seg.endIndex]
+		if (!startCandle || !endCandle) continue
+		line.setData([
+			{ time: tsToChartTime(startCandle.timestamp), value: seg.price },
+			{ time: tsToChartTime(endCandle.timestamp), value: seg.price },
+		])
+	}
+}
+
+function renderAll() {
+	if (!currentData) return
+	initChart()
+	renderCandles(currentData.candles)
+
+	const showUnlabeled = document.getElementById('toggleUnlabeled').checked
+	const allMarkers = []
+
+	if (document.getElementById('toggleStruct').checked) {
+		for (const s of currentData.structure) {
+			const c = currentData.candles[s.index]
+			if (!c) continue
+			allMarkers.push({
+				time: tsToChartTime(c.timestamp),
+				position: s.type === 'high' ? 'aboveBar' : 'belowBar',
+				color: COLORS.structure[s.label] ?? '#8b949e',
+				shape: s.type === 'high' ? 'arrowDown' : 'arrowUp',
+				text: s.label,
+			})
+		}
+	}
+
+	if (document.getElementById('toggleA').checked) {
+		for (const e of currentData.layers.A) {
+			if (!showUnlabeled && e.type === 'unlabeled') continue
+			const c = currentData.candles[e.confirmIndex]
+			if (!c) continue
+			allMarkers.push({
+				time: tsToChartTime(c.timestamp),
+				position: 'aboveBar',
+				color: COLORS.A[e.type],
+				shape: 'circle',
+				text: `A:${e.type === 'unlabeled' ? '?' : e.type}`,
+			})
+		}
+	}
+
+	if (document.getElementById('toggleB').checked) {
+		for (const e of currentData.layers.B) {
+			if (!showUnlabeled && e.type === 'unlabeled') continue
+			const c = currentData.candles[e.confirmIndex]
+			if (!c) continue
+			allMarkers.push({
+				time: tsToChartTime(c.timestamp),
+				position: 'belowBar',
+				color: COLORS.B[e.type],
+				shape: 'square',
+				text: `B:${e.type === 'unlabeled' ? '?' : e.type}`,
+			})
+		}
+	}
+
+	allMarkers.sort((a, b) => a.time - b.time)
+	markersPlugin.setMarkers(allMarkers)
+
+	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
+	chart.timeScale().fitContent()
+}
+
+function updateCounts(data) {
+	// Counts показываем всегда (даже если unlabeled скрыты).
+	document.getElementById('countA').textContent = data.counts.A
+	document.getElementById('countB').textContent = data.counts.B
+	document.getElementById('countMatch').textContent = data.counts.matched
+	document.getElementById('countUniqueB').textContent = data.counts.uniqueB
+	document.getElementById('aBos').textContent = data.counts.byTypeA.bos
+	document.getElementById('aChoch').textContent = data.counts.byTypeA.choch
+	document.getElementById('aUnlabeled').textContent = data.counts.byTypeA.unlabeled
+	document.getElementById('bBos').textContent = data.counts.byTypeB.bos
+	document.getElementById('bChoch').textContent = data.counts.byTypeB.choch
+	document.getElementById('bUnlabeled').textContent = data.counts.byTypeB.unlabeled
+}
+
+function updateDiffTable(uniqueB, candles) {
+	const tbody = document.querySelector('#diffTable tbody')
+	tbody.innerHTML = ''
+	for (const e of uniqueB) {
+		const tr = document.createElement('tr')
+		tr.className = 'diff-row'
+		tr.innerHTML = `<td>${e.confirmIndex}</td><td>${e.type}</td><td>${e.levelPrice.toFixed(2)}</td><td>${e.trend}</td>`
+		tr.addEventListener('click', () => {
+			const c = candles[e.confirmIndex]
+			if (c) chart.timeScale().setVisibleRange({
+				from: tsToChartTime(c.timestamp) - 3600 * 4,
+				to: tsToChartTime(c.timestamp) + 3600 * 4,
+			})
+		})
+		tbody.appendChild(tr)
+	}
+}
+
+async function loadData(isFresh) {
+	const mode = document.getElementById('mode').value
+	const symbol = isFresh ? document.getElementById('symbol').value : 'BTC/USDT'
+	const timeframe = isFresh ? document.getElementById('timeframe').value : '15m'
+	const limit = isFresh ? document.getElementById('limit').value : '500'
+
+	showLoading(true)
+	try {
+		const params = new URLSearchParams({ symbol, timeframe, limit, mode })
+		const res = await fetch(`/api/analyze?${params}`)
+		const data = await res.json()
+		if (data.error) throw new Error(data.error)
+		currentData = data
+		document.getElementById('datasetLabel').textContent =
+			`${isFresh ? 'fresh' : 'fixture'}: ${data.dataset.symbol} ${data.dataset.timeframe} ` +
+			`(${data.dataset.candleCount} candles, ${data.dataset.mode})`
+		renderAll()
+		updateCounts(data)
+		updateDiffTable(data.layers.uniqueB, data.candles)
+	} catch (err) {
+		alert('Error: ' + err.message)
+	} finally {
+		showLoading(false)
+	}
+}
+
+function showLoading(show) {
+	document.getElementById('loading').style.display = show ? 'block' : 'none'
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+	initChart()
+	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
+	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
+	for (const id of ['toggleA', 'toggleB', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode']) {
+		document.getElementById(id).addEventListener('change', () => {
+			// При смене mode — перезагружаем данные с сервера.
+			if (id === 'mode') { loadData(currentData && currentData.dataset.symbol !== 'BTC/USDT') ; return }
+			renderAll()
+		})
+	}
+	// Автозагрузка.
+	loadData(false)
+})

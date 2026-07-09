@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>BOS/CHoCH Probe — SMC Research Engine</title>
+	<style>
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			background: #0d1117;
+			color: #c9d1d9;
+			display: flex;
+			flex-direction: column;
+			height: 100vh;
+			overflow: hidden;
+		}
+		.toolbar {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 8px 16px;
+			background: #161b22;
+			border-bottom: 1px solid #30363d;
+			flex-wrap: wrap;
+		}
+		.toolbar h1 { font-size: 14px; color: #58a6ff; white-space: nowrap; }
+		.toolbar select, .toolbar button {
+			background: #21262d;
+			color: #c9d1d9;
+			border: 1px solid #30363d;
+			border-radius: 6px;
+			padding: 4px 8px;
+			font-size: 13px;
+			cursor: pointer;
+		}
+		.toolbar button:hover { background: #30363d; }
+		.toolbar button.active { background: #1f6feb; border-color: #388bfd; color: #fff; }
+		.toolbar label { font-size: 13px; color: #8b949e; }
+		.dataset-label { font-size: 12px; color: #8b949e; margin-left: auto; }
+
+		.main { display: flex; flex: 1; overflow: hidden; }
+		.chart-wrap { flex: 1; position: relative; min-width: 0; }
+		#chart { width: 100%; height: 100%; }
+
+		.sidebar {
+			width: 340px;
+			background: #161b22;
+			border-left: 1px solid #30363d;
+			overflow-y: auto;
+			padding: 12px;
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+			flex-shrink: 0;
+		}
+		.panel { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 10px; }
+		.panel h2 { font-size: 12px; color: #8b949e; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+		.toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; }
+		.toggle-row input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
+		.color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+		.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+		.stat { background: #21262d; padding: 6px 8px; border-radius: 4px; }
+		.stat-label { font-size: 10px; color: #8b949e; }
+		.stat-value { font-size: 16px; font-weight: 600; color: #58a6ff; }
+		.stat-value.b { color: #f0883e; }
+		.stat-value.match { color: #3fb950; }
+		.type-row { display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0; }
+		.diff-table { width: 100%; font-size: 11px; border-collapse: collapse; }
+		.diff-table th, .diff-table td { text-align: left; padding: 3px 6px; border-bottom: 1px solid #21262d; }
+		.diff-table th { color: #8b949e; font-weight: 400; }
+		.diff-row { cursor: pointer; }
+		.diff-row:hover { background: #21262d; }
+		.loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #8b949e; font-size: 14px; }
+
+		/* Tooltip */
+		.tooltip {
+			position: absolute;
+			background: #161b22;
+			border: 1px solid #30363d;
+			border-radius: 6px;
+			padding: 8px 12px;
+			font-size: 12px;
+			color: #c9d1d9;
+			pointer-events: none;
+			z-index: 100;
+			white-space: nowrap;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+			display: none;
+		}
+		.tooltip strong { color: #58a6ff; }
+		.tooltip .reason { color: #f85149; margin-top: 4px; }
+	</style>
+</head>
+<body>
+	<div class="toolbar">
+		<h1>BOS/CHoCH Probe</h1>
+		<select id="symbol">
+			<option value="BTC/USDT">BTC/USDT</option>
+			<option value="ETH/USDT">ETH/USDT</option>
+			<option value="SOL/USDT">SOL/USDT</option>
+		</select>
+		<select id="timeframe">
+			<option value="15m">15m</option>
+			<option value="1h">1h</option>
+			<option value="4h">4h</option>
+		</select>
+		<select id="limit">
+			<option value="500">500</option>
+			<option value="1000">1000</option>
+			<option value="1500">1500</option>
+		</select>
+		<label>Mode:
+			<select id="mode">
+				<option value="two">two-candle</option>
+				<option value="single">single-candle</option>
+			</select>
+		</label>
+		<button id="loadBtn">Load fixture</button>
+		<button id="freshBtn">Load fresh</button>
+		<span class="dataset-label" id="datasetLabel"></span>
+	</div>
+
+	<div class="main">
+		<div class="chart-wrap">
+			<div id="chart"></div>
+			<div class="loading" id="loading" style="display:none;">Loading...</div>
+			<div class="tooltip" id="tooltip"></div>
+		</div>
+
+		<div class="sidebar">
+			<div class="panel">
+				<h2>Layers</h2>
+				<label class="toggle-row">
+					<input type="checkbox" id="toggleA" checked />
+					<span class="color-dot" style="background:#1f6feb"></span>
+					A: Protected breaches
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="toggleB" checked />
+					<span class="color-dot" style="background:#f0883e"></span>
+					B: Swing breaches
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="toggleStruct" checked />
+					<span class="color-dot" style="background:#8b949e"></span>
+					Structure points (HH/HL/LH/LL)
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="toggleProtected" checked />
+					<span class="color-dot" style="background:#3fb950"></span>
+					Protected level segments
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="toggleUnlabeled" />
+					<span class="color-dot" style="background:#8b949e"></span>
+					Show unlabeled events
+				</label>
+			</div>
+
+			<div class="panel">
+				<h2>Counts</h2>
+				<div class="stat-grid">
+					<div class="stat"><div class="stat-label">Layer A</div><div class="stat-value" id="countA">0</div></div>
+					<div class="stat"><div class="stat-label">Layer B</div><div class="stat-value b" id="countB">0</div></div>
+					<div class="stat"><div class="stat-label">Matched</div><div class="stat-value match" id="countMatch">0</div></div>
+					<div class="stat"><div class="stat-label">Unique B</div><div class="stat-value b" id="countUniqueB">0</div></div>
+				</div>
+				<div style="margin-top:8px;">
+					<div class="type-row"><span style="color:#1f6feb">A: BOS</span><span id="aBos">0</span></div>
+					<div class="type-row"><span style="color:#f85149">A: CHoCH</span><span id="aChoch">0</span></div>
+					<div class="type-row"><span style="color:#8b949e">A: unlabeled</span><span id="aUnlabeled">0</span></div>
+					<div class="type-row"><span style="color:#1f6feb">B: BOS</span><span id="bBos">0</span></div>
+					<div class="type-row"><span style="color:#f85149">B: CHoCH</span><span id="bChoch">0</span></div>
+					<div class="type-row"><span style="color:#8b949e">B: unlabeled</span><span id="bUnlabeled">0</span></div>
+				</div>
+			</div>
+
+			<div class="panel">
+				<h2>Differences (only in B)</h2>
+				<table class="diff-table" id="diffTable">
+					<thead><tr><th>Idx</th><th>Type</th><th>Price</th><th>Trend</th></tr></thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://unpkg.com/lightweight-charts@5.2.0/dist/lightweight-charts.standalone.production.js"></script>
+	<script>
+		window.addEventListener('error', (e) => { console.error('Global error:', e.message, e.filename, e.lineno) })
+		window.addEventListener('unhandledrejection', (e) => { console.error('Unhandled rejection:', e.reason) })
+	</script>
+	<script src="app.js"></script>
+</body>
+</html>
