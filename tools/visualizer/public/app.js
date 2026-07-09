@@ -91,21 +91,68 @@ function renderCandles(candles) {
 	candleSeries.setData(data)
 }
 
+// Базовые опции для всех вспомогательных линий: без ценника на оси и без
+// «бесконечной» priceLine через весь график (из-за них сегменты выглядели
+// как линии во всю ширину).
+const SEGMENT_SERIES_OPTIONS = {
+	lastValueVisible: false,
+	priceLineVisible: false,
+	crosshairMarkerVisible: false,
+}
+
 function renderProtectedSegments(segments, candles) {
 	if (!document.getElementById('toggleProtected').checked) return
 	for (const seg of segments) {
+		const startCandle = candles[seg.startIndex]
+		const endCandle = candles[seg.endIndex]
+		if (!startCandle || !endCandle || seg.startIndex >= seg.endIndex) continue
 		const line = chart.addSeries(LightweightCharts.LineSeries, {
-			color: seg.type === 'high' ? '#3fb950' : '#3fb950',
+			...SEGMENT_SERIES_OPTIONS,
+			color: seg.type === 'high' ? '#d29922' : '#2ea043',
 			lineWidth: 1,
 			lineStyle: LightweightCharts.LineStyle.Dashed,
 		})
-		const startCandle = candles[seg.startIndex]
-		const endCandle = candles[seg.endIndex]
-		if (!startCandle || !endCandle) continue
 		line.setData([
 			{ time: tsToChartTime(startCandle.timestamp), value: seg.price },
 			{ time: tsToChartTime(endCandle.timestamp), value: seg.price },
 		])
+	}
+}
+
+// Рисует события слома как в ручной SMC-разметке: горизонтальная линия от
+// свечи возникновения уровня до свечи подтверждения слома, с подписью
+// BOS/CHoCH на середине линии. Слой A — сплошная, слой B — пунктир.
+function renderEventLines(events, candles, layerName) {
+	for (const e of events) {
+		const startCandle = candles[e.levelIndex]
+		const endCandle = candles[e.confirmIndex]
+		if (!startCandle || !endCandle || e.levelIndex >= e.confirmIndex) continue
+		const color = COLORS.A[e.type]
+		const line = chart.addSeries(LightweightCharts.LineSeries, {
+			...SEGMENT_SERIES_OPTIONS,
+			color,
+			lineWidth: 2,
+			lineStyle: layerName === 'B'
+				? LightweightCharts.LineStyle.Dashed
+				: LightweightCharts.LineStyle.Solid,
+		})
+		line.setData([
+			{ time: tsToChartTime(startCandle.timestamp), value: e.levelPrice },
+			{ time: tsToChartTime(endCandle.timestamp), value: e.levelPrice },
+		])
+		// Подпись на середине линии (маркер живёт на line-series, не на свечах).
+		const midCandle = candles[Math.floor((e.levelIndex + e.confirmIndex) / 2)]
+		if (midCandle) {
+			const label = e.type === 'unlabeled' ? '?' : e.type.toUpperCase()
+			LightweightCharts.createSeriesMarkers(line, [{
+				time: tsToChartTime(midCandle.timestamp),
+				position: e.levelType === 'high' ? 'aboveBar' : 'belowBar',
+				color,
+				shape: layerName === 'B' ? 'square' : 'circle',
+				size: 0,
+				text: layerName === 'B' ? `B·${label}` : label,
+			}])
+		}
 	}
 }
 
@@ -131,38 +178,18 @@ function renderAll() {
 		}
 	}
 
-	if (document.getElementById('toggleA').checked) {
-		for (const e of currentData.layers.A) {
-			if (!showUnlabeled && e.type === 'unlabeled') continue
-			const c = currentData.candles[e.confirmIndex]
-			if (!c) continue
-			allMarkers.push({
-				time: tsToChartTime(c.timestamp),
-				position: 'aboveBar',
-				color: COLORS.A[e.type],
-				shape: 'circle',
-				text: `A:${e.type === 'unlabeled' ? '?' : e.type}`,
-			})
-		}
-	}
-
-	if (document.getElementById('toggleB').checked) {
-		for (const e of currentData.layers.B) {
-			if (!showUnlabeled && e.type === 'unlabeled') continue
-			const c = currentData.candles[e.confirmIndex]
-			if (!c) continue
-			allMarkers.push({
-				time: tsToChartTime(c.timestamp),
-				position: 'belowBar',
-				color: COLORS.B[e.type],
-				shape: 'square',
-				text: `B:${e.type === 'unlabeled' ? '?' : e.type}`,
-			})
-		}
-	}
-
 	allMarkers.sort((a, b) => a.time - b.time)
 	markersPlugin.setMarkers(allMarkers)
+
+	// События слома — линии от уровня до свечи подтверждения (не плавающие точки).
+	const filterEvents = (events) =>
+		showUnlabeled ? events : events.filter((e) => e.type !== 'unlabeled')
+	if (document.getElementById('toggleA').checked) {
+		renderEventLines(filterEvents(currentData.layers.A), currentData.candles, 'A')
+	}
+	if (document.getElementById('toggleB').checked) {
+		renderEventLines(filterEvents(currentData.layers.B), currentData.candles, 'B')
+	}
 
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
 	chart.timeScale().fitContent()
@@ -208,7 +235,7 @@ async function loadData(isFresh) {
 
 	showLoading(true)
 	try {
-		const params = new URLSearchParams({ symbol, timeframe, limit, mode })
+		const params = new URLSearchParams({ symbol, timeframe, limit, mode, source: isFresh ? 'fresh' : 'fixture' })
 		const res = await fetch(`/api/analyze?${params}`)
 		const data = await res.json()
 		if (data.error) throw new Error(data.error)

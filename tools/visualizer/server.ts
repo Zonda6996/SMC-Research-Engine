@@ -38,6 +38,7 @@ interface AnalyzeQuery {
 	timeframe?: string | undefined
 	limit?: string | undefined
 	mode?: string | undefined
+	source?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -47,7 +48,15 @@ function parseQuery(qs: string): AnalyzeQuery {
 		timeframe: params.get('timeframe') ?? undefined,
 		limit: params.get('limit') ?? undefined,
 		mode: params.get('mode') ?? undefined,
+		source: params.get('source') ?? undefined,
 	}
+}
+
+const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
+
+/** Фикстура читается из файла — воспроизводимость без похода на биржу. */
+function loadFixtureCandles(): import('../../src/models/price/Candle.js').Candle[] {
+	return JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8'))
 }
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
@@ -71,8 +80,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const limit = Number(q.limit ?? 500)
 			const mode: BreachMode = q.mode === 'single' ? 'single' : 'two'
 
-			const service = new BinanceService()
-			const candles = await service.getCandles({ symbol, timeframe, limit })
+			const useFixture = q.source !== 'fresh'
+			const candles = useFixture
+				? loadFixtureCandles()
+				: await new BinanceService().getCandles({ symbol, timeframe, limit })
 			const snapshot = runAnalysis(candles)
 
 			// Слой A: protected-пробои. Эмулируем через probeProtectedBreaches с

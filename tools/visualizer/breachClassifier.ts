@@ -18,6 +18,8 @@ export interface ClassifiedEvent {
 	breachTimestamp: number
 	levelPrice: number
 	levelType: 'high' | 'low'
+	/** Индекс свечи, на которой возник пробитый уровень (для отрисовки линии слома). */
+	levelIndex: number
 	/** BOS / CHoCH / unlabeled. */
 	type: EventType
 	/** Тренд на момент события (look-ahead-free). */
@@ -244,6 +246,7 @@ export function classifyBreaches(
 			breachTimestamp: b.breachTimestamp,
 			levelPrice: b.level.price,
 			levelType: b.level.type,
+			levelIndex: b.level.index,
 			type,
 			trend,
 			reason,

@@ -59,6 +59,8 @@
 		.toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; }
 		.toggle-row input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
 		.color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+		.line-sample { width: 18px; height: 0; display: inline-block; border-top: 2px solid #1f6feb; }
+		.line-sample.dashed { border-top-style: dashed; }
 		.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 		.stat { background: #21262d; padding: 6px 8px; border-radius: 4px; }
 		.stat-label { font-size: 10px; color: #8b949e; }
@@ -133,13 +135,13 @@
 				<h2>Layers</h2>
 				<label class="toggle-row">
 					<input type="checkbox" id="toggleA" checked />
-					<span class="color-dot" style="background:#1f6feb"></span>
-					A: Protected breaches
+					<span class="line-sample solid"></span>
+					A: Protected breaches (solid)
 				</label>
 				<label class="toggle-row">
 					<input type="checkbox" id="toggleB" checked />
-					<span class="color-dot" style="background:#f0883e"></span>
-					B: Swing breaches
+					<span class="line-sample dashed"></span>
+					B: Swing breaches (dashed)
 				</label>
 				<label class="toggle-row">
 					<input type="checkbox" id="toggleStruct" checked />
@@ -148,9 +150,14 @@
 				</label>
 				<label class="toggle-row">
 					<input type="checkbox" id="toggleProtected" checked />
-					<span class="color-dot" style="background:#3fb950"></span>
+					<span class="line-sample dashed" style="background:linear-gradient(to right,#2ea043 50%,transparent 50%); background-size:6px 1px;"></span>
 					Protected level segments
 				</label>
+				<div style="font-size:11px; color:#8b949e; margin-top:6px; line-height:1.5;">
+					Линия события: от возникновения уровня до свечи подтверждения слома.
+					<span style="color:#1f6feb">BOS</span> /
+					<span style="color:#f85149">CHoCH</span> — подпись на линии.
+				</div>
 				<label class="toggle-row">
 					<input type="checkbox" id="toggleUnlabeled" />
 					<span class="color-dot" style="background:#8b949e"></span>
