@@ -14,6 +14,7 @@ import { dirname, join, extname } from 'node:path'
 import { BinanceService } from '../../src/services/BinanceService.js'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { probeSwingBreaches, type BreachMode } from './lastSwingBreachProbe.js'
+import { probeActiveLevelPool } from './activeLevelPoolProbe.js'
 import {
 	probeProtectedBreaches,
 	classifyBreaches,
@@ -109,6 +110,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			)
 			const layerB = classifySwing(swingBreaches, snapshot.market.trendHistory)
 
+			// Слой C: пул активных уровней — каждый swing живёт до своего слома,
+			// «важный уровень слева» не вытесняется свежими.
+			const poolBreaches = probeActiveLevelPool(
+				snapshot.structure,
+				snapshot.candles,
+				WINDOW,
+				mode,
+			)
+			const layerC = classifySwing(poolBreaches, snapshot.market.trendHistory)
+
 			// Совпадения: одна и та же свеча подтверждения + тот же уровень цены.
 			const matched = layerA.filter((a) =>
 				layerB.some((b) => b.confirmIndex === a.confirmIndex && b.levelPrice === a.levelPrice),
@@ -137,16 +148,23 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				layers: {
 					A: layerA,
 					B: layerB,
+					C: layerC,
 					matched,
 					uniqueB,
+					// Уникальные для C относительно A — то, что теряет вариант 1.
+					uniqueC: layerC.filter((c) =>
+						!layerA.some((a) => a.confirmIndex === c.confirmIndex && a.levelPrice === c.levelPrice),
+					),
 				},
 				counts: {
 					A: layerA.length,
 					B: layerB.length,
+					C: layerC.length,
 					matched: matched.length,
 					uniqueB: uniqueB.length,
 					byTypeA: countByType(layerA),
 					byTypeB: countByType(layerB),
+					byTypeC: countByType(layerC),
 				},
 			})
 		} catch (err) {

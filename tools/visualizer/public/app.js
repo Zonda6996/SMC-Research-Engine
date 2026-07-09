@@ -78,6 +78,11 @@ function findEventsAtCandle(idx) {
 			if (e.confirmIndex === idx) events.push(e)
 		}
 	}
+	if (document.getElementById('toggleC').checked) {
+		for (const e of currentData.layers.C ?? []) {
+			if (e.confirmIndex === idx) events.push(e)
+		}
+	}
 	// Фильтр unlabeled.
 	const showUnlabeled = document.getElementById('toggleUnlabeled').checked
 	return showUnlabeled ? events : events.filter((e) => e.type !== 'unlabeled')
@@ -119,10 +124,18 @@ function renderProtectedSegments(segments, candles) {
 	}
 }
 
+// Стили линий по слоям: A — сплошная, B — пунктир, C — точки.
+const LAYER_STYLE = {
+	A: { lineStyle: () => LightweightCharts.LineStyle.Solid, shape: 'circle', prefix: '' },
+	B: { lineStyle: () => LightweightCharts.LineStyle.Dashed, shape: 'square', prefix: 'B·' },
+	C: { lineStyle: () => LightweightCharts.LineStyle.Dotted, shape: 'circle', prefix: 'C·' },
+}
+
 // Рисует события слома как в ручной SMC-разметке: горизонтальная линия от
 // свечи возникновения уровня до свечи подтверждения слома, с подписью
-// BOS/CHoCH на середине линии. Слой A — сплошная, слой B — пунктир.
+// BOS/CHoCH на середине линии.
 function renderEventLines(events, candles, layerName) {
+	const style = LAYER_STYLE[layerName] ?? LAYER_STYLE.A
 	for (const e of events) {
 		const startCandle = candles[e.levelIndex]
 		const endCandle = candles[e.confirmIndex]
@@ -132,9 +145,7 @@ function renderEventLines(events, candles, layerName) {
 			...SEGMENT_SERIES_OPTIONS,
 			color,
 			lineWidth: 2,
-			lineStyle: layerName === 'B'
-				? LightweightCharts.LineStyle.Dashed
-				: LightweightCharts.LineStyle.Solid,
+			lineStyle: style.lineStyle(),
 		})
 		line.setData([
 			{ time: tsToChartTime(startCandle.timestamp), value: e.levelPrice },
@@ -148,9 +159,9 @@ function renderEventLines(events, candles, layerName) {
 				time: tsToChartTime(midCandle.timestamp),
 				position: e.levelType === 'high' ? 'aboveBar' : 'belowBar',
 				color,
-				shape: layerName === 'B' ? 'square' : 'circle',
+				shape: style.shape,
 				size: 0,
-				text: layerName === 'B' ? `B·${label}` : label,
+				text: style.prefix + label,
 			}])
 		}
 	}
@@ -190,6 +201,9 @@ function renderAll() {
 	if (document.getElementById('toggleB').checked) {
 		renderEventLines(filterEvents(currentData.layers.B), currentData.candles, 'B')
 	}
+	if (document.getElementById('toggleC').checked) {
+		renderEventLines(filterEvents(currentData.layers.C ?? []), currentData.candles, 'C')
+	}
 
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
 	chart.timeScale().fitContent()
@@ -207,6 +221,10 @@ function updateCounts(data) {
 	document.getElementById('bBos').textContent = data.counts.byTypeB.bos
 	document.getElementById('bChoch').textContent = data.counts.byTypeB.choch
 	document.getElementById('bUnlabeled').textContent = data.counts.byTypeB.unlabeled
+	document.getElementById('countC').textContent = data.counts.C ?? 0
+	document.getElementById('cBos').textContent = data.counts.byTypeC?.bos ?? 0
+	document.getElementById('cChoch').textContent = data.counts.byTypeC?.choch ?? 0
+	document.getElementById('cUnlabeled').textContent = data.counts.byTypeC?.unlabeled ?? 0
 }
 
 function updateDiffTable(uniqueB, candles) {
@@ -261,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	initChart()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
-	for (const id of ['toggleA', 'toggleB', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode']) {
+	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode']) {
 		document.getElementById(id).addEventListener('change', () => {
 			// При смене mode — перезагружаем данные с сервера.
 			if (id === 'mode') { loadData(currentData && currentData.dataset.symbol !== 'BTC/USDT') ; return }

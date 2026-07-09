@@ -61,6 +61,8 @@
 		.color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 		.line-sample { width: 18px; height: 0; display: inline-block; border-top: 2px solid #1f6feb; }
 		.line-sample.dashed { border-top-style: dashed; }
+		.line-sample.dotted { border-top-style: dotted; }
+		.stat-value.c { color: #a371f7; }
 		.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 		.stat { background: #21262d; padding: 6px 8px; border-radius: 4px; }
 		.stat-label { font-size: 10px; color: #8b949e; }
@@ -139,9 +141,14 @@
 					A: Protected breaches (solid)
 				</label>
 				<label class="toggle-row">
-					<input type="checkbox" id="toggleB" checked />
+					<input type="checkbox" id="toggleB" />
 					<span class="line-sample dashed"></span>
 					B: Swing breaches (dashed)
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="toggleC" checked />
+					<span class="line-sample dotted"></span>
+					C: Active level pool (dotted)
 				</label>
 				<label class="toggle-row">
 					<input type="checkbox" id="toggleStruct" checked />
@@ -159,9 +166,9 @@
 					<span style="color:#f85149">CHoCH</span> — подпись на линии.
 				</div>
 				<label class="toggle-row">
-					<input type="checkbox" id="toggleUnlabeled" />
+					<input type="checkbox" id="toggleUnlabeled" checked />
 					<span class="color-dot" style="background:#8b949e"></span>
-					Show unlabeled events
+					Show unlabeled events (?)
 				</label>
 			</div>
 
@@ -170,7 +177,8 @@
 				<div class="stat-grid">
 					<div class="stat"><div class="stat-label">Layer A</div><div class="stat-value" id="countA">0</div></div>
 					<div class="stat"><div class="stat-label">Layer B</div><div class="stat-value b" id="countB">0</div></div>
-					<div class="stat"><div class="stat-label">Matched</div><div class="stat-value match" id="countMatch">0</div></div>
+					<div class="stat"><div class="stat-label">Layer C</div><div class="stat-value c" id="countC">0</div></div>
+					<div class="stat"><div class="stat-label">Matched A∩B</div><div class="stat-value match" id="countMatch">0</div></div>
 					<div class="stat"><div class="stat-label">Unique B</div><div class="stat-value b" id="countUniqueB">0</div></div>
 				</div>
 				<div style="margin-top:8px;">
@@ -180,6 +188,9 @@
 					<div class="type-row"><span style="color:#1f6feb">B: BOS</span><span id="bBos">0</span></div>
 					<div class="type-row"><span style="color:#f85149">B: CHoCH</span><span id="bChoch">0</span></div>
 					<div class="type-row"><span style="color:#8b949e">B: unlabeled</span><span id="bUnlabeled">0</span></div>
+					<div class="type-row"><span style="color:#1f6feb">C: BOS</span><span id="cBos">0</span></div>
+					<div class="type-row"><span style="color:#f85149">C: CHoCH</span><span id="cChoch">0</span></div>
+					<div class="type-row"><span style="color:#8b949e">C: unlabeled</span><span id="cUnlabeled">0</span></div>
 				</div>
 			</div>
 
