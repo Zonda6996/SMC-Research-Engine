@@ -24,6 +24,13 @@ export interface SwingBreach {
 	breachTimestamp: number
 	confirmIndex: number
 	confirmTimestamp: number
+	/**
+	 * true = до слома у уровня уже снимали ликвидность (фитиль проколол
+	 * цену, но закрытием слом не подтвердился). Такой фрактал «отработан» —
+	 * живые трейдеры ждут слом от следующего нетронутого экстремума.
+	 * Заполняется только пробником слоя C (пул активных уровней).
+	 */
+	sweptBeforeBreak?: boolean
 }
 
 type Phase = 'none' | 'pending'

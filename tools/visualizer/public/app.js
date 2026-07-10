@@ -176,6 +176,14 @@ function getATR() {
 function applyFiltersC(events) {
 	let result = [...events].sort((a, b) => a.confirmIndex - b.confirmIndex)
 
+	// Фильтр «skip swept»: если у уровня уже снимали ликвидность (фитиль
+	// проколол, но слом не подтвердился) — фрактал «отработан», слом от него
+	// не событие. Актуальный уровень — следующий нетронутый экстремум глубже,
+	// он и так лежит в пуле и даст своё событие при пробое.
+	if (document.getElementById('fltSwept').checked) {
+		result = result.filter((e) => !e.sweptBefore)
+	}
+
 	// Фильтр «HH/LL only»: только структурно значимые уровни (экстремумы тренда).
 	if (document.getElementById('fltHHLL').checked) {
 		result = result.filter((e) => e.levelLabel === 'HH' || e.levelLabel === 'LL')
@@ -200,7 +208,7 @@ function applyFiltersC(events) {
 	}
 
 	// Фильтр «dedup по близости»: два соседних экстремума почти на одной
-	// цене дают два события в паре тиков друг от друга. Порог — в долях
+	// цене дают дв�� события в паре тиков друг от друга. Порог — в долях
 	// ATR(14) на момент слома: инвариантен к активу, ТФ и волатильности
 	// («0.5 = половина средней свечи»). Если очередное событие того же
 	// направления, что и последнее оставленное, и уровни ближе K×ATR —
@@ -354,7 +362,7 @@ function renderAll() {
 }
 
 function updateCounts(data) {
-	// Counts показываем всегда (даже если unlabeled скрыты).
+	// Counts п��казываем всегда (даже если unlabeled скрыты).
 	document.getElementById('countA').textContent = data.counts.A
 	document.getElementById('countB').textContent = data.counts.B
 	document.getElementById('countMatch').textContent = data.counts.matched
@@ -423,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	initChart()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
-	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltFirstDir', 'fltSeqLabels', 'fltDedup', 'fltDedupValue']) {
+	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltFirstDir', 'fltSeqLabels', 'fltDedup', 'fltDedupValue', 'fltSwept']) {
 		document.getElementById(id).addEventListener('change', () => {
 			// При смене mode — перезагружаем данные с сервера.
 			if (id === 'mode') { loadData(currentData && currentData.dataset.symbol !== 'BTC/USDT') ; return }

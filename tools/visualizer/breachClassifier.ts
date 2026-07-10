@@ -30,6 +30,8 @@ export interface ClassifiedEvent {
 	reason: string
 	/** Источник: 'protected' (слой A) или 'swing' (слой B). */
 	source: 'protected' | 'swing'
+	/** true = до слома уровня у него уже снимали ликвидность (фитиль). */
+	sweptBefore: boolean
 }
 
 export interface TrendAtMoment {
@@ -231,7 +233,7 @@ export function probeProtectedBreaches(
  * Классифицирует массив breach-записей (любой источник) в ClassifiedEvent[].
  */
 export function classifyBreaches(
-	breaches: { level: StructurePoint; breachIndex: number; breachTimestamp: number; confirmIndex: number; confirmTimestamp: number }[],
+	breaches: { level: StructurePoint; breachIndex: number; breachTimestamp: number; confirmIndex: number; confirmTimestamp: number; sweptBeforeBreak?: boolean }[],
 	trendHistory: TrendHistoryEntry[],
 	source: 'protected' | 'swing',
 ): ClassifiedEvent[] {
@@ -254,6 +256,7 @@ export function classifyBreaches(
 			trend,
 			reason,
 			source,
+			sweptBefore: b.sweptBeforeBreak ?? false,
 		}
 	})
 }

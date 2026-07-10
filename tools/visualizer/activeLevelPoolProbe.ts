@@ -23,6 +23,12 @@ interface PoolLevel {
 	confirmedAt: number
 	/** Two-candle: первое закрытие за уровнем (кандидат), null = нет pending. */
 	pending: { breachIndex: number; breachTimestamp: number } | null
+	/**
+	 * Индекс свечи, на которой у уровня впервые сняли ликвидность
+	 * (фитиль проколол цену, но слом не подтвердился), либо null.
+	 * После снятия уровень считается «отработанным» фракталом.
+	 */
+	sweptAt: number | null
 }
 
 /**
@@ -51,7 +57,7 @@ export function probeActiveLevelPool(
 		//    Уровень станет проверяемым только с confirmedAt (look-ahead-free).
 		while (structIdx < structure.length && structure[structIdx]!.index <= i) {
 			const pt = structure[structIdx]!
-			pool.push({ point: pt, confirmedAt: pt.index + window, pending: null })
+			pool.push({ point: pt, confirmedAt: pt.index + window, pending: null, sweptAt: null })
 			structIdx++
 		}
 
@@ -66,6 +72,17 @@ export function probeActiveLevelPool(
 					: candle.close < lvl.point.price
 
 			if (!isBreach) {
+				// Снятие ликвидности: фитиль проколол уровень, но закрытие
+				// не подтвердило слом. Либо был pending-кандидат (закрытие за
+				// уровнем), который защитился — это тоже снятие. Фиксируем
+				// первый такой случай: фрактал «отработан».
+				const wickPierced =
+					lvl.point.type === 'high'
+						? candle.high > lvl.point.price
+						: candle.low < lvl.point.price
+				if ((wickPierced || lvl.pending !== null) && lvl.sweptAt === null) {
+					lvl.sweptAt = i
+				}
 				// Закрытие вернулось за уровень → защита, сброс кандидата.
 				lvl.pending = null
 				continue
@@ -78,6 +95,7 @@ export function probeActiveLevelPool(
 					breachTimestamp: ts,
 					confirmIndex: i,
 					confirmTimestamp: ts,
+					sweptBeforeBreak: lvl.sweptAt !== null,
 				})
 				pool.splice(p, 1)
 				continue
@@ -93,6 +111,7 @@ export function probeActiveLevelPool(
 					breachTimestamp: lvl.pending.breachTimestamp,
 					confirmIndex: i,
 					confirmTimestamp: ts,
+					sweptBeforeBreak: lvl.sweptAt !== null,
 				})
 				pool.splice(p, 1)
 			}
