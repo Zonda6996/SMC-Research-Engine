@@ -409,10 +409,11 @@ async function loadData(isFresh) {
 	const symbol = isFresh ? document.getElementById('symbol').value : 'BTC/USDT'
 	const timeframe = isFresh ? document.getElementById('timeframe').value : '15m'
 	const limit = isFresh ? document.getElementById('limit').value : '500'
+	const market = isFresh ? document.getElementById('market').value : 'spot'
 
 	showLoading(true)
 	try {
-		const params = new URLSearchParams({ symbol, timeframe, limit, mode, source: isFresh ? 'fresh' : 'fixture' })
+		const params = new URLSearchParams({ symbol, timeframe, limit, mode, market, source: isFresh ? 'fresh' : 'fixture' })
 		const res = await fetch(`/api/analyze?${params}`)
 		const data = await res.json()
 		if (data.error) throw new Error(data.error)

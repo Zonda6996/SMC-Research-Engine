@@ -40,6 +40,7 @@ interface AnalyzeQuery {
 	limit?: string | undefined
 	mode?: string | undefined
 	source?: string | undefined
+	market?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -50,6 +51,7 @@ function parseQuery(qs: string): AnalyzeQuery {
 		limit: params.get('limit') ?? undefined,
 		mode: params.get('mode') ?? undefined,
 		source: params.get('source') ?? undefined,
+		market: params.get('market') ?? undefined,
 	}
 }
 
@@ -84,21 +86,23 @@ async function fetchCandlesPaginated(
 	symbol: string,
 	timeframe: string,
 	limit: number,
+	market: 'spot' | 'futures' = 'spot',
 ): Promise<import('../../src/models/price/Candle.js').Candle[]> {
 	const capped = Math.min(limit, MAX_CANDLES)
-	const service = new BinanceService()
 
-	if (capped <= BINANCE_PAGE_LIMIT) {
-		return service.getCandles({ symbol, timeframe, limit: capped })
+	if (capped <= BINANCE_PAGE_LIMIT && market === 'spot') {
+		return new BinanceService().getCandles({ symbol, timeframe, limit: capped })
 	}
 
 	const tfMs = TF_MS[timeframe]
 	if (!tfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
 
-	// ccxt внутри BinanceService не принимает since — для пагинации используем
-	// ccxt напрямую с той же биржей (инструментальный код, не пайплайн).
+	// ccxt внутри BinanceService не принимает since и не умеет фьючерсы —
+	// используем ccxt напрямую (инструментальный код, не пайплайн).
+	// binanceusdm = USDT-M perpetual futures: у низколиквидных альтов (PEPE и
+	// т.п.) фьючерсные свечи чище спотовых — меньше рваных фитилей.
 	const { default: ccxt } = await import('ccxt')
-	const exchange = new ccxt.binance()
+	const exchange = market === 'futures' ? new ccxt.binanceusdm() : new ccxt.binance()
 	const since = Date.now() - capped * tfMs
 
 	const all: number[][] = []
@@ -143,11 +147,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const timeframe = q.timeframe ?? '15m'
 			const limit = Number(q.limit ?? 500)
 			const mode: BreachMode = q.mode === 'single' ? 'single' : 'two'
+			const market = q.market === 'futures' ? 'futures' : 'spot'
 
 			const useFixture = q.source !== 'fresh'
 			const candles = useFixture
 				? loadFixtureCandles()
-				: await fetchCandlesPaginated(symbol, timeframe, limit)
+				: await fetchCandlesPaginated(symbol, timeframe, limit, market)
 			const snapshot = runAnalysis(candles)
 
 			// Слой A: protected-пробои. Эмулируем через probeProtectedBreaches с
