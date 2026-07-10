@@ -13,8 +13,6 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join, extname } from 'node:path'
 import { BinanceService } from '../../src/services/BinanceService.js'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
-import { BosChochEngine, DEFAULT_BOS_CHOCH_CONFIG } from '../../src/core/events/BosChochEngine.js'
-import type { StructureEvent } from '../../src/models/events/StructureEvent.js'
 import { probeSwingBreaches, type BreachMode } from './lastSwingBreachProbe.js'
 import {
 	probeProtectedBreaches,
@@ -42,12 +40,6 @@ interface AnalyzeQuery {
 	mode?: string | undefined
 	source?: string | undefined
 	market?: string | undefined
-	/** Конфиг BosChochEngine из тумблеров UI (слой C). */
-	cascade?: string | undefined
-	hhll?: string | undefined
-	age?: string | undefined
-	dedup?: string | undefined
-	swept?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -59,11 +51,6 @@ function parseQuery(qs: string): AnalyzeQuery {
 		mode: params.get('mode') ?? undefined,
 		source: params.get('source') ?? undefined,
 		market: params.get('market') ?? undefined,
-		cascade: params.get('cascade') ?? undefined,
-		hhll: params.get('hhll') ?? undefined,
-		age: params.get('age') ?? undefined,
-		dedup: params.get('dedup') ?? undefined,
-		swept: params.get('swept') ?? undefined,
 	}
 }
 
@@ -190,33 +177,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			)
 			const layerB = classifySwing(swingBreaches, snapshot.market.trendHistory)
 
-			// Слой C: BosChochEngine из src/core — единственный источник истины.
-			// Тумблеры UI крутят конфиг движка; дефолты = принятый набор (SPEC 7.6).
-			const engineConfig = {
-				pivotWindow: WINDOW,
-				breachMode: mode,
-				collapseCascades: q.cascade !== '0',
-				hhllOnly: q.hhll !== '0',
-				minLevelAge: q.age !== undefined ? Number(q.age) : DEFAULT_BOS_CHOCH_CONFIG.minLevelAge,
-				dedupAtrMultiple:
-					q.dedup === 'off' ? null
-					: q.dedup !== undefined ? Number(q.dedup)
-					: DEFAULT_BOS_CHOCH_CONFIG.dedupAtrMultiple,
-				skipSweptAtrMultiple:
-					q.swept === 'off' ? null
-					: q.swept !== undefined ? Number(q.swept)
-					: DEFAULT_BOS_CHOCH_CONFIG.skipSweptAtrMultiple,
-			}
-			const engine = new BosChochEngine(engineConfig)
-			// Клиент ожидает поля source/trend/reason (общие с A/B) — доклеиваем.
-			const toClientEvent = (e: StructureEvent) => ({
-				...e,
+			// Слой C берётся только из общего pipeline snapshot. Визуализатор не
+			// запускает BosChochEngine повторно и не может разойтись с runAnalysis().
+			const layerC = snapshot.events.map((event) => ({
+				...event,
 				source: 'pool' as const,
-				trend: e.direction === 'up' ? 'bullish' : 'bearish',
-				reason: `engine: направление ${e.direction}`,
-			})
-			const layerC = engine.build(snapshot.structure, snapshot.candles).map(toClientEvent)
-			const layerCRawCount = engine.buildRaw(snapshot.structure, snapshot.candles).length
+				trend: event.direction === 'up' ? 'bullish' : 'bearish',
+				reason: `pipeline: направление ${event.direction}`,
+			}))
 
 			// Совпадения: одна и та же свеча подтверждения + тот же уровень цены.
 			const matched = layerA.filter((a) =>
@@ -236,8 +204,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				finalTrend: snapshot.market.trend,
 				protectedHigh: snapshot.market.protectedHigh ?? null,
 				protectedLow: snapshot.market.protectedLow ?? null,
-				// События из пайплайна (дефолтный конфиг, канон).
-				pipelineEvents: snapshot.events,
+					// Канонические события и Fib Lab из единого pipeline snapshot.
+					pipelineEvents: snapshot.events,
+					fib: snapshot.fib,
 				// Все protected-уровни для отрисовки сегментов (из breached + активные).
 				protectedSegments: buildProtectedSegments(
 					protectedBreaches,
@@ -259,8 +228,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				counts: {
 					A: layerA.length,
 					B: layerB.length,
-					C: layerCRawCount,
-					CFiltered: layerC.length,
+						C: layerC.length,
+						CFiltered: layerC.length,
 					matched: matched.length,
 					uniqueB: uniqueB.length,
 					byTypeA: countByType(layerA),

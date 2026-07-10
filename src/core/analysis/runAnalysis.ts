@@ -10,6 +10,7 @@ import { ATREngine } from '@/core/analysis/ATREngine.js'
 import { LegStrengthEngine } from '@/core/analysis/LegStrengthEngine.js'
 import { LegContextEngine } from '../legs/LegContextEngine.js'
 import { BosChochEngine } from '@/core/events/BosChochEngine.js'
+import { FibGridEngine } from '@/core/fib/FibGridEngine.js'
 
 /**
  * Прогоняет текущий пайплайн анализа над свечами и возвращает
@@ -34,6 +35,7 @@ export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
 	const atr = new ATREngine().build(candles)
 	const legStrength = new LegStrengthEngine().build(swingLegs, atr)
 	const events = new BosChochEngine().build(structure, candles)
+	const fib = new FibGridEngine().build({ events, structure, structuralLegs, legContexts })
 
 	return {
 		candles,
@@ -47,5 +49,6 @@ export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
 		legStrength,
 		legContexts,
 		events,
+		fib,
 	}
 }

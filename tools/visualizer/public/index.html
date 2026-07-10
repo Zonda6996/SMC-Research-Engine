@@ -344,46 +344,42 @@
 					</label>
 				</div>
 
-			<div class="panel">
-				<h2>BosChochEngine config (слой C)</h2>
-				<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
-					Фильтры применяет движок на сервере (src/core/events/).
-					Дефолты = принятый протоколом набор.
+				<div class="panel">
+					<h2>Fib Lab</h2>
+					<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
+						Три исследовательских anchor-кандидата из pipeline. Линии начинаются только с createdAtIndex.
+					</div>
+					<label class="toggle-row">
+						<input type="checkbox" id="toggleFib" />
+						<strong>Show Fibonacci candidates</strong>
+					</label>
+					<label class="toggle-row">
+						<input type="checkbox" id="fibEvent" checked />
+						<span class="color-dot" style="background:#58a6ff"></span>
+						Event impulse
+					</label>
+					<label class="toggle-row">
+						<input type="checkbox" id="fibNearest" checked />
+						<span class="color-dot" style="background:#d29922"></span>
+						Nearest enclosing leg
+					</label>
+					<label class="toggle-row">
+						<input type="checkbox" id="fibOutermost" checked />
+						<span class="color-dot" style="background:#2ea043"></span>
+						Outermost enclosing leg
+					</label>
+					<div style="display:flex; gap:12px; margin:6px 0; border-top:1px solid #21262d; padding-top:6px;">
+						<label><input type="checkbox" id="fibBos" checked /> BOS</label>
+						<label><input type="checkbox" id="fibChoch" checked /> CHoCH</label>
+					</div>
+					<label class="toggle-row">
+						<input type="checkbox" id="fibLatest" checked />
+						Latest per mode + trigger
+					</label>
+					<div class="type-row"><span>Candidates</span><span id="fibCandidateCount">0</span></div>
+					<div class="type-row"><span>Skipped</span><span id="fibSkipCount">0</span></div>
+					<div id="fibSkipReasons" style="font-size:10px; color:#8b949e; margin-top:4px; line-height:1.5;"></div>
 				</div>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltCascade" checked />
-					Collapse cascades (1 свеча = 1 событие)
-				</label>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltHHLL" checked />
-					HH/LL only (значимые экстремумы)
-				</label>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltAge" checked />
-					Min level age
-					<input type="number" id="fltAgeValue" value="20" min="0" step="5"
-						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
-					свечей
-				</label>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltSwept" checked />
-					Skip swept levels, глубже
-					<input type="number" id="fltSweptValue" value="0.6" min="0" step="0.1"
-						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
-					× ATR
-				</label>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltDedup" checked />
-					Dedup nearby levels
-					<input type="number" id="fltDedupValue" value="1.2" min="0" step="0.1"
-						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
-					× ATR
-				</label>
-				<div class="type-row" style="margin-top:6px; border-top:1px solid #21262d; padding-top:6px;">
-					<span style="color:#a371f7">C filtered / raw</span>
-					<span id="countCFiltered" style="font-weight:600; color:#a371f7">—</span>
-				</div>
-			</div>
 
 				<div class="panel">
 					<h2>Counts</h2>

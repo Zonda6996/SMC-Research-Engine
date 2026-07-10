@@ -8,6 +8,7 @@ import type { Leg } from '../legs/Leg.js'
 import type { ATRPoint } from '@/models/indicators/ATRPoint.js'
 import type { LegStrength } from '../legs/LegStrength.js'
 import type { LegContext } from '../legs/LegContext.js'
+import type { FibGridResult } from '../fib/FibGrid.js'
 
 /**
  * Единый результат одного прогона пайплайна анализа.
@@ -38,4 +39,6 @@ export interface AnalysisSnapshot {
 	legContexts: LegContext[]
 	/** События BOS/CHoCH из BosChochEngine (дефолтный конфиг, SPEC 7.6). */
 	events: StructureEvent[]
+	/** Исследовательские Fib-кандидаты и объяснимые причины пропусков. */
+	fib: FibGridResult
 }

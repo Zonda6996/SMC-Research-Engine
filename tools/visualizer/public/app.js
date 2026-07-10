@@ -44,13 +44,21 @@ function initChart() {
 		const idx = findCandleIndexByTime(param.time)
 		if (idx === -1) { tooltip.style.display = 'none'; return }
 		const events = findEventsAtCandle(idx)
-		if (events.length === 0) { tooltip.style.display = 'none'; return }
-		const e = events[0]
-		tooltip.innerHTML = `<strong>${e.source.toUpperCase()}: ${e.type.toUpperCase()}</strong><br>` +
-			`Level: ${e.levelPrice.toFixed(2)} (${e.levelType})<br>` +
-			`Breach: #${e.breachIndex} → Confirm: #${e.confirmIndex}<br>` +
-			`Trend: ${e.trend}` +
-			(e.reason ? `<div class="reason">${e.reason}</div>` : '')
+		const fib = visibleFibCandidates().find((candidate) => candidate.createdAtIndex === idx)
+		if (events.length === 0 && !fib) { tooltip.style.display = 'none'; return }
+		if (fib) {
+			tooltip.innerHTML = `<strong>FIB: ${fib.mode.toUpperCase()}</strong><br>` +
+				`${fib.trigger.toUpperCase()} · ${fib.direction}<br>` +
+				`Anchors: #${fib.start.index} ${fib.start.price.toFixed(2)} → #${fib.end.index} ${fib.end.price.toFixed(2)}<br>` +
+				`Known: #${fib.createdAtIndex}<div class="reason">${fib.explanation}</div>`
+		} else {
+			const e = events[0]
+			tooltip.innerHTML = `<strong>${e.source.toUpperCase()}: ${e.type.toUpperCase()}</strong><br>` +
+				`Level: ${e.levelPrice.toFixed(2)} (${e.levelType})<br>` +
+				`Breach: #${e.breachIndex} → Confirm: #${e.confirmIndex}<br>` +
+				`Trend: ${e.trend}` +
+				(e.reason ? `<div class="reason">${e.reason}</div>` : '')
+		}
 		tooltip.style.left = (param.point.x + 20) + 'px'
 		tooltip.style.top = (param.point.y - 40) + 'px'
 		tooltip.style.display = 'block'
@@ -172,6 +180,67 @@ function renderEventLines(events, candles, layerName) {
 	}
 }
 
+const FIB_MODE_STYLE = {
+	'event-impulse': { color: '#58a6ff', toggle: 'fibEvent', label: 'EVENT' },
+	'nearest-enclosing-leg': { color: '#d29922', toggle: 'fibNearest', label: 'NEAR' },
+	'outermost-enclosing-leg': { color: '#2ea043', toggle: 'fibOutermost', label: 'OUTER' },
+}
+
+function visibleFibCandidates() {
+	if (!currentData?.fib || !document.getElementById('toggleFib').checked) return []
+	const showBos = document.getElementById('fibBos').checked
+	const showChoch = document.getElementById('fibChoch').checked
+	const filtered = currentData.fib.candidates.filter((candidate) => {
+		const mode = FIB_MODE_STYLE[candidate.mode]
+		return mode && document.getElementById(mode.toggle).checked &&
+			(candidate.trigger === 'bos' ? showBos : showChoch)
+	})
+	if (!document.getElementById('fibLatest').checked) return filtered
+	const latest = new Map()
+	for (const candidate of filtered) {
+		const key = `${candidate.mode}:${candidate.trigger}`
+		const previous = latest.get(key)
+		if (!previous || candidate.createdAtIndex > previous.createdAtIndex) latest.set(key, candidate)
+	}
+	return [...latest.values()]
+}
+
+function renderFibCandidates(candidates, candles) {
+	const lastCandle = candles[candles.length - 1]
+	if (!lastCandle) return
+	for (const candidate of candidates) {
+		const style = FIB_MODE_STYLE[candidate.mode]
+		const created = candles[candidate.createdAtIndex]
+		if (!style || !created) continue
+
+		for (const level of candidate.levels) {
+			const isKey = level.ratio === 0 || level.ratio === 100 || level.ratio === 61.8 || level.ratio === 78.6
+			const line = chart.addSeries(LightweightCharts.LineSeries, {
+				...SEGMENT_SERIES_OPTIONS,
+				color: style.color,
+				lineWidth: isKey ? 2 : 1,
+				lineStyle: level.ratio > 100
+					? LightweightCharts.LineStyle.Dotted
+					: LightweightCharts.LineStyle.Dashed,
+			})
+			line.setData([
+				{ time: tsToChartTime(created.timestamp), value: level.price },
+				{ time: tsToChartTime(lastCandle.timestamp), value: level.price },
+			])
+			if (level.ratio === 61.8) {
+				LightweightCharts.createSeriesMarkers(line, [{
+					time: tsToChartTime(created.timestamp),
+					position: candidate.direction === 'long' ? 'belowBar' : 'aboveBar',
+					color: style.color,
+					shape: 'circle',
+					size: 0,
+					text: `${style.label} ${candidate.trigger.toUpperCase()} · 61.8`,
+				}])
+			}
+		}
+	}
+}
+
 function renderAll() {
 	if (!currentData) return
 	initChart()
@@ -209,10 +278,9 @@ function renderAll() {
 	if (document.getElementById('toggleC').checked) {
 		const eventsC = filterEvents(currentData.layers.C ?? [])
 		renderEventLines(eventsC, currentData.candles, 'C')
-		document.getElementById('countCFiltered').textContent =
-			`${(currentData.layers.C ?? []).length} / ${currentData.counts.C ?? 0}`
 	}
 
+	renderFibCandidates(visibleFibCandidates(), currentData.candles)
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
 	chart.timeScale().fitContent()
 }
@@ -233,6 +301,13 @@ function updateCounts(data) {
 	document.getElementById('cBos').textContent = data.counts.byTypeC?.bos ?? 0
 	document.getElementById('cChoch').textContent = data.counts.byTypeC?.choch ?? 0
 	document.getElementById('cUnlabeled').textContent = data.counts.byTypeC?.unlabeled ?? 0
+	document.getElementById('fibCandidateCount').textContent = data.fib?.candidates.length ?? 0
+	document.getElementById('fibSkipCount').textContent = data.fib?.skips.length ?? 0
+	const reasons = {}
+	for (const skip of data.fib?.skips ?? []) reasons[skip.reason] = (reasons[skip.reason] ?? 0) + 1
+	document.getElementById('fibSkipReasons').textContent = Object.entries(reasons)
+		.map(([reason, count]) => `${reason}: ${count}`)
+		.join(' · ')
 }
 
 function updateDiffTable(uniqueB, candles) {
@@ -255,23 +330,6 @@ function updateDiffTable(uniqueB, candles) {
 
 let lastIsFresh = false
 
-// Конфиг BosChochEngine из тумблеров UI → query-параметры /api/analyze.
-function engineParams() {
-	return {
-		cascade: document.getElementById('fltCascade').checked ? '1' : '0',
-		hhll: document.getElementById('fltHHLL').checked ? '1' : '0',
-		age: document.getElementById('fltAge').checked
-			? String(Number(document.getElementById('fltAgeValue').value) || 0)
-			: '0',
-		dedup: document.getElementById('fltDedup').checked
-			? String(Number(document.getElementById('fltDedupValue').value) || 0)
-			: 'off',
-		swept: document.getElementById('fltSwept').checked
-			? String(Number(document.getElementById('fltSweptValue').value) || 0)
-			: 'off',
-	}
-}
-
 async function loadData(isFresh) {
 	lastIsFresh = isFresh
 	const mode = document.getElementById('mode').value
@@ -285,7 +343,6 @@ async function loadData(isFresh) {
 		const params = new URLSearchParams({
 			symbol, timeframe, limit, mode, market,
 			source: isFresh ? 'fresh' : 'fixture',
-			...engineParams(),
 		})
 		const res = await fetch(`/api/analyze?${params}`)
 		const data = await res.json()
@@ -312,14 +369,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	initChart()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
-	// Тумблеры отображения — локальная перерисовка.
-	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled']) {
+	// Тумблеры отображения — локальная перерисовка канонического snapshot.
+	for (const id of [
+		'toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled',
+		'toggleFib', 'fibEvent', 'fibNearest', 'fibOutermost', 'fibBos', 'fibChoch', 'fibLatest',
+	]) {
 		document.getElementById(id).addEventListener('change', () => renderAll())
 	}
-	// mode и фильтры движка — конфиг BosChochEngine, перезапрос к серверу.
-	for (const id of ['mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltDedup', 'fltDedupValue', 'fltSwept', 'fltSweptValue']) {
-		document.getElementById(id).addEventListener('change', () => loadData(lastIsFresh))
-	}
+	// Режим пробоя меняет только диагностические A/B; pipeline C использует утверждённый дефолт.
+	document.getElementById('mode').addEventListener('change', () => loadData(lastIsFresh))
 	// Автозагрузка.
 	loadData(false)
 })
