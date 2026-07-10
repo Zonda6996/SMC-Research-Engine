@@ -571,7 +571,7 @@ swing-экстремум живёт в пуле до своего пробоя (
 2. `nearest-enclosing-leg`: ближайшая доступная непробитая объемлющая structural leg;
 3. `outermost-enclosing-leg`: самая внешняя доступная объемлющая structural leg.
 
-Уровни: 0, 23.6, 38.2, 61.8, 78.6, 100, 141, 161, 241, 261.
+Уровни: 0, 23.6, 38.2, 50, 61.8, 78.6, 100, 141, 161, 200, 241, 261, 300.
 `createdAtIndex = max(event.confirmIndex, start.knownAtIndex, end.knownAtIndex)`, где
 `knownAtIndex = pivot.index + pivotWindow`; UI не рисует сетку левее этого индекса.
 Невалидные кандидаты не маскируются: `fib.skips` хранит режим и причину отказа.

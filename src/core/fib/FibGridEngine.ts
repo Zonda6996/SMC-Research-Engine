@@ -13,7 +13,7 @@ import type { Leg } from '@/models/legs/Leg.js'
 import type { LegContext } from '@/models/legs/LegContext.js'
 import type { StructurePoint } from '@/models/structure/StructurePoint.js'
 
-export const FIB_LEVEL_RATIOS = [0, 23.6, 38.2, 61.8, 78.6, 100, 141, 161, 241, 261] as const
+export const FIB_LEVEL_RATIOS = [0, 23.6, 38.2, 50, 61.8, 78.6, 100, 141, 161, 200, 241, 261, 300] as const
 
 export interface FibGridInput {
 	events: StructureEvent[]

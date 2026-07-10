@@ -49,10 +49,14 @@ describe('FibGridEngine — levels and event impulse', () => {
 	it('вычисляет одинаковые ratios для long и short с правильным знаком', () => {
 		const long = FibGridEngine.levels(100, 200)
 		const short = FibGridEngine.levels(200, 100)
+		assert.equal(long.find((level) => level.ratio === 50)?.price, 150)
+		assert.equal(short.find((level) => level.ratio === 50)?.price, 150)
 		assert.equal(long.find((level) => level.ratio === 61.8)?.price, 161.8)
 		assert.equal(short.find((level) => level.ratio === 61.8)?.price, 138.2)
 		assert.equal(long.find((level) => level.ratio === 161)?.price, 261)
 		assert.equal(short.find((level) => level.ratio === 161)?.price, 39)
+		assert.equal(long.find((level) => level.ratio === 300)?.price, 400)
+		assert.equal(long.length, 13)
 	})
 
 	it('event impulse берёт последний противоположный swing → event-level', () => {

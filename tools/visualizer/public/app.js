@@ -205,38 +205,40 @@ function visibleFibCandidates() {
 	return [...latest.values()]
 }
 
+function fibLevelStyle(ratio) {
+	if ([23.6, 38.2, 61.8, 78.6].includes(ratio)) return { color: '#388bfd', width: 1 }
+	if ([141, 161, 241, 261].includes(ratio)) return { color: '#bc4ed8', width: 1 }
+	if (ratio === 0 || ratio === 100) return { color: '#c9d1d9', width: 2 }
+	return { color: '#6e7681', width: 1 }
+}
+
+function fibRatioLabel(ratio) {
+	return `${ratio.toFixed(ratio % 1 === 0 ? 0 : 1).replace('.', ',')}%`
+}
+
 function renderFibCandidates(candidates, candles) {
 	const lastCandle = candles[candles.length - 1]
 	if (!lastCandle) return
 	for (const candidate of candidates) {
-		const style = FIB_MODE_STYLE[candidate.mode]
+		const mode = FIB_MODE_STYLE[candidate.mode]
 		const created = candles[candidate.createdAtIndex]
-		if (!style || !created) continue
+		if (!mode || !created) continue
 
 		for (const level of candidate.levels) {
-			const isKey = level.ratio === 0 || level.ratio === 100 || level.ratio === 61.8 || level.ratio === 78.6
+			const levelStyle = fibLevelStyle(level.ratio)
 			const line = chart.addSeries(LightweightCharts.LineSeries, {
 				...SEGMENT_SERIES_OPTIONS,
-				color: style.color,
-				lineWidth: isKey ? 2 : 1,
-				lineStyle: level.ratio > 100
-					? LightweightCharts.LineStyle.Dotted
-					: LightweightCharts.LineStyle.Dashed,
+				title: fibRatioLabel(level.ratio),
+				color: levelStyle.color,
+				lineWidth: levelStyle.width,
+				lineStyle: LightweightCharts.LineStyle.Solid,
+				lastValueVisible: true,
+				priceLineVisible: false,
 			})
 			line.setData([
 				{ time: tsToChartTime(created.timestamp), value: level.price },
 				{ time: tsToChartTime(lastCandle.timestamp), value: level.price },
 			])
-			if (level.ratio === 61.8) {
-				LightweightCharts.createSeriesMarkers(line, [{
-					time: tsToChartTime(created.timestamp),
-					position: candidate.direction === 'long' ? 'belowBar' : 'aboveBar',
-					color: style.color,
-					shape: 'circle',
-					size: 0,
-					text: `${style.label} ${candidate.trigger.toUpperCase()} · 61.8`,
-				}])
-			}
 		}
 	}
 }
