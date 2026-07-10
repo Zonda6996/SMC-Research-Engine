@@ -112,6 +112,19 @@ async function main() {
 			isLast: context.isLast,
 		})),
 	)
+
+	console.log('\n=== BOS/CHoCH EVENTS ===')
+	console.table(
+		snapshot.events.map(e => ({
+			type: e.type,
+			direction: e.direction,
+			level: formatPrice(e.levelPrice),
+			label: e.levelLabel,
+			confirmIdx: e.confirmIndex,
+			confirmTime: formatTime(e.confirmTimestamp),
+			swept: e.sweptBefore ? 'yes' : '',
+		})),
+	)
 }
 
 main()

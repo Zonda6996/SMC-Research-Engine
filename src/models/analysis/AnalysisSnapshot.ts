@@ -3,6 +3,7 @@ import type { Pivot } from '../structure/Pivot.js'
 import type { Swing } from '../structure/Swing.js'
 import type { StructurePoint } from '../structure/StructurePoint.js'
 import type { MarketStructure } from '@/models/structure/MarketStructure.js'
+import type { StructureEvent } from '@/models/events/StructureEvent.js'
 import type { Leg } from '../legs/Leg.js'
 import type { ATRPoint } from '@/models/indicators/ATRPoint.js'
 import type { LegStrength } from '../legs/LegStrength.js'
@@ -18,11 +19,11 @@ import type { LegContext } from '../legs/LegContext.js'
  *
  * Поля соответствуют текущему пайплайну из SPEC.md:
  * Candles -> PivotDetector -> SwingEngine -> StructureEngine ->
- * -> MarketStructureEngine / StructuralLegEngine / SwingLegEngine -> ATREngine -> LegStrengthEngine
+ * -> MarketStructureEngine / StructuralLegEngine / SwingLegEngine ->
+ * ATREngine -> LegStrengthEngine -> BosChochEngine
  *
- * По мере добавления новых модулей (BOSDetector, CHoCHDetector и т.д.)
- * сюда добавляются новые поля — старые не переименовываются, чтобы
- * не ломать существующих consumers.
+ * По мере добавления новых модулей сюда добавляются новые поля —
+ * старые не переименовываются, чтобы не ломать существующих consumers.
  */
 export interface AnalysisSnapshot {
 	candles: Candle[]
@@ -35,4 +36,6 @@ export interface AnalysisSnapshot {
 	atr: ATRPoint[]
 	legStrength: LegStrength[]
 	legContexts: LegContext[]
+	/** События BOS/CHoCH из BosChochEngine (дефолтный конфиг, SPEC 7.6). */
+	events: StructureEvent[]
 }

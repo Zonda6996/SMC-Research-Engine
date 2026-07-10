@@ -133,6 +133,15 @@ describe('runAnalysis pipeline', () => {
 			snapshot.structuralLegs.length,
 			'leg contexts 1-1 с structural legs',
 		)
+
+		// BOS/CHoCH events — BosChochEngine подключён к пайплайну (SPEC 7.6).
+		// На 500 реальных свечей с дефолтным конфигом обязаны быть события
+		// (фитры отсекают шум, но не всё). Если движок отключат от runAnalysis —
+		// поле исчезнет из snapshot и тест упадёт.
+		assert.ok(
+			Array.isArray(snapshot.events),
+			'snapshot.events должен быть массивом (BosChochEngine в пайплайне)',
+		)
 	})
 
 	// ──────────────────────────────────────────────

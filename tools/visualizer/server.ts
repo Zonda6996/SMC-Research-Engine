@@ -236,6 +236,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				finalTrend: snapshot.market.trend,
 				protectedHigh: snapshot.market.protectedHigh ?? null,
 				protectedLow: snapshot.market.protectedLow ?? null,
+				// События из пайплайна (дефолтный конфиг, канон).
+				pipelineEvents: snapshot.events,
 				// Все protected-уровни для отрисовки сегментов (из breached + активные).
 				protectedSegments: buildProtectedSegments(
 					protectedBreaches,
