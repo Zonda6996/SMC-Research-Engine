@@ -192,25 +192,25 @@
 			</div>
 
 			<div class="panel">
-				<h2>Layer C filters (experimental)</h2>
+				<h2>BosChochEngine config (слой C)</h2>
+				<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
+					Фильтры применяет движок на сервере (src/core/events/).
+					Дефолты = принятый протоколом набор.
+				</div>
 				<label class="toggle-row">
-					<input type="checkbox" id="fltCascade" />
+					<input type="checkbox" id="fltCascade" checked />
 					Collapse cascades (1 свеча = 1 событие)
 				</label>
 				<label class="toggle-row">
-					<input type="checkbox" id="fltHHLL" />
+					<input type="checkbox" id="fltHHLL" checked />
 					HH/LL only (значимые экстремумы)
 				</label>
 				<label class="toggle-row">
-					<input type="checkbox" id="fltAge" />
+					<input type="checkbox" id="fltAge" checked />
 					Min level age
 					<input type="number" id="fltAgeValue" value="20" min="0" step="5"
 						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
 					свечей
-				</label>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltFirstDir" />
-					First break per direction
 				</label>
 				<label class="toggle-row">
 					<input type="checkbox" id="fltSwept" checked />
@@ -226,12 +226,8 @@
 						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
 					× ATR
 				</label>
-				<label class="toggle-row" style="border-top:1px solid #21262d; padding-top:6px; margin-top:4px;">
-					<input type="checkbox" id="fltSeqLabels" checked />
-					Sequence labels (CHoCH→BOS→BOS)
-				</label>
 				<div class="type-row" style="margin-top:6px; border-top:1px solid #21262d; padding-top:6px;">
-					<span style="color:#a371f7">C after filters</span>
+					<span style="color:#a371f7">C filtered / raw</span>
 					<span id="countCFiltered" style="font-weight:600; color:#a371f7">—</span>
 				</div>
 			</div>
