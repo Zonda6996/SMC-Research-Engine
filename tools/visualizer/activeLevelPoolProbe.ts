@@ -29,6 +29,12 @@ interface PoolLevel {
 	 * После снятия уровень считается «отработанным» фракталом.
 	 */
 	sweptAt: number | null
+	/**
+	 * Максимальная глубина прокола фитилём до слома (в единицах цены).
+	 * 0 = ликвидность не снимали. Порог значимости («мелкий укол vs
+	 * глубокое снятие») сравнивается с этой величиной на клиенте в K×ATR.
+	 */
+	sweptDepth: number
 }
 
 /**
@@ -57,7 +63,7 @@ export function probeActiveLevelPool(
 		//    Уровень станет проверяемым только с confirmedAt (look-ahead-free).
 		while (structIdx < structure.length && structure[structIdx]!.index <= i) {
 			const pt = structure[structIdx]!
-			pool.push({ point: pt, confirmedAt: pt.index + window, pending: null, sweptAt: null })
+			pool.push({ point: pt, confirmedAt: pt.index + window, pending: null, sweptAt: null, sweptDepth: 0 })
 			structIdx++
 		}
 
@@ -74,14 +80,16 @@ export function probeActiveLevelPool(
 			if (!isBreach) {
 				// Снятие ликвидности: фитиль проколол уровень, но закрытие
 				// не подтвердило слом. Либо был pending-кандидат (закрытие за
-				// уровнем), который защитился — это тоже снятие. Фиксируем
-				// первый такой случай: фрактал «отработан».
-				const wickPierced =
+				// уровнем), который защитился — это тоже снятие. Запоминаем
+				// МАКСИМАЛЬНУЮ глубину прокола: мелкий укол и глубокое
+				// снятие — разные вещи, порог значимости решает клиент.
+				const pierceDepth =
 					lvl.point.type === 'high'
-						? candle.high > lvl.point.price
-						: candle.low < lvl.point.price
-				if ((wickPierced || lvl.pending !== null) && lvl.sweptAt === null) {
-					lvl.sweptAt = i
+						? candle.high - lvl.point.price
+						: lvl.point.price - candle.low
+				if (pierceDepth > 0 || lvl.pending !== null) {
+					if (lvl.sweptAt === null) lvl.sweptAt = i
+					lvl.sweptDepth = Math.max(lvl.sweptDepth, pierceDepth)
 				}
 				// Закрытие вернулось за уровень → защита, сброс кандидата.
 				lvl.pending = null
@@ -96,6 +104,7 @@ export function probeActiveLevelPool(
 					confirmIndex: i,
 					confirmTimestamp: ts,
 					sweptBeforeBreak: lvl.sweptAt !== null,
+					sweptDepth: lvl.sweptDepth,
 				})
 				pool.splice(p, 1)
 				continue
@@ -112,6 +121,7 @@ export function probeActiveLevelPool(
 					confirmIndex: i,
 					confirmTimestamp: ts,
 					sweptBeforeBreak: lvl.sweptAt !== null,
+					sweptDepth: lvl.sweptDepth,
 				})
 				pool.splice(p, 1)
 			}

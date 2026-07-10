@@ -32,6 +32,8 @@ export interface ClassifiedEvent {
 	source: 'protected' | 'swing'
 	/** true = до слома уровня у него уже снимали ликвидность (фитиль). */
 	sweptBefore: boolean
+	/** Максимальная глубина прокола до слома (цена), 0 = не снимали. */
+	sweptDepth: number
 }
 
 export interface TrendAtMoment {
@@ -233,7 +235,7 @@ export function probeProtectedBreaches(
  * Классифицирует массив breach-записей (любой источник) в ClassifiedEvent[].
  */
 export function classifyBreaches(
-	breaches: { level: StructurePoint; breachIndex: number; breachTimestamp: number; confirmIndex: number; confirmTimestamp: number; sweptBeforeBreak?: boolean }[],
+	breaches: { level: StructurePoint; breachIndex: number; breachTimestamp: number; confirmIndex: number; confirmTimestamp: number; sweptBeforeBreak?: boolean; sweptDepth?: number }[],
 	trendHistory: TrendHistoryEntry[],
 	source: 'protected' | 'swing',
 ): ClassifiedEvent[] {
@@ -257,6 +259,7 @@ export function classifyBreaches(
 			reason,
 			source,
 			sweptBefore: b.sweptBeforeBreak ?? false,
+			sweptDepth: b.sweptDepth ?? 0,
 		}
 	})
 }
