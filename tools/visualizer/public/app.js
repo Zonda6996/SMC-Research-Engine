@@ -170,6 +170,28 @@ function applyFiltersC(events) {
 		})
 	}
 
+	// Последовательная классификация: метки выводятся из САМИХ событий,
+	// а не из тренда движка (который ленивый и часто в range → куча «?»).
+	// Правило как у человека: слом против текущего направления = CHoCH
+	// (направление переворачивается), слом по направлению = BOS.
+	// Применяется ПОСЛЕ фильтров — метки соответствуют видимой картине.
+	if (document.getElementById('fltSeqLabels').checked) {
+		let dir = null // 'up' | 'down' — текущее направление по событиям C
+		result = result.map((e) => {
+			const eventDir = e.levelType === 'high' ? 'up' : 'down'
+			let type
+			if (dir === null) {
+				type = 'unlabeled' // первому событию не с чем сравнивать
+			} else if (eventDir === dir) {
+				type = 'bos'
+			} else {
+				type = 'choch'
+			}
+			dir = eventDir
+			return { ...e, type, trend: dir === 'up' ? 'bullish' : 'bearish', reason: `seq: направление ${dir}` }
+		})
+	}
+
 	return result
 }
 
@@ -251,7 +273,10 @@ function renderAll() {
 		renderEventLines(filterEvents(currentData.layers.B), currentData.candles, 'B')
 	}
 	if (document.getElementById('toggleC').checked) {
-		const filteredC = applyFiltersC(filterEvents(currentData.layers.C ?? []))
+		// Порядок важен: сперва фильтры + переклассификация (seq), и только
+		// потом скрытие unlabeled — иначе события, которые seq-режим
+		// превратил бы в BOS/CHoCH, отсекались бы по старой метке движка.
+		const filteredC = filterEvents(applyFiltersC(currentData.layers.C ?? []))
 		renderEventLines(filteredC, currentData.candles, 'C')
 		document.getElementById('countCFiltered').textContent =
 			`${filteredC.length} / ${(currentData.layers.C ?? []).length}`
@@ -331,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	initChart()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
-	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltFirstDir']) {
+	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltFirstDir', 'fltSeqLabels']) {
 		document.getElementById(id).addEventListener('change', () => {
 			// При смене mode — перезагружаем данные с сервера.
 			if (id === 'mode') { loadData(currentData && currentData.dataset.symbol !== 'BTC/USDT') ; return }
