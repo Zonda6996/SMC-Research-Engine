@@ -295,17 +295,25 @@ function renderFibCandidates(candidates, candles) {
 			const levelStyle = fibLevelStyle(level.ratio)
 			const line = chart.addSeries(LightweightCharts.LineSeries, {
 				...SEGMENT_SERIES_OPTIONS,
-				title: fibRatioLabel(level.ratio),
 				color: levelStyle.color,
 				lineWidth: levelStyle.width,
 				lineStyle: LightweightCharts.LineStyle.Solid,
-				lastValueVisible: true,
+				lastValueVisible: false,
 				priceLineVisible: false,
 			})
 			line.setData([
 				{ time: tsToChartTime(created.timestamp), value: level.price },
 				{ time: tsToChartTime(lastCandle.timestamp), value: level.price },
 			])
+			// Подпись уровня как на TV: аккуратно у начала линии, не на ценовой шкале.
+			LightweightCharts.createSeriesMarkers(line, [{
+				time: tsToChartTime(created.timestamp),
+				position: 'inBar',
+				color: levelStyle.color,
+				shape: 'circle',
+				size: 0,
+				text: `${fibRatioLabel(level.ratio)} (${level.price.toFixed(2)})`,
+			}])
 		}
 	}
 }
