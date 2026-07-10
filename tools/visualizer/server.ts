@@ -60,6 +60,69 @@ function loadFixtureCandles(): import('../../src/models/price/Candle.js').Candle
 	return JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8'))
 }
 
+/** Максимум свечей за один запрос к Binance (лимит их API). */
+const BINANCE_PAGE_LIMIT = 1000
+/** Потолок визуализатора — защита от случайной загрузки мегаистории. */
+const MAX_CANDLES = 5000
+
+const TF_MS: Record<string, number> = {
+	'1m': 60_000,
+	'5m': 300_000,
+	'15m': 900_000,
+	'30m': 1_800_000,
+	'1h': 3_600_000,
+	'4h': 14_400_000,
+	'1d': 86_400_000,
+}
+
+/**
+ * Постраничная загрузка: Binance отдаёт максимум 1000 свечей за запрос,
+ * для больших лимитов идём страницами от рассчитанного `since` вперёд.
+ * Только для визуализатора — пайплайн работает со своим сервисом.
+ */
+async function fetchCandlesPaginated(
+	symbol: string,
+	timeframe: string,
+	limit: number,
+): Promise<import('../../src/models/price/Candle.js').Candle[]> {
+	const capped = Math.min(limit, MAX_CANDLES)
+	const service = new BinanceService()
+
+	if (capped <= BINANCE_PAGE_LIMIT) {
+		return service.getCandles({ symbol, timeframe, limit: capped })
+	}
+
+	const tfMs = TF_MS[timeframe]
+	if (!tfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
+
+	// ccxt внутри BinanceService не принимает since — для пагинации используем
+	// ccxt напрямую с той же биржей (инструментальный код, не пайплайн).
+	const { default: ccxt } = await import('ccxt')
+	const exchange = new ccxt.binance()
+	const since = Date.now() - capped * tfMs
+
+	const all: number[][] = []
+	let cursor = since
+	while (all.length < capped) {
+		const page = await exchange.fetchOHLCV(symbol, timeframe, cursor, BINANCE_PAGE_LIMIT)
+		if (page.length === 0) break
+		all.push(...(page as number[][]))
+		const lastTs = Number(page[page.length - 1]![0])
+		const nextCursor = lastTs + tfMs
+		if (nextCursor <= cursor) break // защита от зацикливания
+		cursor = nextCursor
+	}
+
+	return all.slice(-capped).map(([timestamp, open, high, low, close, volume]) => ({
+		timestamp: Number(timestamp),
+		open: Number(open),
+		high: Number(high),
+		low: Number(low),
+		close: Number(close),
+		volume: Number(volume),
+	}))
+}
+
 function sendJson(res: ServerResponse, status: number, data: unknown) {
 	const body = JSON.stringify(data)
 	res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' })
@@ -84,7 +147,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const useFixture = q.source !== 'fresh'
 			const candles = useFixture
 				? loadFixtureCandles()
-				: await new BinanceService().getCandles({ symbol, timeframe, limit })
+				: await fetchCandlesPaginated(symbol, timeframe, limit)
 			const snapshot = runAnalysis(candles)
 
 			// Слой A: protected-пробои. Эмулируем через probeProtectedBreaches с

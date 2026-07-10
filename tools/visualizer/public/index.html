@@ -99,20 +99,35 @@
 <body>
 	<div class="toolbar">
 		<h1>BOS/CHoCH Probe</h1>
-		<select id="symbol">
-			<option value="BTC/USDT">BTC/USDT</option>
-			<option value="ETH/USDT">ETH/USDT</option>
-			<option value="SOL/USDT">SOL/USDT</option>
-		</select>
+		<input id="symbol" list="symbolList" value="BTC/USDT" placeholder="Symbol…"
+			style="background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:6px; padding:4px 8px; font-size:13px; width:130px;" />
+		<datalist id="symbolList">
+			<option value="BTC/USDT"></option>
+			<option value="ETH/USDT"></option>
+			<option value="SOL/USDT"></option>
+			<option value="DOGE/USDT"></option>
+			<option value="PEPE/USDT"></option>
+			<option value="WIF/USDT"></option>
+			<option value="XRP/USDT"></option>
+			<option value="BNB/USDT"></option>
+			<option value="AVAX/USDT"></option>
+			<option value="LINK/USDT"></option>
+		</datalist>
 		<select id="timeframe">
-			<option value="15m">15m</option>
+			<option value="1m">1m</option>
+			<option value="5m">5m</option>
+			<option value="15m" selected>15m</option>
+			<option value="30m">30m</option>
 			<option value="1h">1h</option>
 			<option value="4h">4h</option>
+			<option value="1d">1d</option>
 		</select>
 		<select id="limit">
 			<option value="500">500</option>
 			<option value="1000">1000</option>
 			<option value="1500">1500</option>
+			<option value="3000">3000</option>
+			<option value="5000">5000</option>
 		</select>
 		<label>Mode:
 			<select id="mode">
