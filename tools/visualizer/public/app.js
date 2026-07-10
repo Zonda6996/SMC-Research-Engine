@@ -131,6 +131,48 @@ function renderProtectedSegments(segments, candles) {
 // Применяются на клиенте: переключение мгновенное, без запроса к серверу.
 // ──────────────────────────────────────────────
 
+// ATR(period) на момент каждой свечи — скользящее среднее true range.
+// Нормируем на него пороги, чтобы они не зависели от актива/ТФ/волатильности.
+function computeATR(candles, period = 14) {
+	const atr = new Array(candles.length).fill(0)
+	let sum = 0
+	for (let i = 0; i < candles.length; i++) {
+		const c = candles[i]
+		const prevClose = i > 0 ? candles[i - 1].close : c.close
+		const tr = Math.max(
+			c.high - c.low,
+			Math.abs(c.high - prevClose),
+			Math.abs(c.low - prevClose),
+		)
+		sum += tr
+		if (i >= period) {
+			sum -= Math.max(
+				candles[i - period].high - candles[i - period].low,
+				Math.abs(candles[i - period].high - (i - period > 0 ? candles[i - period - 1].close : candles[i - period].close)),
+				Math.abs(candles[i - period].low - (i - period > 0 ? candles[i - period - 1].close : candles[i - period].close)),
+			)
+			atr[i] = sum / period
+		} else {
+			atr[i] = sum / (i + 1)
+		}
+	}
+	return atr
+}
+
+// Кэш ATR: пересчитываем только при смене данных.
+let atrCache = null
+let atrCacheKey = null
+
+function getATR() {
+	const candles = currentData?.candles ?? []
+	const key = candles.length > 0 ? `${candles.length}:${candles[0].timestamp}` : 'empty'
+	if (atrCacheKey !== key) {
+		atrCache = computeATR(candles)
+		atrCacheKey = key
+	}
+	return atrCache
+}
+
 function applyFiltersC(events) {
 	let result = [...events].sort((a, b) => a.confirmIndex - b.confirmIndex)
 
@@ -158,19 +200,23 @@ function applyFiltersC(events) {
 	}
 
 	// Фильтр «dedup по близости»: два соседних экстремума почти на одной
-	// цене дают два события в паре тиков друг от друга. Если очередное
-	// событие того же направления, что и последнее оставленное, и цены их
-	// уровней ближе N% — это дубликат, оставляем первое (оно старше и
-	// значимее). CHoCH/смена направления цепочку сбрасывает.
+	// цене дают два события в паре тиков друг от друга. Порог — в долях
+	// ATR(14) на момент слома: инвариантен к активу, ТФ и волатильности
+	// («0.5 = половина средней свечи»). Если очередное событие того же
+	// направления, что и последнее оставленное, и уровни ближе K×ATR —
+	// дубликат, оставляем первое (оно старше и значимее). Смена
+	// направления (CHoCH) цепочку сбрасывает.
 	if (document.getElementById('fltDedup').checked) {
-		const tolPct = (Number(document.getElementById('fltDedupValue').value) || 0) / 100
+		const atrMult = Number(document.getElementById('fltDedupValue').value) || 0
+		const atr = getATR()
 		let lastKept = null // последнее оставленное событие
 		result = result.filter((e) => {
 			const dir = e.levelType === 'high' ? 'up' : 'down'
 			if (lastKept) {
 				const lastDir = lastKept.levelType === 'high' ? 'up' : 'down'
+				const tolerance = atrMult * (atr[e.confirmIndex] ?? 0)
 				const closeInPrice =
-					Math.abs(e.levelPrice - lastKept.levelPrice) / e.levelPrice < tolPct
+					Math.abs(e.levelPrice - lastKept.levelPrice) < tolerance
 				if (dir === lastDir && closeInPrice) return false
 			}
 			lastKept = e
@@ -216,7 +262,7 @@ function applyFiltersC(events) {
 	return result
 }
 
-// Стили линий по слоям: A — сплошная, B — пунктир, C — точки.
+// Стили линий по слоям: A — сплошная, B — ��унктир, C — точки.
 const LAYER_STYLE = {
 	A: { lineStyle: () => LightweightCharts.LineStyle.Solid, shape: 'circle', prefix: '' },
 	B: { lineStyle: () => LightweightCharts.LineStyle.Dashed, shape: 'square', prefix: 'B·' },
