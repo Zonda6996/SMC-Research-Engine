@@ -5,7 +5,7 @@ let chart = null
 let candleSeries = null
 let markersPlugin = null
 let currentData = null
-let priceZoomFactor = 1
+let priceScaleMargin = 0.08
 let priceScaleWheelBound = false
 
 const COLORS = {
@@ -16,42 +16,22 @@ const COLORS = {
 
 function tsToChartTime(ts) { return ts / 1000 }
 
-function visibleCandlePriceRange() {
-	if (!currentData?.candles.length || !chart) return null
-	const logical = chart.timeScale().getVisibleLogicalRange()
-	const from = Math.max(0, Math.floor(logical?.from ?? 0))
-	const to = Math.min(currentData.candles.length - 1, Math.ceil(logical?.to ?? currentData.candles.length - 1))
-	const visible = currentData.candles.slice(from, to + 1)
-	if (!visible.length) return null
-	const min = Math.min(...visible.map((c) => c.low))
-	const max = Math.max(...visible.map((c) => c.high))
-	const center = (min + max) / 2
-	const halfRange = Math.max((max - min) / 2, Math.abs(center) * 0.0001) * priceZoomFactor
-	return { minValue: center - halfRange, maxValue: center + halfRange }
-}
-
-function applyPriceZoom() {
-	if (!candleSeries) return
-	candleSeries.applyOptions({
-		autoscaleInfoProvider: () => {
-			const priceRange = visibleCandlePriceRange()
-			return priceRange ? { priceRange } : null
-		},
-	})
-	chart.priceScale('right').applyOptions({ autoScale: true })
-}
-
+// Колесо над ценовой шкалой: меняет вертикальные отступы autoscale (высоту графика).
+// Не трогает поведение остальной области графика и ручное перетаскивание шкалы.
 function bindPriceScaleWheel(container) {
 	if (priceScaleWheelBound) return
 	priceScaleWheelBound = true
 	container.addEventListener('wheel', (event) => {
-		if (!chart || !currentData) return
+		if (!chart) return
 		const rect = container.getBoundingClientRect()
 		const scaleWidth = chart.priceScale('right').width()
 		if (event.clientX < rect.right - scaleWidth) return
 		event.preventDefault()
-		priceZoomFactor = Math.min(8, Math.max(0.15, priceZoomFactor * (event.deltaY > 0 ? 1.12 : 0.89)))
-		applyPriceZoom()
+		priceScaleMargin = Math.min(0.42, Math.max(0.01, priceScaleMargin + (event.deltaY > 0 ? 0.035 : -0.035)))
+		chart.priceScale('right').applyOptions({
+			autoScale: true,
+			scaleMargins: { top: priceScaleMargin, bottom: priceScaleMargin },
+		})
 	}, { passive: false })
 }
 
@@ -65,7 +45,10 @@ function initChart() {
 		grid: { vertLines: { color: '#21262d' }, horzLines: { color: '#21262d' } },
 		crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
 		timeScale: { borderColor: '#30363d', timeVisible: true, secondsVisible: false },
-		rightPriceScale: { borderColor: '#30363d' },
+		rightPriceScale: {
+			borderColor: '#30363d',
+			scaleMargins: { top: priceScaleMargin, bottom: priceScaleMargin },
+		},
 	})
 	candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
 		upColor: '#3fb950', downColor: '#f85149',
@@ -74,7 +57,6 @@ function initChart() {
 	})
 	markersPlugin = LightweightCharts.createSeriesMarkers(candleSeries, [])
 	bindPriceScaleWheel(container)
-	chart.timeScale().subscribeVisibleLogicalRangeChange(() => applyPriceZoom())
 	window.addEventListener('resize', () => {
 		if (chart) { chart.applyOptions({ width: container.clientWidth, height: container.clientHeight }) }
 	})
@@ -239,13 +221,19 @@ function visibleFibCandidates() {
 			(candidate.trigger === 'bos' ? showBos : showChoch)
 	})
 	if (!document.getElementById('fibLatest').checked) return filtered
-	const latest = new Map()
+	const lastN = Math.max(1, Number(document.getElementById('fibLastN').value) || 1)
+	const groups = new Map()
 	for (const candidate of filtered) {
 		const key = `${candidate.mode}:${candidate.trigger}`
-		const previous = latest.get(key)
-		if (!previous || candidate.createdAtIndex > previous.createdAtIndex) latest.set(key, candidate)
+		if (!groups.has(key)) groups.set(key, [])
+		groups.get(key).push(candidate)
 	}
-	return [...latest.values()]
+	const result = []
+	for (const group of groups.values()) {
+		group.sort((a, b) => b.createdAtIndex - a.createdAtIndex)
+		result.push(...group.slice(0, lastN))
+	}
+	return result
 }
 
 function fibLevelStyle(ratio) {
@@ -266,6 +254,42 @@ function renderFibCandidates(candidates, candles) {
 		const mode = FIB_MODE_STYLE[candidate.mode]
 		const created = candles[candidate.createdAtIndex]
 		if (!mode || !created) continue
+
+		// Якорная нога 0% → 100%: диагональ цветом режима, чтобы сетка не «висела в воздухе».
+		const startCandle = candles[candidate.start.index]
+		const endCandle = candles[candidate.end.index]
+		if (startCandle && endCandle) {
+			const leg = chart.addSeries(LightweightCharts.LineSeries, {
+				...SEGMENT_SERIES_OPTIONS,
+				color: mode.color,
+				lineWidth: 2,
+				lineStyle: LightweightCharts.LineStyle.Dashed,
+				lastValueVisible: false,
+				priceLineVisible: false,
+			})
+			leg.setData([
+				{ time: tsToChartTime(startCandle.timestamp), value: candidate.start.price },
+				{ time: tsToChartTime(endCandle.timestamp), value: candidate.end.price },
+			])
+			LightweightCharts.createSeriesMarkers(leg, [
+				{
+					time: tsToChartTime(startCandle.timestamp),
+					position: candidate.direction === 'long' ? 'belowBar' : 'aboveBar',
+					color: mode.color,
+					shape: 'circle',
+					size: 0,
+					text: `${mode.label} 0%`,
+				},
+				{
+					time: tsToChartTime(endCandle.timestamp),
+					position: candidate.direction === 'long' ? 'aboveBar' : 'belowBar',
+					color: mode.color,
+					shape: 'circle',
+					size: 0,
+					text: '100%',
+				},
+			])
+		}
 
 		for (const level of candidate.levels) {
 			const levelStyle = fibLevelStyle(level.ratio)
@@ -328,11 +352,12 @@ function renderAll(preserveViewport = false) {
 		renderEventLines(eventsC, currentData.candles, 'C')
 	}
 
-	renderFibCandidates(visibleFibCandidates(), currentData.candles)
+	const visibleFib = visibleFibCandidates()
+	document.getElementById('fibVisibleCount').textContent = visibleFib.length
+	renderFibCandidates(visibleFib, currentData.candles)
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
 	if (visibleLogicalRange) chart.timeScale().setVisibleLogicalRange(visibleLogicalRange)
 	else chart.timeScale().fitContent()
-	applyPriceZoom()
 }
 
 function updateCounts(data) {
@@ -422,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Тумблеры отображения — локальная перерисовка каноническог�� snapshot.
 	for (const id of [
 		'toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled',
-		'toggleFib', 'fibEvent', 'fibNearest', 'fibOutermost', 'fibBos', 'fibChoch', 'fibLatest',
+		'toggleFib', 'fibEvent', 'fibNearest', 'fibOutermost', 'fibBos', 'fibChoch', 'fibLatest', 'fibLastN',
 	]) {
 		document.getElementById(id).addEventListener('change', () => renderAll(true))
 	}
