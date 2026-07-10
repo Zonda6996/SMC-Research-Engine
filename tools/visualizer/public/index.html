@@ -59,6 +59,10 @@
 		.toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; }
 		.toggle-row input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
 		.color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+		.line-sample { width: 18px; height: 0; display: inline-block; border-top: 2px solid #1f6feb; }
+		.line-sample.dashed { border-top-style: dashed; }
+		.line-sample.dotted { border-top-style: dotted; }
+		.stat-value.c { color: #a371f7; }
 		.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 		.stat { background: #21262d; padding: 6px 8px; border-radius: 4px; }
 		.stat-label { font-size: 10px; color: #8b949e; }
@@ -95,20 +99,39 @@
 <body>
 	<div class="toolbar">
 		<h1>BOS/CHoCH Probe</h1>
-		<select id="symbol">
-			<option value="BTC/USDT">BTC/USDT</option>
-			<option value="ETH/USDT">ETH/USDT</option>
-			<option value="SOL/USDT">SOL/USDT</option>
-		</select>
+		<input id="symbol" list="symbolList" value="BTC/USDT" placeholder="Symbol…"
+			style="background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:6px; padding:4px 8px; font-size:13px; width:130px;" />
+		<datalist id="symbolList">
+			<option value="BTC/USDT"></option>
+			<option value="ETH/USDT"></option>
+			<option value="SOL/USDT"></option>
+			<option value="DOGE/USDT"></option>
+			<option value="PEPE/USDT"></option>
+			<option value="WIF/USDT"></option>
+			<option value="XRP/USDT"></option>
+			<option value="BNB/USDT"></option>
+			<option value="AVAX/USDT"></option>
+			<option value="LINK/USDT"></option>
+		</datalist>
 		<select id="timeframe">
-			<option value="15m">15m</option>
+			<option value="1m">1m</option>
+			<option value="5m">5m</option>
+			<option value="15m" selected>15m</option>
+			<option value="30m">30m</option>
 			<option value="1h">1h</option>
 			<option value="4h">4h</option>
+			<option value="1d">1d</option>
 		</select>
 		<select id="limit">
 			<option value="500">500</option>
 			<option value="1000">1000</option>
 			<option value="1500">1500</option>
+			<option value="3000">3000</option>
+			<option value="5000">5000</option>
+		</select>
+		<select id="market">
+			<option value="futures" selected>futures</option>
+			<option value="spot">spot</option>
 		</select>
 		<label>Mode:
 			<select id="mode">
@@ -133,13 +156,18 @@
 				<h2>Layers</h2>
 				<label class="toggle-row">
 					<input type="checkbox" id="toggleA" checked />
-					<span class="color-dot" style="background:#1f6feb"></span>
-					A: Protected breaches
+					<span class="line-sample solid"></span>
+					A: Protected breaches (solid)
 				</label>
 				<label class="toggle-row">
-					<input type="checkbox" id="toggleB" checked />
-					<span class="color-dot" style="background:#f0883e"></span>
-					B: Swing breaches
+					<input type="checkbox" id="toggleB" />
+					<span class="line-sample dashed"></span>
+					B: Swing breaches (dashed)
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="toggleC" checked />
+					<span class="line-sample dotted"></span>
+					C: Active level pool (dotted)
 				</label>
 				<label class="toggle-row">
 					<input type="checkbox" id="toggleStruct" checked />
@@ -148,14 +176,60 @@
 				</label>
 				<label class="toggle-row">
 					<input type="checkbox" id="toggleProtected" checked />
-					<span class="color-dot" style="background:#3fb950"></span>
+					<span class="line-sample dashed" style="background:linear-gradient(to right,#2ea043 50%,transparent 50%); background-size:6px 1px;"></span>
 					Protected level segments
 				</label>
+				<div style="font-size:11px; color:#8b949e; margin-top:6px; line-height:1.5;">
+					Линия события: от возникновения уровня до свечи подтверждения слома.
+					<span style="color:#1f6feb">BOS</span> /
+					<span style="color:#f85149">CHoCH</span> — подпись на линии.
+				</div>
 				<label class="toggle-row">
-					<input type="checkbox" id="toggleUnlabeled" />
+					<input type="checkbox" id="toggleUnlabeled" checked />
 					<span class="color-dot" style="background:#8b949e"></span>
-					Show unlabeled events
+					Show unlabeled events (?)
 				</label>
+			</div>
+
+			<div class="panel">
+				<h2>BosChochEngine config (слой C)</h2>
+				<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
+					Фильтры применяет движок на сервере (src/core/events/).
+					Дефолты = принятый протоколом набор.
+				</div>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltCascade" checked />
+					Collapse cascades (1 свеча = 1 событие)
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltHHLL" checked />
+					HH/LL only (значимые экстремумы)
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltAge" checked />
+					Min level age
+					<input type="number" id="fltAgeValue" value="20" min="0" step="5"
+						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
+					свечей
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltSwept" checked />
+					Skip swept levels, глубже
+					<input type="number" id="fltSweptValue" value="0.6" min="0" step="0.1"
+						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
+					× ATR
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltDedup" checked />
+					Dedup nearby levels
+					<input type="number" id="fltDedupValue" value="1.2" min="0" step="0.1"
+						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
+					× ATR
+				</label>
+				<div class="type-row" style="margin-top:6px; border-top:1px solid #21262d; padding-top:6px;">
+					<span style="color:#a371f7">C filtered / raw</span>
+					<span id="countCFiltered" style="font-weight:600; color:#a371f7">—</span>
+				</div>
 			</div>
 
 			<div class="panel">
@@ -163,7 +237,8 @@
 				<div class="stat-grid">
 					<div class="stat"><div class="stat-label">Layer A</div><div class="stat-value" id="countA">0</div></div>
 					<div class="stat"><div class="stat-label">Layer B</div><div class="stat-value b" id="countB">0</div></div>
-					<div class="stat"><div class="stat-label">Matched</div><div class="stat-value match" id="countMatch">0</div></div>
+					<div class="stat"><div class="stat-label">Layer C</div><div class="stat-value c" id="countC">0</div></div>
+					<div class="stat"><div class="stat-label">Matched A∩B</div><div class="stat-value match" id="countMatch">0</div></div>
 					<div class="stat"><div class="stat-label">Unique B</div><div class="stat-value b" id="countUniqueB">0</div></div>
 				</div>
 				<div style="margin-top:8px;">
@@ -173,6 +248,9 @@
 					<div class="type-row"><span style="color:#1f6feb">B: BOS</span><span id="bBos">0</span></div>
 					<div class="type-row"><span style="color:#f85149">B: CHoCH</span><span id="bChoch">0</span></div>
 					<div class="type-row"><span style="color:#8b949e">B: unlabeled</span><span id="bUnlabeled">0</span></div>
+					<div class="type-row"><span style="color:#1f6feb">C: BOS</span><span id="cBos">0</span></div>
+					<div class="type-row"><span style="color:#f85149">C: CHoCH</span><span id="cChoch">0</span></div>
+					<div class="type-row"><span style="color:#8b949e">C: unlabeled</span><span id="cUnlabeled">0</span></div>
 				</div>
 			</div>
 

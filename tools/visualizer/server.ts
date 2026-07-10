@@ -13,6 +13,8 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join, extname } from 'node:path'
 import { BinanceService } from '../../src/services/BinanceService.js'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
+import { BosChochEngine, DEFAULT_BOS_CHOCH_CONFIG } from '../../src/core/events/BosChochEngine.js'
+import type { StructureEvent } from '../../src/models/events/StructureEvent.js'
 import { probeSwingBreaches, type BreachMode } from './lastSwingBreachProbe.js'
 import {
 	probeProtectedBreaches,
@@ -38,6 +40,14 @@ interface AnalyzeQuery {
 	timeframe?: string | undefined
 	limit?: string | undefined
 	mode?: string | undefined
+	source?: string | undefined
+	market?: string | undefined
+	/** Конфиг BosChochEngine из тумблеров UI (слой C). */
+	cascade?: string | undefined
+	hhll?: string | undefined
+	age?: string | undefined
+	dedup?: string | undefined
+	swept?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -47,7 +57,86 @@ function parseQuery(qs: string): AnalyzeQuery {
 		timeframe: params.get('timeframe') ?? undefined,
 		limit: params.get('limit') ?? undefined,
 		mode: params.get('mode') ?? undefined,
+		source: params.get('source') ?? undefined,
+		market: params.get('market') ?? undefined,
+		cascade: params.get('cascade') ?? undefined,
+		hhll: params.get('hhll') ?? undefined,
+		age: params.get('age') ?? undefined,
+		dedup: params.get('dedup') ?? undefined,
+		swept: params.get('swept') ?? undefined,
 	}
+}
+
+const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
+
+/** Фикстура читается из файла — воспроизводимость без похода на биржу. */
+function loadFixtureCandles(): import('../../src/models/price/Candle.js').Candle[] {
+	return JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8'))
+}
+
+/** Максимум свечей за один запрос к Binance (лимит их API). */
+const BINANCE_PAGE_LIMIT = 1000
+/** Потолок визуализатора — защита от случайной загрузки мегаистории. */
+const MAX_CANDLES = 5000
+
+const TF_MS: Record<string, number> = {
+	'1m': 60_000,
+	'5m': 300_000,
+	'15m': 900_000,
+	'30m': 1_800_000,
+	'1h': 3_600_000,
+	'4h': 14_400_000,
+	'1d': 86_400_000,
+}
+
+/**
+ * Постраничная загрузка: Binance отдаёт максимум 1000 свечей за запрос,
+ * для больших лимитов идём страницами от рассчитанного `since` вперёд.
+ * Только для визуализатора — пайплайн работает со своим сервисом.
+ */
+async function fetchCandlesPaginated(
+	symbol: string,
+	timeframe: string,
+	limit: number,
+	market: 'spot' | 'futures' = 'spot',
+): Promise<import('../../src/models/price/Candle.js').Candle[]> {
+	const capped = Math.min(limit, MAX_CANDLES)
+
+	if (capped <= BINANCE_PAGE_LIMIT && market === 'spot') {
+		return new BinanceService().getCandles({ symbol, timeframe, limit: capped })
+	}
+
+	const tfMs = TF_MS[timeframe]
+	if (!tfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
+
+	// ccxt внутри BinanceService не принимает since и не умеет фьючерсы —
+	// используем ccxt напрямую (инструментальный код, не пайплайн).
+	// binanceusdm = USDT-M perpetual futures: у низколиквидных альтов (PEPE и
+	// т.п.) фьючерсные свечи чище спотовых — меньше рваных фитилей.
+	const { default: ccxt } = await import('ccxt')
+	const exchange = market === 'futures' ? new ccxt.binanceusdm() : new ccxt.binance()
+	const since = Date.now() - capped * tfMs
+
+	const all: number[][] = []
+	let cursor = since
+	while (all.length < capped) {
+		const page = await exchange.fetchOHLCV(symbol, timeframe, cursor, BINANCE_PAGE_LIMIT)
+		if (page.length === 0) break
+		all.push(...(page as number[][]))
+		const lastTs = Number(page[page.length - 1]![0])
+		const nextCursor = lastTs + tfMs
+		if (nextCursor <= cursor) break // защита от зацикливания
+		cursor = nextCursor
+	}
+
+	return all.slice(-capped).map(([timestamp, open, high, low, close, volume]) => ({
+		timestamp: Number(timestamp),
+		open: Number(open),
+		high: Number(high),
+		low: Number(low),
+		close: Number(close),
+		volume: Number(volume),
+	}))
 }
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
@@ -70,9 +159,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const timeframe = q.timeframe ?? '15m'
 			const limit = Number(q.limit ?? 500)
 			const mode: BreachMode = q.mode === 'single' ? 'single' : 'two'
+			const market = q.market === 'futures' ? 'futures' : 'spot'
 
-			const service = new BinanceService()
-			const candles = await service.getCandles({ symbol, timeframe, limit })
+			const useFixture = q.source !== 'fresh'
+			const candles = useFixture
+				? loadFixtureCandles()
+				: await fetchCandlesPaginated(symbol, timeframe, limit, market)
 			const snapshot = runAnalysis(candles)
 
 			// Слой A: protected-пробои. Эмулируем через probeProtectedBreaches с
@@ -97,6 +189,34 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				mode,
 			)
 			const layerB = classifySwing(swingBreaches, snapshot.market.trendHistory)
+
+			// Слой C: BosChochEngine из src/core — единственный источник истины.
+			// Тумблеры UI крутят конфиг движка; дефолты = принятый набор (SPEC 7.6).
+			const engineConfig = {
+				pivotWindow: WINDOW,
+				breachMode: mode,
+				collapseCascades: q.cascade !== '0',
+				hhllOnly: q.hhll !== '0',
+				minLevelAge: q.age !== undefined ? Number(q.age) : DEFAULT_BOS_CHOCH_CONFIG.minLevelAge,
+				dedupAtrMultiple:
+					q.dedup === 'off' ? null
+					: q.dedup !== undefined ? Number(q.dedup)
+					: DEFAULT_BOS_CHOCH_CONFIG.dedupAtrMultiple,
+				skipSweptAtrMultiple:
+					q.swept === 'off' ? null
+					: q.swept !== undefined ? Number(q.swept)
+					: DEFAULT_BOS_CHOCH_CONFIG.skipSweptAtrMultiple,
+			}
+			const engine = new BosChochEngine(engineConfig)
+			// Клиент ожидает поля source/trend/reason (общие с A/B) — доклеиваем.
+			const toClientEvent = (e: StructureEvent) => ({
+				...e,
+				source: 'pool' as const,
+				trend: e.direction === 'up' ? 'bullish' : 'bearish',
+				reason: `engine: направление ${e.direction}`,
+			})
+			const layerC = engine.build(snapshot.structure, snapshot.candles).map(toClientEvent)
+			const layerCRawCount = engine.buildRaw(snapshot.structure, snapshot.candles).length
 
 			// Совпадения: одна и та же свеча подтверждения + тот же уровень цены.
 			const matched = layerA.filter((a) =>
@@ -126,16 +246,24 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				layers: {
 					A: layerA,
 					B: layerB,
+					C: layerC,
 					matched,
 					uniqueB,
+					// Уникальные для C относительно A — то, что теряет вариант 1.
+					uniqueC: layerC.filter((c) =>
+						!layerA.some((a) => a.confirmIndex === c.confirmIndex && a.levelPrice === c.levelPrice),
+					),
 				},
 				counts: {
 					A: layerA.length,
 					B: layerB.length,
+					C: layerCRawCount,
+					CFiltered: layerC.length,
 					matched: matched.length,
 					uniqueB: uniqueB.length,
 					byTypeA: countByType(layerA),
 					byTypeB: countByType(layerB),
+					byTypeC: countByType(layerC),
 				},
 			})
 		} catch (err) {

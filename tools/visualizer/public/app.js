@@ -78,6 +78,12 @@ function findEventsAtCandle(idx) {
 			if (e.confirmIndex === idx) events.push(e)
 		}
 	}
+	if (document.getElementById('toggleC').checked) {
+		// layers.C уже отфильтрован движком на сервере.
+		for (const e of currentData.layers.C ?? []) {
+			if (e.confirmIndex === idx) events.push(e)
+		}
+	}
 	// Фильтр unlabeled.
 	const showUnlabeled = document.getElementById('toggleUnlabeled').checked
 	return showUnlabeled ? events : events.filter((e) => e.type !== 'unlabeled')
@@ -91,21 +97,78 @@ function renderCandles(candles) {
 	candleSeries.setData(data)
 }
 
+// Базовые опции для всех вспомогательных линий: без ценника на оси и без
+// «бесконечной» priceLine через весь график (из-за них сегменты выглядели
+// как линии во всю ширину).
+const SEGMENT_SERIES_OPTIONS = {
+	lastValueVisible: false,
+	priceLineVisible: false,
+	crosshairMarkerVisible: false,
+}
+
 function renderProtectedSegments(segments, candles) {
 	if (!document.getElementById('toggleProtected').checked) return
 	for (const seg of segments) {
+		const startCandle = candles[seg.startIndex]
+		const endCandle = candles[seg.endIndex]
+		if (!startCandle || !endCandle || seg.startIndex >= seg.endIndex) continue
 		const line = chart.addSeries(LightweightCharts.LineSeries, {
-			color: seg.type === 'high' ? '#3fb950' : '#3fb950',
+			...SEGMENT_SERIES_OPTIONS,
+			color: seg.type === 'high' ? '#d29922' : '#2ea043',
 			lineWidth: 1,
 			lineStyle: LightweightCharts.LineStyle.Dashed,
 		})
-		const startCandle = candles[seg.startIndex]
-		const endCandle = candles[seg.endIndex]
-		if (!startCandle || !endCandle) continue
 		line.setData([
 			{ time: tsToChartTime(startCandle.timestamp), value: seg.price },
 			{ time: tsToChartTime(endCandle.timestamp), value: seg.price },
 		])
+	}
+}
+
+// Фильтры слоя C применяются на СЕРВЕРЕ: тумблеры UI крутят конфиг
+// BosChochEngine (src/core/events/) — единственного источника истины.
+// layers.C в ответе уже отфильтрован и классифицирован движком.
+
+// Стили линий по слоям: A — сплошная, B — ��унктир, C — точки.
+const LAYER_STYLE = {
+	A: { lineStyle: () => LightweightCharts.LineStyle.Solid, shape: 'circle', prefix: '' },
+	B: { lineStyle: () => LightweightCharts.LineStyle.Dashed, shape: 'square', prefix: 'B·' },
+	C: { lineStyle: () => LightweightCharts.LineStyle.Dotted, shape: 'circle', prefix: 'C·' },
+}
+
+// Рисует события слома как в ручной SMC-разметке: горизонтальная линия от
+// свечи возникновения уровня до свечи подтверждения слома, с подписью
+// BOS/CHoCH на середине линии.
+function renderEventLines(events, candles, layerName) {
+	const style = LAYER_STYLE[layerName] ?? LAYER_STYLE.A
+	for (const e of events) {
+		const startCandle = candles[e.levelIndex]
+		const endCandle = candles[e.confirmIndex]
+		if (!startCandle || !endCandle || e.levelIndex >= e.confirmIndex) continue
+		const color = COLORS.A[e.type]
+		const line = chart.addSeries(LightweightCharts.LineSeries, {
+			...SEGMENT_SERIES_OPTIONS,
+			color,
+			lineWidth: 2,
+			lineStyle: style.lineStyle(),
+		})
+		line.setData([
+			{ time: tsToChartTime(startCandle.timestamp), value: e.levelPrice },
+			{ time: tsToChartTime(endCandle.timestamp), value: e.levelPrice },
+		])
+		// Подпись на середине линии (маркер живёт на line-series, не на свечах).
+		const midCandle = candles[Math.floor((e.levelIndex + e.confirmIndex) / 2)]
+		if (midCandle) {
+			const label = e.type === 'unlabeled' ? '?' : e.type.toUpperCase()
+			LightweightCharts.createSeriesMarkers(line, [{
+				time: tsToChartTime(midCandle.timestamp),
+				position: e.levelType === 'high' ? 'aboveBar' : 'belowBar',
+				color,
+				shape: style.shape,
+				size: 0,
+				text: style.prefix + label,
+			}])
+		}
 	}
 }
 
@@ -131,45 +194,31 @@ function renderAll() {
 		}
 	}
 
-	if (document.getElementById('toggleA').checked) {
-		for (const e of currentData.layers.A) {
-			if (!showUnlabeled && e.type === 'unlabeled') continue
-			const c = currentData.candles[e.confirmIndex]
-			if (!c) continue
-			allMarkers.push({
-				time: tsToChartTime(c.timestamp),
-				position: 'aboveBar',
-				color: COLORS.A[e.type],
-				shape: 'circle',
-				text: `A:${e.type === 'unlabeled' ? '?' : e.type}`,
-			})
-		}
-	}
-
-	if (document.getElementById('toggleB').checked) {
-		for (const e of currentData.layers.B) {
-			if (!showUnlabeled && e.type === 'unlabeled') continue
-			const c = currentData.candles[e.confirmIndex]
-			if (!c) continue
-			allMarkers.push({
-				time: tsToChartTime(c.timestamp),
-				position: 'belowBar',
-				color: COLORS.B[e.type],
-				shape: 'square',
-				text: `B:${e.type === 'unlabeled' ? '?' : e.type}`,
-			})
-		}
-	}
-
 	allMarkers.sort((a, b) => a.time - b.time)
 	markersPlugin.setMarkers(allMarkers)
+
+	// События слома — линии от уровня до свечи подтверждения (не плавающие точки).
+	const filterEvents = (events) =>
+		showUnlabeled ? events : events.filter((e) => e.type !== 'unlabeled')
+	if (document.getElementById('toggleA').checked) {
+		renderEventLines(filterEvents(currentData.layers.A), currentData.candles, 'A')
+	}
+	if (document.getElementById('toggleB').checked) {
+		renderEventLines(filterEvents(currentData.layers.B), currentData.candles, 'B')
+	}
+	if (document.getElementById('toggleC').checked) {
+		const eventsC = filterEvents(currentData.layers.C ?? [])
+		renderEventLines(eventsC, currentData.candles, 'C')
+		document.getElementById('countCFiltered').textContent =
+			`${(currentData.layers.C ?? []).length} / ${currentData.counts.C ?? 0}`
+	}
 
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
 	chart.timeScale().fitContent()
 }
 
 function updateCounts(data) {
-	// Counts показываем всегда (даже если unlabeled скрыты).
+	// Counts п��казываем всегда (даже если unlabeled скрыты).
 	document.getElementById('countA').textContent = data.counts.A
 	document.getElementById('countB').textContent = data.counts.B
 	document.getElementById('countMatch').textContent = data.counts.matched
@@ -180,6 +229,10 @@ function updateCounts(data) {
 	document.getElementById('bBos').textContent = data.counts.byTypeB.bos
 	document.getElementById('bChoch').textContent = data.counts.byTypeB.choch
 	document.getElementById('bUnlabeled').textContent = data.counts.byTypeB.unlabeled
+	document.getElementById('countC').textContent = data.counts.C ?? 0
+	document.getElementById('cBos').textContent = data.counts.byTypeC?.bos ?? 0
+	document.getElementById('cChoch').textContent = data.counts.byTypeC?.choch ?? 0
+	document.getElementById('cUnlabeled').textContent = data.counts.byTypeC?.unlabeled ?? 0
 }
 
 function updateDiffTable(uniqueB, candles) {
@@ -200,15 +253,40 @@ function updateDiffTable(uniqueB, candles) {
 	}
 }
 
+let lastIsFresh = false
+
+// Конфиг BosChochEngine из тумблеров UI → query-параметры /api/analyze.
+function engineParams() {
+	return {
+		cascade: document.getElementById('fltCascade').checked ? '1' : '0',
+		hhll: document.getElementById('fltHHLL').checked ? '1' : '0',
+		age: document.getElementById('fltAge').checked
+			? String(Number(document.getElementById('fltAgeValue').value) || 0)
+			: '0',
+		dedup: document.getElementById('fltDedup').checked
+			? String(Number(document.getElementById('fltDedupValue').value) || 0)
+			: 'off',
+		swept: document.getElementById('fltSwept').checked
+			? String(Number(document.getElementById('fltSweptValue').value) || 0)
+			: 'off',
+	}
+}
+
 async function loadData(isFresh) {
+	lastIsFresh = isFresh
 	const mode = document.getElementById('mode').value
 	const symbol = isFresh ? document.getElementById('symbol').value : 'BTC/USDT'
 	const timeframe = isFresh ? document.getElementById('timeframe').value : '15m'
 	const limit = isFresh ? document.getElementById('limit').value : '500'
+	const market = isFresh ? document.getElementById('market').value : 'spot'
 
 	showLoading(true)
 	try {
-		const params = new URLSearchParams({ symbol, timeframe, limit, mode })
+		const params = new URLSearchParams({
+			symbol, timeframe, limit, mode, market,
+			source: isFresh ? 'fresh' : 'fixture',
+			...engineParams(),
+		})
 		const res = await fetch(`/api/analyze?${params}`)
 		const data = await res.json()
 		if (data.error) throw new Error(data.error)
@@ -234,12 +312,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	initChart()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
-	for (const id of ['toggleA', 'toggleB', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode']) {
-		document.getElementById(id).addEventListener('change', () => {
-			// При смене mode — перезагружаем данные с сервера.
-			if (id === 'mode') { loadData(currentData && currentData.dataset.symbol !== 'BTC/USDT') ; return }
-			renderAll()
-		})
+	// Тумблеры отображения — локальная перерисовка.
+	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled']) {
+		document.getElementById(id).addEventListener('change', () => renderAll())
+	}
+	// mode и фильтры движка — конфиг BosChochEngine, перезапрос к серверу.
+	for (const id of ['mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltDedup', 'fltDedupValue', 'fltSwept', 'fltSweptValue']) {
+		document.getElementById(id).addEventListener('change', () => loadData(lastIsFresh))
 	}
 	// Автозагрузка.
 	loadData(false)
