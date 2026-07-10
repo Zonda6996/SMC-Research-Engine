@@ -157,6 +157,27 @@ function applyFiltersC(events) {
 		result = [...byKey.values()].sort((a, b) => a.confirmIndex - b.confirmIndex)
 	}
 
+	// Фильтр «dedup по близости»: два соседних экстремума почти на одной
+	// цене дают два события в паре тиков друг от друга. Если очередное
+	// событие того же направления, что и последнее оставленное, и цены их
+	// уровней ближе N% — это дубликат, оставляем первое (оно старше и
+	// значимее). CHoCH/смена направления цепочку сбрасывает.
+	if (document.getElementById('fltDedup').checked) {
+		const tolPct = (Number(document.getElementById('fltDedupValue').value) || 0) / 100
+		let lastKept = null // последнее оставленное событие
+		result = result.filter((e) => {
+			const dir = e.levelType === 'high' ? 'up' : 'down'
+			if (lastKept) {
+				const lastDir = lastKept.levelType === 'high' ? 'up' : 'down'
+				const closeInPrice =
+					Math.abs(e.levelPrice - lastKept.levelPrice) / e.levelPrice < tolPct
+				if (dir === lastDir && closeInPrice) return false
+			}
+			lastKept = e
+			return true
+		})
+	}
+
 	// Фильтр «первый слом в направлении»: серия сломов в одну сторону
 	// (пробой high = движение вверх, low = вниз) — первый является событием,
 	// остальные лишь подтверждения.
@@ -356,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	initChart()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
-	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltFirstDir', 'fltSeqLabels']) {
+	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltFirstDir', 'fltSeqLabels', 'fltDedup', 'fltDedupValue']) {
 		document.getElementById(id).addEventListener('change', () => {
 			// При смене mode — перезагружаем данные с сервера.
 			if (id === 'mode') { loadData(currentData && currentData.dataset.symbol !== 'BTC/USDT') ; return }

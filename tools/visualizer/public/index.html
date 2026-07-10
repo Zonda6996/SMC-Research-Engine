@@ -193,6 +193,13 @@
 					<input type="checkbox" id="fltFirstDir" />
 					First break per direction
 				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltDedup" checked />
+					Dedup nearby levels
+					<input type="number" id="fltDedupValue" value="0.3" min="0" step="0.1"
+						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
+					%
+				</label>
 				<label class="toggle-row" style="border-top:1px solid #21262d; padding-top:6px; margin-top:4px;">
 					<input type="checkbox" id="fltSeqLabels" checked />
 					Sequence labels (CHoCH→BOS→BOS)
