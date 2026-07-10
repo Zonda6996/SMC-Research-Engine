@@ -173,6 +173,33 @@
 			</div>
 
 			<div class="panel">
+				<h2>Layer C filters (experimental)</h2>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltCascade" />
+					Collapse cascades (1 свеча = 1 событие)
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltHHLL" />
+					HH/LL only (значимые экстремумы)
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltAge" />
+					Min level age
+					<input type="number" id="fltAgeValue" value="20" min="0" step="5"
+						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
+					свечей
+				</label>
+				<label class="toggle-row">
+					<input type="checkbox" id="fltFirstDir" />
+					First break per direction
+				</label>
+				<div class="type-row" style="margin-top:6px; border-top:1px solid #21262d; padding-top:6px;">
+					<span style="color:#a371f7">C after filters</span>
+					<span id="countCFiltered" style="font-weight:600; color:#a371f7">—</span>
+				</div>
+			</div>
+
+			<div class="panel">
 				<h2>Counts</h2>
 				<div class="stat-grid">
 					<div class="stat"><div class="stat-label">Layer A</div><div class="stat-value" id="countA">0</div></div>

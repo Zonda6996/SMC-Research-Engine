@@ -20,6 +20,8 @@ export interface ClassifiedEvent {
 	levelType: 'high' | 'low'
 	/** Индекс свечи, на которой возник пробитый уровень (для отрисовки линии слома). */
 	levelIndex: number
+	/** Структурная метка уровня (HH/HL/LH/LL) — для фильтра значимости. */
+	levelLabel: string
 	/** BOS / CHoCH / unlabeled. */
 	type: EventType
 	/** Тренд на момент события (look-ahead-free). */
@@ -247,6 +249,7 @@ export function classifyBreaches(
 			levelPrice: b.level.price,
 			levelType: b.level.type,
 			levelIndex: b.level.index,
+			levelLabel: b.level.label,
 			type,
 			trend,
 			reason,

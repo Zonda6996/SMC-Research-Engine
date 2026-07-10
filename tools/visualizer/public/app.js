@@ -79,7 +79,8 @@ function findEventsAtCandle(idx) {
 		}
 	}
 	if (document.getElementById('toggleC').checked) {
-		for (const e of currentData.layers.C ?? []) {
+		// Тултип показывает только то, что реально на графике (после фильтров).
+		for (const e of applyFiltersC(currentData.layers.C ?? [])) {
 			if (e.confirmIndex === idx) events.push(e)
 		}
 	}
@@ -122,6 +123,54 @@ function renderProtectedSegments(segments, candles) {
 			{ time: tsToChartTime(endCandle.timestamp), value: seg.price },
 		])
 	}
+}
+
+// ──────────────────────────────────────────────
+// Экспериментальные фильтры слоя C.
+// Каждый фильтр — независимая гипотеза «что из пула значимо».
+// Применяются на клиенте: переключение мгновенное, без запроса к серверу.
+// ──────────────────────────────────────────────
+
+function applyFiltersC(events) {
+	let result = [...events].sort((a, b) => a.confirmIndex - b.confirmIndex)
+
+	// Фильтр «HH/LL only»: только структурно значимые уровни (экстремумы тренда).
+	if (document.getElementById('fltHHLL').checked) {
+		result = result.filter((e) => e.levelLabel === 'HH' || e.levelLabel === 'LL')
+	}
+
+	// Фильтр «возраст»: уровень должен продержаться минимум N свечей до слома.
+	if (document.getElementById('fltAge').checked) {
+		const minAge = Number(document.getElementById('fltAgeValue').value) || 0
+		result = result.filter((e) => e.confirmIndex - e.levelIndex >= minAge)
+	}
+
+	// Фильтр «каскады»: одна свеча сносит несколько уровней одного
+	// направления → это ОДНО событие по самому дальнему (старому) уровню.
+	if (document.getElementById('fltCascade').checked) {
+		const byKey = new Map()
+		for (const e of result) {
+			const key = `${e.confirmIndex}:${e.levelType}`
+			const prev = byKey.get(key)
+			if (!prev || e.levelIndex < prev.levelIndex) byKey.set(key, e)
+		}
+		result = [...byKey.values()].sort((a, b) => a.confirmIndex - b.confirmIndex)
+	}
+
+	// Фильтр «первый слом в направлении»: серия сломов в одну сторону
+	// (пробой high = движение вверх, low = вниз) — первый является событием,
+	// остальные лишь подтверждения.
+	if (document.getElementById('fltFirstDir').checked) {
+		let lastDir = null
+		result = result.filter((e) => {
+			const dir = e.levelType === 'high' ? 'up' : 'down'
+			if (dir === lastDir) return false
+			lastDir = dir
+			return true
+		})
+	}
+
+	return result
 }
 
 // Стили линий по слоям: A — сплошная, B — пунктир, C — точки.
@@ -202,7 +251,10 @@ function renderAll() {
 		renderEventLines(filterEvents(currentData.layers.B), currentData.candles, 'B')
 	}
 	if (document.getElementById('toggleC').checked) {
-		renderEventLines(filterEvents(currentData.layers.C ?? []), currentData.candles, 'C')
+		const filteredC = applyFiltersC(filterEvents(currentData.layers.C ?? []))
+		renderEventLines(filteredC, currentData.candles, 'C')
+		document.getElementById('countCFiltered').textContent =
+			`${filteredC.length} / ${(currentData.layers.C ?? []).length}`
 	}
 
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
@@ -279,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	initChart()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
-	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode']) {
+	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltFirstDir']) {
 		document.getElementById(id).addEventListener('change', () => {
 			// При смене mode — перезагружаем данные с сервера.
 			if (id === 'mode') { loadData(currentData && currentData.dataset.symbol !== 'BTC/USDT') ; return }
