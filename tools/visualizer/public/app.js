@@ -79,8 +79,8 @@ function findEventsAtCandle(idx) {
 		}
 	}
 	if (document.getElementById('toggleC').checked) {
-		// Тултип показывает только то, что реально на графике (после фильтров).
-		for (const e of applyFiltersC(currentData.layers.C ?? [])) {
+		// layers.C уже отфильтрован движком на сервере.
+		for (const e of currentData.layers.C ?? []) {
 			if (e.confirmIndex === idx) events.push(e)
 		}
 	}
@@ -125,157 +125,9 @@ function renderProtectedSegments(segments, candles) {
 	}
 }
 
-// ──────────────────────────────────────────────
-// Экспериментальные фильтры слоя C.
-// Каждый фильтр — независимая гипотеза «что из пула значимо».
-// Применяются на клиенте: переключение мгновенное, без запроса к серверу.
-// ──────────────────────────────────────────────
-
-// ATR(period) на момент каждой свечи — скользящее среднее true range.
-// Нормируем на него пороги, чтобы они не зависели от актива/ТФ/волатильности.
-function computeATR(candles, period = 14) {
-	const atr = new Array(candles.length).fill(0)
-	let sum = 0
-	for (let i = 0; i < candles.length; i++) {
-		const c = candles[i]
-		const prevClose = i > 0 ? candles[i - 1].close : c.close
-		const tr = Math.max(
-			c.high - c.low,
-			Math.abs(c.high - prevClose),
-			Math.abs(c.low - prevClose),
-		)
-		sum += tr
-		if (i >= period) {
-			sum -= Math.max(
-				candles[i - period].high - candles[i - period].low,
-				Math.abs(candles[i - period].high - (i - period > 0 ? candles[i - period - 1].close : candles[i - period].close)),
-				Math.abs(candles[i - period].low - (i - period > 0 ? candles[i - period - 1].close : candles[i - period].close)),
-			)
-			atr[i] = sum / period
-		} else {
-			atr[i] = sum / (i + 1)
-		}
-	}
-	return atr
-}
-
-// Кэш ATR: пересчитываем только при смене данных.
-let atrCache = null
-let atrCacheKey = null
-
-function getATR() {
-	const candles = currentData?.candles ?? []
-	const key = candles.length > 0 ? `${candles.length}:${candles[0].timestamp}` : 'empty'
-	if (atrCacheKey !== key) {
-		atrCache = computeATR(candles)
-		atrCacheKey = key
-	}
-	return atrCache
-}
-
-function applyFiltersC(events) {
-	let result = [...events].sort((a, b) => a.confirmIndex - b.confirmIndex)
-
-	// Фильтр «skip swept»: если у уровня уже снимали ликвидность — фрактал
-	// «отработан», слом от него не событие. Но мелкий укол и глубокое снятие
-	// разные вещи: уровень считается отработанным только если фитиль зашёл
-	// за него глубже K×ATR (K=0 — любой прокол, как раньше). Актуальный
-	// уровень — следующий нетронутый экстремум глубже, он и так в пуле.
-	if (document.getElementById('fltSwept').checked) {
-		const sweptMult = Number(document.getElementById('fltSweptValue').value) || 0
-		const atr = getATR()
-		result = result.filter((e) => {
-			if (!e.sweptBefore) return true
-			const threshold = sweptMult * (atr[e.confirmIndex] ?? 0)
-			return (e.sweptDepth ?? 0) <= threshold
-		})
-	}
-
-	// Фильтр «HH/LL only»: только структурно значимые уровни (экстремумы тренда).
-	if (document.getElementById('fltHHLL').checked) {
-		result = result.filter((e) => e.levelLabel === 'HH' || e.levelLabel === 'LL')
-	}
-
-	// Фильтр «возраст»: уровень должен продержаться минимум N свечей до слома.
-	if (document.getElementById('fltAge').checked) {
-		const minAge = Number(document.getElementById('fltAgeValue').value) || 0
-		result = result.filter((e) => e.confirmIndex - e.levelIndex >= minAge)
-	}
-
-	// Фильтр «каскады»: одна свеча сносит несколько уровней одного
-	// направления → это ОДНО событие по самому дальнему (старому) уровню.
-	if (document.getElementById('fltCascade').checked) {
-		const byKey = new Map()
-		for (const e of result) {
-			const key = `${e.confirmIndex}:${e.levelType}`
-			const prev = byKey.get(key)
-			if (!prev || e.levelIndex < prev.levelIndex) byKey.set(key, e)
-		}
-		result = [...byKey.values()].sort((a, b) => a.confirmIndex - b.confirmIndex)
-	}
-
-	// Фильтр «dedup по близости»: два соседних экстремума почти на одной
-	// цене дают дв�� события в паре тиков друг от друга. Порог — в долях
-	// ATR(14) на момент слома: инвариантен к активу, ТФ и волатильности
-	// («0.5 = половина средней свечи»). Если очередное событие того же
-	// направления, что и последнее оставленное, и уровни ближе K×ATR —
-	// дубликат, оставляем первое (оно старше и значимее). Смена
-	// направления (CHoCH) цепочку сбрасывает.
-	if (document.getElementById('fltDedup').checked) {
-		const atrMult = Number(document.getElementById('fltDedupValue').value) || 0
-		const atr = getATR()
-		let lastKept = null // последнее оставленное событие
-		result = result.filter((e) => {
-			const dir = e.levelType === 'high' ? 'up' : 'down'
-			if (lastKept) {
-				const lastDir = lastKept.levelType === 'high' ? 'up' : 'down'
-				const tolerance = atrMult * (atr[e.confirmIndex] ?? 0)
-				const closeInPrice =
-					Math.abs(e.levelPrice - lastKept.levelPrice) < tolerance
-				if (dir === lastDir && closeInPrice) return false
-			}
-			lastKept = e
-			return true
-		})
-	}
-
-	// Фильтр «первый слом в направлении»: серия сломов в одну сторону
-	// (пробой high = движение вверх, low = вниз) — первый является событием,
-	// остальные лишь подтверждения.
-	if (document.getElementById('fltFirstDir').checked) {
-		let lastDir = null
-		result = result.filter((e) => {
-			const dir = e.levelType === 'high' ? 'up' : 'down'
-			if (dir === lastDir) return false
-			lastDir = dir
-			return true
-		})
-	}
-
-	// Последовательная классификация: метки выводятся из САМИХ событий,
-	// а не из тренда движка (который ленивый и часто в range → куча «?»).
-	// Правило как у человека: слом против текущего направления = CHoCH
-	// (направление переворачивается), слом по направлению = BOS.
-	// Применяется ПОСЛЕ фильтров — метки соответствуют видимой картине.
-	if (document.getElementById('fltSeqLabels').checked) {
-		let dir = null // 'up' | 'down' — текущее направление по событиям C
-		result = result.map((e) => {
-			const eventDir = e.levelType === 'high' ? 'up' : 'down'
-			let type
-			if (dir === null) {
-				type = 'unlabeled' // первому событию не с чем сравнивать
-			} else if (eventDir === dir) {
-				type = 'bos'
-			} else {
-				type = 'choch'
-			}
-			dir = eventDir
-			return { ...e, type, trend: dir === 'up' ? 'bullish' : 'bearish', reason: `seq: направление ${dir}` }
-		})
-	}
-
-	return result
-}
+// Фильтры слоя C применяются на СЕРВЕРЕ: тумблеры UI крутят конфиг
+// BosChochEngine (src/core/events/) — единственного источника истины.
+// layers.C в ответе уже отфильтрован и классифицирован движком.
 
 // Стили линий по слоям: A — сплошная, B — ��унктир, C — точки.
 const LAYER_STYLE = {
@@ -355,13 +207,10 @@ function renderAll() {
 		renderEventLines(filterEvents(currentData.layers.B), currentData.candles, 'B')
 	}
 	if (document.getElementById('toggleC').checked) {
-		// Порядок важен: сперва фильтры + переклассификация (seq), и только
-		// потом скрытие unlabeled — иначе со��ытия, которые seq-режим
-		// превратил бы в BOS/CHoCH, отсекались бы по старой метке движка.
-		const filteredC = filterEvents(applyFiltersC(currentData.layers.C ?? []))
-		renderEventLines(filteredC, currentData.candles, 'C')
+		const eventsC = filterEvents(currentData.layers.C ?? [])
+		renderEventLines(eventsC, currentData.candles, 'C')
 		document.getElementById('countCFiltered').textContent =
-			`${filteredC.length} / ${(currentData.layers.C ?? []).length}`
+			`${(currentData.layers.C ?? []).length} / ${currentData.counts.C ?? 0}`
 	}
 
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
@@ -404,7 +253,27 @@ function updateDiffTable(uniqueB, candles) {
 	}
 }
 
+let lastIsFresh = false
+
+// Конфиг BosChochEngine из тумблеров UI → query-параметры /api/analyze.
+function engineParams() {
+	return {
+		cascade: document.getElementById('fltCascade').checked ? '1' : '0',
+		hhll: document.getElementById('fltHHLL').checked ? '1' : '0',
+		age: document.getElementById('fltAge').checked
+			? String(Number(document.getElementById('fltAgeValue').value) || 0)
+			: '0',
+		dedup: document.getElementById('fltDedup').checked
+			? String(Number(document.getElementById('fltDedupValue').value) || 0)
+			: 'off',
+		swept: document.getElementById('fltSwept').checked
+			? String(Number(document.getElementById('fltSweptValue').value) || 0)
+			: 'off',
+	}
+}
+
 async function loadData(isFresh) {
+	lastIsFresh = isFresh
 	const mode = document.getElementById('mode').value
 	const symbol = isFresh ? document.getElementById('symbol').value : 'BTC/USDT'
 	const timeframe = isFresh ? document.getElementById('timeframe').value : '15m'
@@ -413,7 +282,11 @@ async function loadData(isFresh) {
 
 	showLoading(true)
 	try {
-		const params = new URLSearchParams({ symbol, timeframe, limit, mode, market, source: isFresh ? 'fresh' : 'fixture' })
+		const params = new URLSearchParams({
+			symbol, timeframe, limit, mode, market,
+			source: isFresh ? 'fresh' : 'fixture',
+			...engineParams(),
+		})
 		const res = await fetch(`/api/analyze?${params}`)
 		const data = await res.json()
 		if (data.error) throw new Error(data.error)
@@ -439,12 +312,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	initChart()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
-	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled', 'mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltFirstDir', 'fltSeqLabels', 'fltDedup', 'fltDedupValue', 'fltSwept', 'fltSweptValue']) {
-		document.getElementById(id).addEventListener('change', () => {
-			// При смене mode — перезагружаем данные с сервера.
-			if (id === 'mode') { loadData(currentData && currentData.dataset.symbol !== 'BTC/USDT') ; return }
-			renderAll()
-		})
+	// Тумблеры отображения — локальная перерисовка.
+	for (const id of ['toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled']) {
+		document.getElementById(id).addEventListener('change', () => renderAll())
+	}
+	// mode и фильтры движка — конфиг BosChochEngine, перезапрос к серверу.
+	for (const id of ['mode', 'fltCascade', 'fltHHLL', 'fltAge', 'fltAgeValue', 'fltDedup', 'fltDedupValue', 'fltSwept', 'fltSweptValue']) {
+		document.getElementById(id).addEventListener('change', () => loadData(lastIsFresh))
 	}
 	// Автозагрузка.
 	loadData(false)
