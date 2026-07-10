@@ -5,6 +5,8 @@ let chart = null
 let candleSeries = null
 let markersPlugin = null
 let currentData = null
+let priceZoomFactor = 1
+let priceScaleWheelBound = false
 
 const COLORS = {
 	A: { bos: '#1f6feb', choch: '#f85149', unlabeled: '#8b949e' },
@@ -13,6 +15,45 @@ const COLORS = {
 }
 
 function tsToChartTime(ts) { return ts / 1000 }
+
+function visibleCandlePriceRange() {
+	if (!currentData?.candles.length || !chart) return null
+	const logical = chart.timeScale().getVisibleLogicalRange()
+	const from = Math.max(0, Math.floor(logical?.from ?? 0))
+	const to = Math.min(currentData.candles.length - 1, Math.ceil(logical?.to ?? currentData.candles.length - 1))
+	const visible = currentData.candles.slice(from, to + 1)
+	if (!visible.length) return null
+	const min = Math.min(...visible.map((c) => c.low))
+	const max = Math.max(...visible.map((c) => c.high))
+	const center = (min + max) / 2
+	const halfRange = Math.max((max - min) / 2, Math.abs(center) * 0.0001) * priceZoomFactor
+	return { minValue: center - halfRange, maxValue: center + halfRange }
+}
+
+function applyPriceZoom() {
+	if (!candleSeries) return
+	candleSeries.applyOptions({
+		autoscaleInfoProvider: () => {
+			const priceRange = visibleCandlePriceRange()
+			return priceRange ? { priceRange } : null
+		},
+	})
+	chart.priceScale('right').applyOptions({ autoScale: true })
+}
+
+function bindPriceScaleWheel(container) {
+	if (priceScaleWheelBound) return
+	priceScaleWheelBound = true
+	container.addEventListener('wheel', (event) => {
+		if (!chart || !currentData) return
+		const rect = container.getBoundingClientRect()
+		const scaleWidth = chart.priceScale('right').width()
+		if (event.clientX < rect.right - scaleWidth) return
+		event.preventDefault()
+		priceZoomFactor = Math.min(8, Math.max(0.15, priceZoomFactor * (event.deltaY > 0 ? 1.12 : 0.89)))
+		applyPriceZoom()
+	}, { passive: false })
+}
 
 function initChart() {
 	if (chart) { chart.remove(); chart = null; markersPlugin = null }
@@ -32,6 +73,8 @@ function initChart() {
 		wickUpColor: '#3fb950', wickDownColor: '#f85149',
 	})
 	markersPlugin = LightweightCharts.createSeriesMarkers(candleSeries, [])
+	bindPriceScaleWheel(container)
+	chart.timeScale().subscribeVisibleLogicalRangeChange(() => applyPriceZoom())
 	window.addEventListener('resize', () => {
 		if (chart) { chart.applyOptions({ width: container.clientWidth, height: container.clientHeight }) }
 	})
@@ -243,8 +286,11 @@ function renderFibCandidates(candidates, candles) {
 	}
 }
 
-function renderAll() {
+function renderAll(preserveViewport = false) {
 	if (!currentData) return
+	const visibleLogicalRange = preserveViewport && chart
+		? chart.timeScale().getVisibleLogicalRange()
+		: null
 	initChart()
 	renderCandles(currentData.candles)
 
@@ -284,7 +330,9 @@ function renderAll() {
 
 	renderFibCandidates(visibleFibCandidates(), currentData.candles)
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
-	chart.timeScale().fitContent()
+	if (visibleLogicalRange) chart.timeScale().setVisibleLogicalRange(visibleLogicalRange)
+	else chart.timeScale().fitContent()
+	applyPriceZoom()
 }
 
 function updateCounts(data) {
@@ -371,12 +419,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	initChart()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
-	// Тумблеры отображения — локальная перерисовка канонического snapshot.
+	// Тумблеры отображения — локальная перерисовка каноническог�� snapshot.
 	for (const id of [
 		'toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled',
 		'toggleFib', 'fibEvent', 'fibNearest', 'fibOutermost', 'fibBos', 'fibChoch', 'fibLatest',
 	]) {
-		document.getElementById(id).addEventListener('change', () => renderAll())
+		document.getElementById(id).addEventListener('change', () => renderAll(true))
 	}
 	// Режим пробоя меняет только диагностические A/B; pipeline C использует утверждённый дефолт.
 	document.getElementById('mode').addEventListener('change', () => loadData(lastIsFresh))
