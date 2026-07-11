@@ -72,12 +72,15 @@ function initChart() {
 		const idx = findCandleIndexByTime(param.time)
 		if (idx === -1) { tooltip.style.display = 'none'; return }
 		const events = findEventsAtCandle(idx)
-		const fib = visibleFibCandidates().find((candidate) => candidate.createdAtIndex === idx)
-		if (events.length === 0 && !fib) { tooltip.style.display = 'none'; return }
-		if (fib) {
-			tooltip.innerHTML = `<strong>FIB · ${fib.trigger.toUpperCase()} · ${fib.direction}</strong><br>` +
-				`Anchors: #${fib.start.index} ${fib.start.price.toFixed(2)} → #${fib.end.index} ${fib.end.price.toFixed(2)}<br>` +
-				`Known: #${fib.createdAtIndex}<div class="reason">${fib.explanation}</div>`
+	const fibEntry = visibleFibCandidates().find((entry) => entry.candidate.createdAtIndex === idx)
+	if (events.length === 0 && !fibEntry) { tooltip.style.display = 'none'; return }
+	if (fibEntry) {
+		const { candidate: fib, variant } = fibEntry
+		const atrText = variant.legAtrRatio == null ? 'n/a' : `${variant.legAtrRatio.toFixed(2)}×ATR`
+		tooltip.innerHTML = `<strong>FIB · ${fib.trigger.toUpperCase()} · ${fib.direction}</strong><br>` +
+			`Anchors: #${variant.start.index} ${variant.start.price.toFixed(2)} → #${fib.end.index} ${fib.end.price.toFixed(2)}<br>` +
+			`Leg: ${variant.legSize.toFixed(2)} (${atrText}) · Known: #${fib.createdAtIndex}` +
+			`<div class="reason">${fib.explanation}</div>`
 		} else {
 			const e = events[0]
 			tooltip.innerHTML = `<strong>${e.source.toUpperCase()}: ${e.type.toUpperCase()}</strong><br>` +
@@ -210,19 +213,33 @@ function renderEventLines(events, candles, layerName) {
 // Цвет якорной ноги 0%→100% (единый структурный режим).
 const FIB_LEG_COLOR = '#d29922'
 
+function fibAnchorMode() {
+	return document.querySelector('input[name="fibAnchorMode"]:checked')?.value ?? 'local'
+}
+
+// Возвращает записи { candidate, variant } для выбранного режима якоря,
+// после trigger-фильтра, ATR-фильтра и Last N.
 function visibleFibCandidates() {
 	if (!currentData?.fib || !document.getElementById('toggleFib').checked) return []
 	const showBos = document.getElementById('fibBos').checked
 	const showChoch = document.getElementById('fibChoch').checked
-	const filtered = currentData.fib.candidates.filter(
-		(candidate) => (candidate.trigger === 'bos' ? showBos : showChoch),
-	)
-	if (!document.getElementById('fibLatest').checked) return filtered
+	const mode = fibAnchorMode()
+	const minAtr = Number(document.getElementById('fibMinAtr').value) || 0
+
+	const entries = currentData.fib.candidates
+		.filter((candidate) => (candidate.trigger === 'bos' ? showBos : showChoch))
+		.map((candidate) => ({ candidate, variant: candidate.variants?.[mode] ?? null }))
+		.filter((entry) => entry.variant)
+		// Фильтр шума: нога 0%→100% должна быть не меньше K × ATR(14).
+		// Кандидаты без ATR (начало истории) не отбрасываются.
+		.filter((entry) => entry.variant.legAtrRatio == null || entry.variant.legAtrRatio >= minAtr)
+
+	if (!document.getElementById('fibLatest').checked) return entries
 	// Последние N глобально по хронологии: N=1 — самая свежая, N=2 — она и
 	// предыдущая, и так последовательно назад по истории.
 	const lastN = Math.max(1, Number(document.getElementById('fibLastN').value) || 1)
-	return [...filtered]
-		.sort((a, b) => b.createdAtIndex - a.createdAtIndex)
+	return entries
+		.sort((a, b) => b.candidate.createdAtIndex - a.candidate.createdAtIndex)
 		.slice(0, lastN)
 }
 
@@ -237,27 +254,28 @@ function fibRatioLabel(ratio) {
 	return `${ratio.toFixed(ratio % 1 === 0 ? 0 : 1).replace('.', ',')}%`
 }
 
-function renderFibCandidates(candidates, candles) {
+function renderFibCandidates(entries, candles) {
 	const lastIndex = candles.length - 1
 	if (lastIndex < 0) return
 	// Хронологический порядок: линии каждой сетки тянутся до следующей сетки
 	// (с зазором), чтобы история читалась последовательно и без наслоений.
-	const ordered = [...candidates].sort((a, b) => a.createdAtIndex - b.createdAtIndex)
+	const ordered = [...entries].sort((a, b) => a.candidate.createdAtIndex - b.candidate.createdAtIndex)
 	const GAP_BARS = 3
 
-	ordered.forEach((candidate, position) => {
+	ordered.forEach((entry, position) => {
+		const { candidate, variant } = entry
 		const created = candles[candidate.createdAtIndex]
 		if (!created) return
 		const next = ordered[position + 1]
-		let untilIndex = next ? next.createdAtIndex - GAP_BARS : lastIndex
+		let untilIndex = next ? next.candidate.createdAtIndex - GAP_BARS : lastIndex
 		// Минимальная ширина сетки, если события идут вплотную.
 		untilIndex = Math.max(untilIndex, Math.min(candidate.createdAtIndex + 5, lastIndex))
 		untilIndex = Math.min(untilIndex, lastIndex)
 		const until = candles[untilIndex]
 		if (!until) return
 
-		// Якорная нога 0% → 100%: показывает, от какого свинга и до какого уровня посчитана фиба.
-		const startCandle = candles[candidate.start.index]
+		// Якорная нога 0% → 100%: показывает, от какого экстремума и до какого уровня посчитана фиба.
+		const startCandle = candles[variant.start.index]
 		const endCandle = candles[candidate.end.index]
 		if (startCandle && endCandle) {
 			const leg = chart.addSeries(LightweightCharts.LineSeries, {
@@ -266,12 +284,12 @@ function renderFibCandidates(candidates, candles) {
 				lineWidth: 2,
 				lineStyle: LightweightCharts.LineStyle.Dashed,
 			})
-			// 0% (откат) может быть ПОЗЖЕ 100% (пробитый уровень) — line series
+			// 0% (экстремум) может быть ПОЗЖЕ 100% (пробитый уровень) — line series
 			// требует возрастающего времени, поэтому сортируем точки и маркеры.
 			const legPoints = [
 				{
 					time: tsToChartTime(startCandle.timestamp),
-					value: candidate.start.price,
+					value: variant.start.price,
 					position: candidate.direction === 'long' ? 'belowBar' : 'aboveBar',
 					text: `${candidate.trigger.toUpperCase()} 0%`,
 				},
@@ -293,7 +311,7 @@ function renderFibCandidates(candidates, candles) {
 			})))
 		}
 
-		for (const level of candidate.levels) {
+		for (const level of variant.levels) {
 			const levelStyle = fibLevelStyle(level.ratio)
 			const line = chart.addSeries(LightweightCharts.LineSeries, {
 				...SEGMENT_SERIES_OPTIONS,
@@ -473,10 +491,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Тумблеры отображения — локальная перерисовка каноническог�� snapshot.
 	for (const id of [
 		'toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled',
-		'toggleFib', 'fibBos', 'fibChoch', 'fibLatest', 'fibLastN',
+		'toggleFib', 'fibBos', 'fibChoch', 'fibLatest', 'fibLastN', 'fibMinAtr',
+		'fibAnchorLocal', 'fibAnchorGlobal',
 	]) {
 		document.getElementById(id).addEventListener('change', () => renderAll(true))
 	}
+	// Ползунок ATR: live-обновление подписи и перерисовка при перетаскивании.
+	document.getElementById('fibMinAtr').addEventListener('input', () => {
+		document.getElementById('fibMinAtrValue').textContent =
+			`${Number(document.getElementById('fibMinAtr').value).toFixed(1)}×`
+		renderAll(true)
+	})
 	// Режим пробоя меняет только диагностические A/B; pipeline C использует утверждённый дефолт.
 	document.getElementById('mode').addEventListener('change', () => loadData(lastIsFresh))
 	// Автозагрузка.

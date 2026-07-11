@@ -2,12 +2,43 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { FibGridEngine } from '../src/core/fib/FibGridEngine.js'
 import type { StructureEvent } from '../src/models/events/StructureEvent.js'
-import type { StructurePoint } from '../src/models/structure/StructurePoint.js'
+import type { Candle } from '../src/models/price/Candle.js'
+import type { ATRPoint } from '../src/models/indicators/ATRPoint.js'
 
 const MS = 60_000
 
-function pt(index: number, price: number, type: 'high' | 'low', label: StructurePoint['label'] = 'UNKNOWN'): StructurePoint {
-	return { index, timestamp: index * MS, price, type, label }
+/** Плоская свеча с заданным диапазоном high/low. */
+function candle(index: number, low: number, high: number): Candle {
+	return {
+		timestamp: index * MS,
+		open: (low + high) / 2,
+		high,
+		low,
+		close: (low + high) / 2,
+		volume: 1,
+	}
+}
+
+/**
+ * Базовый сценарий (long BOS): уровень high=110 формируется на #20,
+ * откат вниз до low=101 на #25, импульс вверх пробивает уровень на #29.
+ * Абсолютный лоу всей истории — 90 на #2 (для global-режима).
+ */
+function makeCandles(): Candle[] {
+	const candles: Candle[] = []
+	for (let i = 0; i <= 30; i++) {
+		let low = 100
+		let high = 105
+		if (i === 2) { low = 90; high = 95 }
+		if (i === 20) { low = 105; high = 110 }
+		if (i > 20 && i < 25) { low = 103; high = 107 }
+		if (i === 25) { low = 101; high = 104 }
+		if (i > 25 && i < 29) { low = 104; high = 109 }
+		if (i === 29) { low = 108; high = 112 }
+		if (i === 30) { low = 110; high = 113 }
+		candles.push(candle(i, low, high))
+	}
+	return candles
 }
 
 function event(overrides: Partial<StructureEvent> = {}): StructureEvent {
@@ -28,6 +59,8 @@ function event(overrides: Partial<StructureEvent> = {}): StructureEvent {
 	}
 }
 
+const NO_ATR: ATRPoint[] = []
+
 describe('FibGridEngine — уровни', () => {
 	it('вычисляет одинаковые ratios для long и short с правильным знаком', () => {
 		const long = FibGridEngine.levels(100, 200)
@@ -43,81 +76,95 @@ describe('FibGridEngine — уровни', () => {
 	})
 })
 
-describe('FibGridEngine — структурные якоря', () => {
-	it('0% берётся из отката МЕЖДУ уровнем и пробоем, а не до уровня', () => {
-		const structure = [
-			pt(2, 90, 'low', 'LL'),
-			pt(8, 104, 'high', 'HH'),
-			pt(12, 96, 'low', 'HL'),
-			pt(20, 110, 'high', 'HH'), // пробиваемый уровень
-			pt(25, 101, 'low', 'HL'), // откат перед импульсом — настоящий 0%
-		]
-		const result = new FibGridEngine().build({ events: [event()], structure })
+describe('FibGridEngine — экстремальные якоря', () => {
+	it('local: 0% = минимальный low между формированием уровня и пробоем', () => {
+		const result = new FibGridEngine().build({ events: [event()], candles: makeCandles(), atr: NO_ATR })
 		assert.equal(result.candidates.length, 1)
-		const candidate = result.candidates[0]
-		assert.equal(candidate?.start.index, 25)
-		assert.equal(candidate?.start.price, 101)
-		assert.equal(candidate?.end.index, 20)
-		assert.equal(candidate?.end.price, 110)
-		assert.equal(candidate?.createdAtIndex, 30)
+		const local = result.candidates[0]?.variants.local
+		assert.equal(local?.start.index, 25)
+		assert.equal(local?.start.price, 101)
+		assert.equal(result.candidates[0]?.end.price, 110)
+		assert.equal(result.candidates[0]?.createdAtIndex, 30)
 	})
 
-	it('без промежуточного отката берётся последний валидный свинг до уровня', () => {
-		const structure = [
-			pt(12, 96, 'low', 'HL'),
-			pt(20, 110, 'high', 'HH'),
-		]
-		const result = new FibGridEngine().build({ events: [event()], structure })
-		assert.equal(result.candidates[0]?.start.index, 12)
+	it('global: 0% = абсолютный экстремум от последнего противоположного события', () => {
+		const result = new FibGridEngine().build({ events: [event()], candles: makeCandles(), atr: NO_ATR })
+		const global = result.candidates[0]?.variants.global
+		// Противоположных событий нет — окно от начала данных, лоу 90 на #2.
+		assert.equal(global?.start.index, 2)
+		assert.equal(global?.start.price, 90)
 	})
 
-	it('short-событие берёт последний high перед пробоем low', () => {
-		const structure = [
-			pt(10, 120, 'high', 'HH'),
-			pt(20, 100, 'low', 'HL'), // пробиваемый уровень
-			pt(25, 112, 'high', 'LH'), // откат перед импульсом вниз
-		]
+	it('global-окно начинается после противоположного события', () => {
+		const opposite = event({
+			type: 'choch',
+			direction: 'down',
+			levelPrice: 95,
+			levelType: 'low',
+			levelIndex: 2,
+			breachIndex: 10,
+			breachTimestamp: 10 * MS,
+			confirmIndex: 11,
+			confirmTimestamp: 11 * MS,
+		})
+		const result = new FibGridEngine().build({
+			events: [opposite, event()],
+			candles: makeCandles(),
+			atr: NO_ATR,
+		})
+		const bos = result.candidates.find((c) => c.trigger === 'bos')
+		// Окно от breachIndex=10 противоположного события: лоу 90 на #2 недоступен,
+		// минимум окна — 100 на #10.
+		assert.equal(bos?.variants.global?.start.index, 10)
+		assert.equal(bos?.variants.global?.start.price, 100)
+	})
+
+	it('short: 0% = максимальный high в окне', () => {
+		const candles = makeCandles().map((c, i) => (i === 25 ? candle(25, 101, 118) : c))
 		const result = new FibGridEngine().build({
 			events: [event({ type: 'choch', direction: 'down', levelType: 'low', levelPrice: 100, levelLabel: 'HL' })],
-			structure,
+			candles,
+			atr: NO_ATR,
 		})
-		const candidate = result.candidates[0]
-		assert.equal(candidate?.direction, 'short')
-		assert.equal(candidate?.start.index, 25)
-		assert.equal(candidate?.end.price, 100)
+		const local = result.candidates[0]?.variants.local
+		assert.equal(result.candidates[0]?.direction, 'short')
+		assert.equal(local?.start.index, 25)
+		assert.equal(local?.start.price, 118)
 	})
 
-	it('unlabeled не строит сетку и оставляет один диагностический skip', () => {
-		const result = new FibGridEngine().build({ events: [event({ type: 'unlabeled' })], structure: [] })
+	it('legAtrRatio = размер ноги в единицах ATR на момент пробоя', () => {
+		const atr: ATRPoint[] = [{ index: 28, timestamp: 28 * MS, value: 3 }]
+		const result = new FibGridEngine().build({ events: [event()], candles: makeCandles(), atr })
+		const local = result.candidates[0]?.variants.local
+		assert.equal(local?.legSize, 9) // 110 - 101
+		assert.equal(local?.legAtrRatio, 3) // 9 / 3
+	})
+
+	it('без ATR legAtrRatio = null, кандидат не отбрасывается', () => {
+		const result = new FibGridEngine().build({ events: [event()], candles: makeCandles(), atr: NO_ATR })
+		assert.equal(result.candidates[0]?.variants.local?.legAtrRatio, null)
+	})
+
+	it('unlabeled не строит сетку и оставляет диагностический skip', () => {
+		const result = new FibGridEngine().build({
+			events: [event({ type: 'unlabeled' })],
+			candles: makeCandles(),
+			atr: NO_ATR,
+		})
 		assert.equal(result.candidates.length, 0)
-		assert.equal(result.skips.length, 1)
 		assert.equal(result.skips[0]?.reason, 'unlabeled-event')
 	})
 
-	it('якорь, подтверждённый после события, отклоняется без look-ahead', () => {
-		// Единственный откат подтверждается на 31-й свече (29+2), событие — на 30-й.
-		const structure = [pt(20, 110, 'high', 'HH'), pt(29, 96, 'low', 'HL')]
-		const result = new FibGridEngine({ pivotWindow: 2 }).build({ events: [event()], structure })
-		assert.equal(result.candidates.length, 0)
-		assert.equal(result.skips[0]?.reason, 'missing-opposite-swing')
-	})
-
-	it('свинг с невалидным диапазоном пропускается в пользу более раннего валидного', () => {
-		const structure = [
-			pt(12, 96, 'low', 'HL'),
-			pt(20, 110, 'high', 'HH'),
-			pt(25, 115, 'low', 'HL'), // «низ» выше уровня — невалидный диапазон
-		]
-		const result = new FibGridEngine().build({ events: [event()], structure })
-		assert.equal(result.candidates[0]?.start.index, 12)
-	})
-
-	it('отсутствие валидного свинга даёт missing-opposite-swing', () => {
+	it('экстремум по неправильную сторону уровня даёт невалидный вариант', () => {
+		// Все свечи выше уровня 100 → для long-события с level=100 нет lows ниже.
+		const candles: Candle[] = []
+		for (let i = 0; i <= 30; i++) candles.push(candle(i, 101, 105))
 		const result = new FibGridEngine().build({
-			events: [event()],
-			structure: [pt(20, 110, 'high', 'HH')],
+			events: [event({ levelPrice: 100 })],
+			candles,
+			atr: NO_ATR,
 		})
 		assert.equal(result.candidates.length, 0)
-		assert.equal(result.skips[0]?.reason, 'missing-opposite-swing')
+		assert.equal(result.skips[0]?.reason, 'no-valid-variant')
 	})
 })

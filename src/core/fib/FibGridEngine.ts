@@ -1,44 +1,45 @@
+import type { Candle } from '@/models/price/Candle.js'
 import type { StructureEvent } from '@/models/events/StructureEvent.js'
+import type { ATRPoint } from '@/models/indicators/ATRPoint.js'
 import type {
 	FibAnchor,
+	FibAnchorMode,
 	FibDirection,
 	FibGridCandidate,
 	FibGridResult,
 	FibGridSkip,
 	FibLevel,
 	FibSkipReason,
+	FibVariant,
 } from '@/models/fib/FibGrid.js'
-import type { StructurePoint } from '@/models/structure/StructurePoint.js'
 
 export const FIB_LEVEL_RATIOS = [0, 23.6, 38.2, 50, 61.8, 78.6, 100, 141, 161, 200, 241, 261, 300] as const
 
 export interface FibGridInput {
 	events: StructureEvent[]
-	structure: StructurePoint[]
-}
-
-export interface FibGridConfig {
-	pivotWindow: number
+	candles: Candle[]
+	atr: ATRPoint[]
 }
 
 /**
- * Строит одну структурную Fib-сетку на каждое размеченное BOS/CHoCH-событие.
+ * Строит структурную Fib-сетку на каждое размеченное BOS/CHoCH-событие.
  *
- * Якоря привязаны к той же разметке, что и линии событий на графике:
- * - 100% = пробитый уровень (начало линии BOS/CHoCH);
- * - 0%   = последний подтверждённый противоположный структурный свинг
- *          ПЕРЕД пробоем — начало импульса, который сломал уровень.
+ * 100% = пробитый event-level (та же цена, что и линия события на графике).
+ * 0%   = ценовой экстремум по сырым свечам — не подтверждённый пивот,
+ *        а фактический хай/лоу, откуда пошёл ломающий импульс. Два режима:
+ *   - local:  экстремум в окне [levelIndex..breachIndex] — «от самого
+ *             хая/лоу движения, сломавшего уровень»;
+ *   - global: экстремум от последнего события противоположного направления
+ *             до пробоя — вершина/дно всего тренда.
  *
- * Движок не выбирает «правильную» сетку, не торгует и не
- * пересчитывает якоря после создания. Только генерация + диагностика.
+ * Экстремум по сырым свечам известен сразу на пробое (окно заканчивается
+ * breachIndex ≤ confirmIndex), поэтому look-ahead невозможен по построению.
+ *
+ * Для фильтрации шума каждый вариант несёт legAtrRatio — размер ноги
+ * 0%→100% в единицах ATR(14) на момент пробоя. Порог применяет UI/стратегия,
+ * движок ничего не отбрасывает.
  */
 export class FibGridEngine {
-	private readonly config: FibGridConfig
-
-	constructor(config: Partial<FibGridConfig> = {}) {
-		this.config = { pivotWindow: config.pivotWindow ?? 2 }
-	}
-
 	build(input: FibGridInput): FibGridResult {
 		const result: FibGridResult = { candidates: [], skips: [] }
 
@@ -48,7 +49,7 @@ export class FibGridEngine {
 				result.skips.push(this.skip(event, eventId, 'unlabeled-event', 'Первое событие не имеет BOS/CHoCH-классификации'))
 				continue
 			}
-			const candidate = this.buildCandidate(event, eventId, input.structure)
+			const candidate = this.buildCandidate(event, eventId, input)
 			if ('reason' in candidate) result.skips.push(candidate)
 			else result.candidates.push(candidate)
 		}
@@ -69,85 +70,121 @@ export class FibGridEngine {
 	private buildCandidate(
 		event: StructureEvent,
 		eventId: string,
-		structure: StructurePoint[],
+		input: FibGridInput,
 	): FibGridCandidate | FibGridSkip {
 		const direction = this.direction(event)
-		const oppositeType = direction === 'long' ? 'low' : 'high'
 
-		// Начало импульса: идём от пробоя назад и берём первый противоположный
-		// свинг, который уже подтверждён к моменту события и даёт валидный
-		// диапазон. Свинги ПОСЛЕ возникновения уровня приоритетны (это и есть
-		// откат, из которого вышел ломающий импульс); свинги до уровня —
-		// запасной вариант для событий без промежуточного отката.
-		const startPoint = [...structure]
-			.reverse()
-			.find((point) =>
-				point.type === oppositeType &&
-				point.index < event.breachIndex &&
-				point.index !== event.levelIndex &&
-				this.knownAt(point.index) <= event.confirmIndex &&
-				(direction === 'long' ? point.price < event.levelPrice : point.price > event.levelPrice),
-			)
-
-		if (!startPoint) {
-			return this.skip(event, eventId, 'missing-opposite-swing', 'Перед пробоем нет подтверждённого противоположного свинга с валидным диапазоном')
+		const end: FibAnchor = {
+			index: event.levelIndex,
+			timestamp: input.candles[event.levelIndex]?.timestamp ?? event.breachTimestamp,
+			price: event.levelPrice,
+			type: event.levelType,
+			label: event.levelLabel as FibAnchor['label'],
+			knownAtIndex: event.breachIndex,
 		}
 
-		const levelPoint = structure.find((point) => point.index === event.levelIndex && point.type === event.levelType)
-		const end: FibAnchor = levelPoint
-			? this.anchor(levelPoint)
-			: {
-				index: event.levelIndex,
-				timestamp: event.breachTimestamp,
-				price: event.levelPrice,
-				type: event.levelType,
-				label: event.levelLabel as FibAnchor['label'],
-				knownAtIndex: this.knownAt(event.levelIndex),
-			}
+		const atrAtBreach = this.atrAt(input.atr, event.breachIndex)
 
-		const start = this.anchor(startPoint)
-		if (start.knownAtIndex > event.confirmIndex || end.knownAtIndex > event.confirmIndex) {
-			return this.skip(event, eventId, 'anchor-known-after-event', 'Один из якорей подтверждается после trigger-события')
-		}
-		if (start.price === end.price) {
-			return this.skip(event, eventId, 'zero-range', 'Якоря имеют одинаковую цену')
-		}
-		if ((direction === 'long' && start.price >= end.price) || (direction === 'short' && start.price <= end.price)) {
-			return this.skip(event, eventId, 'invalid-direction', `Цены якорей не соответствуют направлению ${direction}`)
+		const variants: Record<FibAnchorMode, FibVariant | null> = {
+			local: this.buildVariant(event, direction, end, event.levelIndex, input.candles, atrAtBreach),
+			global: this.buildVariant(event, direction, end, this.globalWindowStart(event, input.events), input.candles, atrAtBreach),
 		}
 
-		const createdAtIndex = Math.max(event.confirmIndex, start.knownAtIndex, end.knownAtIndex)
+		if (!variants.local && !variants.global) {
+			return this.skip(event, eventId, 'no-valid-variant', 'Ни в одном окне нет экстремума с валидным диапазоном')
+		}
+
 		const trigger = event.type === 'bos' ? 'bos' : 'choch'
 		return {
 			id: `${eventId}:structural`,
 			eventId,
 			trigger,
 			direction,
-			start,
 			end,
-			createdAtIndex,
-			levels: FibGridEngine.levels(start.price, end.price),
-			explanation: `Импульс ${start.label} #${start.index} → пробитый ${event.levelLabel} event-level #${event.levelIndex}`,
+			variants,
+			createdAtIndex: event.confirmIndex,
+			explanation: `Экстремум импульса → пробитый ${event.levelLabel} event-level #${event.levelIndex}`,
 		}
+	}
+
+	/**
+	 * Начало окна для global-режима: пробой последнего события
+	 * противоположного направления (или начало данных, если его нет).
+	 */
+	private globalWindowStart(event: StructureEvent, events: StructureEvent[]): number {
+		let start = 0
+		for (const other of events) {
+			if (other.breachIndex >= event.breachIndex) break
+			if (other.direction !== event.direction) start = other.breachIndex
+		}
+		return start
+	}
+
+	/** Ищет экстремум в окне [windowStart..breachIndex] и собирает вариант. */
+	private buildVariant(
+		event: StructureEvent,
+		direction: FibDirection,
+		end: FibAnchor,
+		windowStart: number,
+		candles: Candle[],
+		atrAtBreach: number | null,
+	): FibVariant | null {
+		const from = Math.max(0, windowStart)
+		const to = Math.min(event.breachIndex, candles.length - 1)
+		if (from > to) return null
+
+		let extremeIndex = -1
+		let extremePrice = direction === 'long' ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY
+		for (let i = from; i <= to; i++) {
+			const candle = candles[i]
+			if (!candle) continue
+			if (direction === 'long') {
+				if (candle.low < extremePrice) {
+					extremePrice = candle.low
+					extremeIndex = i
+				}
+			} else if (candle.high > extremePrice) {
+				extremePrice = candle.high
+				extremeIndex = i
+			}
+		}
+		if (extremeIndex < 0) return null
+
+		// Диапазон должен соответствовать направлению: 0% строго по нужную сторону от 100%.
+		if (direction === 'long' ? extremePrice >= end.price : extremePrice <= end.price) return null
+
+		const candle = candles[extremeIndex]
+		if (!candle) return null
+		const start: FibAnchor = {
+			index: extremeIndex,
+			timestamp: candle.timestamp,
+			price: extremePrice,
+			type: direction === 'long' ? 'low' : 'high',
+			label: 'UNKNOWN',
+			knownAtIndex: extremeIndex,
+		}
+
+		const legSize = Math.abs(end.price - start.price)
+		return {
+			start,
+			levels: FibGridEngine.levels(start.price, end.price),
+			legSize,
+			legAtrRatio: atrAtBreach && atrAtBreach > 0 ? legSize / atrAtBreach : null,
+		}
+	}
+
+	/** Последнее значение ATR, известное к данному индексу (без look-ahead). */
+	private atrAt(atr: ATRPoint[], index: number): number | null {
+		let value: number | null = null
+		for (const point of atr) {
+			if (point.index > index) break
+			value = point.value
+		}
+		return value
 	}
 
 	private direction(event: StructureEvent): FibDirection {
 		return event.direction === 'up' ? 'long' : 'short'
-	}
-
-	private anchor(point: StructurePoint): FibAnchor {
-		return {
-			index: point.index,
-			timestamp: point.timestamp,
-			price: point.price,
-			type: point.type,
-			label: point.label,
-			knownAtIndex: this.knownAt(point.index),
-		}
-	}
-
-	private knownAt(index: number): number {
-		return index + this.config.pivotWindow
 	}
 
 	private eventId(event: StructureEvent): string {

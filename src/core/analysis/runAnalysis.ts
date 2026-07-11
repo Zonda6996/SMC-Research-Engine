@@ -35,7 +35,7 @@ export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
 	const atr = new ATREngine().build(candles)
 	const legStrength = new LegStrengthEngine().build(swingLegs, atr)
 	const events = new BosChochEngine().build(structure, candles)
-	const fib = new FibGridEngine().build({ events, structure })
+	const fib = new FibGridEngine().build({ events, candles, atr })
 
 	return {
 		candles,

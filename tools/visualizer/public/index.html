@@ -347,8 +347,8 @@
 				<div class="panel">
 					<h2>Fib Lab</h2>
 					<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
-						Структурная сетка на каждое событие: 0% = свинг, с которого начался импульс,
-						100% = пробитый BOS/CHoCH-уровень. Линии живут до следующей сетки.
+						Сетка на событие: 0% = ценовой экстремум движения, 100% = пробитый
+						BOS/CHoCH-уровень. Линии живут до следующей сетки.
 					</div>
 					<div class="type-row" style="border-bottom:1px solid #21262d; padding-bottom:6px; margin-bottom:6px;">
 						<span>Trend</span><span id="trendLabel" style="font-weight:600; color:#8b949e;">—</span>
@@ -357,6 +357,24 @@
 						<input type="checkbox" id="toggleFib" />
 						<strong>Show Fibonacci grids</strong>
 					</label>
+					<div style="margin:6px 0; border-top:1px solid #21262d; padding-top:6px;">
+						<div style="font-size:11px; color:#8b949e; margin-bottom:4px;">Anchor 0%:</div>
+						<label style="display:block; margin-bottom:2px;">
+							<input type="radio" name="fibAnchorMode" id="fibAnchorLocal" value="local" checked />
+							Local — экстремум движения, сломавшего уровень
+						</label>
+						<label style="display:block;">
+							<input type="radio" name="fibAnchorMode" id="fibAnchorGlobal" value="global" />
+							Global — экстремум всего тренда
+						</label>
+					</div>
+					<div style="margin:6px 0; border-top:1px solid #21262d; padding-top:6px;">
+						<div style="font-size:11px; color:#8b949e; display:flex; justify-content:space-between;">
+							<span>Min leg size (× ATR14)</span>
+							<span id="fibMinAtrValue" style="color:#c9d1d9; font-weight:600;">0.0×</span>
+						</div>
+						<input type="range" id="fibMinAtr" min="0" max="10" step="0.5" value="0" style="width:100%;" />
+					</div>
 					<div style="display:flex; gap:12px; margin:6px 0; border-top:1px solid #21262d; padding-top:6px;">
 						<label><input type="checkbox" id="fibBos" checked /> BOS</label>
 						<label><input type="checkbox" id="fibChoch" checked /> CHoCH</label>

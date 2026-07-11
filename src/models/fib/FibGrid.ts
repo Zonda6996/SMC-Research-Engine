@@ -1,7 +1,22 @@
+// FibGrid.ts
+//
+// Модель структурной Fib-сетки, привязанной к BOS/CHoCH-событию.
+// На каждое событие строится до двух вариантов якоря 0% (local / global),
+// 100% всегда = пробитый event-level.
+
 import type { StructureEventType } from '@/models/events/StructureEvent.js'
 import type { StructureLabel } from '@/models/structure/StructurePoint.js'
 
 export type FibDirection = 'long' | 'short'
+
+/**
+ * Режим выбора 0%:
+ * - 'local'  — экстремум между формированием пробитого уровня и пробоем
+ *              (локальный хай/лоу движения, сломавшего уровень);
+ * - 'global' — экстремум от последнего события противоположного направления
+ *              до пробоя (вершина/дно всего тренда).
+ */
+export type FibAnchorMode = 'local' | 'global'
 
 export interface FibAnchor {
 	index: number
@@ -9,7 +24,7 @@ export interface FibAnchor {
 	price: number
 	type: 'high' | 'low'
 	label: StructureLabel | 'UNKNOWN'
-	/** Индекс свечи, на которой pivot уже подтверждён и доступен алгоритму. */
+	/** Индекс свечи, на которой якорь уже известен алгоритму (без look-ahead). */
 	knownAtIndex: number
 }
 
@@ -20,30 +35,35 @@ export interface FibLevel {
 	kind: 'anchor' | 'retracement' | 'extension'
 }
 
+/** Один вариант сетки (для конкретного режима якоря 0%). */
+export interface FibVariant {
+	start: FibAnchor
+	levels: FibLevel[]
+	/** Размер ноги 0%→100% в цене. */
+	legSize: number
+	/** Нога в единицах ATR(14) на момент пробоя; null, если ATR ещё не рассчитан. */
+	legAtrRatio: number | null
+}
+
 /**
- * Единственный структурный кандидат на событие:
- * 0% = последний размеченный противоположный свинг перед пробоем (начало импульса),
- * 100% = пробитый BOS/CHoCH-уровень.
+ * Кандидат на событие. 100% (end) общий, 0% зависит от режима.
+ * Вариант равен null, если для данного режима не нашлось валидного экстремума.
  */
 export interface FibGridCandidate {
 	id: string
 	eventId: string
 	trigger: Exclude<StructureEventType, 'unlabeled'>
 	direction: FibDirection
-	start: FibAnchor
 	end: FibAnchor
-	/** Первый индекс, на котором событие и оба якоря известны без look-ahead. */
+	variants: Record<FibAnchorMode, FibVariant | null>
+	/** Первый индекс, на котором событие и якоря известны без look-ahead. */
 	createdAtIndex: number
-	levels: FibLevel[]
 	explanation: string
 }
 
 export type FibSkipReason =
 	| 'unlabeled-event'
-	| 'missing-opposite-swing'
-	| 'anchor-known-after-event'
-	| 'invalid-direction'
-	| 'zero-range'
+	| 'no-valid-variant'
 
 export interface FibGridSkip {
 	eventId: string
