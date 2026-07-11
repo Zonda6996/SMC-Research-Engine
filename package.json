@@ -6,7 +6,8 @@
 	"scripts": {
 		"test": "tsx --test tests/*.test.ts",
 		"dev": "tsx watch src/index.ts",
-		"start": "tsx src/index.ts"
+		"start": "tsx src/index.ts",
+		"server": "tsx tools/visualizer/server.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -22,5 +23,3 @@
 		"typescript": "^6.0.3"
 	}
 }
-
-
