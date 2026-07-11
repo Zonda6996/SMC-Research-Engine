@@ -347,26 +347,15 @@
 				<div class="panel">
 					<h2>Fib Lab</h2>
 					<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
-						Три исследовательских anchor-кандидата из pipeline. Линии начинаются только с createdAtIndex.
+						Структурная сетка на каждое событие: 0% = свинг, с которого начался импульс,
+						100% = пробитый BOS/CHoCH-уровень. Линии живут до следующей сетки.
+					</div>
+					<div class="type-row" style="border-bottom:1px solid #21262d; padding-bottom:6px; margin-bottom:6px;">
+						<span>Trend</span><span id="trendLabel" style="font-weight:600; color:#8b949e;">—</span>
 					</div>
 					<label class="toggle-row">
 						<input type="checkbox" id="toggleFib" />
-						<strong>Show Fibonacci candidates</strong>
-					</label>
-					<label class="toggle-row">
-						<input type="checkbox" id="fibEvent" checked />
-						<span class="color-dot" style="background:#58a6ff"></span>
-						Event impulse
-					</label>
-					<label class="toggle-row">
-						<input type="checkbox" id="fibNearest" checked />
-						<span class="color-dot" style="background:#d29922"></span>
-						Nearest enclosing leg
-					</label>
-					<label class="toggle-row">
-						<input type="checkbox" id="fibOutermost" checked />
-						<span class="color-dot" style="background:#2ea043"></span>
-						Outermost enclosing leg
+						<strong>Show Fibonacci grids</strong>
 					</label>
 					<div style="display:flex; gap:12px; margin:6px 0; border-top:1px solid #21262d; padding-top:6px;">
 						<label><input type="checkbox" id="fibBos" checked /> BOS</label>
@@ -375,9 +364,9 @@
 					<label class="toggle-row">
 						<input type="checkbox" id="fibLatest" checked />
 						Last
-						<input type="number" id="fibLastN" value="1" min="1" max="10" step="1"
+						<input type="number" id="fibLastN" value="1" min="1" max="20" step="1"
 							style="width:44px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
-						per mode + trigger
+						grids (newest first)
 					</label>
 					<div class="type-row"><span>Visible now</span><span id="fibVisibleCount" style="font-weight:600;">0</span></div>
 					<div class="type-row"><span>Candidates (total)</span><span id="fibCandidateCount">0</span></div>

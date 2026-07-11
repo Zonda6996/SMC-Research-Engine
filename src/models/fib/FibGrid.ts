@@ -1,11 +1,6 @@
 import type { StructureEventType } from '@/models/events/StructureEvent.js'
 import type { StructureLabel } from '@/models/structure/StructurePoint.js'
 
-export type FibAnchorMode =
-	| 'event-impulse'
-	| 'nearest-enclosing-leg'
-	| 'outermost-enclosing-leg'
-
 export type FibDirection = 'long' | 'short'
 
 export interface FibAnchor {
@@ -25,12 +20,16 @@ export interface FibLevel {
 	kind: 'anchor' | 'retracement' | 'extension'
 }
 
+/**
+ * Единственный структурный кандидат на событие:
+ * 0% = последний размеченный противоположный свинг перед пробоем (начало импульса),
+ * 100% = пробитый BOS/CHoCH-уровень.
+ */
 export interface FibGridCandidate {
 	id: string
 	eventId: string
 	trigger: Exclude<StructureEventType, 'unlabeled'>
 	direction: FibDirection
-	mode: FibAnchorMode
 	start: FibAnchor
 	end: FibAnchor
 	/** Первый индекс, на котором событие и оба якоря известны без look-ahead. */
@@ -42,8 +41,6 @@ export interface FibGridCandidate {
 export type FibSkipReason =
 	| 'unlabeled-event'
 	| 'missing-opposite-swing'
-	| 'missing-base-leg'
-	| 'missing-enclosing-leg'
 	| 'anchor-known-after-event'
 	| 'invalid-direction'
 	| 'zero-range'
@@ -52,7 +49,6 @@ export interface FibGridSkip {
 	eventId: string
 	eventIndex: number
 	trigger: StructureEventType
-	mode: FibAnchorMode
 	reason: FibSkipReason
 	details: string
 }

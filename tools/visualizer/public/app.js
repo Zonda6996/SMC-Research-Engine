@@ -21,18 +21,21 @@ function tsToChartTime(ts) { return ts / 1000 }
 function bindPriceScaleWheel(container) {
 	if (priceScaleWheelBound) return
 	priceScaleWheelBound = true
+	// capture: true + stopPropagation — иначе событие доходит до встроенного
+	// zoom библиотеки и график масштабируется по горизонтали вместе со шкалой.
 	container.addEventListener('wheel', (event) => {
 		if (!chart) return
 		const rect = container.getBoundingClientRect()
 		const scaleWidth = chart.priceScale('right').width()
 		if (event.clientX < rect.right - scaleWidth) return
 		event.preventDefault()
+		event.stopPropagation()
 		priceScaleMargin = Math.min(0.42, Math.max(0.01, priceScaleMargin + (event.deltaY > 0 ? 0.035 : -0.035)))
 		chart.priceScale('right').applyOptions({
 			autoScale: true,
 			scaleMargins: { top: priceScaleMargin, bottom: priceScaleMargin },
 		})
-	}, { passive: false })
+	}, { passive: false, capture: true })
 }
 
 function initChart() {
@@ -72,8 +75,7 @@ function initChart() {
 		const fib = visibleFibCandidates().find((candidate) => candidate.createdAtIndex === idx)
 		if (events.length === 0 && !fib) { tooltip.style.display = 'none'; return }
 		if (fib) {
-			tooltip.innerHTML = `<strong>FIB: ${fib.mode.toUpperCase()}</strong><br>` +
-				`${fib.trigger.toUpperCase()} · ${fib.direction}<br>` +
+			tooltip.innerHTML = `<strong>FIB · ${fib.trigger.toUpperCase()} · ${fib.direction}</strong><br>` +
 				`Anchors: #${fib.start.index} ${fib.start.price.toFixed(2)} → #${fib.end.index} ${fib.end.price.toFixed(2)}<br>` +
 				`Known: #${fib.createdAtIndex}<div class="reason">${fib.explanation}</div>`
 		} else {
@@ -189,7 +191,7 @@ function renderEventLines(events, candles, layerName) {
 			{ time: tsToChartTime(startCandle.timestamp), value: e.levelPrice },
 			{ time: tsToChartTime(endCandle.timestamp), value: e.levelPrice },
 		])
-		// Подпись на середине линии (маркер живёт на line-series, не на свечах).
+		// Подпись на середине линии (маркер живёт на line-series, не на свеч��х).
 		const midCandle = candles[Math.floor((e.levelIndex + e.confirmIndex) / 2)]
 		if (midCandle) {
 			const label = e.type === 'unlabeled' ? '?' : e.type.toUpperCase()
@@ -205,35 +207,23 @@ function renderEventLines(events, candles, layerName) {
 	}
 }
 
-const FIB_MODE_STYLE = {
-	'event-impulse': { color: '#58a6ff', toggle: 'fibEvent', label: 'EVENT' },
-	'nearest-enclosing-leg': { color: '#d29922', toggle: 'fibNearest', label: 'NEAR' },
-	'outermost-enclosing-leg': { color: '#2ea043', toggle: 'fibOutermost', label: 'OUTER' },
-}
+// Цвет якорной ноги 0%→100% (единый структурный режим).
+const FIB_LEG_COLOR = '#d29922'
 
 function visibleFibCandidates() {
 	if (!currentData?.fib || !document.getElementById('toggleFib').checked) return []
 	const showBos = document.getElementById('fibBos').checked
 	const showChoch = document.getElementById('fibChoch').checked
-	const filtered = currentData.fib.candidates.filter((candidate) => {
-		const mode = FIB_MODE_STYLE[candidate.mode]
-		return mode && document.getElementById(mode.toggle).checked &&
-			(candidate.trigger === 'bos' ? showBos : showChoch)
-	})
+	const filtered = currentData.fib.candidates.filter(
+		(candidate) => (candidate.trigger === 'bos' ? showBos : showChoch),
+	)
 	if (!document.getElementById('fibLatest').checked) return filtered
+	// Последние N глобально по хронологии: N=1 — самая свежая, N=2 — она и
+	// предыдущая, и так последовательно назад по истории.
 	const lastN = Math.max(1, Number(document.getElementById('fibLastN').value) || 1)
-	const groups = new Map()
-	for (const candidate of filtered) {
-		const key = `${candidate.mode}:${candidate.trigger}`
-		if (!groups.has(key)) groups.set(key, [])
-		groups.get(key).push(candidate)
-	}
-	const result = []
-	for (const group of groups.values()) {
-		group.sort((a, b) => b.createdAtIndex - a.createdAtIndex)
-		result.push(...group.slice(0, lastN))
-	}
-	return result
+	return [...filtered]
+		.sort((a, b) => b.createdAtIndex - a.createdAtIndex)
+		.slice(0, lastN)
 }
 
 function fibLevelStyle(ratio) {
@@ -248,47 +238,59 @@ function fibRatioLabel(ratio) {
 }
 
 function renderFibCandidates(candidates, candles) {
-	const lastCandle = candles[candles.length - 1]
-	if (!lastCandle) return
-	for (const candidate of candidates) {
-		const mode = FIB_MODE_STYLE[candidate.mode]
-		const created = candles[candidate.createdAtIndex]
-		if (!mode || !created) continue
+	const lastIndex = candles.length - 1
+	if (lastIndex < 0) return
+	// Хронологический порядок: линии каждой сетки тянутся до следующей сетки
+	// (с зазором), чтобы история читалась последовательно и без наслоений.
+	const ordered = [...candidates].sort((a, b) => a.createdAtIndex - b.createdAtIndex)
+	const GAP_BARS = 3
 
-		// Якорная нога 0% → 100%: диагональ цветом режима, чтобы сетка не «висела в воздухе».
+	ordered.forEach((candidate, position) => {
+		const created = candles[candidate.createdAtIndex]
+		if (!created) return
+		const next = ordered[position + 1]
+		let untilIndex = next ? next.createdAtIndex - GAP_BARS : lastIndex
+		// Минимальная ширина сетки, если события идут вплотную.
+		untilIndex = Math.max(untilIndex, Math.min(candidate.createdAtIndex + 5, lastIndex))
+		untilIndex = Math.min(untilIndex, lastIndex)
+		const until = candles[untilIndex]
+		if (!until) return
+
+		// Якорная нога 0% → 100%: показывает, от какого свинга и до какого уровня посчитана фиба.
 		const startCandle = candles[candidate.start.index]
 		const endCandle = candles[candidate.end.index]
 		if (startCandle && endCandle) {
 			const leg = chart.addSeries(LightweightCharts.LineSeries, {
 				...SEGMENT_SERIES_OPTIONS,
-				color: mode.color,
+				color: FIB_LEG_COLOR,
 				lineWidth: 2,
 				lineStyle: LightweightCharts.LineStyle.Dashed,
-				lastValueVisible: false,
-				priceLineVisible: false,
 			})
-			leg.setData([
-				{ time: tsToChartTime(startCandle.timestamp), value: candidate.start.price },
-				{ time: tsToChartTime(endCandle.timestamp), value: candidate.end.price },
-			])
-			LightweightCharts.createSeriesMarkers(leg, [
+			// 0% (откат) может быть ПОЗЖЕ 100% (пробитый уровень) — line series
+			// требует возрастающего времени, поэтому сортируем точки и маркеры.
+			const legPoints = [
 				{
 					time: tsToChartTime(startCandle.timestamp),
+					value: candidate.start.price,
 					position: candidate.direction === 'long' ? 'belowBar' : 'aboveBar',
-					color: mode.color,
-					shape: 'circle',
-					size: 0,
-					text: `${mode.label} 0%`,
+					text: `${candidate.trigger.toUpperCase()} 0%`,
 				},
 				{
 					time: tsToChartTime(endCandle.timestamp),
+					value: candidate.end.price,
 					position: candidate.direction === 'long' ? 'aboveBar' : 'belowBar',
-					color: mode.color,
-					shape: 'circle',
-					size: 0,
 					text: '100%',
 				},
-			])
+			].sort((a, b) => a.time - b.time)
+			leg.setData(legPoints.map((p) => ({ time: p.time, value: p.value })))
+			LightweightCharts.createSeriesMarkers(leg, legPoints.map((p) => ({
+				time: p.time,
+				position: p.position,
+				color: FIB_LEG_COLOR,
+				shape: 'circle',
+				size: 0,
+				text: p.text,
+			})))
 		}
 
 		for (const level of candidate.levels) {
@@ -298,12 +300,10 @@ function renderFibCandidates(candidates, candles) {
 				color: levelStyle.color,
 				lineWidth: levelStyle.width,
 				lineStyle: LightweightCharts.LineStyle.Solid,
-				lastValueVisible: false,
-				priceLineVisible: false,
 			})
 			line.setData([
 				{ time: tsToChartTime(created.timestamp), value: level.price },
-				{ time: tsToChartTime(lastCandle.timestamp), value: level.price },
+				{ time: tsToChartTime(until.timestamp), value: level.price },
 			])
 			// Подпись уровня как на TV: аккуратно у начала линии, не на ценовой шкале.
 			LightweightCharts.createSeriesMarkers(line, [{
@@ -315,7 +315,7 @@ function renderFibCandidates(candidates, candles) {
 				text: `${fibRatioLabel(level.ratio)} (${level.price.toFixed(2)})`,
 			}])
 		}
-	}
+	})
 }
 
 function renderAll(preserveViewport = false) {
@@ -362,10 +362,28 @@ function renderAll(preserveViewport = false) {
 
 	const visibleFib = visibleFibCandidates()
 	document.getElementById('fibVisibleCount').textContent = visibleFib.length
+	updateTrendLabel()
 	renderFibCandidates(visibleFib, currentData.candles)
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
 	if (visibleLogicalRange) chart.timeScale().setVisibleLogicalRange(visibleLogicalRange)
 	else chart.timeScale().fitContent()
+}
+
+// Текущий тренд по последнему классифицированному событию канонического слоя C.
+function updateTrendLabel() {
+	const label = document.getElementById('trendLabel')
+	if (!label || !currentData) return
+	const events = (currentData.layers.C ?? currentData.layers.A ?? [])
+		.filter((e) => e.type !== 'unlabeled')
+	const last = events[events.length - 1]
+	if (!last) {
+		label.textContent = '—'
+		label.style.color = '#8b949e'
+		return
+	}
+	const bullish = last.direction === 'up'
+	label.textContent = bullish ? 'Bullish' : 'Bearish'
+	label.style.color = bullish ? '#3fb950' : '#f85149'
 }
 
 function updateCounts(data) {
@@ -455,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Тумблеры отображения — локальная перерисовка каноническог�� snapshot.
 	for (const id of [
 		'toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled',
-		'toggleFib', 'fibEvent', 'fibNearest', 'fibOutermost', 'fibBos', 'fibChoch', 'fibLatest', 'fibLastN',
+		'toggleFib', 'fibBos', 'fibChoch', 'fibLatest', 'fibLastN',
 	]) {
 		document.getElementById(id).addEventListener('change', () => renderAll(true))
 	}
