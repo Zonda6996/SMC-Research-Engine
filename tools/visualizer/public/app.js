@@ -553,8 +553,24 @@ function showLoading(show) {
 	document.getElementById('loading').style.display = show ? 'block' : 'none'
 }
 
+// Наполняет datalist топ-100 парами по объёму с Binance futures.
+// При недоступности API остаётся статический список из HTML.
+async function populateSymbols() {
+	try {
+		const res = await fetch('/api/symbols')
+		if (!res.ok) return
+		const { symbols } = await res.json()
+		if (!Array.isArray(symbols) || symbols.length === 0) return
+		const datalist = document.getElementById('symbolList')
+		datalist.innerHTML = symbols.map((s) => `<option value="${s}"></option>`).join('')
+	} catch {
+		// Оффлайн или биржа недоступна — не критично, работает статический список.
+	}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	initChart()
+	populateSymbols()
 	document.getElementById('loadBtn').addEventListener('click', () => loadData(false))
 	document.getElementById('freshBtn').addEventListener('click', () => loadData(true))
 	// Тумблеры отображения — локальная перерисовка каноническог�� snapshot.

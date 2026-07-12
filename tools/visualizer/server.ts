@@ -64,7 +64,7 @@ function loadFixtureCandles(): import('../../src/models/price/Candle.js').Candle
 /** Максимум свечей за один запрос к Binance (лимит их API). */
 const BINANCE_PAGE_LIMIT = 1000
 /** Потолок визуализатора — защита от случайной загрузки мегаистории. */
-const MAX_CANDLES = 5000
+const MAX_CANDLES = 20_000
 
 const TF_MS: Record<string, number> = {
 	'1m': 60_000,
@@ -132,11 +132,58 @@ function sendJson(res: ServerResponse, status: number, data: unknown) {
 	res.end(body)
 }
 
+/** Кэш списка символов: топ по объёму меняется медленно, час — достаточно. */
+let symbolsCache: { symbols: string[]; fetchedAt: number } | null = null
+const SYMBOLS_CACHE_TTL_MS = 60 * 60 * 1000
+
+/**
+ * Топ-100 USDT-пар по суточному объёму с Binance USDT-M futures.
+ * Публичный endpoint, без API-ключей. Fallback — статический список.
+ */
+async function fetchTopSymbols(): Promise<string[]> {
+	if (symbolsCache && Date.now() - symbolsCache.fetchedAt < SYMBOLS_CACHE_TTL_MS) {
+		return symbolsCache.symbols
+	}
+	const { default: ccxt } = await import('ccxt')
+	// futures предпочтительнее (чище свечи у альтов), spot — fallback.
+	let tickers
+	try {
+		tickers = await new ccxt.binanceusdm().fetchTickers()
+	} catch {
+		tickers = await new ccxt.binance().fetchTickers()
+	}
+	const symbols = Object.values(tickers)
+		.filter((t) => t.symbol?.endsWith('/USDT:USDT') || t.symbol?.endsWith('/USDT'))
+		.map((t) => ({
+			// ccxt для перпов отдаёт 'BTC/USDT:USDT' — приводим к 'BTC/USDT'.
+			symbol: (t.symbol ?? '').replace(':USDT', ''),
+			volume: Number(t.quoteVolume ?? 0),
+		}))
+		.filter((t) => t.symbol && t.volume > 0)
+		.sort((a, b) => b.volume - a.volume)
+		.slice(0, 100)
+		.map((t) => t.symbol)
+	symbolsCache = { symbols, fetchedAt: Date.now() }
+	return symbols
+}
+
 const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
 	const url = new URL(req.url ?? '/', `http://localhost:${PORT}`)
 
 	// CORS для локальной разработки (если HTML открывают отдельно).
 	res.setHeader('Access-Control-Allow-Origin', '*')
+
+	// /api/symbols — топ-100 USDT-пар по объёму для автодополнения.
+	if (url.pathname === '/api/symbols') {
+		try {
+			sendJson(res, 200, { symbols: await fetchTopSymbols() })
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err)
+			console.error('[api/symbols] error:', message)
+			sendJson(res, 500, { error: message })
+		}
+		return
+	}
 
 	// /api/analyze?symbol=BTC/USDT&timeframe=15m&limit=500&mode=two
 	if (url.pathname === '/api/analyze') {
