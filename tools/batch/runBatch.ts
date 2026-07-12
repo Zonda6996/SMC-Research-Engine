@@ -19,6 +19,11 @@
 //   --no-cache    не использовать дисковый кэш свечей
 //   --min-in      минимум входов, чтобы строка попала в сводку (default: 20)
 //   --out         путь к CSV (default: tools/batch/results/batch-<timestamp>.csv)
+//   --sweep       OFAT-свип настроек детектора BOS/CHoCH: базовый конфиг +
+//                 каждая ручка отклоняется по одной (pivotWindow, minLevelAge,
+//                 dedup, skipSwept, breachMode). ~11 вариантов на датасет.
+//   --variants    выборочный свип: id вариантов через запятую (см. SWEEP_VARIANTS,
+//                 например --variants base,pw3,age0). Игнорируется без смысла --sweep.
 //
 // Кэш свечей: tools/batch/cache/*.json — повторный прогон той же матрицы
 // не ходит на биржу (удалить каталог = скачать заново).
@@ -27,9 +32,45 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
+import type { BosChochConfig } from '../../src/core/events/BosChochEngine.js'
 import { fetchCandlesPaginated, MAX_CANDLES, type MarketKind } from '../shared/candleFetcher.js'
 import type { Candle } from '../../src/models/price/Candle.js'
 import type { FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
+
+// ---------- Свип детектора ----------
+
+/**
+ * OFAT (one-factor-at-a-time) свип вокруг принятого базового конфига
+ * (SPEC 7.6): каждая ручка отклоняется по одной, остальные на базе.
+ * Полная решётка намеренно НЕ строится: 100+ комбинаций на датасет — это
+ * гарантированный оверфиттинг и нечитаемый вывод. Если OFAT покажет две
+ * перспективные ручки — прицельно прогнать их парную решётку отдельным
+ * запуском через --variants.
+ */
+interface SweepVariant {
+	id: string
+	config: Partial<BosChochConfig>
+}
+
+const SWEEP_VARIANTS: SweepVariant[] = [
+	{ id: 'base', config: {} },
+	// Окно пивотов — самая фундаментальная ручка: меняет всю структуру.
+	// Главная надежда для 4h, где window=2 размечает шум.
+	{ id: 'pw3', config: { pivotWindow: 3 } },
+	{ id: 'pw5', config: { pivotWindow: 5 } },
+	// Возраст уровня: 0 = без фильтра (все уровни), 40 = только старые.
+	{ id: 'age0', config: { minLevelAge: 0 } },
+	{ id: 'age10', config: { minLevelAge: 10 } },
+	{ id: 'age40', config: { minLevelAge: 40 } },
+	// Dedup соседних уровней: выкл / агрессивнее базовых 1.2.
+	{ id: 'dedupOff', config: { dedupAtrMultiple: null } },
+	{ id: 'dedup25', config: { dedupAtrMultiple: 2.5 } },
+	// Skip swept: выкл / мягче базовых 0.6 (уровень «прощает» глубокий свип).
+	{ id: 'sweptOff', config: { skipSweptAtrMultiple: null } },
+	{ id: 'swept12', config: { skipSweptAtrMultiple: 1.2 } },
+	// Подтверждение пробоя одной свечой вместо двух.
+	{ id: 'single', config: { breachMode: 'single' } },
+]
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const CACHE_DIR = join(__dirname, 'cache')
@@ -48,6 +89,7 @@ interface CliArgs {
 	cache: boolean
 	minIn: number
 	out: string | null
+	variants: SweepVariant[]
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -65,7 +107,22 @@ function parseArgs(argv: string[]): CliArgs {
 		cache: !argv.includes('--no-cache'),
 		minIn: Number(get('--min-in') ?? 20),
 		out: get('--out'),
+		variants: resolveVariants(argv, get('--variants')),
 	}
+}
+
+/** Без --sweep — только base; --sweep — все; --variants id,id — выборочно. */
+function resolveVariants(argv: string[], variantsFlag: string | null): SweepVariant[] {
+	if (variantsFlag) {
+		const ids = variantsFlag.split(',').map((s) => s.trim())
+		const unknown = ids.filter((id) => !SWEEP_VARIANTS.some((v) => v.id === id))
+		if (unknown.length > 0) {
+			throw new Error(`Unknown variants: ${unknown.join(', ')}. Known: ${SWEEP_VARIANTS.map((v) => v.id).join(', ')}`)
+		}
+		return SWEEP_VARIANTS.filter((v) => ids.includes(v.id))
+	}
+	if (argv.includes('--sweep')) return SWEEP_VARIANTS
+	return [SWEEP_VARIANTS[0]!]
 }
 
 // ---------- Данные ----------
@@ -140,6 +197,8 @@ function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
 interface ResultRow {
 	symbol: string
 	timeframe: string
+	/** id варианта конфига детектора (base | pw3 | age0 | ...). */
+	variant: string
 	anchor: string
 	trigger: string
 	atr: number
@@ -156,7 +215,7 @@ interface ResultRow {
 }
 
 /** Все разрезы по одному датасету: якорь × триггер × ATR × сценарий × стоп. */
-function sliceDataset(symbol: string, timeframe: string, outcomes: FibSetupOutcome[], atrThresholds: number[]): ResultRow[] {
+function sliceDataset(symbol: string, timeframe: string, variant: string, outcomes: FibSetupOutcome[], atrThresholds: number[]): ResultRow[] {
 	const rows: ResultRow[] = []
 	const anchors = ['local', 'global'] as const
 	const triggers = ['bos', 'choch'] as const
@@ -178,7 +237,7 @@ function sliceDataset(symbol: string, timeframe: string, outcomes: FibSetupOutco
 				for (const { scenario, stopMode } of scenarioSlices) {
 					const group = base.filter((o) => o.scenario === scenario && o.stopMode === stopMode)
 					rows.push({
-						symbol, timeframe, anchor, trigger, atr, scenario, stopMode,
+						symbol, timeframe, variant, anchor, trigger, atr, scenario, stopMode,
 						stats: aggregate(group),
 						long: aggregate(group.filter((o) => o.direction === 'long')),
 						short: aggregate(group.filter((o) => o.direction === 'short')),
@@ -203,13 +262,13 @@ function scenarioLabel(scenario: string, stopMode: string): string {
 
 function toMarkdown(rows: ResultRow[], minIn: number): string {
 	const lines: string[] = []
-	lines.push('| Symbol | TF | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be | L: In/EVf/EVbe | S: In/EVf/EVbe |')
-	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
+	lines.push('| Symbol | TF | Var | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be | L: In/EVf/EVbe | S: In/EVf/EVbe |')
+	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
 	const dir = (s: SliceStats) => `${s.entered}/${fmtEv(s.evFull)}/${fmtEv(s.evBe)}`
 	for (const r of rows) {
 		if (r.stats.entered < minIn) continue
 		lines.push(
-			`| ${r.symbol} | ${r.timeframe} | ${r.anchor} | ${r.trigger.toUpperCase()} | ${r.atr} ` +
+			`| ${r.symbol} | ${r.timeframe} | ${r.variant} | ${r.anchor} | ${r.trigger.toUpperCase()} | ${r.atr} ` +
 			`| ${scenarioLabel(r.scenario, r.stopMode)} | ${r.stats.entered} ` +
 			`| ${fmtPct(r.stats.tp1Pct)} | ${fmtPct(r.stats.tp2Pct)} | ${fmtPct(r.stats.slPct)} ` +
 			`| ${fmtEv(r.stats.evFull)} | ${fmtEv(r.stats.evBe)} ` +
@@ -221,12 +280,12 @@ function toMarkdown(rows: ResultRow[], minIn: number): string {
 
 function toCsv(rows: ResultRow[]): string {
 	const header =
-		'symbol,timeframe,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be,' +
+		'symbol,timeframe,variant,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be,' +
 		'long_in,long_ev_full,long_ev_be,short_in,short_ev_full,short_ev_be'
 	const num = (v: number | null) => (v == null ? '' : v.toFixed(4))
 	const body = rows.map((r) =>
 		[
-			r.symbol, r.timeframe, r.anchor, r.trigger, r.atr, r.scenario, r.stopMode,
+			r.symbol, r.timeframe, r.variant, r.anchor, r.trigger, r.atr, r.scenario, r.stopMode,
 			r.stats.setups, r.stats.entered, r.stats.resolved,
 			num(r.stats.tp1Pct), num(r.stats.tp2Pct), num(r.stats.slPct),
 			num(r.stats.evFull), num(r.stats.evBe),
@@ -245,7 +304,7 @@ function topLines(rows: ResultRow[], minIn: number, n = 10): string {
 		.slice(0, n)
 	return ranked
 		.map((r, i) =>
-			`${String(i + 1).padStart(2)}. ${r.symbol} ${r.timeframe} ${r.anchor}/${r.trigger.toUpperCase()}` +
+			`${String(i + 1).padStart(2)}. ${r.symbol} ${r.timeframe} [${r.variant}] ${r.anchor}/${r.trigger.toUpperCase()}` +
 			` ATR${r.atr} ${scenarioLabel(r.scenario, r.stopMode)} → EV_be ${fmtEv(r.stats.evBe)}` +
 			` (EV_full ${fmtEv(r.stats.evFull)}, In ${r.stats.entered};` +
 			` L ${r.long.entered}/${fmtEv(r.long.evBe)}, S ${r.short.entered}/${fmtEv(r.short.evBe)})`,
@@ -261,27 +320,40 @@ async function main() {
 	const failures: string[] = []
 
 	console.log(`\nBatch: ${args.symbols.join(', ')} × ${args.timeframes.join(', ')} × ${args.limit} candles (${args.market})`)
-	console.log(`ATR thresholds: ${args.atrThresholds.join(', ')}; min In: ${args.minIn}${args.fixture ? '; FIXTURE MODE' : ''}\n`)
+	console.log(`ATR thresholds: ${args.atrThresholds.join(', ')}; min In: ${args.minIn}${args.fixture ? '; FIXTURE MODE' : ''}`)
+	console.log(`Detector variants: ${args.variants.map((v) => v.id).join(', ')}\n`)
 
 	for (const symbol of args.symbols) {
 		for (const timeframe of args.timeframes) {
 			const label = `${symbol} ${timeframe}`
+			let candles: Candle[]
 			try {
-				const started = Date.now()
-				const candles = args.fixture
+				candles = args.fixture
 					? (JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8')) as Candle[])
 					: await loadCandles(symbol, timeframe, args.limit, args.market, args.cache)
-				if (candles.length === 0) {
-					failures.push(`${label}: 0 candles`)
-					continue
-				}
-				const snapshot = runAnalysis(candles)
-				allRows.push(...sliceDataset(symbol, timeframe, snapshot.fibLifecycle.outcomes, args.atrThresholds))
-				console.log(`  ✓ ${label}: ${candles.length} candles, ${snapshot.fib.candidates.length} candidates (${((Date.now() - started) / 1000).toFixed(1)}s)`)
 			} catch (err) {
 				const message = err instanceof Error ? err.message : String(err)
 				failures.push(`${label}: ${message}`)
 				console.log(`  ✗ ${label}: ${message}`)
+				continue
+			}
+			if (candles.length === 0) {
+				failures.push(`${label}: 0 candles`)
+				continue
+			}
+
+			for (const variant of args.variants) {
+				const vLabel = `${label} [${variant.id}]`
+				try {
+					const started = Date.now()
+					const snapshot = runAnalysis(candles, { bosChoch: variant.config })
+					allRows.push(...sliceDataset(symbol, timeframe, variant.id, snapshot.fibLifecycle.outcomes, args.atrThresholds))
+					console.log(`  ✓ ${vLabel}: ${candles.length} candles, ${snapshot.fib.candidates.length} candidates (${((Date.now() - started) / 1000).toFixed(1)}s)`)
+				} catch (err) {
+					const message = err instanceof Error ? err.message : String(err)
+					failures.push(`${vLabel}: ${message}`)
+					console.log(`  ✗ ${vLabel}: ${message}`)
+				}
 			}
 		}
 	}

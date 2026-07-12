@@ -9,9 +9,19 @@ import { SwingLegEngine } from '@/core/builders/SwingLegEngine.js'
 import { ATREngine } from '@/core/analysis/ATREngine.js'
 import { LegStrengthEngine } from '@/core/analysis/LegStrengthEngine.js'
 import { LegContextEngine } from '../legs/LegContextEngine.js'
-import { BosChochEngine } from '@/core/events/BosChochEngine.js'
+import { BosChochEngine, type BosChochConfig } from '@/core/events/BosChochEngine.js'
 import { FibGridEngine } from '@/core/fib/FibGridEngine.js'
 import { FibLifecycleEngine } from '@/core/fib/FibLifecycleEngine.js'
+
+/** Переопределения конфигурации пайплайна (для research-инструментов). */
+export interface RunAnalysisOptions {
+	/**
+	 * Частичный конфиг BosChochEngine. `pivotWindow` применяется согласованно
+	 * к PivotDetector И к движку событий — датировка confirmedAt обязана
+	 * совпадать с фактическим окном пивотов, иначе появится look-ahead.
+	 */
+	bosChoch?: Partial<BosChochConfig>
+}
 
 /**
  * Прогоняет текущий пайплайн анализа над свечами и возвращает
@@ -21,8 +31,9 @@ import { FibLifecycleEngine } from '@/core/fib/FibLifecycleEngine.js'
  * Как именно показывать снапшот (console.table, debug UI, JSON для чарта) —
  * решает вызывающий код, а не эта функция.
  */
-export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
-	const pivots = new PivotDetector(2).detect(candles)
+export function runAnalysis(candles: Candle[], options: RunAnalysisOptions = {}): AnalysisSnapshot {
+	const pivotWindow = options.bosChoch?.pivotWindow ?? 2
+	const pivots = new PivotDetector(pivotWindow).detect(candles)
 	const swings = new SwingEngine().build(pivots)
 	const structure = new StructureEngine().build(swings)
 	const marketEngine = new MarketStructureEngine(2)
@@ -35,7 +46,7 @@ export function runAnalysis(candles: Candle[]): AnalysisSnapshot {
 	const swingLegs = new SwingLegEngine().build(structure)
 	const atr = new ATREngine().build(candles)
 	const legStrength = new LegStrengthEngine().build(swingLegs, atr)
-	const events = new BosChochEngine().build(structure, candles)
+	const events = new BosChochEngine({ ...options.bosChoch, pivotWindow }).build(structure, candles)
 	const fib = new FibGridEngine().build({ events, candles, atr })
 	const fibLifecycle = new FibLifecycleEngine().build({ candidates: fib.candidates, events, candles })
 
