@@ -1,0 +1,71 @@
+// FibLifecycle.ts
+//
+// Модель жизненного цикла Fib-сетапа: симуляция плейбука по каждой сетке
+// (вход в зоне ретрейса, стоп за 0%, цели на расширениях) и запись исхода.
+// Это исследовательская статистика, не торговый движок: никакого управления
+// позицией, только фиксация того, что сделала цена.
+
+import type { FibAnchorMode, FibDirection } from './FibGrid.js'
+import type { StructureEventType } from '@/models/events/StructureEvent.js'
+
+/**
+ * Сценарии входа из плейбука:
+ * - 'ote'     — ретрейс в зону 61.8–78.6, вход по первому касанию (78.6);
+ * - 'deep'    — глубокий откат в зону 23.6–38.2, вход по касанию 38.2;
+ * - 'breaker' — цена после события дошла до 141 БЕЗ касания OTE-зоны,
+ *               вход на ретесте 100% (точки слома). Запись создаётся только
+ *               если предусловие (141 раньше OTE) выполнилось.
+ */
+export type FibScenario = 'ote' | 'deep' | 'breaker'
+
+/**
+ * Финальное состояние сетапа:
+ * - 'no-entry'    — вход не случился до конца данных;
+ * - 'expired'     — до входа подтвердилось событие противоположного
+ *                   направления (структура развернулась, сетап отменён);
+ * - 'invalidated' — цена ушла за 0% до входа (для breaker: до ретеста 100%);
+ * - 'open'        — вход есть, но ни стоп, ни TP2 не сработали до конца данных;
+ * - 'stopped'     — после входа коснулись стопа (за 0%) раньше TP2;
+ * - 'tp2'         — после входа дошли до TP2 (241) раньше стопа.
+ *
+ * TP1 (141) записывается отдельным флагом: состояние 'stopped' с tp1Hit=true —
+ * это «дошли до первой цели, потом вернулись в стоп».
+ */
+export type FibSetupState = 'no-entry' | 'expired' | 'invalidated' | 'open' | 'stopped' | 'tp2'
+
+/** Исход одного сетапа (кандидат × вариант якоря × сценарий). */
+export interface FibSetupOutcome {
+	candidateId: string
+	variantMode: FibAnchorMode
+	scenario: FibScenario
+	trigger: Exclude<StructureEventType, 'unlabeled'>
+	direction: FibDirection
+	/** Нога 0%→100% в ATR на момент пробоя — для фильтра в UI. */
+	legAtrRatio: number | null
+	createdAtIndex: number
+
+	entered: boolean
+	entryIndex: number | null
+	entryPrice: number | null
+	stopPrice: number
+	/** |entry − stop| — размер риска (1R) в цене. */
+	riskSize: number | null
+
+	state: FibSetupState
+	tp1Hit: boolean
+	tp1Index: number | null
+	tp2Hit: boolean
+	tp2Index: number | null
+	stopIndex: number | null
+
+	/** Максимальный ход в плюс/минус после входа, в R. */
+	mfeR: number | null
+	maeR: number | null
+	barsToEntry: number | null
+	/** Баров от входа до финала (stop/tp2) либо до конца данных. */
+	barsToResolve: number | null
+}
+
+export interface FibLifecycleResult {
+	outcomes: FibSetupOutcome[]
+}

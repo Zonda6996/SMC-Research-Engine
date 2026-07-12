@@ -74,12 +74,25 @@ function initChart() {
 		const events = findEventsAtCandle(idx)
 	const fibEntry = visibleFibCandidates().find((entry) => entry.candidate.createdAtIndex === idx)
 	if (events.length === 0 && !fibEntry) { tooltip.style.display = 'none'; return }
-	if (fibEntry) {
+		if (fibEntry) {
 		const { candidate: fib, variant } = fibEntry
 		const atrText = variant.legAtrRatio == null ? 'n/a' : `${variant.legAtrRatio.toFixed(2)}×ATR`
+		// Исходы плейбука для этой сетки в текущем режиме якоря.
+		const outcomes = (currentData.fibLifecycle?.outcomes ?? [])
+			.filter((o) => o.candidateId === fib.id && o.variantMode === fibAnchorMode())
+		const stateText = (o) => {
+			if (o.state === 'tp2') return 'TP2 ✓'
+			if (o.state === 'stopped') return o.tp1Hit ? 'TP1 ✓ → SL' : 'SL ✗'
+			if (o.state === 'open') return o.tp1Hit ? 'TP1 ✓ (open)' : 'open'
+			return o.state
+		}
+		const outcomesHtml = outcomes.length
+			? '<br>' + outcomes.map((o) => `${o.scenario}: ${stateText(o)}`).join(' · ')
+			: ''
 		tooltip.innerHTML = `<strong>FIB · ${fib.trigger.toUpperCase()} · ${fib.direction}</strong><br>` +
 			`Anchors: #${variant.start.index} ${variant.start.price.toFixed(2)} → #${fib.end.index} ${fib.end.price.toFixed(2)}<br>` +
 			`Leg: ${variant.legSize.toFixed(2)} (${atrText}) · Known: #${fib.createdAtIndex}` +
+			outcomesHtml +
 			`<div class="reason">${fib.explanation}</div>`
 		} else {
 			const e = events[0]
@@ -174,7 +187,7 @@ const LAYER_STYLE = {
 	C: { lineStyle: () => LightweightCharts.LineStyle.Dotted, shape: 'circle', prefix: 'C·' },
 }
 
-// Рисует события слома как в ручной SMC-разметке: горизонтальная линия от
+// Рисует события слома к��к в ручной SMC-разметке: горизонтальная линия от
 // свечи возникновения уровня до свечи подтверждения слома, с подписью
 // BOS/CHoCH на середине линии.
 function renderEventLines(events, candles, layerName) {
@@ -241,6 +254,61 @@ function visibleFibCandidates() {
 	return entries
 		.sort((a, b) => b.candidate.createdAtIndex - a.candidate.createdAtIndex)
 		.slice(0, lastN)
+}
+
+// Агрегирует исходы плейбука по текущим фильтрам Fib Lab
+// (режим якоря, BOS/CHoCH, ATR-порог; Last N НЕ применяется — статистика
+// считается по всей истории, а не по видимым сеткам).
+function renderFibStats() {
+	const container = document.getElementById('fibStatsBody')
+	if (!container) return
+	if (!currentData?.fibLifecycle) { container.innerHTML = '' ; return }
+
+	const showBos = document.getElementById('fibBos').checked
+	const showChoch = document.getElementById('fibChoch').checked
+	const mode = fibAnchorMode()
+	const minAtr = Number(document.getElementById('fibMinAtr').value) || 0
+
+	const outcomes = currentData.fibLifecycle.outcomes.filter((o) =>
+		o.variantMode === mode &&
+		(o.trigger === 'bos' ? showBos : showChoch) &&
+		(o.legAtrRatio == null || o.legAtrRatio >= minAtr))
+
+	const SCENARIOS = [
+		{ id: 'ote', label: 'OTE 61.8–78.6' },
+		{ id: 'deep', label: 'Deep 23.6–38.2' },
+		{ id: 'breaker', label: 'Breaker 100%' },
+	]
+
+	const rows = SCENARIOS.map(({ id, label }) => {
+		const group = outcomes.filter((o) => o.scenario === id)
+		const entered = group.filter((o) => o.entered)
+		const tp1 = entered.filter((o) => o.tp1Hit)
+		const tp2 = entered.filter((o) => o.state === 'tp2')
+		const stopped = entered.filter((o) => o.state === 'stopped' && !o.tp1Hit)
+		const pct = (part, total) => (total ? `${Math.round((part / total) * 100)}%` : '—')
+		return `<tr>
+			<td>${label}</td>
+			<td>${group.length}</td>
+			<td>${entered.length}</td>
+			<td style="color:#3fb950">${pct(tp1.length, entered.length)}</td>
+			<td style="color:#3fb950">${pct(tp2.length, entered.length)}</td>
+			<td style="color:#f85149">${pct(stopped.length, entered.length)}</td>
+		</tr>`
+	}).join('')
+
+	container.innerHTML = `<table style="width:100%; border-collapse:collapse; font-size:11px;">
+		<thead><tr style="color:#8b949e; text-align:left;">
+			<th style="padding:2px 4px;">Scenario</th><th>Set</th><th>In</th>
+			<th>TP1</th><th>TP2</th><th>SL</th>
+		</tr></thead>
+		<tbody>${rows}</tbody>
+	</table>
+	<div style="font-size:10px; color:#8b949e; margin-top:4px; line-height:1.4;">
+		Set — сетапов всего, In — входов. TP1/TP2/SL — % от входов.
+		SL — стоп без касания TP1. Вход: OTE по 78.6, Deep по 38.2,
+		Breaker по ретесту 100% (если 141 была раньше OTE). Стоп за 0%.
+	</div>`
 }
 
 function fibLevelStyle(ratio) {
@@ -381,6 +449,7 @@ function renderAll(preserveViewport = false) {
 	const visibleFib = visibleFibCandidates()
 	document.getElementById('fibVisibleCount').textContent = visibleFib.length
 	updateTrendLabel()
+	renderFibStats()
 	renderFibCandidates(visibleFib, currentData.candles)
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
 	if (visibleLogicalRange) chart.timeScale().setVisibleLogicalRange(visibleLogicalRange)

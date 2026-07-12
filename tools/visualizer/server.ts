@@ -207,6 +207,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					// Канонические события и Fib Lab из единого pipeline snapshot.
 					pipelineEvents: snapshot.events,
 					fib: snapshot.fib,
+					fibLifecycle: snapshot.fibLifecycle,
 				// Все protected-уровни для отрисовки сегментов (из breached + активные).
 				protectedSegments: buildProtectedSegments(
 					protectedBreaches,
