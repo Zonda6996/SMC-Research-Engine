@@ -11,8 +11,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, extname } from 'node:path'
-import { BinanceService } from '../../src/services/BinanceService.js'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
+import { fetchCandlesPaginated } from '../shared/candleFetcher.js'
 import { probeSwingBreaches, type BreachMode } from './lastSwingBreachProbe.js'
 import {
 	probeProtectedBreaches,
@@ -61,70 +61,8 @@ function loadFixtureCandles(): import('../../src/models/price/Candle.js').Candle
 	return JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8'))
 }
 
-/** Максимум свечей за один запрос к Binance (лимит их API). */
-const BINANCE_PAGE_LIMIT = 1000
-/** Потолок визуализатора — защита от случайной загрузки мегаистории. */
-const MAX_CANDLES = 20_000
-
-const TF_MS: Record<string, number> = {
-	'1m': 60_000,
-	'5m': 300_000,
-	'15m': 900_000,
-	'30m': 1_800_000,
-	'1h': 3_600_000,
-	'4h': 14_400_000,
-	'1d': 86_400_000,
-}
-
-/**
- * Постраничная загрузка: Binance отдаёт максимум 1000 свечей за запрос,
- * для больших лимитов идём страницами от рассчитанного `since` вперёд.
- * Только для визуализатора — пайплайн работает со своим сервисом.
- */
-async function fetchCandlesPaginated(
-	symbol: string,
-	timeframe: string,
-	limit: number,
-	market: 'spot' | 'futures' = 'spot',
-): Promise<import('../../src/models/price/Candle.js').Candle[]> {
-	const capped = Math.min(limit, MAX_CANDLES)
-
-	if (capped <= BINANCE_PAGE_LIMIT && market === 'spot') {
-		return new BinanceService().getCandles({ symbol, timeframe, limit: capped })
-	}
-
-	const tfMs = TF_MS[timeframe]
-	if (!tfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
-
-	// ccxt внутри BinanceService не принимает since и не умеет фьючерсы —
-	// используем ccxt напрямую (инструментальный код, не пайплайн).
-	// binanceusdm = USDT-M perpetual futures: у низколиквидных альтов (PEPE и
-	// т.п.) фьючерсные свечи чище спотовых — меньше рваных фитилей.
-	const { default: ccxt } = await import('ccxt')
-	const exchange = market === 'futures' ? new ccxt.binanceusdm() : new ccxt.binance()
-	const since = Date.now() - capped * tfMs
-
-	const all: number[][] = []
-	let cursor = since
-	while (all.length < capped) {
-		const page = await exchange.fetchOHLCV(symbol, timeframe, cursor, BINANCE_PAGE_LIMIT)
-		if (page.length === 0) break
-		all.push(...(page as number[][]))
-		const lastTs = Number(page[page.length - 1]![0])
-		const nextCursor = lastTs + tfMs
-		if (nextCursor <= cursor) break // защита от зацикливания
-		cursor = nextCursor
-	}
-
-	return all.slice(-capped).map(([timestamp, open, high, low, close, volume]) => ({
-		timestamp: Number(timestamp),
-		open: Number(open),
-		high: Number(high),
-		low: Number(low),
-		close: Number(close),
-		volume: Number(volume),
-	}))
-}
+// Загрузка свечей вынесена в общий модуль — используется и batch-раннером.
+// (см. tools/shared/candleFetcher.ts)
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
 	const body = JSON.stringify(data)

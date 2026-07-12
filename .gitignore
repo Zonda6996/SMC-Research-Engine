@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 # zcode agent artifacts
 .zcode/
+
+# batch runner artifacts (кэш свечей и результаты прогонов)
+tools/batch/cache/
+tools/batch/results/
