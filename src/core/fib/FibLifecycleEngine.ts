@@ -19,6 +19,7 @@ import type {
 	FibLifecycleResult,
 	FibScenario,
 	FibSetupOutcome,
+	FibStopMode,
 } from '@/models/fib/FibLifecycle.js'
 
 export interface FibLifecycleInput {
@@ -56,6 +57,7 @@ export class FibLifecycleEngine {
 
 		const long = candidate.direction === 'long'
 		const p0 = price(0)
+		const p236 = price(23.6)
 		const p382 = price(38.2)
 		const p786 = price(78.6)
 		const p100 = price(100)
@@ -76,23 +78,31 @@ export class FibLifecycleEngine {
 			expiryIndex,
 		)
 
-		const scenarios: { scenario: FibScenario; entryLevel: number; fromIndex: number }[] = [
-			{ scenario: 'ote', entryLevel: p786, fromIndex: candidate.createdAtIndex + 1 },
-			{ scenario: 'deep', entryLevel: p382, fromIndex: candidate.createdAtIndex + 1 },
+		const scenarios: {
+			scenario: FibScenario
+			stopMode: FibStopMode
+			entryLevel: number
+			stopLevel: number
+			fromIndex: number
+		}[] = [
+			// OTE симулируется в двух режимах стопа: за 0% и укороченный за 23.6.
+			{ scenario: 'ote', stopMode: 'zero', entryLevel: p786, stopLevel: p0, fromIndex: candidate.createdAtIndex + 1 },
+			{ scenario: 'ote', stopMode: 'tight', entryLevel: p786, stopLevel: p236, fromIndex: candidate.createdAtIndex + 1 },
+			{ scenario: 'deep', stopMode: 'zero', entryLevel: p382, stopLevel: p0, fromIndex: candidate.createdAtIndex + 1 },
 		]
 		// Breaker существует только при выполненном предусловии; ретест 100%
 		// отслеживается после бара, где цена достигла 141.
 		if (extFirst && extIndex != null) {
-			scenarios.push({ scenario: 'breaker', entryLevel: p100, fromIndex: extIndex + 1 })
+			scenarios.push({ scenario: 'breaker', stopMode: 'zero', entryLevel: p100, stopLevel: p0, fromIndex: extIndex + 1 })
 		}
 
-		return scenarios.map(({ scenario, entryLevel, fromIndex }) =>
-			this.simulateScenario(candidate, mode, variant, scenario, {
+		return scenarios.map(({ scenario, stopMode, entryLevel, stopLevel, fromIndex }) =>
+			this.simulateScenario(candidate, mode, variant, scenario, stopMode, {
 				candles: input.candles,
 				fromIndex,
 				long,
 				entryLevel,
-				stopLevel: p0,
+				stopLevel,
 				tp1: p141,
 				tp2: p241,
 				expiryIndex,
@@ -131,6 +141,7 @@ export class FibLifecycleEngine {
 		mode: FibAnchorMode,
 		variant: FibVariant,
 		scenario: FibScenario,
+		stopMode: FibStopMode,
 		ctx: {
 			candles: Candle[]
 			fromIndex: number
@@ -146,6 +157,7 @@ export class FibLifecycleEngine {
 			candidateId: candidate.id,
 			variantMode: mode,
 			scenario,
+			stopMode,
 			trigger: candidate.trigger,
 			direction: candidate.direction,
 			legAtrRatio: variant.legAtrRatio,
@@ -161,6 +173,9 @@ export class FibLifecycleEngine {
 			tp2Hit: false,
 			tp2Index: null,
 			stopIndex: null,
+			rTp1: null,
+			rTp2: null,
+			beAfterTp1: null,
 			mfeR: null,
 			maeR: null,
 			barsToEntry: null,
@@ -187,14 +202,17 @@ export class FibLifecycleEngine {
 				entryIndex = i
 				// Вход и стоп в одной свече — консервативно немедленный лосс.
 				if (breachedStop) {
+					const conflictRisk = Math.abs(ctx.entryLevel - ctx.stopLevel)
 					return {
 						...base,
 						entered: true,
 						entryIndex: i,
 						entryPrice: ctx.entryLevel,
-						riskSize: Math.abs(ctx.entryLevel - ctx.stopLevel),
+						riskSize: conflictRisk,
 						state: 'stopped',
 						stopIndex: i,
+						rTp1: Math.abs(ctx.tp1 - ctx.entryLevel) / conflictRisk,
+						rTp2: Math.abs(ctx.tp2 - ctx.entryLevel) / conflictRisk,
 						barsToEntry: i - candidate.createdAtIndex,
 						barsToResolve: 0,
 						mfeR: 0,
@@ -222,6 +240,9 @@ export class FibLifecycleEngine {
 		let tp2Hit = false
 		let tp2Index: number | null = null
 		let stopIndex: number | null = null
+		// Для менеджмента «безубыток после TP1»: вернулась ли цена к входу
+		// раньше TP2. Бар касания TP1 проверяется консервативно (см. модель).
+		let beAfterTp1: boolean | null = null
 		let mfeR = 0
 		let maeR = 0
 		let finalIndex = candles.length - 1
@@ -239,23 +260,33 @@ export class FibLifecycleEngine {
 			const hitStop = long ? candle.low <= ctx.stopLevel : candle.high >= ctx.stopLevel
 			const hitTp1 = long ? candle.high >= ctx.tp1 : candle.low <= ctx.tp1
 			const hitTp2 = long ? candle.high >= ctx.tp2 : candle.low <= ctx.tp2
+			const touchedEntryBack = long ? candle.low <= entryPrice : candle.high >= entryPrice
+
+			// Возврат к входу после TP1 (до TP2) — раннер при безубытке закрыт в 0.
+			if (tp1Hit && beAfterTp1 == null && !hitTp2 && touchedEntryBack) {
+				beAfterTp1 = true
+			}
 
 			// Конфликт внутри бара: стоп имеет приоритет (консервативно лосс).
 			if (hitStop) {
 				stopIndex = i
 				finalIndex = i
 				state = 'stopped'
+				if (tp1Hit && beAfterTp1 == null) beAfterTp1 = true
 				break
 			}
 			if (hitTp1 && !tp1Hit) {
 				tp1Hit = true
 				tp1Index = i
+				// Консервативно: тень бара касания TP1 задела вход — считаем возврат.
+				if (!hitTp2 && touchedEntryBack) beAfterTp1 = true
 			}
 			if (hitTp2) {
 				tp2Hit = true
 				tp2Index = i
 				finalIndex = i
 				state = 'tp2'
+				if (beAfterTp1 == null) beAfterTp1 = false
 				break
 			}
 		}
@@ -272,6 +303,9 @@ export class FibLifecycleEngine {
 			tp2Hit,
 			tp2Index,
 			stopIndex,
+			rTp1: Math.abs(ctx.tp1 - entryPrice) / risk,
+			rTp2: Math.abs(ctx.tp2 - entryPrice) / risk,
+			beAfterTp1,
 			mfeR,
 			maeR,
 			barsToEntry: entryIndex - candidate.createdAtIndex,

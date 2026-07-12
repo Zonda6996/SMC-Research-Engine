@@ -19,6 +19,15 @@ import type { StructureEventType } from '@/models/events/StructureEvent.js'
 export type FibScenario = 'ote' | 'deep' | 'breaker'
 
 /**
+ * Режим стопа:
+ * - 'zero'  — стоп за 0% сетки (базовый плейбук);
+ * - 'tight' — стоп за 23.6 (только для OTE-входа от 78.6 — гипотеза
+ *   пользователя, что укороченный стоп даёт лучшее матожидание).
+ * Deep и Breaker всегда симулируются только с 'zero'.
+ */
+export type FibStopMode = 'zero' | 'tight'
+
+/**
  * Финальное состояние сетапа:
  * - 'no-entry'    — вход не случился до конца данных;
  * - 'expired'     — до входа подтвердилось событие противоположного
@@ -33,11 +42,12 @@ export type FibScenario = 'ote' | 'deep' | 'breaker'
  */
 export type FibSetupState = 'no-entry' | 'expired' | 'invalidated' | 'open' | 'stopped' | 'tp2'
 
-/** Исход одного сетапа (кандидат × вариант якоря × сценарий). */
+/** Исход одного сетапа (кандидат × вариант якоря × сценарий × режим стопа). */
 export interface FibSetupOutcome {
 	candidateId: string
 	variantMode: FibAnchorMode
 	scenario: FibScenario
+	stopMode: FibStopMode
 	trigger: Exclude<StructureEventType, 'unlabeled'>
 	direction: FibDirection
 	/** Нога 0%→100% в ATR на момент пробоя — для фильтра в UI. */
@@ -57,6 +67,21 @@ export interface FibSetupOutcome {
 	tp2Hit: boolean
 	tp2Index: number | null
 	stopIndex: number | null
+
+	/**
+	 * Расстояние до TP1/TP2 от входа в единицах риска (R-мультипликаторы целей).
+	 * Заполняются при входе — нужны для расчёта EV в UI.
+	 */
+	rTp1: number | null
+	rTp2: number | null
+	/**
+	 * Поведение после TP1 при менеджменте «безубыток»: вернулась ли цена
+	 * к цене входа раньше, чем дошла до TP2. true — раннер закрыт в 0,
+	 * false — дошли до TP2, null — TP1 не был достигнут или данные кончились.
+	 * Бар касания TP1 проверяется консервативно: если его противоположная
+	 * тень задела вход, считаем возврат (внутрибарная последовательность неизвестна).
+	 */
+	beAfterTp1: boolean | null
 
 	/** Максимальный ход в плюс/минус после входа, в R. */
 	mfeR: number | null

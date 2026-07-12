@@ -77,9 +77,11 @@ function initChart() {
 		if (fibEntry) {
 		const { candidate: fib, variant } = fibEntry
 		const atrText = variant.legAtrRatio == null ? 'n/a' : `${variant.legAtrRatio.toFixed(2)}×ATR`
-		// Исходы плейбука для этой сетки в текущем режиме якоря.
+		// Исходы плейбука для этой сетки в текущем режиме якоря и режиме стопа OTE.
+		const tooltipStopMode = document.getElementById('fibOteTightStop')?.checked ? 'tight' : 'zero'
 		const outcomes = (currentData.fibLifecycle?.outcomes ?? [])
-			.filter((o) => o.candidateId === fib.id && o.variantMode === fibAnchorMode())
+			.filter((o) => o.candidateId === fib.id && o.variantMode === fibAnchorMode() &&
+				(o.scenario === 'ote' ? o.stopMode === tooltipStopMode : o.stopMode === 'zero'))
 		const stateText = (o) => {
 			if (o.state === 'tp2') return 'TP2 ✓'
 			if (o.state === 'stopped') return o.tp1Hit ? 'TP1 ✓ → SL' : 'SL ✗'
@@ -269,16 +271,46 @@ function renderFibStats() {
 	const mode = fibAnchorMode()
 	const minAtr = Number(document.getElementById('fibMinAtr').value) || 0
 
+	// Режим стопа OTE: 'zero' (за 0%) или 'tight' (за 23.6). Deep/Breaker всегда 'zero'.
+	const oteStopMode = document.getElementById('fibOteTightStop')?.checked ? 'tight' : 'zero'
+
 	const outcomes = currentData.fibLifecycle.outcomes.filter((o) =>
 		o.variantMode === mode &&
 		(o.trigger === 'bos' ? showBos : showChoch) &&
-		(o.legAtrRatio == null || o.legAtrRatio >= minAtr))
+		(o.legAtrRatio == null || o.legAtrRatio >= minAtr) &&
+		(o.scenario === 'ote' ? o.stopMode === oteStopMode : o.stopMode === 'zero'))
 
 	const SCENARIOS = [
-		{ id: 'ote', label: 'OTE 61.8–78.6' },
-		{ id: 'deep', label: 'Deep 23.6–38.2' },
-		{ id: 'breaker', label: 'Breaker 100%' },
+		{ id: 'ote', label: `OTE 78.6 (SL ${oteStopMode === 'tight' ? '23.6' : '0'})` },
+		{ id: 'deep', label: 'Deep 38.2 (SL 0)' },
+		{ id: 'breaker', label: 'Breaker 100 (SL 0)' },
 	]
+
+	// EV на сделку в R для двух вариантов менеджмента.
+	// Разрешённые сделки: есть TP1 либо стоп; открытые без TP1 исключаются.
+	const evStats = (entered) => {
+		const resolved = entered.filter((o) => o.tp1Hit || o.state === 'stopped')
+		if (resolved.length === 0) return { full: null, be: null, n: 0 }
+		let fullSum = 0
+		let beSum = 0
+		for (const o of resolved) {
+			// Менеджмент A: весь объём закрывается на TP1.
+			fullSum += o.tp1Hit ? o.rTp1 : -1
+			// Менеджмент B: половина на TP1, стоп в безубыток, раннер до TP2.
+			// Раннер: TP2 → 0.5×rTp2; возврат к входу или конец данных → 0.
+			beSum += o.tp1Hit ? 0.5 * o.rTp1 + (o.state === 'tp2' ? 0.5 * o.rTp2 : 0) : -1
+		}
+		return {
+			full: fullSum / resolved.length,
+			be: beSum / resolved.length,
+			n: resolved.length,
+		}
+	}
+	const evText = (v) => {
+		if (v == null) return '—'
+		const color = v > 0.05 ? '#3fb950' : v < -0.05 ? '#f85149' : '#d29922'
+		return `<span style="color:${color}">${v >= 0 ? '+' : ''}${v.toFixed(2)}</span>`
+	}
 
 	const rows = SCENARIOS.map(({ id, label }) => {
 		const group = outcomes.filter((o) => o.scenario === id)
@@ -286,28 +318,33 @@ function renderFibStats() {
 		const tp1 = entered.filter((o) => o.tp1Hit)
 		const tp2 = entered.filter((o) => o.state === 'tp2')
 		const stopped = entered.filter((o) => o.state === 'stopped' && !o.tp1Hit)
+		const ev = evStats(entered)
 		const pct = (part, total) => (total ? `${Math.round((part / total) * 100)}%` : '—')
 		return `<tr>
 			<td>${label}</td>
-			<td>${group.length}</td>
 			<td>${entered.length}</td>
 			<td style="color:#3fb950">${pct(tp1.length, entered.length)}</td>
 			<td style="color:#3fb950">${pct(tp2.length, entered.length)}</td>
 			<td style="color:#f85149">${pct(stopped.length, entered.length)}</td>
+			<td>${evText(ev.full)}</td>
+			<td>${evText(ev.be)}</td>
 		</tr>`
 	}).join('')
 
 	container.innerHTML = `<table style="width:100%; border-collapse:collapse; font-size:11px;">
 		<thead><tr style="color:#8b949e; text-align:left;">
-			<th style="padding:2px 4px;">Scenario</th><th>Set</th><th>In</th>
+			<th style="padding:2px 4px;">Scenario</th><th>In</th>
 			<th>TP1</th><th>TP2</th><th>SL</th>
+			<th>EV<sub>full</sub></th><th>EV<sub>be</sub></th>
 		</tr></thead>
 		<tbody>${rows}</tbody>
 	</table>
 	<div style="font-size:10px; color:#8b949e; margin-top:4px; line-height:1.4;">
-		Set — сетапов всего, In — входов. TP1/TP2/SL — % от входов.
-		SL — стоп без касания TP1. Вход: OTE по 78.6, Deep по 38.2,
-		Breaker по ретесту 100% (если 141 была раньше OTE). Стоп за 0%.
+		In — входов. TP1/TP2/SL — % от входов, SL — стоп без касания TP1.
+		EV — матожидание на сделку в R (риск = вход−стоп):
+		EV<sub>full</sub> — весь объём закрыт на TP1 (141);
+		EV<sub>be</sub> — 50% на TP1, стоп в безубыток, раннер до TP2 (241).
+		Открытые сделки без TP1 не учитываются в EV.
 	</div>`
 }
 
@@ -577,7 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	for (const id of [
 		'toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled',
 		'toggleFib', 'fibBos', 'fibChoch', 'fibLatest', 'fibLastN', 'fibMinAtr',
-		'fibAnchorLocal', 'fibAnchorGlobal',
+		'fibAnchorLocal', 'fibAnchorGlobal', 'fibOteTightStop',
 	]) {
 		document.getElementById(id).addEventListener('change', () => renderAll(true))
 	}

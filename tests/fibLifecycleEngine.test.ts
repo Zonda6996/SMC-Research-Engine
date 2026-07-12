@@ -51,8 +51,12 @@ function run(candidate: FibGridCandidate, candles: Candle[], events: StructureEv
 	return new FibLifecycleEngine().build({ candidates: [candidate], events, candles })
 }
 
-function outcome(result: ReturnType<FibLifecycleEngine['build']>, scenario: string) {
-	return result.outcomes.find((o) => o.scenario === scenario)
+function outcome(
+	result: ReturnType<FibLifecycleEngine['build']>,
+	scenario: string,
+	stopMode = 'zero',
+) {
+	return result.outcomes.find((o) => o.scenario === scenario && o.stopMode === stopMode)
 }
 
 describe('FibLifecycleEngine', () => {
@@ -162,6 +166,56 @@ describe('FibLifecycleEngine', () => {
 		const candles = flat(15, 205)
 		const result = run(longCandidate(9), candles)
 		assert.equal(outcome(result, 'ote')?.state, 'no-entry')
+	})
+
+	it('OTE tight: стоп за 23.6, срабатывает раньше стопа за 0%', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175)) // вход на 178.6
+		candles.push(candle(11, 180, 120)) // пробили 23.6 (123.6), но не 0% (100)
+		const result = run(longCandidate(9), candles)
+
+		const tight = outcome(result, 'ote', 'tight')
+		assert.equal(tight?.entered, true)
+		assert.equal(tight?.stopPrice, 123.6)
+		assert.equal(tight?.state, 'stopped')
+
+		const zero = outcome(result, 'ote', 'zero')
+		assert.equal(zero?.state, 'open') // 0% не задет — позиция ещё жива
+	})
+
+	it('rTp1/rTp2 считаются от входа и риска', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175))
+		candles.push(candle(11, 250, 200))
+		candles.push(candle(12, 350, 240))
+		const result = run(longCandidate(9), candles)
+
+		const ote = outcome(result, 'ote')
+		// Вход 178.6, стоп 100 → риск 78.6; TP1=241 → (241−178.6)/78.6 ≈ 0.794.
+		assert.ok(Math.abs((ote?.rTp1 ?? 0) - (241 - 178.6) / 78.6) < 1e-9)
+		assert.ok(Math.abs((ote?.rTp2 ?? 0) - (341 - 178.6) / 78.6) < 1e-9)
+	})
+
+	it('beAfterTp1: возврат к входу после TP1 фиксируется', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175)) // вход 178.6
+		candles.push(candle(11, 250, 200)) // TP1 (241)
+		candles.push(candle(12, 200, 170)) // возврат к входу (178.6) без TP2
+		candles.push(candle(13, 210, 190))
+		const result = run(longCandidate(9), candles)
+
+		const ote = outcome(result, 'ote')
+		assert.equal(ote?.tp1Hit, true)
+		assert.equal(ote?.beAfterTp1, true)
+	})
+
+	it('beAfterTp1 = false, если TP2 достигнут без возврата к входу', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175))
+		candles.push(candle(11, 250, 200))
+		candles.push(candle(12, 350, 240))
+		const result = run(longCandidate(9), candles)
+		assert.equal(outcome(result, 'ote')?.beAfterTp1, false)
 	})
 
 	it('полный runAnalysis возвращает fibLifecycle', async () => {
