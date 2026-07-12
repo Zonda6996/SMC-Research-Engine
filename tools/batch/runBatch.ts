@@ -146,6 +146,13 @@ interface ResultRow {
 	scenario: string
 	stopMode: string
 	stats: SliceStats
+	/**
+	 * Разбивка по направлению сделки. Ключевой тест на природу edge:
+	 * если EV положительный только у лонгов — это ставка на бычий режим
+	 * периода; если у обеих сторон — структурное преимущество сетапа.
+	 */
+	long: SliceStats
+	short: SliceStats
 }
 
 /** Все разрезы по одному датасету: якорь × триггер × ATR × сценарий × стоп. */
@@ -170,7 +177,12 @@ function sliceDataset(symbol: string, timeframe: string, outcomes: FibSetupOutco
 					(o.legAtrRatio == null || o.legAtrRatio >= atr))
 				for (const { scenario, stopMode } of scenarioSlices) {
 					const group = base.filter((o) => o.scenario === scenario && o.stopMode === stopMode)
-					rows.push({ symbol, timeframe, anchor, trigger, atr, scenario, stopMode, stats: aggregate(group) })
+					rows.push({
+						symbol, timeframe, anchor, trigger, atr, scenario, stopMode,
+						stats: aggregate(group),
+						long: aggregate(group.filter((o) => o.direction === 'long')),
+						short: aggregate(group.filter((o) => o.direction === 'short')),
+					})
 				}
 			}
 		}
@@ -191,22 +203,26 @@ function scenarioLabel(scenario: string, stopMode: string): string {
 
 function toMarkdown(rows: ResultRow[], minIn: number): string {
 	const lines: string[] = []
-	lines.push('| Symbol | TF | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be |')
-	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|')
+	lines.push('| Symbol | TF | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be | L: In/EVf/EVbe | S: In/EVf/EVbe |')
+	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
+	const dir = (s: SliceStats) => `${s.entered}/${fmtEv(s.evFull)}/${fmtEv(s.evBe)}`
 	for (const r of rows) {
 		if (r.stats.entered < minIn) continue
 		lines.push(
 			`| ${r.symbol} | ${r.timeframe} | ${r.anchor} | ${r.trigger.toUpperCase()} | ${r.atr} ` +
 			`| ${scenarioLabel(r.scenario, r.stopMode)} | ${r.stats.entered} ` +
 			`| ${fmtPct(r.stats.tp1Pct)} | ${fmtPct(r.stats.tp2Pct)} | ${fmtPct(r.stats.slPct)} ` +
-			`| ${fmtEv(r.stats.evFull)} | ${fmtEv(r.stats.evBe)} |`,
+			`| ${fmtEv(r.stats.evFull)} | ${fmtEv(r.stats.evBe)} ` +
+			`| ${dir(r.long)} | ${dir(r.short)} |`,
 		)
 	}
 	return lines.join('\n')
 }
 
 function toCsv(rows: ResultRow[]): string {
-	const header = 'symbol,timeframe,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be'
+	const header =
+		'symbol,timeframe,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be,' +
+		'long_in,long_ev_full,long_ev_be,short_in,short_ev_full,short_ev_be'
 	const num = (v: number | null) => (v == null ? '' : v.toFixed(4))
 	const body = rows.map((r) =>
 		[
@@ -214,6 +230,8 @@ function toCsv(rows: ResultRow[]): string {
 			r.stats.setups, r.stats.entered, r.stats.resolved,
 			num(r.stats.tp1Pct), num(r.stats.tp2Pct), num(r.stats.slPct),
 			num(r.stats.evFull), num(r.stats.evBe),
+			r.long.entered, num(r.long.evFull), num(r.long.evBe),
+			r.short.entered, num(r.short.evFull), num(r.short.evBe),
 		].join(','),
 	)
 	return [header, ...body].join('\n')
@@ -229,7 +247,8 @@ function topLines(rows: ResultRow[], minIn: number, n = 10): string {
 		.map((r, i) =>
 			`${String(i + 1).padStart(2)}. ${r.symbol} ${r.timeframe} ${r.anchor}/${r.trigger.toUpperCase()}` +
 			` ATR${r.atr} ${scenarioLabel(r.scenario, r.stopMode)} → EV_be ${fmtEv(r.stats.evBe)}` +
-			` (EV_full ${fmtEv(r.stats.evFull)}, In ${r.stats.entered})`,
+			` (EV_full ${fmtEv(r.stats.evFull)}, In ${r.stats.entered};` +
+			` L ${r.long.entered}/${fmtEv(r.long.evBe)}, S ${r.short.entered}/${fmtEv(r.short.evBe)})`,
 		)
 		.join('\n')
 }
