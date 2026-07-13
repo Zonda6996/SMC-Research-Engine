@@ -16,6 +16,11 @@ function candle(i: number, high: number, low: number): Candle {
 	return { timestamp: i * 60_000, open: (high + low) / 2, high, low, close: (high + low) / 2, volume: 1 }
 }
 
+/** Свеча с явным close — для тестов подтверждения закрытием (волна 2). */
+function candleC(i: number, high: number, low: number, close: number): Candle {
+	return { timestamp: i * 60_000, open: (high + low) / 2, high, low, close, volume: 1 }
+}
+
 /** Плоский ряд свечей вокруг цены. */
 function flat(count: number, price: number): Candle[] {
 	return Array.from({ length: count }, (_, i) => candle(i, price + 1, price - 1))
@@ -435,6 +440,68 @@ describe('FibLifecycleEngine', () => {
 		const zero = outcome(result, 'ote', 'zero')
 		assert.equal(zero?.state, 'stopped') // до 341 не дошли, вернулись в стоп
 		assert.equal(zero?.tp1Hit, true)
+	})
+
+	// ---- Волна 2: вход с подтверждением закрытия свечи (fade141c/fade241nc).
+	// Механизация «глаза»: после касания уровня ждём свечу, закрывшуюся
+	// обратно на «нашей» стороне, вход по её close. ----
+
+	it('fade141c: вход только после свечи, закрывшейся ниже 141', () => {
+		const candles = flat(10, 205)
+		// Касание 141 (241), но close выше уровня — подтверждения нет.
+		candles.push(candleC(10, 245, 235, 243))
+		// Свеча закрылась НИЖЕ 141 → подтверждение, вход по close = 238.
+		candles.push(candleC(11, 244, 236, 238))
+		// Позиция стартует со следующего бара: TP1 = 100% (200).
+		candles.push(candle(12, 240, 195))
+		const result = run(longCandidate(9), candles)
+
+		const confirm = outcome(result, 'fade141c', 'far')
+		assert.equal(confirm?.entered, true)
+		assert.equal(confirm?.entryIndex, 11)
+		assert.equal(confirm?.entryPrice, 238) // close подтверждающей свечи
+		assert.equal(confirm?.stopPrice, 310) // 300 (уровень 200) + 0.5 ATR
+		assert.equal(confirm?.tp1Hit, true)
+		// Риск 72 (238→310), TP1 = 200 → rTp1 = 38/72.
+		assert.ok(Math.abs((confirm?.rTp1 ?? 0) - 38 / 72) < 1e-9)
+
+		// Обычный fade141 far вошёл бы уже на баре 10 по 241.
+		const instant = outcome(result, 'fade141', 'far')
+		assert.equal(instant?.entryIndex, 10)
+		assert.equal(instant?.entryPrice, 241)
+	})
+
+	it('fade141c: прошив стопа до подтверждения — invalidated (нож отфильтрован)', () => {
+		const candles = flat(10, 205)
+		candles.push(candleC(10, 245, 235, 243)) // касание 141, без подтверждения
+		candles.push(candleC(11, 315, 240, 312)) // пронесло через стоп (310) — фильтр
+		candles.push(candle(12, 300, 195))
+		const result = run(longCandidate(9), candles)
+
+		const confirm = outcome(result, 'fade141c', 'far')
+		assert.equal(confirm?.state, 'invalidated')
+		assert.equal(confirm?.entered, false)
+
+		// Обычный fade141 far вошёл на 10-м баре и словил стоп на 11-м.
+		const instant = outcome(result, 'fade141', 'far')
+		assert.equal(instant?.state, 'stopped')
+	})
+
+	it('fade241nc: подтверждение может прийти в самой свече касания', () => {
+		const candles = flat(10, 205)
+		// Касание 241 (341) с закрытием ниже уровня — подтверждение сразу.
+		candles.push(candleC(10, 345, 300, 320))
+		candles.push(candle(11, 330, 240)) // TP1 = 141 (241)
+		candles.push(candle(12, 250, 195)) // TP2 = 100% (200)
+		const result = run(longCandidate(9), candles)
+
+		const confirm = outcome(result, 'fade241nc', 'zoneAtr')
+		assert.equal(confirm?.entered, true)
+		assert.equal(confirm?.entryIndex, 10)
+		assert.equal(confirm?.entryPrice, 320) // close свечи касания
+		assert.equal(confirm?.stopPrice, 371) // 361 (уровень 261) + 0.5 ATR
+		assert.equal(confirm?.tp1Index, 11)
+		assert.equal(confirm?.state, 'tp2')
 	})
 
 	it('полный runAnalysis возвращает fibLifecycle', async () => {

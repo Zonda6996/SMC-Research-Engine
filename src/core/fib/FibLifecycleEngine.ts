@@ -120,6 +120,11 @@ export class FibLifecycleEngine {
 			tp2: number
 			/** Трекинг maxExtensionRatio — только тренд-сценарии. */
 			trackExtension: boolean
+			/**
+			 * Волна 2: вход не по касанию, а по закрытию первой свечи обратно
+			 * на «нашей» стороне уровня (подтверждение отбоя). Вход по close.
+			 */
+			confirmClose?: boolean
 		}
 
 		const from = candidate.createdAtIndex + 1
@@ -142,9 +147,10 @@ export class FibLifecycleEngine {
 			stopLevel: number,
 			tp1 = p100,
 			tp2 = p786,
+			confirmClose = false,
 		): ScenarioSpec => ({
 			scenario, stopMode, entryLevel, stopLevel, fromIndex: from,
-			tradeLong: !long, tp1, tp2, trackExtension: false,
+			tradeLong: !long, tp1, tp2, trackExtension: false, confirmClose,
 		})
 
 		const scenarios: ScenarioSpec[] = [
@@ -192,6 +198,10 @@ export class FibLifecycleEngine {
 				fade('fade141', 'far', p141, p200 - away * 0.5 * atr),
 				// Волна 1: fade200 со стопом за 241 + 0.5 ATR («небольшой запас»).
 				fade('fade200', 'zoneAtr', p200, p241 - away * 0.5 * atr),
+				// Волна 2: те же лучшие конструкции, но вход только после свечи,
+				// закрывшейся обратно за уровнем (подтверждение отбоя).
+				fade('fade141c', 'far', p141, p200 - away * 0.5 * atr, p100, p786, true),
+				fade('fade241nc', 'zoneAtr', p241, p261 - away * 0.5 * atr, p141, p100, true),
 			)
 		}
 
@@ -207,6 +217,7 @@ export class FibLifecycleEngine {
 				tp2: spec.tp2,
 				expiryIndex,
 				extension: spec.trackExtension ? { p0, legSize: variant.legSize } : null,
+				confirmClose: spec.confirmClose ?? false,
 			}),
 		)
 	}
@@ -256,6 +267,8 @@ export class FibLifecycleEngine {
 			expiryIndex: number | null
 			/** Параметры трекинга maxExtensionRatio; null — не отслеживать (fade). */
 			extension: { p0: number; legSize: number } | null
+			/** Волна 2: вход по закрытию подтверждающей свечи вместо касания. */
+			confirmClose: boolean
 		},
 	): FibSetupOutcome {
 		const base: FibSetupOutcome = {
@@ -295,7 +308,13 @@ export class FibLifecycleEngine {
 		const { candles, long } = ctx
 
 		// ---- Фаза 1: ждём вход ----
+		// Обычный режим: вход по касанию уровня. Волна 2 (confirmClose): после
+		// касания ждём первую свечу, ЗАКРЫВШУЮСЯ обратно на «нашей» стороне
+		// уровня, вход по её close (сама свеча касания может подтвердить сразу).
+		// Прошив стопа до подтверждения — invalidated: фильтр «не ловим нож».
 		let entryIndex = -1
+		let entryPriceActual = ctx.entryLevel
+		let touched = false
 		for (let i = ctx.fromIndex; i < candles.length; i++) {
 			// Экспирация проверяется на баре подтверждения противоположного события:
 			// сетап отменён структурным разворотом.
@@ -307,6 +326,21 @@ export class FibLifecycleEngine {
 
 			const touchedEntry = long ? candle.low <= ctx.entryLevel : candle.high >= ctx.entryLevel
 			const breachedStop = long ? candle.low <= ctx.stopLevel : candle.high >= ctx.stopLevel
+
+			if (ctx.confirmClose) {
+				if (!touched && touchedEntry) touched = true
+				if (touched) {
+					// Цена ушла за стоп до подтверждения — вход отфильтрован.
+					if (breachedStop) return { ...base, state: 'invalidated' }
+					const closeConfirmed = long ? candle.close > ctx.entryLevel : candle.close < ctx.entryLevel
+					if (closeConfirmed) {
+						entryIndex = i
+						entryPriceActual = candle.close
+						break
+					}
+				}
+				continue
+			}
 
 			if (touchedEntry) {
 				entryIndex = i
@@ -344,7 +378,9 @@ export class FibLifecycleEngine {
 		if (entryIndex < 0) return { ...base, state: 'no-entry' }
 
 		// ---- Фаза 2: позиция открыта, ждём стоп или TP2 ----
-		const entryPrice = ctx.entryLevel
+		// При confirmClose вход по close подтверждающей свечи: её экстремумы уже
+		// в прошлом, симуляция позиции начинается со СЛЕДУЮЩЕГО бара.
+		const entryPrice = entryPriceActual
 		const risk = Math.abs(entryPrice - ctx.stopLevel)
 		const toR = (priceValue: number): number =>
 			(long ? priceValue - entryPrice : entryPrice - priceValue) / risk
@@ -354,7 +390,7 @@ export class FibLifecycleEngine {
 		let tp2Hit = false
 		let tp2Index: number | null = null
 		let stopIndex: number | null = null
-		// Для менеджмента «безубыток после TP1»: вернулась ли цена к входу
+		// Для менеджмента «безубыток после TP1»: вернулась ли ��ена к входу
 		// раньше TP2. Бар касания TP1 проверяется консервативно (см. модель).
 		let beAfterTp1: boolean | null = null
 		let mfeR = 0
@@ -362,7 +398,8 @@ export class FibLifecycleEngine {
 		let finalIndex = candles.length - 1
 		let state: FibSetupOutcome['state'] = 'open'
 
-		for (let i = entryIndex; i < candles.length; i++) {
+		const phase2From = ctx.confirmClose ? entryIndex + 1 : entryIndex
+		for (let i = phase2From; i < candles.length; i++) {
 			const candle = candles[i]
 			if (!candle) continue
 

@@ -298,6 +298,10 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 		{ scenario: 'fade241n', stopMode: 'zone' },
 		{ scenario: 'fade200', stopMode: 'zone' },
 		{ scenario: 'fade200', stopMode: 'zoneAtr' },
+		// Волна 2: те же лучшие конструкции, но вход по закрытию
+		// подтверждающей свечи (механизация «глаза»).
+		{ scenario: 'fade141c', stopMode: 'far' },
+		{ scenario: 'fade241nc', stopMode: 'zoneAtr' },
 	] as const
 
 	for (const anchor of anchors) {
@@ -344,6 +348,8 @@ function scenarioLabel(scenario: string, stopMode: string): string {
 	if (scenario === 'fade241') return stopMode === 'zoneAtr' ? 'Fade241 (SL 261+0.5ATR)' : 'Fade241 (SL 261)'
 	if (scenario === 'fade241n') return 'Fade241→141/100 (SL 261)'
 	if (scenario === 'fade200') return stopMode === 'zoneAtr' ? 'Fade200 (SL 241+0.5ATR)' : 'Fade200 (SL 241)'
+	if (scenario === 'fade141c') return 'Fade141 confirm (SL 200+0.5ATR)'
+	if (scenario === 'fade241nc') return 'Fade241→141/100 confirm (SL 261+0.5ATR)'
 	return 'Breaker (SL 0)'
 }
 
