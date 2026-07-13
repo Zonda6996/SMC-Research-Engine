@@ -320,40 +320,18 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 	const rows: ResultRow[] = []
 	const anchors = ['local', 'global'] as const
 	const triggers = ['bos', 'choch'] as const
-	// OTE: zero/tight/wide/zero200; Deep: zero/wide/zero200; Breaker: только zero;
-	// Fade: стоп за дальней границей зоны и + 0.5 ATR; волна 1 —
-	// fade141 far (SL за 200), fade241n (цели 141→100), fade200 (вход 200).
+	// Только плейбук (итоги волн 1–4, SPEC 7.10–7.13): ядро ote/deep/breaker
+	// со стопом за 0, вариант TP2=200 (цели 141/200/241 остаются в работе)
+	// и принятый фильтр breaker161. Отклонённые сценарии (fade-семейство,
+	// breaker78, breaker tight, wide-стопы, scale-добор) из батча убраны,
+	// но код и тесты сохранены — вернуть можно одной строкой здесь.
 	const scenarioSlices = [
 		{ scenario: 'ote', stopMode: 'zero' },
-		{ scenario: 'ote', stopMode: 'tight' },
-		{ scenario: 'ote', stopMode: 'wide05' },
-		{ scenario: 'ote', stopMode: 'wide10' },
 		{ scenario: 'ote', stopMode: 'zero200' },
 		{ scenario: 'deep', stopMode: 'zero' },
-		{ scenario: 'deep', stopMode: 'wide05' },
-		{ scenario: 'deep', stopMode: 'wide10' },
 		{ scenario: 'deep', stopMode: 'zero200' },
 		{ scenario: 'breaker', stopMode: 'zero' },
-	// Волна 3: вариации breaker — сокращённый стоп, отмена за 161, вход от 78.6.
-	{ scenario: 'breaker', stopMode: 'tight' },
-	{ scenario: 'breaker161', stopMode: 'zero' },
-	{ scenario: 'breaker78', stopMode: 'zero' },
-	// Волна 4: добор второй половины (50/50) на медиане MAE победителей.
-	{ scenario: 'oteScale', stopMode: 'zero' },
-	{ scenario: 'deepScale', stopMode: 'zero' },
-	{ scenario: 'breakerScale', stopMode: 'zero' },
-		{ scenario: 'fade141', stopMode: 'zone' },
-		{ scenario: 'fade141', stopMode: 'zoneAtr' },
-		{ scenario: 'fade141', stopMode: 'far' },
-		{ scenario: 'fade241', stopMode: 'zone' },
-		{ scenario: 'fade241', stopMode: 'zoneAtr' },
-		{ scenario: 'fade241n', stopMode: 'zone' },
-		{ scenario: 'fade200', stopMode: 'zone' },
-		{ scenario: 'fade200', stopMode: 'zoneAtr' },
-		// Волна 2: те же лучшие конструкции, но вход по закрытию
-		// подтверждающей свечи (механизация «глаза»).
-		{ scenario: 'fade141c', stopMode: 'far' },
-		{ scenario: 'fade241nc', stopMode: 'zoneAtr' },
+		{ scenario: 'breaker161', stopMode: 'zero' },
 	] as const
 
 	for (const anchor of anchors) {
