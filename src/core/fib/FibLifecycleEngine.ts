@@ -208,6 +208,8 @@ export class FibLifecycleEngine {
 			confirmClose?: boolean
 			/** Волна 3 (breaker161): уровень отмены сетапа до входа. */
 			cancelLevel?: number | null
+			/** Волна 4 (scale-in): уровень добора второй половины позиции. */
+			addLevel?: number | null
 		}
 
 		const from = candidate.createdAtIndex + 1
@@ -245,6 +247,10 @@ export class FibLifecycleEngine {
 			// по данным расширений (до 200 доходит заметно больше сделок).
 			trend('ote', 'zero200', p786, p0, from, p200),
 			trend('deep', 'zero200', p382, p0, from, p200),
+			// Волна 4: добор второй половины на уровне медианной просадки
+			// победителей (данные MAE): ote → 50, deep → 23.6.
+			{ ...trend('oteScale', 'zero', p786, p0), addLevel: price(50) },
+			{ ...trend('deepScale', 'zero', p382, p0), addLevel: p236 },
 		]
 		// Wide-стопы: буфер в ATR за уровнем 0% (только при известном ATR).
 		if (atr != null) {
@@ -259,6 +265,9 @@ export class FibLifecycleEngine {
 		// отслеживается после бара, где цена достигла 141.
 		if (extFirst && extIndex != null) {
 			scenarios.push(trend('breaker', 'zero', p100, p0, extIndex + 1))
+			// Волна 4: добор второй половины на 78.6 (медиана MAE победителей
+			// breaker ≈ −0.18R ≈ уровень 82).
+			scenarios.push({ ...trend('breakerScale', 'zero', p100, p0, extIndex + 1), addLevel: p786 })
 			// Волна 3: сокращённый стоп за 23.6 (тест по MAE победителей).
 			scenarios.push(trend('breaker', 'tight', p100, p236, extIndex + 1))
 			// Волна 3: вход глубже — на 78.6 вместо 100 (лучше цена, шире запас).
@@ -315,12 +324,13 @@ export class FibLifecycleEngine {
 				extension: spec.trackExtension ? { p0, legSize: variant.legSize } : null,
 				confirmClose: spec.confirmClose ?? false,
 				cancelLevel: spec.cancelLevel ?? null,
+				addLevel: spec.addLevel ?? null,
 			}),
 		)
 	}
 
 	/**
-	 * Проверяет, что случилось раньше после соз��ания сетки:
+	 * Проверяет, что случилось раньше после соз����ания сетки:
 	 * касание расширения 141 или касание OTE-зоны (78.6).
 	 */
 	private breakerPrecondition(
@@ -372,6 +382,12 @@ export class FibLifecycleEngine {
 			 * в одном баре с касанием входа — консервативно отмена.
 			 */
 			cancelLevel?: number | null
+			/**
+			 * Волна 4 (scale-in): уровень добора второй половины позиции.
+			 * Позиция 50/50, 1R = плановый риск полной позиции. Добор — только
+			 * до TP1. null — обычный сценарий одним объёмом.
+			 */
+			addLevel?: number | null
 		},
 	): FibSetupOutcome {
 		const base: FibSetupOutcome = {
@@ -399,6 +415,8 @@ export class FibLifecycleEngine {
 			stopIndex: null,
 			rTp1: null,
 			rTp2: null,
+			rStop: null,
+			exposure: null,
 			beAfterTp1: null,
 			mfeR: null,
 			maeR: null,
@@ -456,18 +474,27 @@ export class FibLifecycleEngine {
 			if (touchedEntry) {
 				entryIndex = i
 				// Вход и стоп в одной свече — консервативно немедленный лосс.
+				// Scale: уровень добора лежит между входом и стопом, значит на пути
+				// к стопу задет — обе половины набраны, полный лосс −1R планового.
 				if (breachedStop) {
-					const conflictRisk = Math.abs(ctx.entryLevel - ctx.stopLevel)
+					const addLvl = ctx.addLevel ?? null
+					const conflictEntry = addLvl != null ? (ctx.entryLevel + addLvl) / 2 : ctx.entryLevel
+					const conflictRisk =
+						addLvl != null
+							? 0.5 * Math.abs(ctx.entryLevel - ctx.stopLevel) + 0.5 * Math.abs(addLvl - ctx.stopLevel)
+							: Math.abs(ctx.entryLevel - ctx.stopLevel)
 					return {
 						...base,
 						entered: true,
 						entryIndex: i,
-						entryPrice: ctx.entryLevel,
+						entryPrice: conflictEntry,
 						riskSize: conflictRisk,
 						state: 'stopped',
 						stopIndex: i,
-						rTp1: Math.abs(ctx.tp1 - ctx.entryLevel) / conflictRisk,
-						rTp2: Math.abs(ctx.tp2 - ctx.entryLevel) / conflictRisk,
+						rTp1: Math.abs(ctx.tp1 - conflictEntry) / conflictRisk,
+						rTp2: Math.abs(ctx.tp2 - conflictEntry) / conflictRisk,
+						rStop: -1,
+						exposure: 1,
 						barsToEntry: i - candidate.createdAtIndex,
 						barsToResolve: 0,
 						mfeR: 0,
@@ -490,11 +517,24 @@ export class FibLifecycleEngine {
 
 		// ---- Фаза 2: позиция открыта, ждём стоп или TP2 ----
 		// При confirmClose вход по close подтверждающей свечи: её экстремумы уже
-		// в прошлом, с��муляция позиции начинается со СЛЕДУЮЩЕГО бара.
-		const entryPrice = entryPriceActual
-		const risk = Math.abs(entryPrice - ctx.stopLevel)
+		// в прошлом, симуляция позиции начинается со СЛЕДУЮЩЕГО бара.
+		//
+		// Scale-in (волна 4): позиция 50/50, вторая половина — по касанию
+		// addLevel (только до TP1). 1R = плановый риск полной позиции:
+		// 0.5·|e1−stop| + 0.5·|add−stop|. Все R-значения (mae/mfe/rTp/rStop)
+		// считаются от средневзвешенного входа с учётом набранной доли —
+		// не набравшая добор позиция и рискует, и зарабатывает половиной.
+		const e1 = entryPriceActual
+		const addLevel = ctx.addLevel ?? null
+		const plannedRisk =
+			addLevel != null
+				? 0.5 * Math.abs(e1 - ctx.stopLevel) + 0.5 * Math.abs(addLevel - ctx.stopLevel)
+				: Math.abs(e1 - ctx.stopLevel)
+		let exposure = addLevel != null ? 0.5 : 1
+		let avgEntry = e1
+		let addFilled = false
 		const toR = (priceValue: number): number =>
-			(long ? priceValue - entryPrice : entryPrice - priceValue) / risk
+			(exposure * (long ? priceValue - avgEntry : avgEntry - priceValue)) / plannedRisk
 
 		let tp1Hit = false
 		let tp1Index: number | null = null
@@ -514,6 +554,22 @@ export class FibLifecycleEngine {
 			const candle = candles[i]
 			if (!candle) continue
 
+			const hitStop = long ? candle.low <= ctx.stopLevel : candle.high >= ctx.stopLevel
+			const hitTp1 = long ? candle.high >= ctx.tp1 : candle.low <= ctx.tp1
+			const hitTp2 = long ? candle.high >= ctx.tp2 : candle.low <= ctx.tp2
+
+			// Волна 4: добор второй половины — только до TP1. Конфликты в одном
+			// баре: с TP1 — консервативно TP первым (добор НЕ засчитан, прибыль
+			// половиной); со стопом — добор первым (полный лосс −1R планового).
+			if (addLevel != null && !addFilled && !tp1Hit) {
+				const touchedAdd = long ? candle.low <= addLevel : candle.high >= addLevel
+				if (touchedAdd && (hitStop || !hitTp1)) {
+					addFilled = true
+					avgEntry = (e1 + addLevel) / 2
+					exposure = 1
+				}
+			}
+
 			const favorable = long ? candle.high : candle.low
 			const adverse = long ? candle.low : candle.high
 			mfeR = Math.max(mfeR, toR(favorable))
@@ -523,10 +579,7 @@ export class FibLifecycleEngine {
 			// загрязняла метрику значениями глубже стопа.
 			if (!tp1Hit) maeR = Math.min(maeR, toR(adverse))
 
-			const hitStop = long ? candle.low <= ctx.stopLevel : candle.high >= ctx.stopLevel
-			const hitTp1 = long ? candle.high >= ctx.tp1 : candle.low <= ctx.tp1
-			const hitTp2 = long ? candle.high >= ctx.tp2 : candle.low <= ctx.tp2
-			const touchedEntryBack = long ? candle.low <= entryPrice : candle.high >= entryPrice
+			const touchedEntryBack = long ? candle.low <= avgEntry : candle.high >= avgEntry
 
 			// Возврат к входу после TP1 (до TP2) — раннер при безубытке закрыт в 0.
 			if (tp1Hit && beAfterTp1 == null && !hitTp2 && touchedEntryBack) {
@@ -561,16 +614,22 @@ export class FibLifecycleEngine {
 			...base,
 			entered: true,
 			entryIndex,
-			entryPrice,
-			riskSize: risk,
+			entryPrice: avgEntry,
+			riskSize: plannedRisk,
 			state,
 			tp1Hit,
 			tp1Index,
 			tp2Hit,
 			tp2Index,
 			stopIndex,
-			rTp1: Math.abs(ctx.tp1 - entryPrice) / risk,
-			rTp2: Math.abs(ctx.tp2 - entryPrice) / risk,
+			// R-мультипликаторы целей от фактической позиции (для scale —
+			// средневзвешенный вход, масштаб на набранную долю).
+			rTp1: Math.abs(toR(ctx.tp1)),
+			rTp2: Math.abs(toR(ctx.tp2)),
+			// Фактический лосс в плановых R: полный набор = −1 ровно,
+			// половина без добора = меньше по модулю.
+			rStop: state === 'stopped' ? toR(ctx.stopLevel) : null,
+			exposure,
 			beAfterTp1,
 			mfeR,
 			maeR,

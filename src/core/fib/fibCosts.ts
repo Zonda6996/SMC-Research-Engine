@@ -52,13 +52,19 @@ export function netFullR(outcome: FibSetupOutcome): number | null {
 	if (!isResolved(outcome)) return null
 	const entry = outcome.entryPrice!
 	const risk = outcome.riskSize!
-	const entryCost = fillCostR(entry, FEE_RATE + SLIP_RATE, 1, risk)
+	// Волна 4 (scale-in): объём всех филлов масштабируется на фактически
+	// набранную долю позиции; entryPrice — средневзвешенный вход (для
+	// линейных комиссий это точная стоимость двух филлов). Лосс — rStop
+	// (< 1R по модулю, если добор не сработал). Обычные сценарии: exposure=1,
+	// rStop=−1 — формулы эквивалентны прежним.
+	const size = outcome.exposure ?? 1
+	const entryCost = fillCostR(entry, FEE_RATE + SLIP_RATE, size, risk)
 
 	if (outcome.tp1Hit) {
 		const tp1Price = targetPrice(outcome, outcome.rTp1 ?? 0)
-		return (outcome.rTp1 ?? 0) - entryCost - fillCostR(tp1Price, FEE_RATE, 1, risk)
+		return (outcome.rTp1 ?? 0) - entryCost - fillCostR(tp1Price, FEE_RATE, size, risk)
 	}
-	return -1 - entryCost - fillCostR(outcome.stopPrice, FEE_RATE + SLIP_RATE, 1, risk)
+	return (outcome.rStop ?? -1) - entryCost - fillCostR(outcome.stopPrice, FEE_RATE + SLIP_RATE, size, risk)
 }
 
 /**
@@ -74,20 +80,22 @@ export function netBeR(outcome: FibSetupOutcome): number | null {
 	if (!isResolved(outcome)) return null
 	const entry = outcome.entryPrice!
 	const risk = outcome.riskSize!
-	const entryCost = fillCostR(entry, FEE_RATE + SLIP_RATE, 1, risk)
+	// Волна 4: см. netFullR — объём филлов × exposure, лосс = rStop.
+	const size = outcome.exposure ?? 1
+	const entryCost = fillCostR(entry, FEE_RATE + SLIP_RATE, size, risk)
 
 	if (!outcome.tp1Hit) {
-		return -1 - entryCost - fillCostR(outcome.stopPrice, FEE_RATE + SLIP_RATE, 1, risk)
+		return (outcome.rStop ?? -1) - entryCost - fillCostR(outcome.stopPrice, FEE_RATE + SLIP_RATE, size, risk)
 	}
 
 	const tp1Price = targetPrice(outcome, outcome.rTp1 ?? 0)
-	let net = 0.5 * (outcome.rTp1 ?? 0) - entryCost - fillCostR(tp1Price, FEE_RATE, 0.5, risk)
+	let net = 0.5 * (outcome.rTp1 ?? 0) - entryCost - fillCostR(tp1Price, FEE_RATE, 0.5 * size, risk)
 	if (outcome.state === 'tp2') {
 		const tp2Price = targetPrice(outcome, outcome.rTp2 ?? 0)
-		net += 0.5 * (outcome.rTp2 ?? 0) - fillCostR(tp2Price, FEE_RATE, 0.5, risk)
+		net += 0.5 * (outcome.rTp2 ?? 0) - fillCostR(tp2Price, FEE_RATE, 0.5 * size, risk)
 	} else {
 		// Раннер закрыт BE-стопом по цене входа: gross 0, издержки рыночного филла.
-		net -= fillCostR(entry, FEE_RATE + SLIP_RATE, 0.5, risk)
+		net -= fillCostR(entry, FEE_RATE + SLIP_RATE, 0.5 * size, risk)
 	}
 	return net
 }

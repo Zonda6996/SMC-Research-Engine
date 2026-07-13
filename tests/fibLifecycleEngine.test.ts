@@ -198,6 +198,76 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(outcome(result, 'breaker')?.entryPrice, 200)
 	})
 
+	// ---- Волна 4: scale-in (добор второй половины) ----
+
+	it('breakerScale: добор на 78.6, R-мультипликаторы от средневзвешенного входа', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 245, 210)) // 141 раньше OTE (предусловие breaker)
+		candles.push(candle(11, 230, 178)) // ретест 100 (200) и добор 78.6 (178.6)
+		candles.push(candle(12, 250, 200)) // TP1 (241)
+		candles.push(candle(13, 345, 250)) // TP2 (341)
+		const result = run(longCandidate(9), candles)
+
+		const s = outcome(result, 'breakerScale')
+		assert.equal(s?.entered, true)
+		assert.equal(s?.exposure, 1)
+		// avg = (200 + 178.6)/2 = 189.3; plannedRisk = 0.5·100 + 0.5·78.6 = 89.3
+		assert.ok(Math.abs((s?.entryPrice ?? 0) - 189.3) < 1e-9)
+		assert.ok(Math.abs((s?.riskSize ?? 0) - 89.3) < 1e-9)
+		// rTp1 = (241 − 189.3)/89.3 ≈ 0.5789
+		assert.ok(Math.abs((s?.rTp1 ?? 0) - (241 - 189.3) / 89.3) < 1e-9)
+		assert.equal(s?.state, 'tp2')
+	})
+
+	it('oteScale: добор не сработал — прибыль половиной позиции (exposure 0.5)', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 178)) // вход 78.6 (178.6), добор 50 (150) не задет
+		candles.push(candle(11, 250, 200)) // TP1
+		candles.push(candle(12, 345, 250)) // TP2
+		const result = run(longCandidate(9), candles)
+
+		const s = outcome(result, 'oteScale')
+		assert.equal(s?.entered, true)
+		assert.equal(s?.exposure, 0.5)
+		// plannedRisk = 0.5·78.6 + 0.5·50 = 64.3; rTp1 = 0.5·(241−178.6)/64.3
+		assert.ok(Math.abs((s?.rTp1 ?? 0) - (0.5 * (241 - 178.6)) / 64.3) < 1e-9)
+		assert.equal(s?.state, 'tp2')
+	})
+
+	it('deepScale: стоп после добора — лосс ровно −1R планового риска', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 130)) // вход 38.2 (138.2), добор 23.6 (123.6) не задет
+		candles.push(candle(11, 135, 95)) // добор и стоп в одном баре: добор первым, лосс
+		const result = run(longCandidate(9), candles)
+
+		const s = outcome(result, 'deepScale')
+		assert.equal(s?.state, 'stopped')
+		assert.equal(s?.exposure, 1)
+		assert.ok(Math.abs((s?.rStop ?? 0) - -1) < 1e-9)
+	})
+
+	it('scale: конфликт добора и TP1 в одном баре — консервативно TP без добора', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 178)) // вход oteScale (178.6)
+		candles.push(candle(11, 250, 149)) // и добор (150), и TP1 (241) в одном баре
+		const result = run(longCandidate(9), candles)
+
+		const s = outcome(result, 'oteScale')
+		assert.equal(s?.tp1Hit, true)
+		assert.equal(s?.exposure, 0.5) // добор не засчитан
+	})
+
+	it('обычные сценарии: rStop = −1 при стопе, exposure = 1', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175)) // вход ote
+		candles.push(candle(11, 180, 95)) // стоп
+		const result = run(longCandidate(9), candles)
+
+		const ote = outcome(result, 'ote')
+		assert.equal(ote?.rStop, -1)
+		assert.equal(ote?.exposure, 1)
+	})
+
 	it('breaker tight: стоп за 23.6 (123.6) выбивается там, где zero выживает', () => {
 		const candles = flat(10, 205)
 		candles.push(candle(10, 245, 210)) // касание 141

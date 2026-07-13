@@ -233,8 +233,10 @@ function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
 	let fullNetSum = 0
 	let beNetSum = 0
 	for (const o of resolved) {
-		fullSum += o.tp1Hit ? (o.rTp1 ?? 0) : -1
-		beSum += o.tp1Hit ? 0.5 * (o.rTp1 ?? 0) + (o.state === 'tp2' ? 0.5 * (o.rTp2 ?? 0) : 0) : -1
+		// Волна 4 (scale-in): лосс = rStop (< 1R по модулю, если добор не
+		// сработал); обычные сценарии несут rStop = −1 — формула эквивалентна.
+		fullSum += o.tp1Hit ? (o.rTp1 ?? 0) : (o.rStop ?? -1)
+		beSum += o.tp1Hit ? 0.5 * (o.rTp1 ?? 0) + (o.state === 'tp2' ? 0.5 * (o.rTp2 ?? 0) : 0) : (o.rStop ?? -1)
 		fullNetSum += netFullR(o) ?? 0
 		beNetSum += netBeR(o) ?? 0
 	}
@@ -313,7 +315,7 @@ interface ResultRow {
 	noSweep: SliceStats
 }
 
-/** Все разрезы по одному датасету: якорь × триггер × ATR × сценарий × стоп. */
+/** В��е разрезы по одному датасету: якорь × триггер × ATR × сценарий × стоп. */
 function sliceDataset(symbol: string, timeframe: string, variant: string, period: string, outcomes: FibSetupOutcome[], atrThresholds: number[]): ResultRow[] {
 	const rows: ResultRow[] = []
 	const anchors = ['local', 'global'] as const
@@ -336,6 +338,10 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 	{ scenario: 'breaker', stopMode: 'tight' },
 	{ scenario: 'breaker161', stopMode: 'zero' },
 	{ scenario: 'breaker78', stopMode: 'zero' },
+	// Волна 4: добор второй половины (50/50) на медиане MAE победителей.
+	{ scenario: 'oteScale', stopMode: 'zero' },
+	{ scenario: 'deepScale', stopMode: 'zero' },
+	{ scenario: 'breakerScale', stopMode: 'zero' },
 		{ scenario: 'fade141', stopMode: 'zone' },
 		{ scenario: 'fade141', stopMode: 'zoneAtr' },
 		{ scenario: 'fade141', stopMode: 'far' },
@@ -527,7 +533,7 @@ function reachToMarkdown(rows: ReachRow[]): string {
 	return [header, sep, ...lines].join('\n')
 }
 
-/** Fade-reach таблица: после касания 141/241 — куда откатывает и куда несёт. */
+/** Fade-reach таблица: после касан��я 141/241 — куда откатывает и куда несёт. */
 function fadeReachToMarkdown(rows: ReachRow[]): string {
 	const header = `| Dataset | Anchor | Trig | 141: N | →120 | →100 | →78.6 | ↑161 | ↑200 | medPull | 241: N | →200 | →141 | →100 | ↑261 | medPull |`
 	const sep = `|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|`
@@ -568,6 +574,10 @@ function scenarioLabel(scenario: string, stopMode: string): string {
 	if (scenario === 'breaker161') return 'Breaker cancel>161 (SL 0)'
 	if (scenario === 'breaker78') return 'Breaker@78.6 (SL 0)'
 	if (scenario === 'breaker' && stopMode === 'tight') return 'Breaker (SL 23.6)'
+	// Волна 4: добор второй половины.
+	if (scenario === 'oteScale') return 'OTE scale 78.6+50 (SL 0)'
+	if (scenario === 'deepScale') return 'Deep scale 38.2+23.6 (SL 0)'
+	if (scenario === 'breakerScale') return 'Breaker scale 100+78.6 (SL 0)'
 	return 'Breaker (SL 0)'
 }
 
