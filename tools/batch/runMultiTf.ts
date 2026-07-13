@@ -6,9 +6,9 @@
 // мульти-ТФ вход (MultiTfEntryEngine) — попарное сравнение на идентичных
 // сетапах. Исследовательский инструмент, НЕ часть пайплайна.
 //
-// Запуск (через runBatch либо напрямую):
-//   npx tsx tools/batch/runBatch.ts --multi-tf
-//   npx tsx tools/batch/runBatch.ts --multi-tf --symbols BTC/USDT \
+// Запуск:
+//   npm run multitf
+//   npx tsx tools/batch/runMultiTf.ts --symbols BTC/USDT \
 //     --pairs 4h:15m --until 2023-01-01
 //
 // Флаги:
@@ -422,3 +422,9 @@ export async function runMultiTf(argv: string[]): Promise<void> {
 	writeFileSync(outPath, toCsv(allRows))
 	console.log(`CSV: ${outPath}`)
 }
+
+// Прямой запуск: npx tsx tools/batch/runMultiTf.ts [flags] / npm run multitf.
+runMultiTf(process.argv.slice(2)).catch((err) => {
+	console.error('Fatal:', err instanceof Error ? err.message : err)
+	process.exit(1)
+})
