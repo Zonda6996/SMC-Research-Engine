@@ -74,6 +74,16 @@ const SWEEP_VARIANTS: SweepVariant[] = [
 	{ id: 'swept12', config: { skipSweptAtrMultiple: 1.2 } },
 	// Подтверждение пробоя одной свечой вместо двух.
 	{ id: 'single', config: { breachMode: 'single' } },
+	// Окно свежести свипа для аннотации oppositeSweptBefore (base = 25).
+	// Меняет ТОЛЬКО разрез sweep/noSweep в выводе, отбор событий не трогает:
+	// узкое окно = только «CHoCH сразу после стоп-ханта» попадает в sweep-группу.
+	{ id: 'swp5', config: { oppositeSweepLookback: 5 } },
+	{ id: 'swp10', config: { oppositeSweepLookback: 10 } },
+	{ id: 'swp50', config: { oppositeSweepLookback: 50 } },
+	// Комбинации-кандидаты по итогам OFAT на 1h/2h (age0 — главная ручка,
+	// single — второй кандидат): проверка на синергию против одиночных эффектов.
+	{ id: 'age0single', config: { minLevelAge: 0, breachMode: 'single' } },
+	{ id: 'age0swp10', config: { minLevelAge: 0, oppositeSweepLookback: 10 } },
 ]
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
