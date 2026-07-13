@@ -6,15 +6,27 @@
 //   - Deep:    откат в 23.6–38.2  → вход по 38.2;
 //   - Breaker: цена дошла до 141 до касания OTE → вход на ретесте 100%;
 //   - стоп за 0%, TP1 = 141, TP2 = 241;
+//   - wide-стопы (исследовательские): за 0% с буфером 0.5/1.0 × ATR14,
+//     где ATR восстанавливается как legSize / legAtrRatio;
+//   - Fade (исследовательский, ПРОТИВ сетки): вход по касанию 141 (fade141)
+//     или 241 (fade241), стоп за 161/261 ('zone') либо + 0.5 ATR ('zoneAtr'),
+//     цели TP1 = 100%, TP2 = 78.6;
 //   - экспирация: противоположное событие подтверждено до входа;
 //   - конфликт внутри бара (вход и стоп в одной свече) — консервативно лосс.
+//
+// Диагностические поля (в EV не участвуют, look-ahead не добавляют —
+// это post-hoc сканы строго вперёд от уже известных индексов):
+//   - maxExtensionRatio: максимум цены после входа как ratio сетки, окно
+//     до касания исходного стопа либо конца данных (только тренд-сценарии);
+//   - tpAfterStop: после стопа цена всё же дошла до TP1 раньше события
+//     против направления сделки.
 //
 // Look-ahead исключён: симуляция начинается с createdAtIndex + 1 и идёт
 // только вперёд; экспирация проверяется по confirmIndex событий.
 
 import type { Candle } from '@/models/price/Candle.js'
 import type { StructureEvent } from '@/models/events/StructureEvent.js'
-import type { FibAnchorMode, FibGridCandidate, FibVariant } from '@/models/fib/FibGrid.js'
+import type { FibAnchorMode, FibDirection, FibGridCandidate, FibVariant } from '@/models/fib/FibGrid.js'
 import type {
 	FibLifecycleResult,
 	FibScenario,
@@ -62,11 +74,24 @@ export class FibLifecycleEngine {
 		const p786 = price(78.6)
 		const p100 = price(100)
 		const p141 = price(141)
+		const p161 = price(161)
 		const p241 = price(241)
+		const p261 = price(261)
+
+		// ATR14 на момент пробоя восстанавливается из уже посчитанного отношения:
+		// legAtrRatio = legSize / atr. Если недоступен — ATR-зависимые режимы
+		// (wide05/wide10/zoneAtr) для этого варианта не эмитятся.
+		const atr =
+			variant.legAtrRatio != null && variant.legAtrRatio > 0
+				? variant.legSize / variant.legAtrRatio
+				: null
+		// Буфер откладывается «за» уровень в сторону от направления сделки:
+		// для long-сетки — вниз от 0%, для short — вверх (и зеркально для fade).
+		const away = long ? -1 : 1
 
 		// Индекс подтверждения первого противоположного события после создания —
 		// с этого бара невошедшие сетапы экспирируются.
-		const expiryIndex = this.firstOppositeConfirm(candidate, input.events)
+		const expiryIndex = this.firstOppositeConfirm(candidate.direction, candidate.createdAtIndex, input.events)
 
 		// Предусловие breaker: касание 141 ДО касания OTE-зоны (78.6).
 		const { extFirst, extIndex } = this.breakerPrecondition(
@@ -78,34 +103,88 @@ export class FibLifecycleEngine {
 			expiryIndex,
 		)
 
-		const scenarios: {
+		interface ScenarioSpec {
 			scenario: FibScenario
 			stopMode: FibStopMode
 			entryLevel: number
 			stopLevel: number
 			fromIndex: number
-		}[] = [
+			/** Направление СДЕЛКИ (для fade инвертировано относительно сетки). */
+			tradeLong: boolean
+			tp1: number
+			tp2: number
+			/** Трекинг maxExtensionRatio — только тренд-сценарии. */
+			trackExtension: boolean
+		}
+
+		const from = candidate.createdAtIndex + 1
+		const trend = (
+			scenario: FibScenario,
+			stopMode: FibStopMode,
+			entryLevel: number,
+			stopLevel: number,
+			fromIndex = from,
+		): ScenarioSpec => ({
+			scenario, stopMode, entryLevel, stopLevel, fromIndex,
+			tradeLong: long, tp1: p141, tp2: p241, trackExtension: true,
+		})
+		// Fade: сделка ПРОТИВ сетки от зоны расширения, цели вниз по сетке.
+		const fade = (
+			scenario: FibScenario,
+			stopMode: FibStopMode,
+			entryLevel: number,
+			stopLevel: number,
+		): ScenarioSpec => ({
+			scenario, stopMode, entryLevel, stopLevel, fromIndex: from,
+			tradeLong: !long, tp1: p100, tp2: p786, trackExtension: false,
+		})
+
+		const scenarios: ScenarioSpec[] = [
 			// OTE симулируется в двух режимах стопа: за 0% и укороченный за 23.6.
-			{ scenario: 'ote', stopMode: 'zero', entryLevel: p786, stopLevel: p0, fromIndex: candidate.createdAtIndex + 1 },
-			{ scenario: 'ote', stopMode: 'tight', entryLevel: p786, stopLevel: p236, fromIndex: candidate.createdAtIndex + 1 },
-			{ scenario: 'deep', stopMode: 'zero', entryLevel: p382, stopLevel: p0, fromIndex: candidate.createdAtIndex + 1 },
+			trend('ote', 'zero', p786, p0),
+			trend('ote', 'tight', p786, p236),
+			trend('deep', 'zero', p382, p0),
 		]
+		// Wide-стопы: буфер в ATR за уровнем 0% (только при известном ATR).
+		if (atr != null) {
+			scenarios.push(
+				trend('ote', 'wide05', p786, p0 + away * 0.5 * atr),
+				trend('ote', 'wide10', p786, p0 + away * 1.0 * atr),
+				trend('deep', 'wide05', p382, p0 + away * 0.5 * atr),
+				trend('deep', 'wide10', p382, p0 + away * 1.0 * atr),
+			)
+		}
 		// Breaker существует только при выполненном предусловии; ретест 100%
 		// отслеживается после бара, где цена достигла 141.
 		if (extFirst && extIndex != null) {
-			scenarios.push({ scenario: 'breaker', stopMode: 'zero', entryLevel: p100, stopLevel: p0, fromIndex: extIndex + 1 })
+			scenarios.push(trend('breaker', 'zero', p100, p0, extIndex + 1))
+		}
+		// Fade-зоны: стоп за дальней границей ('zone') и + 0.5 ATR ('zoneAtr').
+		// Дальняя граница лежит В НАПРАВЛЕНИИ сетки (против сделки), поэтому
+		// ATR-буфер откладывается с противоположным знаком (−away).
+		scenarios.push(
+			fade('fade141', 'zone', p141, p161),
+			fade('fade241', 'zone', p241, p261),
+		)
+		if (atr != null) {
+			scenarios.push(
+				fade('fade141', 'zoneAtr', p141, p161 - away * 0.5 * atr),
+				fade('fade241', 'zoneAtr', p241, p261 - away * 0.5 * atr),
+			)
 		}
 
-		return scenarios.map(({ scenario, stopMode, entryLevel, stopLevel, fromIndex }) =>
-			this.simulateScenario(candidate, mode, variant, scenario, stopMode, {
+		return scenarios.map((spec) =>
+			this.simulateScenario(candidate, mode, variant, spec.scenario, spec.stopMode, {
 				candles: input.candles,
-				fromIndex,
-				long,
-				entryLevel,
-				stopLevel,
-				tp1: p141,
-				tp2: p241,
+				events: input.events,
+				fromIndex: spec.fromIndex,
+				long: spec.tradeLong,
+				entryLevel: spec.entryLevel,
+				stopLevel: spec.stopLevel,
+				tp1: spec.tp1,
+				tp2: spec.tp2,
 				expiryIndex,
+				extension: spec.trackExtension ? { p0, legSize: variant.legSize } : null,
 			}),
 		)
 	}
@@ -144,13 +223,17 @@ export class FibLifecycleEngine {
 		stopMode: FibStopMode,
 		ctx: {
 			candles: Candle[]
+			events: StructureEvent[]
 			fromIndex: number
+			/** Направление сделки (для fade инвертировано относительно сетки). */
 			long: boolean
 			entryLevel: number
 			stopLevel: number
 			tp1: number
 			tp2: number
 			expiryIndex: number | null
+			/** Параметры трекинга maxExtensionRatio; null — не отслеживать (fade). */
+			extension: { p0: number; legSize: number } | null
 		},
 	): FibSetupOutcome {
 		const base: FibSetupOutcome = {
@@ -159,7 +242,9 @@ export class FibLifecycleEngine {
 			scenario,
 			stopMode,
 			trigger: candidate.trigger,
-			direction: candidate.direction,
+			// Фактическое направление сделки — для fade инвертировано, чтобы
+			// L/S-разрезы в агрегации оставались честными.
+			direction: ctx.long ? 'long' : 'short',
 			legAtrRatio: variant.legAtrRatio,
 			oppositeSweptBefore: candidate.oppositeSweptBefore,
 			createdAtIndex: candidate.createdAtIndex,
@@ -179,6 +264,8 @@ export class FibLifecycleEngine {
 			beAfterTp1: null,
 			mfeR: null,
 			maeR: null,
+			maxExtensionRatio: null,
+			tpAfterStop: null,
 			barsToEntry: null,
 			barsToResolve: null,
 		}
@@ -218,6 +305,10 @@ export class FibLifecycleEngine {
 						barsToResolve: 0,
 						mfeR: 0,
 						maeR: -1,
+						maxExtensionRatio: ctx.extension
+							? this.trackMaxExtension(candles, i, long, ctx.stopLevel, ctx.extension)
+							: null,
+						tpAfterStop: this.checkTpAfterStop(candles, ctx.events, i, long, ctx.tp1),
 					}
 				}
 				break
@@ -309,20 +400,84 @@ export class FibLifecycleEngine {
 			beAfterTp1,
 			mfeR,
 			maeR,
+			maxExtensionRatio: ctx.extension
+				? this.trackMaxExtension(candles, entryIndex, long, ctx.stopLevel, ctx.extension)
+				: null,
+			tpAfterStop:
+				state === 'stopped' && stopIndex != null
+					? this.checkTpAfterStop(candles, ctx.events, stopIndex, long, ctx.tp1)
+					: null,
 			barsToEntry: entryIndex - candidate.createdAtIndex,
 			barsToResolve: finalIndex - entryIndex,
 		}
 	}
 
-	/** confirmIndex первого события противоположного направления после создания сетки. */
+	/**
+	 * Максимум цены после входа как ratio сетки. Скан строго вперёд от входа
+	 * до первого касания ИСХОДНОГО стопа adverse-стороной либо конца данных
+	 * (favorable-экстремум стоп-бара включается — как в mfeR).
+	 * Диагностика для анализа целей 141/200/241 и трейлинга; в EV не участвует.
+	 */
+	private trackMaxExtension(
+		candles: Candle[],
+		entryIndex: number,
+		long: boolean,
+		stopLevel: number,
+		extension: { p0: number; legSize: number },
+	): number | null {
+		if (extension.legSize <= 0) return null
+		let maxFavorable = long ? -Infinity : Infinity
+		for (let i = entryIndex; i < candles.length; i++) {
+			const candle = candles[i]
+			if (!candle) continue
+			maxFavorable = long
+				? Math.max(maxFavorable, candle.high)
+				: Math.min(maxFavorable, candle.low)
+			const hitStop = long ? candle.low <= stopLevel : candle.high >= stopLevel
+			if (hitStop) break
+		}
+		if (!Number.isFinite(maxFavorable)) return null
+		const distance = long ? maxFavorable - extension.p0 : extension.p0 - maxFavorable
+		return (distance / extension.legSize) * 100
+	}
+
+	/**
+	 * «Стоп выбит, затем TP1 достигнут»: скан после стоп-бара до подтверждения
+	 * первого события ПРОТИВ направления сделки либо конца данных.
+	 */
+	private checkTpAfterStop(
+		candles: Candle[],
+		events: StructureEvent[],
+		stopIndex: number,
+		long: boolean,
+		tp1: number,
+	): boolean {
+		const boundary = this.firstOppositeConfirm(long ? 'long' : 'short', stopIndex, events)
+		for (let i = stopIndex + 1; i < candles.length; i++) {
+			if (boundary != null && i >= boundary) break
+			const candle = candles[i]
+			if (!candle) continue
+			const hitTp1 = long ? candle.high >= tp1 : candle.low <= tp1
+			if (hitTp1) return true
+		}
+		return false
+	}
+
+	/**
+	 * confirmIndex первого события против заданного направления после afterIndex.
+	 * Используется для экспирации невошедших сетапов (направление сетки,
+	 * afterIndex = createdAtIndex) и для окна tpAfterStop (направление сделки,
+	 * afterIndex = стоп-бар).
+	 */
 	private firstOppositeConfirm(
-		candidate: FibGridCandidate,
+		direction: FibDirection,
+		afterIndex: number,
 		events: StructureEvent[],
 	): number | null {
-		const wantDirection = candidate.direction === 'long' ? 'down' : 'up'
+		const wantDirection = direction === 'long' ? 'down' : 'up'
 		for (const event of events) {
 			if (event.type === 'unlabeled') continue
-			if (event.confirmIndex <= candidate.createdAtIndex) continue
+			if (event.confirmIndex <= afterIndex) continue
 			if (event.direction === wantDirection) return event.confirmIndex
 		}
 		return null

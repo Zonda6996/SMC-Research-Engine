@@ -40,6 +40,7 @@ import type { BosChochConfig } from '../../src/core/events/BosChochEngine.js'
 import { fetchCandlesPaginated, MAX_CANDLES, type MarketKind } from '../shared/candleFetcher.js'
 import type { Candle } from '../../src/models/price/Candle.js'
 import type { FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
+import { netFullR, netBeR } from '../../src/core/fib/fibCosts.js'
 
 // ---------- Свип детектора ----------
 
@@ -175,6 +176,15 @@ interface SliceStats {
 	slPct: number | null
 	evFull: number | null
 	evBe: number | null
+	/** Net EV (комиссия + слиппедж, см. fibCosts) — gross не подменяется. */
+	evFullNet: number | null
+	evBeNet: number | null
+	/** Доля stopped-сделок, где после стопа цена всё же дошла до TP1. */
+	stopTpPct: number | null
+	/** Доля entered с maxExtensionRatio ≥ 141/200/241 (только тренд-сценарии). */
+	ext141Pct: number | null
+	ext200Pct: number | null
+	ext241Pct: number | null
 	resolved: number
 }
 
@@ -182,6 +192,7 @@ interface SliceStats {
  * EV на сделку в R для двух вариантов менеджмента — идентично формуле UI:
  * full — весь объём на TP1; be — 50% на TP1, безубыток, раннер до TP2.
  * Разрешённые сделки: TP1 либо стоп; открытые без TP1 исключаются.
+ * Net-варианты — те же формулы за вычетом издержек (fibCosts).
  */
 function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
 	const entered = outcomes.filter((o) => o.entered)
@@ -192,10 +203,25 @@ function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
 
 	let fullSum = 0
 	let beSum = 0
+	let fullNetSum = 0
+	let beNetSum = 0
 	for (const o of resolved) {
 		fullSum += o.tp1Hit ? (o.rTp1 ?? 0) : -1
 		beSum += o.tp1Hit ? 0.5 * (o.rTp1 ?? 0) + (o.state === 'tp2' ? 0.5 * (o.rTp2 ?? 0) : 0) : -1
+		fullNetSum += netFullR(o) ?? 0
+		beNetSum += netBeR(o) ?? 0
 	}
+
+	// «Стоп выбит, затем TP1» — по всем stopped-сделкам (включая tp1Hit-стопы).
+	const allStopped = entered.filter((o) => o.state === 'stopped' && o.tpAfterStop != null)
+	const stopTp = allStopped.filter((o) => o.tpAfterStop === true)
+
+	// Максимальное достигнутое расширение — только тренд-сценарии несут поле.
+	const withExt = entered.filter((o) => o.maxExtensionRatio != null)
+	const extPct = (threshold: number) =>
+		withExt.length
+			? withExt.filter((o) => (o.maxExtensionRatio ?? 0) >= threshold).length / withExt.length
+			: null
 
 	const pct = (part: number) => (entered.length ? part / entered.length : null)
 	return {
@@ -206,6 +232,12 @@ function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
 		slPct: pct(stopped.length),
 		evFull: resolved.length ? fullSum / resolved.length : null,
 		evBe: resolved.length ? beSum / resolved.length : null,
+		evFullNet: resolved.length ? fullNetSum / resolved.length : null,
+		evBeNet: resolved.length ? beNetSum / resolved.length : null,
+		stopTpPct: allStopped.length ? stopTp.length / allStopped.length : null,
+		ext141Pct: extPct(141),
+		ext200Pct: extPct(200),
+		ext241Pct: extPct(241),
 		resolved: resolved.length,
 	}
 }
@@ -244,12 +276,21 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 	const rows: ResultRow[] = []
 	const anchors = ['local', 'global'] as const
 	const triggers = ['bos', 'choch'] as const
-	// OTE в двух режимах стопа, Deep/Breaker только zero.
+	// OTE: zero/tight/wide; Deep: zero/wide; Breaker: только zero;
+	// Fade: стоп за дальней границей зоны и + 0.5 ATR.
 	const scenarioSlices = [
 		{ scenario: 'ote', stopMode: 'zero' },
 		{ scenario: 'ote', stopMode: 'tight' },
+		{ scenario: 'ote', stopMode: 'wide05' },
+		{ scenario: 'ote', stopMode: 'wide10' },
 		{ scenario: 'deep', stopMode: 'zero' },
+		{ scenario: 'deep', stopMode: 'wide05' },
+		{ scenario: 'deep', stopMode: 'wide10' },
 		{ scenario: 'breaker', stopMode: 'zero' },
+		{ scenario: 'fade141', stopMode: 'zone' },
+		{ scenario: 'fade141', stopMode: 'zoneAtr' },
+		{ scenario: 'fade241', stopMode: 'zone' },
+		{ scenario: 'fade241', stopMode: 'zoneAtr' },
 	] as const
 
 	for (const anchor of anchors) {
@@ -282,15 +323,19 @@ const fmtPct = (v: number | null) => (v == null ? '—' : `${Math.round(v * 100)
 const fmtEv = (v: number | null) => (v == null ? '—' : `${v >= 0 ? '+' : ''}${v.toFixed(2)}`)
 
 function scenarioLabel(scenario: string, stopMode: string): string {
-	if (scenario === 'ote') return stopMode === 'tight' ? 'OTE (SL 23.6)' : 'OTE (SL 0)'
-	if (scenario === 'deep') return 'Deep (SL 0)'
+	const wide = (base: string) =>
+		stopMode === 'wide05' ? `${base} (SL 0−0.5ATR)` : stopMode === 'wide10' ? `${base} (SL 0−1ATR)` : `${base} (SL 0)`
+	if (scenario === 'ote') return stopMode === 'tight' ? 'OTE (SL 23.6)' : wide('OTE')
+	if (scenario === 'deep') return wide('Deep')
+	if (scenario === 'fade141') return stopMode === 'zoneAtr' ? 'Fade141 (SL 161+0.5ATR)' : 'Fade141 (SL 161)'
+	if (scenario === 'fade241') return stopMode === 'zoneAtr' ? 'Fade241 (SL 261+0.5ATR)' : 'Fade241 (SL 261)'
 	return 'Breaker (SL 0)'
 }
 
 function toMarkdown(rows: ResultRow[], minIn: number): string {
 	const lines: string[] = []
-	lines.push('| Symbol | TF | Var | Per | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be | L: In/EVf/EVbe | S: In/EVf/EVbe | Swp: In/EVf/EVbe | NoSwp: In/EVf/EVbe |')
-	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
+	lines.push('| Symbol | TF | Var | Per | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be | EV_fn | EV_bn | L: In/EVf/EVbe | S: In/EVf/EVbe | Swp: In/EVf/EVbe | NoSwp: In/EVf/EVbe |')
+	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
 	const dir = (s: SliceStats) => `${s.entered}/${fmtEv(s.evFull)}/${fmtEv(s.evBe)}`
 	for (const r of rows) {
 		if (r.stats.entered < minIn) continue
@@ -299,6 +344,7 @@ function toMarkdown(rows: ResultRow[], minIn: number): string {
 			`| ${scenarioLabel(r.scenario, r.stopMode)} | ${r.stats.entered} ` +
 			`| ${fmtPct(r.stats.tp1Pct)} | ${fmtPct(r.stats.tp2Pct)} | ${fmtPct(r.stats.slPct)} ` +
 			`| ${fmtEv(r.stats.evFull)} | ${fmtEv(r.stats.evBe)} ` +
+			`| ${fmtEv(r.stats.evFullNet)} | ${fmtEv(r.stats.evBeNet)} ` +
 			`| ${dir(r.long)} | ${dir(r.short)} | ${dir(r.sweep)} | ${dir(r.noSweep)} |`,
 		)
 	}
@@ -306,10 +352,13 @@ function toMarkdown(rows: ResultRow[], minIn: number): string {
 }
 
 function toCsv(rows: ResultRow[]): string {
+	// Новые колонки добавляются строго В КОНЕЦ — старые скрипты анализа CSV
+	// по позициям не ломаются.
 	const header =
 		'symbol,timeframe,variant,period,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be,' +
 		'long_in,long_ev_full,long_ev_be,short_in,short_ev_full,short_ev_be,' +
-		'sweep_in,sweep_ev_full,sweep_ev_be,nosweep_in,nosweep_ev_full,nosweep_ev_be'
+		'sweep_in,sweep_ev_full,sweep_ev_be,nosweep_in,nosweep_ev_full,nosweep_ev_be,' +
+		'ev_full_net,ev_be_net,stop_tp_pct,ext141_pct,ext200_pct,ext241_pct'
 	const num = (v: number | null) => (v == null ? '' : v.toFixed(4))
 	const body = rows.map((r) =>
 		[
@@ -321,6 +370,8 @@ function toCsv(rows: ResultRow[]): string {
 			r.short.entered, num(r.short.evFull), num(r.short.evBe),
 			r.sweep.entered, num(r.sweep.evFull), num(r.sweep.evBe),
 			r.noSweep.entered, num(r.noSweep.evFull), num(r.noSweep.evBe),
+			num(r.stats.evFullNet), num(r.stats.evBeNet), num(r.stats.stopTpPct),
+			num(r.stats.ext141Pct), num(r.stats.ext200Pct), num(r.stats.ext241Pct),
 		].join(','),
 	)
 	return [header, ...body].join('\n')

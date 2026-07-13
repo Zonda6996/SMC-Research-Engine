@@ -220,6 +220,134 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(outcome(result, 'ote')?.beAfterTp1, false)
 	})
 
+	// ---- Wide-стопы (буфер в ATR за 0%): ATR = legSize / legAtrRatio = 100/5 = 20,
+	// wide05 → стоп 90, wide10 → стоп 80 ----
+
+	it('wide05 переживает шейкаут, который выбивает zero', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175)) // вход 178.6
+		candles.push(candle(11, 180, 95)) // пробили 0% (100), но не 90
+		candles.push(candle(12, 250, 200)) // TP1
+		candles.push(candle(13, 350, 240)) // TP2
+		const result = run(longCandidate(9), candles)
+
+		const zero = outcome(result, 'ote', 'zero')
+		assert.equal(zero?.state, 'stopped')
+
+		const wide05 = outcome(result, 'ote', 'wide05')
+		assert.equal(wide05?.stopPrice, 90)
+		assert.equal(wide05?.state, 'tp2')
+
+		const wide10 = outcome(result, 'ote', 'wide10')
+		assert.equal(wide10?.stopPrice, 80)
+		assert.equal(wide10?.state, 'tp2')
+	})
+
+	it('tpAfterStop: стоп выбит, затем TP1 всё же достигнут', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175)) // вход 178.6
+		candles.push(candle(11, 180, 95)) // стоп за 0%
+		candles.push(candle(12, 250, 150)) // после стопа дошли до TP1 (241)
+		const result = run(longCandidate(9), candles)
+
+		const ote = outcome(result, 'ote')
+		assert.equal(ote?.state, 'stopped')
+		assert.equal(ote?.tpAfterStop, true)
+		// Окно maxExtension закрывается на стоп-баре: максимум до него — 205.
+		assert.equal(ote?.maxExtensionRatio, 105)
+	})
+
+	it('tpAfterStop = false, если после стопа TP1 не достигнут', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175))
+		candles.push(candle(11, 180, 95)) // стоп
+		candles.push(candle(12, 150, 120)) // TP1 не достигнут
+		const result = run(longCandidate(9), candles)
+
+		const ote = outcome(result, 'ote')
+		assert.equal(ote?.state, 'stopped')
+		assert.equal(ote?.tpAfterStop, false)
+	})
+
+	it('tpAfterStop = null для не-stopped исходов', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175))
+		candles.push(candle(11, 250, 200))
+		candles.push(candle(12, 350, 240))
+		const result = run(longCandidate(9), candles)
+		assert.equal(outcome(result, 'ote')?.tpAfterStop, null)
+	})
+
+	it('maxExtensionRatio продолжает расти после TP2 и фиксируется при касании стопа', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175)) // вход
+		candles.push(candle(11, 250, 200)) // TP1
+		candles.push(candle(12, 350, 240)) // TP2 (ratio 250)
+		candles.push(candle(13, 380, 300)) // продолжение до ratio 280
+		candles.push(candle(14, 320, 95)) // возврат к исходному стопу — окно закрыто
+		candles.push(candle(15, 500, 400)) // уже не учитывается
+		const result = run(longCandidate(9), candles)
+
+		const ote = outcome(result, 'ote')
+		assert.equal(ote?.state, 'tp2')
+		// (380 − 100) / 100 × 100 = 280; бар 15 за пределами окна.
+		assert.equal(ote?.maxExtensionRatio, 280)
+	})
+
+	// ---- Fade: вход против сетки от зоны расширения ----
+
+	it('fade141: касание 141 → шорт против лонг-сетки, цели 100% и 78.6', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 245, 204)) // касание 141 (241) → вход шорт
+		candles.push(candle(11, 240, 195)) // TP1 = 100% (200)
+		candles.push(candle(12, 200, 170)) // TP2 = 78.6 (178.6)
+		const result = run(longCandidate(9), candles)
+
+		const zone = outcome(result, 'fade141', 'zone')
+		assert.equal(zone?.entered, true)
+		assert.equal(zone?.direction, 'short') // фактическое направление сделки
+		assert.equal(zone?.entryPrice, 241)
+		assert.equal(zone?.stopPrice, 261) // за 161
+		assert.equal(zone?.state, 'tp2')
+		// Риск 20 (241→261), TP1 = 200 → rTp1 = 41/20 = 2.05.
+		assert.ok(Math.abs((zone?.rTp1 ?? 0) - 2.05) < 1e-9)
+		assert.equal(zone?.maxExtensionRatio, null) // только тренд-сценарии
+
+		const zoneAtr = outcome(result, 'fade141', 'zoneAtr')
+		assert.equal(zoneAtr?.stopPrice, 271) // 261 + 0.5 × ATR(20)
+		assert.equal(zoneAtr?.state, 'tp2')
+	})
+
+	it('fade241: вход от 241, стоп за 261', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 345, 204)) // сразу к 241 (цена 341)
+		candles.push(candle(11, 340, 195)) // TP1 (200)
+		const result = run(longCandidate(9), candles)
+
+		const zone = outcome(result, 'fade241', 'zone')
+		assert.equal(zone?.entered, true)
+		assert.equal(zone?.entryPrice, 341) // уровень 241 сетки
+		assert.equal(zone?.stopPrice, 361) // уровень 261
+		assert.equal(zone?.tp1Hit, true)
+	})
+
+	it('без legAtrRatio ATR-зависимые режимы не эмитятся', () => {
+		const candidate = longCandidate(9)
+		candidate.variants.local!.legAtrRatio = null
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175))
+		const result = run(candidate, candles)
+
+		assert.equal(outcome(result, 'ote', 'wide05'), undefined)
+		assert.equal(outcome(result, 'ote', 'wide10'), undefined)
+		assert.equal(outcome(result, 'deep', 'wide05'), undefined)
+		assert.equal(outcome(result, 'fade141', 'zoneAtr'), undefined)
+		// ATR-независимые режимы на месте.
+		assert.ok(outcome(result, 'ote', 'zero'))
+		assert.ok(outcome(result, 'ote', 'tight'))
+		assert.ok(outcome(result, 'fade141', 'zone'))
+	})
+
 	it('полный runAnalysis возвращает fibLifecycle', async () => {
 		const { runAnalysis } = await import('@/core/analysis/runAnalysis.js')
 		const { readFileSync } = await import('node:fs')
