@@ -20,8 +20,16 @@ import type { StructureEventType } from '@/models/events/StructureEvent.js'
  *               сетке: TP1 = 100%, TP2 = 78.6. Направление сделки в outcome
  *               ИНВЕРТИРОВАНО относительно направления сетки.
  * - 'fade241' — то же от зоны 2.41–2.61: вход по касанию 241, стоп за 261.
+ *
+ * Волна 1 доработок fade (гипотезы пользователя после первых прогонов —
+ * короткий стоп у fade съедается издержками, вход по первому касанию 141
+ * ловит нож):
+ * - 'fade241n' — вход по касанию 241 как fade241, но БЛИЖНИЕ цели:
+ *                TP1 = 141, TP2 = 100 (EV_full = «фулл на 141»);
+ * - 'fade200'  — вход по касанию 200 (фильтр «прошили 141 — не ловим»),
+ *                стоп за 241 (+ запас), цели TP1 = 100%, TP2 = 78.6.
  */
-export type FibScenario = 'ote' | 'deep' | 'breaker' | 'fade141' | 'fade241'
+export type FibScenario = 'ote' | 'deep' | 'breaker' | 'fade141' | 'fade241' | 'fade241n' | 'fade200'
 
 /**
  * Режим стопа:
@@ -31,12 +39,17 @@ export type FibScenario = 'ote' | 'deep' | 'breaker' | 'fade141' | 'fade241'
  * - 'wide05'  — стоп за 0% с буфером 0.5 × ATR14 на момент пробоя
  *   (ote/deep; ATR восстанавливается как legSize / legAtrRatio);
  * - 'wide10'  — то же с буфером 1.0 × ATR14;
- * - 'zone'    — только fade: стоп за дальней границей зоны (161 / 261);
- * - 'zoneAtr' — только fade: стоп за дальней границей зоны + 0.5 × ATR14.
+ * - 'zone'    — только fade: стоп за дальней границей зоны (fade141: 161,
+ *   fade241/fade241n: 261, fade200: 241);
+ * - 'zoneAtr' — только fade: стоп за той же границей + 0.5 × ATR14;
+ * - 'far'     — только fade141: стоп за 200 + 0.5 × ATR14 — широкий стоп,
+ *   лечащий проблему издержек на коротком зонном стопе;
+ * - 'zero200' — тренд-сценарии (ote/deep): стоп за 0% как 'zero', но
+ *   TP2 = 200 вместо 241 (гипотеза по данным ext200Pct > ext241Pct).
  * Breaker всегда симулируется только с 'zero'. ATR-зависимые режимы
- * (wide05/wide10/zoneAtr) не эмитятся, если legAtrRatio недоступен.
+ * (wide05/wide10/zoneAtr/far) не эмитятся, если legAtrRatio недоступен.
  */
-export type FibStopMode = 'zero' | 'tight' | 'wide05' | 'wide10' | 'zone' | 'zoneAtr'
+export type FibStopMode = 'zero' | 'tight' | 'wide05' | 'wide10' | 'zone' | 'zoneAtr' | 'far' | 'zero200'
 
 /**
  * Финальное состояние сетапа:

@@ -276,21 +276,28 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 	const rows: ResultRow[] = []
 	const anchors = ['local', 'global'] as const
 	const triggers = ['bos', 'choch'] as const
-	// OTE: zero/tight/wide; Deep: zero/wide; Breaker: только zero;
-	// Fade: стоп за дальней границей зоны и + 0.5 ATR.
+	// OTE: zero/tight/wide/zero200; Deep: zero/wide/zero200; Breaker: только zero;
+	// Fade: стоп за дальней границей зоны и + 0.5 ATR; волна 1 —
+	// fade141 far (SL за 200), fade241n (цели 141→100), fade200 (вход 200).
 	const scenarioSlices = [
 		{ scenario: 'ote', stopMode: 'zero' },
 		{ scenario: 'ote', stopMode: 'tight' },
 		{ scenario: 'ote', stopMode: 'wide05' },
 		{ scenario: 'ote', stopMode: 'wide10' },
+		{ scenario: 'ote', stopMode: 'zero200' },
 		{ scenario: 'deep', stopMode: 'zero' },
 		{ scenario: 'deep', stopMode: 'wide05' },
 		{ scenario: 'deep', stopMode: 'wide10' },
+		{ scenario: 'deep', stopMode: 'zero200' },
 		{ scenario: 'breaker', stopMode: 'zero' },
 		{ scenario: 'fade141', stopMode: 'zone' },
 		{ scenario: 'fade141', stopMode: 'zoneAtr' },
+		{ scenario: 'fade141', stopMode: 'far' },
 		{ scenario: 'fade241', stopMode: 'zone' },
 		{ scenario: 'fade241', stopMode: 'zoneAtr' },
+		{ scenario: 'fade241n', stopMode: 'zone' },
+		{ scenario: 'fade200', stopMode: 'zone' },
+		{ scenario: 'fade200', stopMode: 'zoneAtr' },
 	] as const
 
 	for (const anchor of anchors) {
@@ -324,11 +331,19 @@ const fmtEv = (v: number | null) => (v == null ? '—' : `${v >= 0 ? '+' : ''}${
 
 function scenarioLabel(scenario: string, stopMode: string): string {
 	const wide = (base: string) =>
-		stopMode === 'wide05' ? `${base} (SL 0−0.5ATR)` : stopMode === 'wide10' ? `${base} (SL 0−1ATR)` : `${base} (SL 0)`
+		stopMode === 'wide05' ? `${base} (SL 0−0.5ATR)`
+		: stopMode === 'wide10' ? `${base} (SL 0−1ATR)`
+		: stopMode === 'zero200' ? `${base} (SL 0, TP2 200)`
+		: `${base} (SL 0)`
 	if (scenario === 'ote') return stopMode === 'tight' ? 'OTE (SL 23.6)' : wide('OTE')
 	if (scenario === 'deep') return wide('Deep')
-	if (scenario === 'fade141') return stopMode === 'zoneAtr' ? 'Fade141 (SL 161+0.5ATR)' : 'Fade141 (SL 161)'
+	if (scenario === 'fade141') {
+		if (stopMode === 'far') return 'Fade141 (SL 200+0.5ATR)'
+		return stopMode === 'zoneAtr' ? 'Fade141 (SL 161+0.5ATR)' : 'Fade141 (SL 161)'
+	}
 	if (scenario === 'fade241') return stopMode === 'zoneAtr' ? 'Fade241 (SL 261+0.5ATR)' : 'Fade241 (SL 261)'
+	if (scenario === 'fade241n') return 'Fade241→141/100 (SL 261)'
+	if (scenario === 'fade200') return stopMode === 'zoneAtr' ? 'Fade200 (SL 241+0.5ATR)' : 'Fade200 (SL 241)'
 	return 'Breaker (SL 0)'
 }
 

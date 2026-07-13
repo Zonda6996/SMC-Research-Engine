@@ -342,10 +342,99 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(outcome(result, 'ote', 'wide10'), undefined)
 		assert.equal(outcome(result, 'deep', 'wide05'), undefined)
 		assert.equal(outcome(result, 'fade141', 'zoneAtr'), undefined)
+		assert.equal(outcome(result, 'fade141', 'far'), undefined)
+		assert.equal(outcome(result, 'fade200', 'zoneAtr'), undefined)
 		// ATR-независимые режимы на месте.
 		assert.ok(outcome(result, 'ote', 'zero'))
 		assert.ok(outcome(result, 'ote', 'tight'))
 		assert.ok(outcome(result, 'fade141', 'zone'))
+		assert.ok(outcome(result, 'fade241n', 'zone'))
+		assert.ok(outcome(result, 'fade200', 'zone'))
+	})
+
+	// ---- Волна 1: широкий стоп fade141, ближние цели fade241n, вход от 200,
+	// тренд с TP2 = 200. ATR = 20 (legSize 100 / legAtrRatio 5) ----
+
+	it('fade141 far: стоп за 200 + 0.5 ATR переживает прошив 161', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 245, 204)) // касание 141 (241) → вход шорт
+		candles.push(candle(11, 265, 230)) // прошили 161 (261) — zone выбит, far (310) жив
+		candles.push(candle(12, 260, 195)) // TP1 = 100% (200)
+		candles.push(candle(13, 200, 170)) // TP2 = 78.6 (178.6)
+		const result = run(longCandidate(9), candles)
+
+		const zone = outcome(result, 'fade141', 'zone')
+		assert.equal(zone?.state, 'stopped')
+
+		const far = outcome(result, 'fade141', 'far')
+		assert.equal(far?.entered, true)
+		assert.equal(far?.entryPrice, 241)
+		assert.equal(far?.stopPrice, 310) // 300 (уровень 200) + 0.5 × 20
+		assert.equal(far?.state, 'tp2')
+		// Риск 69 (241→310), TP1 = 200 → rTp1 = 41/69.
+		assert.ok(Math.abs((far?.rTp1 ?? 0) - 41 / 69) < 1e-9)
+	})
+
+	it('fade241n: вход от 241, ближние цели 141 → 100', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 345, 250)) // касание 241 (341) → вход шорт, до 241 не дошли
+		candles.push(candle(11, 340, 240)) // TP1 = 141 (241)
+		candles.push(candle(12, 250, 195)) // TP2 = 100% (200)
+		const result = run(longCandidate(9), candles)
+
+		const near = outcome(result, 'fade241n', 'zone')
+		assert.equal(near?.entered, true)
+		assert.equal(near?.entryPrice, 341)
+		assert.equal(near?.stopPrice, 361) // за 261
+		assert.equal(near?.tp1Index, 11)
+		assert.equal(near?.state, 'tp2')
+		assert.equal(near?.tp2Index, 12)
+		// Риск 20, TP1 = 241 → rTp1 = 100/20 = 5.
+		assert.equal(near?.rTp1, 5)
+
+		// Старый fade241 (цели 100 → 78.6) в том же прогоне достиг только TP1.
+		const old = outcome(result, 'fade241', 'zone')
+		assert.equal(old?.tp1Hit, true)
+		assert.equal(old?.state, 'open')
+	})
+
+	it('fade200: вход по касанию 200, стоп за 241 (+0.5 ATR), цель 100%', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 305, 204)) // касание 200 (300) → вход шорт
+		candles.push(candle(11, 310, 250)) // ни стоп (341/351), ни тейк
+		candles.push(candle(12, 260, 195)) // TP1 = 100% (200)
+		const result = run(longCandidate(9), candles)
+
+		const zone = outcome(result, 'fade200', 'zone')
+		assert.equal(zone?.entered, true)
+		assert.equal(zone?.entryPrice, 300)
+		assert.equal(zone?.stopPrice, 341) // за 241
+		assert.equal(zone?.tp1Hit, true)
+		// Риск 41, TP1 = 200 → rTp1 = 100/41.
+		assert.ok(Math.abs((zone?.rTp1 ?? 0) - 100 / 41) < 1e-9)
+
+		const zoneAtr = outcome(result, 'fade200', 'zoneAtr')
+		assert.equal(zoneAtr?.stopPrice, 351) // 341 + 0.5 × 20
+		assert.equal(zoneAtr?.tp1Hit, true)
+	})
+
+	it('zero200: TP2 = 200 закрывается раньше, чем zero дошёл бы до 241', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 205, 175)) // вход 178.6
+		candles.push(candle(11, 250, 200)) // TP1 (241)
+		candles.push(candle(12, 305, 240)) // 200-уровень (300) достигнут, 241 (341) нет
+		candles.push(candle(13, 250, 95)) // возврат в стоп
+		const result = run(longCandidate(9), candles)
+
+		const z200 = outcome(result, 'ote', 'zero200')
+		assert.equal(z200?.state, 'tp2')
+		assert.equal(z200?.tp2Index, 12)
+		// Риск 78.6, TP2 = 300 → rTp2 = 121.4/78.6.
+		assert.ok(Math.abs((z200?.rTp2 ?? 0) - 121.4 / 78.6) < 1e-9)
+
+		const zero = outcome(result, 'ote', 'zero')
+		assert.equal(zero?.state, 'stopped') // до 341 не дошли, вернулись в стоп
+		assert.equal(zero?.tp1Hit, true)
 	})
 
 	it('полный runAnalysis возвращает fibLifecycle', async () => {

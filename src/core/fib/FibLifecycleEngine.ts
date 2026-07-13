@@ -11,6 +11,10 @@
 //   - Fade (исследовательский, ПРОТИВ сетки): вход по касанию 141 (fade141)
 //     или 241 (fade241), стоп за 161/261 ('zone') либо + 0.5 ATR ('zoneAtr'),
 //     цели TP1 = 100%, TP2 = 78.6;
+//   - Fade волна 1: fade141 с широким стопом за 200 + 0.5 ATR ('far');
+//     fade241n — вход 241 с ближними целями TP1 = 141, TP2 = 100;
+//     fade200 — вход 200, стоп за 241 (+ 0.5 ATR), цели 100 → 78.6;
+//   - 'zero200' — тренд-сценарии со стопом за 0% и TP2 = 200 вместо 241;
 //   - экспирация: противоположное событие подтверждено до входа;
 //   - конфликт внутри бара (вход и стоп в одной свече) — консервативно лосс.
 //
@@ -75,6 +79,7 @@ export class FibLifecycleEngine {
 		const p100 = price(100)
 		const p141 = price(141)
 		const p161 = price(161)
+		const p200 = price(200)
 		const p241 = price(241)
 		const p261 = price(261)
 
@@ -124,9 +129,10 @@ export class FibLifecycleEngine {
 			entryLevel: number,
 			stopLevel: number,
 			fromIndex = from,
+			tp2 = p241,
 		): ScenarioSpec => ({
 			scenario, stopMode, entryLevel, stopLevel, fromIndex,
-			tradeLong: long, tp1: p141, tp2: p241, trackExtension: true,
+			tradeLong: long, tp1: p141, tp2, trackExtension: true,
 		})
 		// Fade: сделка ПРОТИВ сетки от зоны расширения, цели вниз по сетке.
 		const fade = (
@@ -134,9 +140,11 @@ export class FibLifecycleEngine {
 			stopMode: FibStopMode,
 			entryLevel: number,
 			stopLevel: number,
+			tp1 = p100,
+			tp2 = p786,
 		): ScenarioSpec => ({
 			scenario, stopMode, entryLevel, stopLevel, fromIndex: from,
-			tradeLong: !long, tp1: p100, tp2: p786, trackExtension: false,
+			tradeLong: !long, tp1, tp2, trackExtension: false,
 		})
 
 		const scenarios: ScenarioSpec[] = [
@@ -144,6 +152,10 @@ export class FibLifecycleEngine {
 			trend('ote', 'zero', p786, p0),
 			trend('ote', 'tight', p786, p236),
 			trend('deep', 'zero', p382, p0),
+			// Волна 1: тот же стоп за 0%, но TP2 = 200 вместо 241 — гипотеза
+			// по данным расширений (до 200 доходит заметно больше сделок).
+			trend('ote', 'zero200', p786, p0, from, p200),
+			trend('deep', 'zero200', p382, p0, from, p200),
 		]
 		// Wide-стопы: буфер в ATR за уровнем 0% (только при известном ATR).
 		if (atr != null) {
@@ -165,11 +177,21 @@ export class FibLifecycleEngine {
 		scenarios.push(
 			fade('fade141', 'zone', p141, p161),
 			fade('fade241', 'zone', p241, p261),
+			// Волна 1: fade241n — тот же вход/стоп, но ближние цели 141 → 100.
+			fade('fade241n', 'zone', p241, p261, p141, p100),
+			// Волна 1: fade200 — вход по касанию 200 (фильтр «прошили 141 —
+			// ждём глубже»), стоп ровно за 241, цели 100 → 78.6.
+			fade('fade200', 'zone', p200, p241),
 		)
 		if (atr != null) {
 			scenarios.push(
 				fade('fade141', 'zoneAtr', p141, p161 - away * 0.5 * atr),
 				fade('fade241', 'zoneAtr', p241, p261 - away * 0.5 * atr),
+				// Волна 1: fade141 с широким стопом за 200 + 0.5 ATR — риск в цене
+				// ~3× шире зонного, издержки в R пропорционально меньше.
+				fade('fade141', 'far', p141, p200 - away * 0.5 * atr),
+				// Волна 1: fade200 со стопом за 241 + 0.5 ATR («небольшой запас»).
+				fade('fade200', 'zoneAtr', p200, p241 - away * 0.5 * atr),
 			)
 		}
 
