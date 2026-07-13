@@ -627,10 +627,23 @@ async function main() {
 				console.log(`  ✗ ${label}: ${message}`)
 				continue
 			}
-			if (candles.length === 0) {
-				failures.push(`${label}: 0 candles`)
+		if (candles.length === 0) {
+			failures.push(`${label}: 0 candles`)
+			continue
+		}
+
+		// Контроль окна данных: печатаем фактический диапазон, чтобы прогоны
+		// с --until нельзя было спутать с текущим периодом (и наоборот).
+		{
+			const first = new Date(candles[0]!.timestamp).toISOString().slice(0, 10)
+			const last = new Date(candles[candles.length - 1]!.timestamp).toISOString().slice(0, 10)
+			console.log(`  ${label}: ${candles.length} candles, ${first} → ${last}`)
+			if (args.untilMs !== null && candles[candles.length - 1]!.timestamp >= args.untilMs) {
+				failures.push(`${label}: data range violates --until (last candle ${last})`)
+				console.log(`  ✗ ${label}: last candle ${last} >= --until — окно нарушено, пропускаю`)
 				continue
 			}
+		}
 
 			// Хронологические отрезки: каждый анализируется независимо,
 			// «настоящий» edge обязан быть виден в каждом, не только в сумме.
