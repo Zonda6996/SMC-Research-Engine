@@ -504,6 +504,55 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(confirm?.state, 'tp2')
 	})
 
+	// ---- Гистограмма досягаемости: куда цена ходит после события,
+	// независимо от сценариев входа (одна запись на кандидат × якорь). ----
+
+	it('reach: min/max ratio замеряются от создания до конца данных', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 210, 170)) // low 170 → ratio 70
+		candles.push(candle(11, 260, 200)) // high 260 → ratio 160
+		candles.push(candle(12, 240, 190))
+		const result = run(longCandidate(9), candles)
+
+		assert.equal(result.reach.length, 1)
+		const reach = result.reach[0]
+		assert.equal(reach?.variantMode, 'local')
+		assert.equal(reach?.trigger, 'bos')
+		// Замер с бара 10: min low = 170 → (170−100)/100×100 = 70.
+		assert.equal(reach?.minRetraceRatio, 70)
+		// Max high = 260 → ratio 160.
+		assert.equal(reach?.maxExtensionRatio, 160)
+		assert.equal(reach?.windowBars, 3)
+	})
+
+	it('reach: окно обрезается подтверждением противоположного события', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 210, 170)) // ratio 70 — в окне
+		candles.push(candle(11, 230, 200)) // ratio 130 — в окне
+		candles.push(candle(12, 300, 90)) // вне окна: expiry на баре 12
+		const opposite: StructureEvent = {
+			type: 'choch',
+			direction: 'down',
+			levelPrice: 120,
+			levelType: 'low',
+			levelIndex: 3,
+			levelLabel: 'UNKNOWN',
+			breachIndex: 11,
+			breachTimestamp: 11,
+			confirmIndex: 12,
+			confirmTimestamp: 12,
+			sweptBefore: false,
+			sweptDepth: 0,
+			oppositeSweptBefore: false,
+		}
+		const result = run(longCandidate(9), candles, [opposite])
+
+		const reach = result.reach[0]
+		assert.equal(reach?.minRetraceRatio, 70)
+		assert.equal(reach?.maxExtensionRatio, 130) // бар 12 не попал в окно
+		assert.equal(reach?.windowBars, 2)
+	})
+
 	it('полный runAnalysis возвращает fibLifecycle', async () => {
 		const { runAnalysis } = await import('@/core/analysis/runAnalysis.js')
 		const { readFileSync } = await import('node:fs')

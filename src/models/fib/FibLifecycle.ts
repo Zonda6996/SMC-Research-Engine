@@ -144,6 +144,32 @@ export interface FibSetupOutcome {
 	barsToResolve: number | null
 }
 
+/**
+ * Гистограмма досягаемости: куда цена реально ходит после подтверждения
+ * BOS/CHoCH — независимо от сценариев входа. Одна запись на кандидат × якорь.
+ * Окно замера: от createdAtIndex + 1 до подтверждения первого противоположного
+ * события либо конца данных. Всё в ratio сетки (проценты, для short зеркально):
+ * 100 = точка слома, 0 = основание ноги, 141/200/241 = расширения.
+ * Назначение: увидеть распределение глубины ретрейса и потолка расширения,
+ * чтобы ставить входы и цели по данным, а не перебором уровней.
+ */
+export interface FibReachRecord {
+	candidateId: string
+	variantMode: FibAnchorMode
+	trigger: Exclude<StructureEventType, 'unlabeled'>
+	direction: FibDirection
+	legAtrRatio: number | null
+	oppositeSweptBefore: boolean
+	/** Минимальный достигнутый ratio (глубина ретрейса к 0%). */
+	minRetraceRatio: number
+	/** Максимальный достигнутый ratio (потолок расширения). */
+	maxExtensionRatio: number
+	/** Баров в окне замера (для оценки длины жизни сетки). */
+	windowBars: number
+}
+
 export interface FibLifecycleResult {
 	outcomes: FibSetupOutcome[]
+	/** Досягаемость по каждому кандидату — независимая диагностика уровней. */
+	reach: FibReachRecord[]
 }

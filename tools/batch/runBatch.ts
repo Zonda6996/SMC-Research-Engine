@@ -39,7 +39,7 @@ import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import type { BosChochConfig } from '../../src/core/events/BosChochEngine.js'
 import { fetchCandlesPaginated, MAX_CANDLES, type MarketKind } from '../shared/candleFetcher.js'
 import type { Candle } from '../../src/models/price/Candle.js'
-import type { FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
+import type { FibReachRecord, FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
 import { netFullR, netBeR } from '../../src/core/fib/fibCosts.js'
 
 // ---------- Свип детектора ----------
@@ -328,6 +328,97 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 	return rows
 }
 
+// ---------- Гистограмма досягаемости ----------
+
+/**
+ * Агрегат досягаемости по срезу: доли кандидатов, чей ретрейс дошёл до уровня
+ * (minRetraceRatio <= X) и чьё расширение достигло уровня (maxExtensionRatio >= X),
+ * плюс медианы. Независимо от сценариев входа — «куда цена реально ходит».
+ */
+interface ReachRow {
+	symbol: string
+	timeframe: string
+	variant: string
+	period: string
+	anchor: string
+	trigger: string
+	candidates: number
+	/** Доли ретрейса до уровня: 78.6 / 61.8 / 50 / 38.2 / 23.6 / 0 (инвалидация). */
+	ret: Record<string, number>
+	/** Доли расширения до уровня: 100 / 141 / 161 / 200 / 241 / 261. */
+	ext: Record<string, number>
+	medianRetrace: number | null
+	medianExtension: number | null
+}
+
+const RETRACE_LEVELS = [78.6, 61.8, 50, 38.2, 23.6, 0] as const
+const EXTENSION_LEVELS = [100, 141, 161, 200, 241, 261] as const
+
+function median(values: number[]): number | null {
+	if (values.length === 0) return null
+	const sorted = [...values].sort((a, b) => a - b)
+	const mid = Math.floor(sorted.length / 2)
+	const lo = sorted[mid - 1]
+	const hi = sorted[mid]
+	if (hi == null) return null
+	return sorted.length % 2 === 0 && lo != null ? (lo + hi) / 2 : hi
+}
+
+function sliceReach(symbol: string, timeframe: string, variant: string, period: string, reach: FibReachRecord[]): ReachRow[] {
+	const rows: ReachRow[] = []
+	for (const anchor of ['local', 'global'] as const) {
+		for (const trigger of ['bos', 'choch'] as const) {
+			const group = reach.filter((r) => r.variantMode === anchor && r.trigger === trigger)
+			if (group.length === 0) continue
+			const ret: Record<string, number> = {}
+			for (const level of RETRACE_LEVELS) {
+				ret[String(level)] = group.filter((r) => r.minRetraceRatio <= level).length / group.length
+			}
+			const ext: Record<string, number> = {}
+			for (const level of EXTENSION_LEVELS) {
+				ext[String(level)] = group.filter((r) => r.maxExtensionRatio >= level).length / group.length
+			}
+			rows.push({
+				symbol, timeframe, variant, period, anchor, trigger,
+				candidates: group.length,
+				ret, ext,
+				medianRetrace: median(group.map((r) => r.minRetraceRatio)),
+				medianExtension: median(group.map((r) => r.maxExtensionRatio)),
+			})
+		}
+	}
+	return rows
+}
+
+function reachToCsv(rows: ReachRow[]): string {
+	const header = [
+		'symbol', 'timeframe', 'variant', 'period', 'anchor', 'trigger', 'candidates',
+		...RETRACE_LEVELS.map((l) => `ret${String(l).replace('.', '')}_pct`),
+		...EXTENSION_LEVELS.map((l) => `ext${String(l).replace('.', '')}_pct`),
+		'median_retrace', 'median_extension',
+	]
+	const lines = rows.map((r) => [
+		r.symbol, r.timeframe, r.variant, r.period, r.anchor, r.trigger, r.candidates,
+		...RETRACE_LEVELS.map((l) => (r.ret[String(l)] ?? 0).toFixed(4)),
+		...EXTENSION_LEVELS.map((l) => (r.ext[String(l)] ?? 0).toFixed(4)),
+		r.medianRetrace?.toFixed(1) ?? '',
+		r.medianExtension?.toFixed(1) ?? '',
+	].join(','))
+	return [header.join(','), ...lines].join('\n')
+}
+
+function reachToMarkdown(rows: ReachRow[]): string {
+	const header = `| Dataset | Anchor | Trig | N | ≤78.6 | ≤61.8 | ≤50 | ≤38.2 | ≤23.6 | ≤0 | ≥141 | ≥200 | ≥241 | medRet | medExt |`
+	const sep = `|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|`
+	const pct = (v: number | undefined) => (v == null ? '—' : `${Math.round(v * 100)}%`)
+	const lines = rows.map((r) =>
+		`| ${r.symbol} ${r.timeframe} ${r.variant}${r.period === 'full' ? '' : ` ${r.period}`} | ${r.anchor} | ${r.trigger} | ${r.candidates} | ` +
+		RETRACE_LEVELS.map((l) => pct(r.ret[String(l)])).join(' | ') + ' | ' +
+		[141, 200, 241].map((l) => pct(r.ext[String(l)])).join(' | ') +
+		` | ${r.medianRetrace?.toFixed(0) ?? '—'} | ${r.medianExtension?.toFixed(0) ?? '—'} |`)
+	return [header, sep, ...lines].join('\n')
+}
+
 // ---------- Вывод ----------
 
 const fmtPct = (v: number | null) => (v == null ? '—' : `${Math.round(v * 100)}%`)
@@ -419,6 +510,7 @@ function topLines(rows: ResultRow[], minIn: number, n = 10): string {
 async function main() {
 	const args = parseArgs(process.argv.slice(2))
 	const allRows: ResultRow[] = []
+	const allReach: ReachRow[] = []
 	const failures: string[] = []
 
 	console.log(`\nBatch: ${args.symbols.join(', ')} × ${args.timeframes.join(', ')} × ${args.limit} candles (${args.market})`)
@@ -464,6 +556,7 @@ async function main() {
 						const started = Date.now()
 						const snapshot = runAnalysis(chunk, { bosChoch: variant.config })
 						allRows.push(...sliceDataset(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.outcomes, args.atrThresholds))
+						allReach.push(...sliceReach(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.reach))
 						console.log(`  ✓ ${vLabel}: ${chunk.length} candles, ${snapshot.fib.candidates.length} candidates (${((Date.now() - started) / 1000).toFixed(1)}s)`)
 					} catch (err) {
 						const message = err instanceof Error ? err.message : String(err)
@@ -480,17 +573,24 @@ async function main() {
 		process.exit(1)
 	}
 
-	// CSV — всегда полный (без фильтра min-in), фильтрация — забота анализа.
+	// CSV — всегда полный (без фильтра min-in), фильтрация — забота анал��за.
 	mkdirSync(RESULTS_DIR, { recursive: true })
 	const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
 	const csvPath = args.out ?? join(RESULTS_DIR, `batch-${stamp}.csv`)
 	writeFileSync(csvPath, toCsv(allRows))
+	const reachCsvPath = join(RESULTS_DIR, `reach-${stamp}.csv`)
+	if (allReach.length > 0) writeFileSync(reachCsvPath, reachToCsv(allReach))
 
 	console.log(`\n=== Top by EV_be (In >= ${args.minIn}) ===\n`)
 	console.log(topLines(allRows, args.minIn))
 	console.log(`\n=== Full table (In >= ${args.minIn}) ===\n`)
 	console.log(toMarkdown(allRows, args.minIn))
+	if (allReach.length > 0) {
+		console.log(`\n=== Reach histogram (куда доходит цена после события, доля кандидатов) ===\n`)
+		console.log(reachToMarkdown(allReach))
+	}
 	console.log(`\nCSV (all ${allRows.length} rows): ${csvPath}`)
+	if (allReach.length > 0) console.log(`Reach CSV (${allReach.length} rows): ${reachCsvPath}`)
 	if (failures.length > 0) {
 		console.log(`\nFailures:\n` + failures.map((f) => `  - ${f}`).join('\n'))
 	}

@@ -33,6 +33,7 @@ import type { StructureEvent } from '@/models/events/StructureEvent.js'
 import type { FibAnchorMode, FibDirection, FibGridCandidate, FibVariant } from '@/models/fib/FibGrid.js'
 import type {
 	FibLifecycleResult,
+	FibReachRecord,
 	FibScenario,
 	FibSetupOutcome,
 	FibStopMode,
@@ -49,14 +50,66 @@ const ANCHOR_MODES: FibAnchorMode[] = ['local', 'global']
 export class FibLifecycleEngine {
 	build(input: FibLifecycleInput): FibLifecycleResult {
 		const outcomes: FibSetupOutcome[] = []
+		const reach: FibReachRecord[] = []
 		for (const candidate of input.candidates) {
 			for (const mode of ANCHOR_MODES) {
 				const variant = candidate.variants[mode]
 				if (!variant) continue
 				outcomes.push(...this.simulate(candidate, mode, variant, input))
+				const record = this.measureReach(candidate, mode, variant, input)
+				if (record) reach.push(record)
 			}
 		}
-		return { outcomes }
+		return { outcomes, reach }
+	}
+
+	/**
+	 * Гистограмма досягаемости: min/max ratio сетки от создания кандидата до
+	 * подтверждения первого противоположного события либо конца данных.
+	 * Независима от сценариев входа — «куда цена реально ходит после BOS/CHoCH».
+	 */
+	private measureReach(
+		candidate: FibGridCandidate,
+		mode: FibAnchorMode,
+		variant: FibVariant,
+		input: FibLifecycleInput,
+	): FibReachRecord | null {
+		if (variant.legSize <= 0) return null
+		const long = candidate.direction === 'long'
+		const level0 = variant.levels.find((l) => l.ratio === 0)
+		if (!level0) return null
+		const p0 = level0.price
+
+		const expiryIndex = this.firstOppositeConfirm(candidate.direction, candidate.createdAtIndex, input.events)
+		const from = candidate.createdAtIndex + 1
+		const to = expiryIndex != null ? Math.min(expiryIndex, input.candles.length) : input.candles.length
+		if (from >= to) return null
+
+		// Ratio точки цены: (price − p0) / legSize × 100, для short зеркально.
+		const ratioOf = (price: number) => ((long ? price - p0 : p0 - price) / variant.legSize) * 100
+
+		let minRatio = Infinity
+		let maxRatio = -Infinity
+		for (let i = from; i < to; i++) {
+			const candle = input.candles[i]
+			if (!candle) continue
+			// Для long-сетки глубина ретрейса — low, потолок — high (short зеркально).
+			minRatio = Math.min(minRatio, ratioOf(long ? candle.low : candle.high))
+			maxRatio = Math.max(maxRatio, ratioOf(long ? candle.high : candle.low))
+		}
+		if (!Number.isFinite(minRatio) || !Number.isFinite(maxRatio)) return null
+
+		return {
+			candidateId: candidate.id,
+			variantMode: mode,
+			trigger: candidate.trigger,
+			direction: candidate.direction,
+			legAtrRatio: variant.legAtrRatio,
+			oppositeSweptBefore: candidate.oppositeSweptBefore,
+			minRetraceRatio: minRatio,
+			maxExtensionRatio: maxRatio,
+			windowBars: to - from,
+		}
 	}
 
 	private simulate(
@@ -379,7 +432,7 @@ export class FibLifecycleEngine {
 
 		// ---- Фаза 2: позиция открыта, ждём стоп или TP2 ----
 		// При confirmClose вход по close подтверждающей свечи: её экстремумы уже
-		// в прошлом, симуляция позиции начинается со СЛЕДУЮЩЕГО бара.
+		// в прошлом, с��муляция позиции начинается со СЛЕДУЮЩЕГО бара.
 		const entryPrice = entryPriceActual
 		const risk = Math.abs(entryPrice - ctx.stopLevel)
 		const toR = (priceValue: number): number =>
