@@ -24,6 +24,10 @@
 //                 dedup, skipSwept, breachMode). ~11 вариантов на датасет.
 //   --variants    выборочный свип: id вариантов через запятую (см. SWEEP_VARIANTS,
 //                 например --variants base,pw3,age0). Игнорируется без смысла --sweep.
+//   --split       разрезать историю на N последовательных отрезков и посчитать
+//                 каждый отдельно (default: 1). Тест на затухание edge во
+//                 времени: настоящий edge должен быть виден в каждом отрезке,
+//                 а не только в одной удачной фазе рынка.
 //
 // Кэш свечей: tools/batch/cache/*.json — повторный прогон той же матрицы
 // не ходит на биржу (удалить каталог = скачать заново).
@@ -90,6 +94,7 @@ interface CliArgs {
 	minIn: number
 	out: string | null
 	variants: SweepVariant[]
+	split: number
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -108,6 +113,7 @@ function parseArgs(argv: string[]): CliArgs {
 		minIn: Number(get('--min-in') ?? 20),
 		out: get('--out'),
 		variants: resolveVariants(argv, get('--variants')),
+		split: Math.max(1, Math.min(6, Number(get('--split') ?? 1))),
 	}
 }
 
@@ -199,6 +205,8 @@ interface ResultRow {
 	timeframe: string
 	/** id варианта конфига детектора (base | pw3 | age0 | ...). */
 	variant: string
+	/** Отрезок истории при --split: 'full' либо '1/3', '2/3', ... (хронологически). */
+	period: string
 	anchor: string
 	trigger: string
 	atr: number
@@ -206,7 +214,7 @@ interface ResultRow {
 	stopMode: string
 	stats: SliceStats
 	/**
-	 * Разбивка по направлению сделки. Ключевой тест на природу edge:
+	 * Разбивка ��о направлению сделки. Ключевой тест на природу edge:
 	 * если EV положительный только у лонгов — это ставка на бычий режим
 	 * периода; если у обеих сторон — структурное преимущество сетапа.
 	 */
@@ -215,7 +223,7 @@ interface ResultRow {
 }
 
 /** Все разрезы по одному датасету: якорь × триггер × ATR × сценарий × стоп. */
-function sliceDataset(symbol: string, timeframe: string, variant: string, outcomes: FibSetupOutcome[], atrThresholds: number[]): ResultRow[] {
+function sliceDataset(symbol: string, timeframe: string, variant: string, period: string, outcomes: FibSetupOutcome[], atrThresholds: number[]): ResultRow[] {
 	const rows: ResultRow[] = []
 	const anchors = ['local', 'global'] as const
 	const triggers = ['bos', 'choch'] as const
@@ -237,7 +245,7 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, outcom
 				for (const { scenario, stopMode } of scenarioSlices) {
 					const group = base.filter((o) => o.scenario === scenario && o.stopMode === stopMode)
 					rows.push({
-						symbol, timeframe, variant, anchor, trigger, atr, scenario, stopMode,
+						symbol, timeframe, variant, period, anchor, trigger, atr, scenario, stopMode,
 						stats: aggregate(group),
 						long: aggregate(group.filter((o) => o.direction === 'long')),
 						short: aggregate(group.filter((o) => o.direction === 'short')),
@@ -262,13 +270,13 @@ function scenarioLabel(scenario: string, stopMode: string): string {
 
 function toMarkdown(rows: ResultRow[], minIn: number): string {
 	const lines: string[] = []
-	lines.push('| Symbol | TF | Var | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be | L: In/EVf/EVbe | S: In/EVf/EVbe |')
-	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
+	lines.push('| Symbol | TF | Var | Per | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be | L: In/EVf/EVbe | S: In/EVf/EVbe |')
+	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
 	const dir = (s: SliceStats) => `${s.entered}/${fmtEv(s.evFull)}/${fmtEv(s.evBe)}`
 	for (const r of rows) {
 		if (r.stats.entered < minIn) continue
 		lines.push(
-			`| ${r.symbol} | ${r.timeframe} | ${r.variant} | ${r.anchor} | ${r.trigger.toUpperCase()} | ${r.atr} ` +
+			`| ${r.symbol} | ${r.timeframe} | ${r.variant} | ${r.period} | ${r.anchor} | ${r.trigger.toUpperCase()} | ${r.atr} ` +
 			`| ${scenarioLabel(r.scenario, r.stopMode)} | ${r.stats.entered} ` +
 			`| ${fmtPct(r.stats.tp1Pct)} | ${fmtPct(r.stats.tp2Pct)} | ${fmtPct(r.stats.slPct)} ` +
 			`| ${fmtEv(r.stats.evFull)} | ${fmtEv(r.stats.evBe)} ` +
@@ -280,12 +288,12 @@ function toMarkdown(rows: ResultRow[], minIn: number): string {
 
 function toCsv(rows: ResultRow[]): string {
 	const header =
-		'symbol,timeframe,variant,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be,' +
+		'symbol,timeframe,variant,period,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be,' +
 		'long_in,long_ev_full,long_ev_be,short_in,short_ev_full,short_ev_be'
 	const num = (v: number | null) => (v == null ? '' : v.toFixed(4))
 	const body = rows.map((r) =>
 		[
-			r.symbol, r.timeframe, r.variant, r.anchor, r.trigger, r.atr, r.scenario, r.stopMode,
+			r.symbol, r.timeframe, r.variant, r.period, r.anchor, r.trigger, r.atr, r.scenario, r.stopMode,
 			r.stats.setups, r.stats.entered, r.stats.resolved,
 			num(r.stats.tp1Pct), num(r.stats.tp2Pct), num(r.stats.slPct),
 			num(r.stats.evFull), num(r.stats.evBe),
@@ -304,7 +312,7 @@ function topLines(rows: ResultRow[], minIn: number, n = 10): string {
 		.slice(0, n)
 	return ranked
 		.map((r, i) =>
-			`${String(i + 1).padStart(2)}. ${r.symbol} ${r.timeframe} [${r.variant}] ${r.anchor}/${r.trigger.toUpperCase()}` +
+			`${String(i + 1).padStart(2)}. ${r.symbol} ${r.timeframe} [${r.variant}${r.period === 'full' ? '' : ` ${r.period}`}] ${r.anchor}/${r.trigger.toUpperCase()}` +
 			` ATR${r.atr} ${scenarioLabel(r.scenario, r.stopMode)} → EV_be ${fmtEv(r.stats.evBe)}` +
 			` (EV_full ${fmtEv(r.stats.evFull)}, In ${r.stats.entered};` +
 			` L ${r.long.entered}/${fmtEv(r.long.evBe)}, S ${r.short.entered}/${fmtEv(r.short.evBe)})`,
@@ -321,7 +329,7 @@ async function main() {
 
 	console.log(`\nBatch: ${args.symbols.join(', ')} × ${args.timeframes.join(', ')} × ${args.limit} candles (${args.market})`)
 	console.log(`ATR thresholds: ${args.atrThresholds.join(', ')}; min In: ${args.minIn}${args.fixture ? '; FIXTURE MODE' : ''}`)
-	console.log(`Detector variants: ${args.variants.map((v) => v.id).join(', ')}\n`)
+	console.log(`Detector variants: ${args.variants.map((v) => v.id).join(', ')}${args.split > 1 ? `; time split: ${args.split}` : ''}\n`)
 
 	for (const symbol of args.symbols) {
 		for (const timeframe of args.timeframes) {
@@ -342,17 +350,32 @@ async function main() {
 				continue
 			}
 
-			for (const variant of args.variants) {
-				const vLabel = `${label} [${variant.id}]`
-				try {
-					const started = Date.now()
-					const snapshot = runAnalysis(candles, { bosChoch: variant.config })
-					allRows.push(...sliceDataset(symbol, timeframe, variant.id, snapshot.fibLifecycle.outcomes, args.atrThresholds))
-					console.log(`  ✓ ${vLabel}: ${candles.length} candles, ${snapshot.fib.candidates.length} candidates (${((Date.now() - started) / 1000).toFixed(1)}s)`)
-				} catch (err) {
-					const message = err instanceof Error ? err.message : String(err)
-					failures.push(`${vLabel}: ${message}`)
-					console.log(`  ✗ ${vLabel}: ${message}`)
+			// Хронологические отрезки: каждый анализируется независимо,
+			// «настоящий» edge обязан быть виден в каждом, не только в сумме.
+			const chunks: { period: string; candles: Candle[] }[] = []
+			if (args.split <= 1) {
+				chunks.push({ period: 'full', candles })
+			} else {
+				const size = Math.floor(candles.length / args.split)
+				for (let i = 0; i < args.split; i++) {
+					const end = i === args.split - 1 ? candles.length : (i + 1) * size
+					chunks.push({ period: `${i + 1}/${args.split}`, candles: candles.slice(i * size, end) })
+				}
+			}
+
+			for (const { period, candles: chunk } of chunks) {
+				for (const variant of args.variants) {
+					const vLabel = `${label} [${variant.id}${period === 'full' ? '' : ` ${period}`}]`
+					try {
+						const started = Date.now()
+						const snapshot = runAnalysis(chunk, { bosChoch: variant.config })
+						allRows.push(...sliceDataset(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.outcomes, args.atrThresholds))
+						console.log(`  ✓ ${vLabel}: ${chunk.length} candles, ${snapshot.fib.candidates.length} candidates (${((Date.now() - started) / 1000).toFixed(1)}s)`)
+					} catch (err) {
+						const message = err instanceof Error ? err.message : String(err)
+						failures.push(`${vLabel}: ${message}`)
+						console.log(`  ✗ ${vLabel}: ${message}`)
+					}
 				}
 			}
 		}
