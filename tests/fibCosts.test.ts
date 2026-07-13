@@ -34,6 +34,8 @@ function makeOutcome(overrides: Partial<FibSetupOutcome>): FibSetupOutcome {
 		stopIndex: null,
 		rTp1: 2,
 		rTp2: 4,
+		rStop: -1,
+		exposure: 1,
 		beAfterTp1: false,
 		mfeR: 4,
 		maeR: 0,
