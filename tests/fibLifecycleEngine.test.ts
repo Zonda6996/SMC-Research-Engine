@@ -553,6 +553,36 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(reach?.windowBars, 2)
 	})
 
+	it('reach: fade-reach after141/after241 замеряются после первого касания', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 220, 180)) // до 141 (241) не дошли: after141 = null пока
+		candles.push(candle(11, 250, 210)) // касание 141 (241): after141 стартует
+		candles.push(candle(12, 230, 150)) // откат до ratio 50 после касания
+		candles.push(candle(13, 350, 200)) // продолжение до ratio 250 (241 тоже задет)
+		candles.push(candle(14, 320, 280)) // после касания 241: откат до 180
+		const result = run(longCandidate(9), candles)
+
+		const reach = result.reach[0]
+		// after141: окно с бара 11 (свеча касания включена).
+		assert.equal(reach?.after141?.pullbackRatio, 50) // low 150 на баре 12
+		assert.equal(reach?.after141?.extensionRatio, 250) // high 350 на баре 13
+		// after241: окно с бара 13 (первое касание 241 = 341? нет: ratio 241 = цена 341).
+		// High 350 → ratio 250 ≥ 241, значит бар 13 — касание.
+		assert.equal(reach?.after241?.pullbackRatio, 100) // low 200 на баре 13
+		assert.equal(reach?.after241?.extensionRatio, 250)
+	})
+
+	it('reach: after141 = null, если 141 не был достигнут', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 230, 180)) // max ratio 130 < 141
+		candles.push(candle(11, 220, 190))
+		const result = run(longCandidate(9), candles)
+
+		const reach = result.reach[0]
+		assert.equal(reach?.after141, null)
+		assert.equal(reach?.after241, null)
+	})
+
 	it('полный runAnalysis возвращает fibLifecycle', async () => {
 		const { runAnalysis } = await import('@/core/analysis/runAnalysis.js')
 		const { readFileSync } = await import('node:fs')

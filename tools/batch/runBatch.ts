@@ -106,12 +106,24 @@ interface CliArgs {
 	out: string | null
 	variants: SweepVariant[]
 	split: number
+	/** Walk-forward: правая граница окна данных (ms epoch), null = сейчас. */
+	untilMs: number | null
+	/** Человекочитаемая метка --until для имён файлов и кеша. */
+	untilLabel: string | null
 }
 
 function parseArgs(argv: string[]): CliArgs {
 	const get = (flag: string): string | null => {
 		const i = argv.indexOf(flag)
 		return i >= 0 && argv[i + 1] ? argv[i + 1]! : null
+	}
+	// --until 2023-01-01 (или полный ISO): walk-forward на исторических окнах.
+	const untilRaw = get('--until')
+	let untilMs: number | null = null
+	if (untilRaw) {
+		const parsed = Date.parse(untilRaw)
+		if (Number.isNaN(parsed)) throw new Error(`Bad --until date: ${untilRaw} (expected e.g. 2023-01-01)`)
+		untilMs = parsed
 	}
 	return {
 		symbols: (get('--symbols') ?? 'BTC/USDT,ETH/USDT,SOL/USDT').split(',').map((s) => s.trim()),
@@ -125,6 +137,8 @@ function parseArgs(argv: string[]): CliArgs {
 		out: get('--out'),
 		variants: resolveVariants(argv, get('--variants')),
 		split: Math.max(1, Math.min(6, Number(get('--split') ?? 1))),
+		untilMs,
+		untilLabel: untilRaw ? untilRaw.replace(/[:]/g, '-') : null,
 	}
 }
 
@@ -150,15 +164,20 @@ async function loadCandles(
 	limit: number,
 	market: MarketKind,
 	useCache: boolean,
+	untilMs: number | null = null,
+	untilLabel: string | null = null,
 ): Promise<Candle[]> {
-	const key = `${symbol.replace('/', '-')}_${timeframe}_${limit}_${market}.json`
+	// Окно с --until попадает в ключ кеша — исторические окна не смешиваются
+	// со свежими (и между собой).
+	const untilKey = untilLabel ? `_until-${untilLabel}` : ''
+	const key = `${symbol.replace('/', '-')}_${timeframe}_${limit}_${market}${untilKey}.json`
 	const cachePath = join(CACHE_DIR, key)
 
 	if (useCache && existsSync(cachePath)) {
 		return JSON.parse(readFileSync(cachePath, 'utf-8'))
 	}
 
-	const candles = await fetchCandlesPaginated(symbol, timeframe, limit, market)
+	const candles = await fetchCandlesPaginated(symbol, timeframe, limit, market, untilMs)
 	if (useCache && candles.length > 0) {
 		mkdirSync(CACHE_DIR, { recursive: true })
 		writeFileSync(cachePath, JSON.stringify(candles))
@@ -349,10 +368,44 @@ interface ReachRow {
 	ext: Record<string, number>
 	medianRetrace: number | null
 	medianExtension: number | null
+	/**
+	 * Fade-reach после первого касания 141: n — коснувшихся, pull — доли
+	 * отката до уровня (fade-цели), go — доли продолжения до уровня
+	 * (fade-риск), medPull — медиана отката после касания.
+	 */
+	f141: { n: number; pull: Record<string, number>; go: Record<string, number>; medPull: number | null } | null
+	/** То же после первого касания 241. */
+	f241: { n: number; pull: Record<string, number>; go: Record<string, number>; medPull: number | null } | null
 }
 
 const RETRACE_LEVELS = [78.6, 61.8, 50, 38.2, 23.6, 0] as const
 const EXTENSION_LEVELS = [100, 141, 161, 200, 241, 261] as const
+/** Fade-цели после касания 141: откат до X (fade141 TP-уровни). */
+const F141_PULL_LEVELS = [120, 100, 78.6, 61.8, 38.2] as const
+/** Продолжение после касания 141 (fade141 SL-уровни). */
+const F141_GO_LEVELS = [161, 200, 241] as const
+/** Fade-цели после касания 241 (fade241n TP-уровни). */
+const F241_PULL_LEVELS = [200, 141, 100, 78.6] as const
+/** Продолжение после касания 241 (fade241 SL-уровни). */
+const F241_GO_LEVELS = [261, 300, 350] as const
+
+/** Агрегат fade-reach по группе: доли отката/продолжения после касания уровня. */
+function fadeReachStats(
+	records: { pullbackRatio: number; extensionRatio: number }[],
+	pullLevels: readonly number[],
+	goLevels: readonly number[],
+): { n: number; pull: Record<string, number>; go: Record<string, number>; medPull: number | null } | null {
+	if (records.length === 0) return null
+	const pull: Record<string, number> = {}
+	for (const level of pullLevels) {
+		pull[String(level)] = records.filter((r) => r.pullbackRatio <= level).length / records.length
+	}
+	const go: Record<string, number> = {}
+	for (const level of goLevels) {
+		go[String(level)] = records.filter((r) => r.extensionRatio >= level).length / records.length
+	}
+	return { n: records.length, pull, go, medPull: median(records.map((r) => r.pullbackRatio)) }
+}
 
 function median(values: number[]): number | null {
 	if (values.length === 0) return null
@@ -384,6 +437,14 @@ function sliceReach(symbol: string, timeframe: string, variant: string, period: 
 				ret, ext,
 				medianRetrace: median(group.map((r) => r.minRetraceRatio)),
 				medianExtension: median(group.map((r) => r.maxExtensionRatio)),
+				f141: fadeReachStats(
+					group.flatMap((r) => (r.after141 ? [r.after141] : [])),
+					F141_PULL_LEVELS, F141_GO_LEVELS,
+				),
+				f241: fadeReachStats(
+					group.flatMap((r) => (r.after241 ? [r.after241] : [])),
+					F241_PULL_LEVELS, F241_GO_LEVELS,
+				),
 			})
 		}
 	}
@@ -396,6 +457,24 @@ function reachToCsv(rows: ReachRow[]): string {
 		...RETRACE_LEVELS.map((l) => `ret${String(l).replace('.', '')}_pct`),
 		...EXTENSION_LEVELS.map((l) => `ext${String(l).replace('.', '')}_pct`),
 		'median_retrace', 'median_extension',
+		'f141_n',
+		...F141_PULL_LEVELS.map((l) => `f141_pull${String(l).replace('.', '')}_pct`),
+		...F141_GO_LEVELS.map((l) => `f141_go${l}_pct`),
+		'f141_median_pull',
+		'f241_n',
+		...F241_PULL_LEVELS.map((l) => `f241_pull${String(l).replace('.', '')}_pct`),
+		...F241_GO_LEVELS.map((l) => `f241_go${l}_pct`),
+		'f241_median_pull',
+	]
+	const fadeCols = (
+		f: { n: number; pull: Record<string, number>; go: Record<string, number>; medPull: number | null } | null,
+		pullLevels: readonly number[],
+		goLevels: readonly number[],
+	) => [
+		f?.n ?? 0,
+		...pullLevels.map((l) => (f ? (f.pull[String(l)] ?? 0).toFixed(4) : '')),
+		...goLevels.map((l) => (f ? (f.go[String(l)] ?? 0).toFixed(4) : '')),
+		f?.medPull?.toFixed(1) ?? '',
 	]
 	const lines = rows.map((r) => [
 		r.symbol, r.timeframe, r.variant, r.period, r.anchor, r.trigger, r.candidates,
@@ -403,6 +482,8 @@ function reachToCsv(rows: ReachRow[]): string {
 		...EXTENSION_LEVELS.map((l) => (r.ext[String(l)] ?? 0).toFixed(4)),
 		r.medianRetrace?.toFixed(1) ?? '',
 		r.medianExtension?.toFixed(1) ?? '',
+		...fadeCols(r.f141, F141_PULL_LEVELS, F141_GO_LEVELS),
+		...fadeCols(r.f241, F241_PULL_LEVELS, F241_GO_LEVELS),
 	].join(','))
 	return [header.join(','), ...lines].join('\n')
 }
@@ -416,6 +497,21 @@ function reachToMarkdown(rows: ReachRow[]): string {
 		RETRACE_LEVELS.map((l) => pct(r.ret[String(l)])).join(' | ') + ' | ' +
 		[141, 200, 241].map((l) => pct(r.ext[String(l)])).join(' | ') +
 		` | ${r.medianRetrace?.toFixed(0) ?? '—'} | ${r.medianExtension?.toFixed(0) ?? '—'} |`)
+	return [header, sep, ...lines].join('\n')
+}
+
+/** Fade-reach таблица: после касания 141/241 — куда откатывает и куда несёт. */
+function fadeReachToMarkdown(rows: ReachRow[]): string {
+	const header = `| Dataset | Anchor | Trig | 141: N | →120 | →100 | →78.6 | ↑161 | ↑200 | medPull | 241: N | →200 | →141 | →100 | ↑261 | medPull |`
+	const sep = `|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|`
+	const pct = (v: number | undefined) => (v == null ? '—' : `${Math.round(v * 100)}%`)
+	const lines = rows.filter((r) => r.f141 || r.f241).map((r) => {
+		const a = r.f141
+		const b = r.f241
+		return `| ${r.symbol} ${r.timeframe} ${r.variant}${r.period === 'full' ? '' : ` ${r.period}`} | ${r.anchor} | ${r.trigger} | ` +
+			`${a?.n ?? 0} | ${pct(a?.pull['120'])} | ${pct(a?.pull['100'])} | ${pct(a?.pull['78.6'])} | ${pct(a?.go['161'])} | ${pct(a?.go['200'])} | ${a?.medPull?.toFixed(0) ?? '—'} | ` +
+			`${b?.n ?? 0} | ${pct(b?.pull['200'])} | ${pct(b?.pull['141'])} | ${pct(b?.pull['100'])} | ${pct(b?.go['261'])} | ${b?.medPull?.toFixed(0) ?? '—'} |`
+	})
 	return [header, sep, ...lines].join('\n')
 }
 
@@ -513,7 +609,7 @@ async function main() {
 	const allReach: ReachRow[] = []
 	const failures: string[] = []
 
-	console.log(`\nBatch: ${args.symbols.join(', ')} × ${args.timeframes.join(', ')} × ${args.limit} candles (${args.market})`)
+	console.log(`\nBatch: ${args.symbols.join(', ')} × ${args.timeframes.join(', ')} × ${args.limit} candles (${args.market})${args.untilLabel ? ` until ${args.untilLabel}` : ''}`)
 	console.log(`ATR thresholds: ${args.atrThresholds.join(', ')}; min In: ${args.minIn}${args.fixture ? '; FIXTURE MODE' : ''}`)
 	console.log(`Detector variants: ${args.variants.map((v) => v.id).join(', ')}${args.split > 1 ? `; time split: ${args.split}` : ''}\n`)
 
@@ -524,7 +620,7 @@ async function main() {
 			try {
 				candles = args.fixture
 					? (JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8')) as Candle[])
-					: await loadCandles(symbol, timeframe, args.limit, args.market, args.cache)
+					: await loadCandles(symbol, timeframe, args.limit, args.market, args.cache, args.untilMs, args.untilLabel)
 			} catch (err) {
 				const message = err instanceof Error ? err.message : String(err)
 				failures.push(`${label}: ${message}`)
@@ -576,9 +672,10 @@ async function main() {
 	// CSV — всегда полный (без фильтра min-in), фильтрация — забота анал��за.
 	mkdirSync(RESULTS_DIR, { recursive: true })
 	const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-	const csvPath = args.out ?? join(RESULTS_DIR, `batch-${stamp}.csv`)
+	const untilTag = args.untilLabel ? `-until-${args.untilLabel}` : ''
+	const csvPath = args.out ?? join(RESULTS_DIR, `batch-${stamp}${untilTag}.csv`)
 	writeFileSync(csvPath, toCsv(allRows))
-	const reachCsvPath = join(RESULTS_DIR, `reach-${stamp}.csv`)
+	const reachCsvPath = join(RESULTS_DIR, `reach-${stamp}${untilTag}.csv`)
 	if (allReach.length > 0) writeFileSync(reachCsvPath, reachToCsv(allReach))
 
 	console.log(`\n=== Top by EV_be (In >= ${args.minIn}) ===\n`)
@@ -588,6 +685,8 @@ async function main() {
 	if (allReach.length > 0) {
 		console.log(`\n=== Reach histogram (куда доходит цена после события, доля кандидатов) ===\n`)
 		console.log(reachToMarkdown(allReach))
+		console.log(`\n=== Fade-reach (после касания 141/241: → откат до, ↑ продолжение до) ===\n`)
+		console.log(fadeReachToMarkdown(allReach))
 	}
 	console.log(`\nCSV (all ${allRows.length} rows): ${csvPath}`)
 	if (allReach.length > 0) console.log(`Reach CSV (${allReach.length} rows): ${reachCsvPath}`)

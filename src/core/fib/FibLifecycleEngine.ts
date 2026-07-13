@@ -90,12 +90,34 @@ export class FibLifecycleEngine {
 
 		let minRatio = Infinity
 		let maxRatio = -Infinity
+		// Fade-reach: min/max ratio ПОСЛЕ первого касания 141 и 241 (в том же
+		// окне). Свеча касания включается: её противоположный экстремум — уже
+		// потенциальный откат. touched* становится true до обновления after*.
+		let touched141 = false
+		let touched241 = false
+		let after141Min = Infinity
+		let after141Max = -Infinity
+		let after241Min = Infinity
+		let after241Max = -Infinity
 		for (let i = from; i < to; i++) {
 			const candle = input.candles[i]
 			if (!candle) continue
 			// Для long-сетки глубина ретрейса — low, потолок — high (short зеркально).
-			minRatio = Math.min(minRatio, ratioOf(long ? candle.low : candle.high))
-			maxRatio = Math.max(maxRatio, ratioOf(long ? candle.high : candle.low))
+			const lowRatio = ratioOf(long ? candle.low : candle.high)
+			const highRatio = ratioOf(long ? candle.high : candle.low)
+			minRatio = Math.min(minRatio, lowRatio)
+			maxRatio = Math.max(maxRatio, highRatio)
+
+			if (!touched141 && highRatio >= 141) touched141 = true
+			if (touched141) {
+				after141Min = Math.min(after141Min, lowRatio)
+				after141Max = Math.max(after141Max, highRatio)
+			}
+			if (!touched241 && highRatio >= 241) touched241 = true
+			if (touched241) {
+				after241Min = Math.min(after241Min, lowRatio)
+				after241Max = Math.max(after241Max, highRatio)
+			}
 		}
 		if (!Number.isFinite(minRatio) || !Number.isFinite(maxRatio)) return null
 
@@ -109,6 +131,12 @@ export class FibLifecycleEngine {
 			minRetraceRatio: minRatio,
 			maxExtensionRatio: maxRatio,
 			windowBars: to - from,
+			after141: touched141 && Number.isFinite(after141Min)
+				? { pullbackRatio: after141Min, extensionRatio: after141Max }
+				: null,
+			after241: touched241 && Number.isFinite(after241Min)
+				? { pullbackRatio: after241Min, extensionRatio: after241Max }
+				: null,
 		}
 	}
 

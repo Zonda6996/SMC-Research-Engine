@@ -29,12 +29,17 @@ export type MarketKind = 'spot' | 'futures'
  * для больших лимитов идём страницами от рассчитанного `since` вперёд.
  * binanceusdm = USDT-M perpetual futures: у низколиквидных альтов
  * фьючерсные свечи чище спотовых — меньше рваных фитилей.
+ *
+ * `untilMs` — правая граница окна (walk-forward): «limit свечей, ЗАКАНЧИВАЯ
+ * этим моментом». По умолчанию — текущий момент. Свечи с timestamp >= untilMs
+ * отбрасываются, чтобы граница периодов была жёсткой.
  */
 export async function fetchCandlesPaginated(
 	symbol: string,
 	timeframe: string,
 	limit: number,
 	market: MarketKind = 'spot',
+	untilMs: number | null = null,
 ): Promise<Candle[]> {
 	const capped = Math.min(limit, MAX_CANDLES)
 
@@ -43,7 +48,8 @@ export async function fetchCandlesPaginated(
 
 	const { default: ccxt } = await import('ccxt')
 	const exchange = market === 'futures' ? new ccxt.binanceusdm() : new ccxt.binance()
-	const since = Date.now() - capped * tfMs
+	const end = untilMs ?? Date.now()
+	const since = end - capped * tfMs
 
 	const all: number[][] = []
 	let cursor = since
@@ -54,10 +60,12 @@ export async function fetchCandlesPaginated(
 		const lastTs = Number(page[page.length - 1]![0])
 		const nextCursor = lastTs + tfMs
 		if (nextCursor <= cursor) break // защита от зацикливания
+		if (nextCursor >= end) break // правая граница окна достигнута
 		cursor = nextCursor
 	}
 
-	return all.slice(-capped).map(([timestamp, open, high, low, close, volume]) => ({
+	const bounded = all.filter((row) => Number(row[0]) < end)
+	return bounded.slice(-capped).map(([timestamp, open, high, low, close, volume]) => ({
 		timestamp: Number(timestamp),
 		open: Number(open),
 		high: Number(high),

@@ -166,6 +166,15 @@ export interface FibReachRecord {
 	maxExtensionRatio: number
 	/** Баров в окне замера (для оценки длины жизни сетки). */
 	windowBars: number
+	/**
+	 * Fade-reach: куда цена идёт ПОСЛЕ первого касания 141 (в том же окне).
+	 * pullback — минимальный ratio после касания (глубина отката против
+	 * сетки — потенциал fade-сделки), extension — максимальный ratio после
+	 * касания (продолжение — риск fade-сделки). null = 141 не был достигнут.
+	 */
+	after141: { pullbackRatio: number; extensionRatio: number } | null
+	/** То же после первого касания 241. null = 241 не был достигнут. */
+	after241: { pullbackRatio: number; extensionRatio: number } | null
 }
 
 export interface FibLifecycleResult {
