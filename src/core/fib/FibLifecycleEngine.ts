@@ -320,7 +320,7 @@ export class FibLifecycleEngine {
 	}
 
 	/**
-	 * Проверяет, что случилось раньше после создания сетки:
+	 * Проверяет, что случилось раньше после соз��ания сетки:
 	 * касание расширения 141 или касание OTE-зоны (78.6).
 	 */
 	private breakerPrecondition(
@@ -517,7 +517,11 @@ export class FibLifecycleEngine {
 			const favorable = long ? candle.high : candle.low
 			const adverse = long ? candle.low : candle.high
 			mfeR = Math.max(mfeR, toR(favorable))
-			maeR = Math.min(maeR, toR(adverse))
+			// MAE фиксируется только ДО взятия TP1: это база для калибровки
+			// стопа («насколько глубоко проседают будущие победители»).
+			// Просадка раннера после TP1 — другой вопрос (менеджмент), она
+			// загрязняла метрику значениями глубже стопа.
+			if (!tp1Hit) maeR = Math.min(maeR, toR(adverse))
 
 			const hitStop = long ? candle.low <= ctx.stopLevel : candle.high >= ctx.stopLevel
 			const hitTp1 = long ? candle.high >= ctx.tp1 : candle.low <= ctx.tp1
