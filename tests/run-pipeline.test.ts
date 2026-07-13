@@ -142,6 +142,14 @@ describe('runAnalysis pipeline', () => {
 			Array.isArray(snapshot.events),
 			'snapshot.events должен быть массивом (BosChochEngine в пайплайне)',
 		)
+		assert.ok(
+			Array.isArray(snapshot.fib.candidates) && Array.isArray(snapshot.fib.skips),
+			'snapshot.fib должен приходить из FibGridEngine в общем пайплайне',
+		)
+		assert.ok(
+			snapshot.fib.candidates.every((candidate) => candidate.createdAtIndex >= 0),
+			'каждая Fib-сетка имеет явный момент доступности без look-ahead',
+		)
 	})
 
 	// ──────────────────────────────────────────────
@@ -149,7 +157,7 @@ describe('runAnalysis pipeline', () => {
 	// при пробое ценой) закрыт отдельным тест-файлом
 	// tests/market-structure.test.ts — прямой unit-тест
 	// MarketStructureEngine на синтетических данных.
-	// ──────────────────────────────────────────────
+	// ───────────────────────────────────��──────────
 
 	// На реальных данных активный protected-уровень (если он есть) должен
 	// реально принадлежать массиву structure — это нижняя граница,

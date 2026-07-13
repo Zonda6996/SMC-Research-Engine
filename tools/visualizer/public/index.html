@@ -263,6 +263,8 @@
 				<option value="1500">1500</option>
 				<option value="3000">3000</option>
 				<option value="5000">5000</option>
+				<option value="10000">10000</option>
+				<option value="20000">20000</option>
 			</select>
 			<select id="market">
 				<option value="futures" selected>futures</option>
@@ -344,46 +346,66 @@
 					</label>
 				</div>
 
-			<div class="panel">
-				<h2>BosChochEngine config (слой C)</h2>
-				<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
-					Фильтры применяет движок на сервере (src/core/events/).
-					Дефолты = принятый протоколом набор.
+				<div class="panel">
+					<h2>Fib Lab</h2>
+					<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
+						Сетка на событие: 0% = ценовой экстремум движения, 100% = пробитый
+						BOS/CHoCH-уровень. Линии живут до следующей сетки.
+					</div>
+					<div class="type-row" style="border-bottom:1px solid #21262d; padding-bottom:6px; margin-bottom:6px;">
+						<span>Trend</span><span id="trendLabel" style="font-weight:600; color:#8b949e;">—</span>
+					</div>
+					<label class="toggle-row">
+						<input type="checkbox" id="toggleFib" />
+						<strong>Show Fibonacci grids</strong>
+					</label>
+					<div style="margin:6px 0; border-top:1px solid #21262d; padding-top:6px;">
+						<div style="font-size:11px; color:#8b949e; margin-bottom:4px;">Anchor 0%:</div>
+						<label style="display:block; margin-bottom:2px;">
+							<input type="radio" name="fibAnchorMode" id="fibAnchorLocal" value="local" checked />
+							Local — экстремум движения, сломавшего уровень
+						</label>
+						<label style="display:block;">
+							<input type="radio" name="fibAnchorMode" id="fibAnchorGlobal" value="global" />
+							Global — экстремум всего тренда
+						</label>
+					</div>
+					<div style="margin:6px 0; border-top:1px solid #21262d; padding-top:6px;">
+						<div style="font-size:11px; color:#8b949e; display:flex; justify-content:space-between;">
+							<span>Min leg size (× ATR14)</span>
+							<span id="fibMinAtrValue" style="color:#c9d1d9; font-weight:600;">0.0×</span>
+						</div>
+						<input type="range" id="fibMinAtr" min="0" max="10" step="0.5" value="0" style="width:100%;" />
+					</div>
+					<div style="display:flex; gap:12px; margin:6px 0; border-top:1px solid #21262d; padding-top:6px;">
+						<label><input type="checkbox" id="fibBos" checked /> BOS</label>
+						<label><input type="checkbox" id="fibChoch" checked /> CHoCH</label>
+					</div>
+					<label class="toggle-row">
+						<input type="checkbox" id="fibLatest" checked />
+						Last
+						<input type="number" id="fibLastN" value="1" min="1" max="20" step="1"
+							style="width:44px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
+						grids (newest first)
+					</label>
+					<div class="type-row"><span>Visible now</span><span id="fibVisibleCount" style="font-weight:600;">0</span></div>
+					<div class="type-row"><span>Candidates (total)</span><span id="fibCandidateCount">0</span></div>
+					<div class="type-row"><span>Skipped</span><span id="fibSkipCount">0</span></div>
+					<div id="fibSkipReasons" style="font-size:10px; color:#8b949e; margin-top:4px; line-height:1.5;"></div>
 				</div>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltCascade" checked />
-					Collapse cascades (1 свеча = 1 событие)
-				</label>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltHHLL" checked />
-					HH/LL only (значимые экстремумы)
-				</label>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltAge" checked />
-					Min level age
-					<input type="number" id="fltAgeValue" value="20" min="0" step="5"
-						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
-					свечей
-				</label>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltSwept" checked />
-					Skip swept levels, глубже
-					<input type="number" id="fltSweptValue" value="0.6" min="0" step="0.1"
-						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
-					× ATR
-				</label>
-				<label class="toggle-row">
-					<input type="checkbox" id="fltDedup" checked />
-					Dedup nearby levels
-					<input type="number" id="fltDedupValue" value="1.2" min="0" step="0.1"
-						style="width:56px; background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px;" />
-					× ATR
-				</label>
-				<div class="type-row" style="margin-top:6px; border-top:1px solid #21262d; padding-top:6px;">
-					<span style="color:#a371f7">C filtered / raw</span>
-					<span id="countCFiltered" style="font-weight:600; color:#a371f7">—</span>
+
+				<div class="panel">
+					<h2>Fib Playbook Stats</h2>
+					<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
+						Симуляция плейбука по всей истории с учётом фильтров выше
+						(режим якоря, BOS/CHoCH, ATR). Last N не влияет.
+					</div>
+					<label class="toggle-row" style="margin-bottom:6px;">
+						<input type="checkbox" id="fibOteTightStop" />
+						OTE: стоп за 23.6 вместо 0%
+					</label>
+					<div id="fibStatsBody"></div>
 				</div>
-			</div>
 
 				<div class="panel">
 					<h2>Counts</h2>

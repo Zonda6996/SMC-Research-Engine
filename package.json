@@ -7,7 +7,8 @@
 		"test": "tsx --test tests/*.test.ts",
 		"dev": "tsx watch src/index.ts",
 		"start": "tsx src/index.ts",
-		"server": "tsx tools/visualizer/server.ts"
+		"viz": "tsx tools/visualizer/server.ts",
+		"batch": "tsx tools/batch/runBatch.ts"
 	},
 	"keywords": [],
 	"author": "",

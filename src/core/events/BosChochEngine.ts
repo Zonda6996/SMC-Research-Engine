@@ -44,6 +44,12 @@ export interface BosChochConfig {
 	skipSweptAtrMultiple: number | null
 	/** Период ATR для нормировки порогов. */
 	atrPeriod: number
+	/**
+	 * Окно (в свечах) для аннотации oppositeSweptBefore: свип противоположного
+	 * экстремума не старше N свечей до breachIndex. Только аннотация —
+	 * на отбор событий не влияет, принятый конфиг не нарушает.
+	 */
+	oppositeSweepLookback: number
 }
 
 /** Принятый протоколом приёмки набор (SPEC 7.6). */
@@ -56,6 +62,7 @@ export const DEFAULT_BOS_CHOCH_CONFIG: BosChochConfig = {
 	dedupAtrMultiple: 1.2,
 	skipSweptAtrMultiple: 0.6,
 	atrPeriod: 14,
+	oppositeSweepLookback: 25,
 }
 
 /** Внутреннее состояние уровня в пуле. */
@@ -78,6 +85,14 @@ interface RawBreach {
 	sweptDepth: number
 }
 
+/** Факт снятия ликвидности: фитиль проколол уровень без слома. */
+interface SweepRecord {
+	/** Свеча, на которой случился прокол. */
+	index: number
+	/** Тип проколотого экстремума. */
+	levelType: 'high' | 'low'
+}
+
 export class BosChochEngine {
 	private readonly config: BosChochConfig
 
@@ -89,24 +104,29 @@ export class BosChochEngine {
 	 * Полный проход: пул → фильтры (фиксированный порядок) → классификация.
 	 */
 	build(structure: StructurePoint[], candles: Candle[]): StructureEvent[] {
-		const raw = this.detectPool(structure, candles)
+		const { breaches, sweeps } = this.detectPool(structure, candles)
 		const atr = this.buildAtrByIndex(candles)
-		const filtered = this.applyFilters(raw, atr)
-		return this.classify(filtered)
+		const filtered = this.applyFilters(breaches, atr)
+		return this.classify(filtered, sweeps)
 	}
 
 	/**
 	 * Сырые пробои пула без фильтров — для отладки и сравнения в визуализаторе.
 	 */
 	buildRaw(structure: StructurePoint[], candles: Candle[]): StructureEvent[] {
-		return this.classify(this.detectPool(structure, candles))
+		const { breaches, sweeps } = this.detectPool(structure, candles)
+		return this.classify(breaches, sweeps)
 	}
 
 	// ── Шаг 1. Пул активных уровней ─────────────────────────────
 
-	private detectPool(structure: StructurePoint[], candles: Candle[]): RawBreach[] {
+	private detectPool(
+		structure: StructurePoint[],
+		candles: Candle[],
+	): { breaches: RawBreach[]; sweeps: SweepRecord[] } {
 		const { pivotWindow, breachMode } = this.config
 		const breaches: RawBreach[] = []
+		const sweeps: SweepRecord[] = []
 		const pool: PoolLevel[] = []
 		let structIdx = 0
 
@@ -141,6 +161,9 @@ export class BosChochEngine {
 					if (pierceDepth > 0 || lvl.pending !== null) {
 						if (lvl.sweptAt === null) lvl.sweptAt = i
 						lvl.sweptDepth = Math.max(lvl.sweptDepth, pierceDepth)
+						// Каждый прокол — отдельная запись: для oppositeSweptBefore
+						// важна свежесть последнего свипа, не первого.
+						if (pierceDepth > 0) sweeps.push({ index: i, levelType: lvl.point.type })
 					}
 					lvl.pending = null
 					continue
@@ -177,7 +200,7 @@ export class BosChochEngine {
 
 		// Детерминированный порядок: по свече подтверждения, затем по возрасту уровня.
 		breaches.sort((a, b) => a.confirmIndex - b.confirmIndex || a.level.index - b.level.index)
-		return breaches
+		return { breaches, sweeps }
 	}
 
 	// ── ATR по индексу свечи ─────────────────────────────────────
@@ -266,7 +289,8 @@ export class BosChochEngine {
 	 * текущего направления = CHoCH (направление переворачивается), слом по
 	 * направлению = BOS. Первому событию не с чем сравниваться → unlabeled.
 	 */
-	private classify(breaches: RawBreach[]): StructureEvent[] {
+	private classify(breaches: RawBreach[], sweeps: SweepRecord[]): StructureEvent[] {
+		const { oppositeSweepLookback } = this.config
 		let dir: 'up' | 'down' | null = null
 		return breaches.map((b) => {
 			const eventDir: 'up' | 'down' = b.level.type === 'high' ? 'up' : 'down'
@@ -275,6 +299,17 @@ export class BosChochEngine {
 			else if (eventDir === dir) type = 'bos'
 			else type = 'choch'
 			dir = eventDir
+
+			// Свип противоположного экстремума в окне до первого закрытия за
+			// уровнем. Только прошлое (index <= breachIndex) — look-ahead-free.
+			const oppositeType = b.level.type === 'high' ? 'low' : 'high'
+			const oppositeSweptBefore = sweeps.some(
+				(s) =>
+					s.levelType === oppositeType &&
+					s.index <= b.breachIndex &&
+					b.breachIndex - s.index <= oppositeSweepLookback,
+			)
+
 			return {
 				type,
 				direction: eventDir,
@@ -288,6 +323,7 @@ export class BosChochEngine {
 				confirmTimestamp: b.confirmTimestamp,
 				sweptBefore: b.sweptBefore,
 				sweptDepth: b.sweptDepth,
+				oppositeSweptBefore,
 			}
 		})
 	}
