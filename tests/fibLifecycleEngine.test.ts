@@ -145,6 +145,71 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(outcome(result, 'breaker'), undefined)
 	})
 
+	// ---- Волна 3: вариации breaker ----
+
+	it('breaker161: уход за 161 до ретеста отменяет сетап (обычный breaker жив)', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 245, 210)) // касание 141 (241), без 161 (261)
+		candles.push(candle(11, 265, 220)) // прошили 161 (261) до ретеста
+		candles.push(candle(12, 230, 195)) // ретест 100% (200)
+		const result = run(longCandidate(9), candles)
+
+		const b161 = outcome(result, 'breaker161')
+		assert.equal(b161?.state, 'expired')
+		assert.equal(b161?.entered, false)
+		// Обычный breaker при этом входит на ретесте.
+		const breaker = outcome(result, 'breaker')
+		assert.equal(breaker?.entered, true)
+		assert.equal(breaker?.entryIndex, 12)
+	})
+
+	it('breaker161: без ухода за 161 входит как обычный breaker', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 245, 210)) // касание 141
+		candles.push(candle(11, 230, 195)) // ретест 100% без захода за 261
+		const result = run(longCandidate(9), candles)
+
+		const b161 = outcome(result, 'breaker161')
+		assert.equal(b161?.entered, true)
+		assert.equal(b161?.entryIndex, 11)
+		assert.equal(b161?.entryPrice, 200)
+	})
+
+	it('breaker161: бар касания 141 сам прошил 161 — сетап не эмитится', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 262, 210)) // 141 и 161 в одном баре
+		candles.push(candle(11, 230, 195)) // ретест
+		const result = run(longCandidate(9), candles)
+
+		assert.equal(outcome(result, 'breaker161'), undefined)
+		assert.equal(outcome(result, 'breaker')?.entered, true)
+	})
+
+	it('breaker78: вход на 78.6 (178.6) после предусловия 141', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 245, 210)) // касание 141
+		candles.push(candle(11, 230, 175)) // глубокий ретест до 78.6
+		const result = run(longCandidate(9), candles)
+
+		const b78 = outcome(result, 'breaker78')
+		assert.equal(b78?.entered, true)
+		assert.equal(b78?.entryPrice, 178.6)
+		// Обычный breaker вошёл в том же баре по 200 — выше.
+		assert.equal(outcome(result, 'breaker')?.entryPrice, 200)
+	})
+
+	it('breaker tight: стоп за 23.6 (123.6) выбивается там, где zero выживает', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 245, 210)) // касание 141
+		candles.push(candle(11, 230, 195)) // ретест 100% — вход обоих
+		candles.push(candle(12, 210, 120)) // глубокий шейкаут: ниже 123.6, выше 100
+		candles.push(candle(13, 250, 200)) // восстановление
+		const result = run(longCandidate(9), candles)
+
+		assert.equal(outcome(result, 'breaker', 'tight')?.state, 'stopped')
+		assert.notEqual(outcome(result, 'breaker', 'zero')?.state, 'stopped')
+	})
+
 	it('экспирация: противоположное событие до входа отменяет сетап', () => {
 		const candles = flat(20, 205) // цена не ретрейсит
 		const opposite: StructureEvent = {

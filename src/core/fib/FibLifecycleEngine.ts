@@ -206,6 +206,8 @@ export class FibLifecycleEngine {
 			 * на «нашей» стороне уровня (подтверждение отбоя). Вход по close.
 			 */
 			confirmClose?: boolean
+			/** Волна 3 (breaker161): уровень отмены сетапа до входа. */
+			cancelLevel?: number | null
 		}
 
 		const from = candidate.createdAtIndex + 1
@@ -257,6 +259,19 @@ export class FibLifecycleEngine {
 		// отслеживается после бара, где цена достигла 141.
 		if (extFirst && extIndex != null) {
 			scenarios.push(trend('breaker', 'zero', p100, p0, extIndex + 1))
+			// Волна 3: сокращённый стоп за 23.6 (тест по MAE победителей).
+			scenarios.push(trend('breaker', 'tight', p100, p236, extIndex + 1))
+			// Волна 3: вход глубже — на 78.6 вместо 100 (лучше цена, шире запас).
+			scenarios.push(trend('breaker78', 'zero', p786, p0, extIndex + 1))
+			// Волна 3 (breaker161): отмена, если импульс уходит за 161 до ретеста.
+			// Если бар касания 141 сам прошил 161 — сетап мгновенно отменён,
+			// не эмитим вовсе (эквивалент expired, в EV не участвует).
+			const extBar = input.candles[extIndex]
+			const insta161 = extBar != null && (long ? extBar.high >= p161 : extBar.low <= p161)
+			if (!insta161) {
+				const spec = trend('breaker161', 'zero', p100, p0, extIndex + 1)
+				scenarios.push({ ...spec, cancelLevel: p161 })
+			}
 		}
 		// Fade-зоны: стоп за дальней границей ('zone') и + 0.5 ATR ('zoneAtr').
 		// Дальняя граница лежит В НАПРАВЛЕНИИ сетки (против сделки), поэтому
@@ -299,6 +314,7 @@ export class FibLifecycleEngine {
 				expiryIndex,
 				extension: spec.trackExtension ? { p0, legSize: variant.legSize } : null,
 				confirmClose: spec.confirmClose ?? false,
+				cancelLevel: spec.cancelLevel ?? null,
 			}),
 		)
 	}
@@ -350,6 +366,12 @@ export class FibLifecycleEngine {
 			extension: { p0: number; legSize: number } | null
 			/** Волна 2: вход по закрытию подтверждающей свечи вместо касания. */
 			confirmClose: boolean
+			/**
+			 * Волна 3 (breaker161): если цена до входа уходит ЗА этот уровень в
+			 * favorable-сторону — сетап отменяется (state 'expired'). Конфликт
+			 * в одном баре с касанием входа — консервативно отмена.
+			 */
+			cancelLevel?: number | null
 		},
 	): FibSetupOutcome {
 		const base: FibSetupOutcome = {
@@ -407,6 +429,14 @@ export class FibLifecycleEngine {
 
 			const touchedEntry = long ? candle.low <= ctx.entryLevel : candle.high >= ctx.entryLevel
 			const breachedStop = long ? candle.low <= ctx.stopLevel : candle.high >= ctx.stopLevel
+
+			// Волна 3 (breaker161): импульс ушёл за уровень отмены до входа —
+			// сетап отменён. Проверка ДО касания входа: конфликт в одном баре
+			// (и 100, и 161 задеты) трактуется консервативно как отмена.
+			if (ctx.cancelLevel != null) {
+				const beyondCancel = long ? candle.high >= ctx.cancelLevel : candle.low <= ctx.cancelLevel
+				if (beyondCancel) return { ...base, state: 'expired' }
+			}
 
 			if (ctx.confirmClose) {
 				if (!touched && touchedEntry) touched = true

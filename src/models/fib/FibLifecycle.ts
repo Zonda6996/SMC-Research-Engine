@@ -37,9 +37,19 @@ import type { StructureEventType } from '@/models/events/StructureEvent.js'
  * - 'fade141c'  — как fade141 far (стоп за 200 + 0.5 ATR), но с подтверждением;
  * - 'fade241nc' — как fade241n (цели 141 → 100, стоп за 261 + 0.5 ATR),
  *                 но с подтверждением.
+ *
+ * Волна 3 — вариации breaker (гипотезы пользователя):
+ * - 'breaker161' — как breaker, но если цена до входа (ретеста 100%) уходит
+ *                  за 161, сетап ОТМЕНЯЕТСЯ (state 'expired'): фильтр
+ *                  «слишком сильный импульс — ретест уже не тот».
+ *                  Конфликт в одном баре (касание 100 и 161) — консервативно
+ *                  отмена.
+ * - 'breaker78'  — то же предусловие (141 раньше OTE-зоны), но вход глубже:
+ *                  на 78.6 вместо 100. Реже входит, зато шире запас до стопа
+ *                  и лучше цена. Симулируется со стопом 'zero'.
  */
 export type FibScenario =
-	| 'ote' | 'deep' | 'breaker'
+	| 'ote' | 'deep' | 'breaker' | 'breaker161' | 'breaker78'
 	| 'fade141' | 'fade241' | 'fade241n' | 'fade200'
 	| 'fade141c' | 'fade241nc'
 
@@ -58,8 +68,10 @@ export type FibScenario =
  *   лечащий проблему издержек на коротком зонном стопе;
  * - 'zero200' — тренд-сценарии (ote/deep): стоп за 0% как 'zero', но
  *   TP2 = 200 вместо 241 (гипотеза по данным ext200Pct > ext241Pct).
- * Breaker всегда симулируется только с 'zero'. ATR-зависимые режимы
- * (wide05/wide10/zoneAtr/far) не эмитятся, если legAtrRatio недоступен.
+ * Breaker: 'zero' (базовый) + волна 3 — 'tight' (стоп за 23.6 при входе от
+ * 100: тест сокращения стопа по данным MAE победителей). breaker161 и
+ * breaker78 — только 'zero'. ATR-зависимые режимы (wide05/wide10/zoneAtr/far)
+ * не эмитятся, если legAtrRatio недоступен.
  */
 export type FibStopMode = 'zero' | 'tight' | 'wide05' | 'wide10' | 'zone' | 'zoneAtr' | 'far' | 'zero200'
 

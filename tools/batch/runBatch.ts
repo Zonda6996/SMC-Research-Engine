@@ -204,6 +204,14 @@ interface SliceStats {
 	ext141Pct: number | null
 	ext200Pct: number | null
 	ext241Pct: number | null
+	/**
+	 * MAE победителей (сделок, достигших TP1) — база для сокращения стопа:
+	 * медиана и p90 худшей просадки в R (maeR отрицателен; −1 = полный стоп).
+	 * Если 90% победителей не проседают глубже −0.5R, стоп можно вдвое короче
+	 * ценой ~10% побед — а R каждой сделки удваивается.
+	 */
+	winMaeMed: number | null
+	winMaeP90: number | null
 	resolved: number
 }
 
@@ -242,6 +250,18 @@ function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
 			? withExt.filter((o) => (o.maxExtensionRatio ?? 0) >= threshold).length / withExt.length
 			: null
 
+	// MAE победителей: сортировка по возрастанию (глубже — раньше), p90 —
+	// значение, глубже которого просаживаются лишь 10% худших победителей.
+	const winMae = tp1
+		.map((o) => o.maeR)
+		.filter((v): v is number => v != null)
+		.sort((a, b) => a - b)
+	const quantile = (sorted: number[], q: number): number | null => {
+		if (sorted.length === 0) return null
+		const idx = Math.min(sorted.length - 1, Math.max(0, Math.floor(q * sorted.length)))
+		return sorted[idx] ?? null
+	}
+
 	const pct = (part: number) => (entered.length ? part / entered.length : null)
 	return {
 		setups: outcomes.length,
@@ -257,6 +277,9 @@ function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
 		ext141Pct: extPct(141),
 		ext200Pct: extPct(200),
 		ext241Pct: extPct(241),
+		winMaeMed: quantile(winMae, 0.5),
+		// 10-й перцентиль по возрастанию = «90% победителей проседают НЕ глубже».
+		winMaeP90: quantile(winMae, 0.1),
 		resolved: resolved.length,
 	}
 }
@@ -309,6 +332,10 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 		{ scenario: 'deep', stopMode: 'wide10' },
 		{ scenario: 'deep', stopMode: 'zero200' },
 		{ scenario: 'breaker', stopMode: 'zero' },
+	// Волна 3: вариации breaker — сокращённый стоп, отмена за 161, вход от 78.6.
+	{ scenario: 'breaker', stopMode: 'tight' },
+	{ scenario: 'breaker161', stopMode: 'zero' },
+	{ scenario: 'breaker78', stopMode: 'zero' },
 		{ scenario: 'fade141', stopMode: 'zone' },
 		{ scenario: 'fade141', stopMode: 'zoneAtr' },
 		{ scenario: 'fade141', stopMode: 'far' },
@@ -537,6 +564,10 @@ function scenarioLabel(scenario: string, stopMode: string): string {
 	if (scenario === 'fade200') return stopMode === 'zoneAtr' ? 'Fade200 (SL 241+0.5ATR)' : 'Fade200 (SL 241)'
 	if (scenario === 'fade141c') return 'Fade141 confirm (SL 200+0.5ATR)'
 	if (scenario === 'fade241nc') return 'Fade241→141/100 confirm (SL 261+0.5ATR)'
+	// Волна 3: вариации breaker.
+	if (scenario === 'breaker161') return 'Breaker cancel>161 (SL 0)'
+	if (scenario === 'breaker78') return 'Breaker@78.6 (SL 0)'
+	if (scenario === 'breaker' && stopMode === 'tight') return 'Breaker (SL 23.6)'
 	return 'Breaker (SL 0)'
 }
 
@@ -566,7 +597,7 @@ function toCsv(rows: ResultRow[]): string {
 		'symbol,timeframe,variant,period,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be,' +
 		'long_in,long_ev_full,long_ev_be,short_in,short_ev_full,short_ev_be,' +
 		'sweep_in,sweep_ev_full,sweep_ev_be,nosweep_in,nosweep_ev_full,nosweep_ev_be,' +
-		'ev_full_net,ev_be_net,stop_tp_pct,ext141_pct,ext200_pct,ext241_pct'
+		'ev_full_net,ev_be_net,stop_tp_pct,ext141_pct,ext200_pct,ext241_pct,win_mae_med,win_mae_p90'
 	const num = (v: number | null) => (v == null ? '' : v.toFixed(4))
 	const body = rows.map((r) =>
 		[
@@ -580,6 +611,7 @@ function toCsv(rows: ResultRow[]): string {
 			r.noSweep.entered, num(r.noSweep.evFull), num(r.noSweep.evBe),
 			num(r.stats.evFullNet), num(r.stats.evBeNet), num(r.stats.stopTpPct),
 			num(r.stats.ext141Pct), num(r.stats.ext200Pct), num(r.stats.ext241Pct),
+			num(r.stats.winMaeMed), num(r.stats.winMaeP90),
 		].join(','),
 	)
 	return [header, ...body].join('\n')
@@ -633,7 +665,7 @@ async function main() {
 		}
 
 		// Контроль окна данных: печатаем фактический диапазон, чтобы прогоны
-		// с --until нельзя было спутать с текущим периодом (и наоборот).
+		// с --until нельзя было спутать с текущим ��ериодом (и наоборот).
 		{
 			const first = new Date(candles[0]!.timestamp).toISOString().slice(0, 10)
 			const last = new Date(candles[candles.length - 1]!.timestamp).toISOString().slice(0, 10)
