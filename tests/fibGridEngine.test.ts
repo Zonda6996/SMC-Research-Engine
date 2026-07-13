@@ -55,6 +55,7 @@ function event(overrides: Partial<StructureEvent> = {}): StructureEvent {
 		confirmTimestamp: 30 * MS,
 		sweptBefore: false,
 		sweptDepth: 0,
+		oppositeSweptBefore: false,
 		...overrides,
 	}
 }

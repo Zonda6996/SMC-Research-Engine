@@ -161,6 +161,7 @@ export class FibLifecycleEngine {
 			trigger: candidate.trigger,
 			direction: candidate.direction,
 			legAtrRatio: variant.legAtrRatio,
+			oppositeSweptBefore: candidate.oppositeSweptBefore,
 			createdAtIndex: candidate.createdAtIndex,
 			entered: false,
 			entryIndex: null,

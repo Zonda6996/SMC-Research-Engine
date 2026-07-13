@@ -58,6 +58,8 @@ export interface FibGridCandidate {
 	variants: Record<FibAnchorMode, FibVariant | null>
 	/** Первый индекс, на котором событие и якоря известны без look-ahead. */
 	createdAtIndex: number
+	/** Пронесено из события: свип противоположного экстремума перед сломом. */
+	oppositeSweptBefore: boolean
 	explanation: string
 }
 

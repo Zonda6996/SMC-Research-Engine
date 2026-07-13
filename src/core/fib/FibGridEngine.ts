@@ -103,6 +103,7 @@ export class FibGridEngine {
 			end,
 			variants,
 			createdAtIndex: event.confirmIndex,
+			oppositeSweptBefore: event.oppositeSweptBefore,
 			explanation: `Экстремум импульса → пробитый ${event.levelLabel} event-level #${event.levelIndex}`,
 		}
 	}

@@ -52,6 +52,8 @@ export interface FibSetupOutcome {
 	direction: FibDirection
 	/** Нога 0%→100% в ATR на момент пробоя — для фильтра в UI. */
 	legAtrRatio: number | null
+	/** Свип противоположного экстремума перед сломом (стоп-хант) — A/B-разрез. */
+	oppositeSweptBefore: boolean
 	createdAtIndex: number
 
 	entered: boolean

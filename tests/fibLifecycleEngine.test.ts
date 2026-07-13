@@ -43,6 +43,7 @@ function longCandidate(createdAtIndex: number): FibGridCandidate {
 			global: null,
 		},
 		createdAtIndex,
+		oppositeSweptBefore: false,
 		explanation: 'test',
 	}
 }
@@ -154,6 +155,7 @@ describe('FibLifecycleEngine', () => {
 			confirmTimestamp: 15,
 			sweptBefore: false,
 			sweptDepth: 0,
+			oppositeSweptBefore: false,
 		}
 		const result = run(longCandidate(9), candles, [opposite])
 

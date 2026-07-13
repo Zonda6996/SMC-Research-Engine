@@ -220,6 +220,13 @@ interface ResultRow {
 	 */
 	long: SliceStats
 	short: SliceStats
+	/**
+	 * A/B по свипу ликвидности: sweep — перед сломом был прокол
+	 * противоположного экстремума (стоп-хант), noSweep — не было.
+	 * Гипотеза: развороты (CHoCH) после свипа статистически надёжнее.
+	 */
+	sweep: SliceStats
+	noSweep: SliceStats
 }
 
 /** Все разрезы по одному датасету: якорь × триггер × ATR × сценарий × стоп. */
@@ -249,6 +256,8 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 						stats: aggregate(group),
 						long: aggregate(group.filter((o) => o.direction === 'long')),
 						short: aggregate(group.filter((o) => o.direction === 'short')),
+						sweep: aggregate(group.filter((o) => o.oppositeSweptBefore)),
+						noSweep: aggregate(group.filter((o) => !o.oppositeSweptBefore)),
 					})
 				}
 			}
@@ -270,8 +279,8 @@ function scenarioLabel(scenario: string, stopMode: string): string {
 
 function toMarkdown(rows: ResultRow[], minIn: number): string {
 	const lines: string[] = []
-	lines.push('| Symbol | TF | Var | Per | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be | L: In/EVf/EVbe | S: In/EVf/EVbe |')
-	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
+	lines.push('| Symbol | TF | Var | Per | Anchor | Trig | ATR | Scenario | In | TP1 | TP2 | SL | EV_full | EV_be | L: In/EVf/EVbe | S: In/EVf/EVbe | Swp: In/EVf/EVbe | NoSwp: In/EVf/EVbe |')
+	lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
 	const dir = (s: SliceStats) => `${s.entered}/${fmtEv(s.evFull)}/${fmtEv(s.evBe)}`
 	for (const r of rows) {
 		if (r.stats.entered < minIn) continue
@@ -280,7 +289,7 @@ function toMarkdown(rows: ResultRow[], minIn: number): string {
 			`| ${scenarioLabel(r.scenario, r.stopMode)} | ${r.stats.entered} ` +
 			`| ${fmtPct(r.stats.tp1Pct)} | ${fmtPct(r.stats.tp2Pct)} | ${fmtPct(r.stats.slPct)} ` +
 			`| ${fmtEv(r.stats.evFull)} | ${fmtEv(r.stats.evBe)} ` +
-			`| ${dir(r.long)} | ${dir(r.short)} |`,
+			`| ${dir(r.long)} | ${dir(r.short)} | ${dir(r.sweep)} | ${dir(r.noSweep)} |`,
 		)
 	}
 	return lines.join('\n')
@@ -289,7 +298,8 @@ function toMarkdown(rows: ResultRow[], minIn: number): string {
 function toCsv(rows: ResultRow[]): string {
 	const header =
 		'symbol,timeframe,variant,period,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be,' +
-		'long_in,long_ev_full,long_ev_be,short_in,short_ev_full,short_ev_be'
+		'long_in,long_ev_full,long_ev_be,short_in,short_ev_full,short_ev_be,' +
+		'sweep_in,sweep_ev_full,sweep_ev_be,nosweep_in,nosweep_ev_full,nosweep_ev_be'
 	const num = (v: number | null) => (v == null ? '' : v.toFixed(4))
 	const body = rows.map((r) =>
 		[
@@ -299,6 +309,8 @@ function toCsv(rows: ResultRow[]): string {
 			num(r.stats.evFull), num(r.stats.evBe),
 			r.long.entered, num(r.long.evFull), num(r.long.evBe),
 			r.short.entered, num(r.short.evFull), num(r.short.evBe),
+			r.sweep.entered, num(r.sweep.evFull), num(r.sweep.evBe),
+			r.noSweep.entered, num(r.noSweep.evFull), num(r.noSweep.evBe),
 		].join(','),
 	)
 	return [header, ...body].join('\n')
