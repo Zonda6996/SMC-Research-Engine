@@ -32,6 +32,10 @@
 //                 per-outcome CSV (regime-<stamp>.csv) — строка на каждый
 //                 resolved-исход ядра плейбука с 4 метриками режима на момент
 //                 создания сетапа. Диагностика перед фильтром.
+//   --regime-filter волна 2 (SPEC 7.15): добавить в сводку сценарии
+//                 oteRegime/deepRegime — те же исходы минус созданные в
+//                 плохом режиме (atrRatio < 0.94 либо chochShare >= 0.5).
+//                 Сравнение до/после в одном CSV; breaker не фильтруется.
 //
 // Кэш свечей: tools/batch/cache/*.json — повторный прогон той же матрицы
 // не ходит на биржу (удалить каталог = скачать заново).
@@ -46,6 +50,7 @@ import type { Candle } from '../../src/models/price/Candle.js'
 import type { FibReachRecord, FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
 import { netFullR, netBeR } from '../../src/core/fib/fibCosts.js'
 import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
+import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analysis/regimeFilter.js'
 
 // ---------- Свип детектора ----------
 
@@ -122,6 +127,13 @@ interface CliArgs {
 	 * победителей и лоссы, порог выбираем по данным.
 	 */
 	regimeCsv: boolean
+	/**
+	 * Волна 2 фильтра режима (SPEC 7.15): добавить в сводку фильтрованные
+	 * копии сценариев (oteRegime/deepRegime) — те же исходы минус сетапы,
+	 * созданные в плохом режиме (atrRatio < 0.94 или chochShare >= 0.5).
+	 * Сравнение до/после — в одном CSV на идентичных выборках.
+	 */
+	regimeFilter: boolean
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -152,6 +164,7 @@ function parseArgs(argv: string[]): CliArgs {
 		untilMs,
 		untilLabel: untilRaw ? untilRaw.replace(/[:]/g, '-') : null,
 		regimeCsv: argv.includes('--regime-csv'),
+		regimeFilter: argv.includes('--regime-filter'),
 	}
 }
 
@@ -338,14 +351,23 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 	// и принятый фильтр breaker161. Отклонённые сценарии (fade-семейство,
 	// breaker78, breaker tight, wide-стопы, scale-добор) из батча убраны,
 	// но код и тесты сохранены — вернуть можно одной строкой здесь.
-	const scenarioSlices = [
+	const scenarioSlices: { scenario: string; stopMode: string }[] = [
 		{ scenario: 'ote', stopMode: 'zero' },
 		{ scenario: 'ote', stopMode: 'zero200' },
 		{ scenario: 'deep', stopMode: 'zero' },
 		{ scenario: 'deep', stopMode: 'zero200' },
 		{ scenario: 'breaker', stopMode: 'zero' },
 		{ scenario: 'breaker161', stopMode: 'zero' },
-	] as const
+	]
+	// Волна 2 фильтра режима: сравнение до/после на идентичных выборках.
+	// Строки появляются только когда main подмешал релейбленные исходы
+	// (--regime-filter); иначе группы пусты и в вывод не попадают.
+	if (outcomes.some((o) => o.scenario.endsWith('Regime'))) {
+		scenarioSlices.push(
+			{ scenario: 'oteRegime', stopMode: 'zero' },
+			{ scenario: 'deepRegime', stopMode: 'zero' },
+		)
+	}
 
 	for (const anchor of anchors) {
 		for (const trigger of triggers) {
@@ -781,7 +803,25 @@ async function main() {
 					try {
 						const started = Date.now()
 						const snapshot = runAnalysis(chunk, { bosChoch: variant.config })
-						allRows.push(...sliceDataset(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.outcomes, args.atrThresholds))
+						// Волна 2 фильтра режима: релейбленные копии прошедших фильтр
+						// исходов (oteRegime/deepRegime) подмешиваются к оригиналам —
+						// сравнение до/после в одной сводке. Только базовый конфиг.
+						let outcomesForSlicing = snapshot.fibLifecycle.outcomes
+						if (args.regimeFilter && variant.id === 'base') {
+							const metrics = computeRegimeMetrics(
+								snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory,
+							)
+							const passed = snapshot.fibLifecycle.outcomes
+								.filter((o) =>
+									DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) &&
+									o.stopMode === 'zero' &&
+									passesRegimeFilter(o.scenario, metrics[o.createdAtIndex]))
+								// Релейбл выходит за союз FibScenario намеренно: синтетические
+								// имена живут только внутри сводки раннера, не в пайплайне.
+								.map((o) => ({ ...o, scenario: `${o.scenario}Regime` }) as unknown as FibSetupOutcome)
+							outcomesForSlicing = [...snapshot.fibLifecycle.outcomes, ...passed]
+						}
+						allRows.push(...sliceDataset(symbol, timeframe, variant.id, period, outcomesForSlicing, args.atrThresholds))
 						allReach.push(...sliceReach(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.reach))
 						// Диагностика режима — только на базовом конфиге детектора,
 						// чтобы не плодить дубли исходов при --sweep.

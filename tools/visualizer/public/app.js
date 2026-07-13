@@ -363,7 +363,7 @@ function renderFibCandidates(entries, candles) {
 	const lastIndex = candles.length - 1
 	if (lastIndex < 0) return
 	// Хронологический порядок: линии каждой сетки тянутся до следующей сетки
-	// (с зазором), чтобы история читалась последовательно и без наслоений.
+	// (с зазором), чтобы история читалась последовательно и без насло��ний.
 	const ordered = [...entries].sort((a, b) => a.candidate.createdAtIndex - b.candidate.createdAtIndex)
 	const GAP_BARS = 3
 
@@ -441,6 +441,192 @@ function renderFibCandidates(entries, candles) {
 	})
 }
 
+// ---------- Setup Gallery: просмотр каждого сетапа плейбука вживую ----------
+
+// Ключ выбранного сетапа: candidateId + scenario (уникален внутри режима якоря).
+let selectedSetupKey = null
+
+// Исходы для галереи: текущий режим якоря, BOS/CHoCH и ATR-фильтры Fib Lab,
+// стоп-режим ote по чекбоксу, deep/breaker — zero. Затем фильтры самой галереи.
+function galleryOutcomes() {
+	if (!currentData?.fibLifecycle) return []
+	const showBos = document.getElementById('fibBos').checked
+	const showChoch = document.getElementById('fibChoch').checked
+	const mode = fibAnchorMode()
+	const minAtr = Number(document.getElementById('fibMinAtr').value) || 0
+	const oteStopMode = document.getElementById('fibOteTightStop')?.checked ? 'tight' : 'zero'
+	const scenarioFilter = document.getElementById('galScenario').value
+	const outcomeFilter = document.getElementById('galOutcome').value
+	const regimeFilter = document.getElementById('galRegime').value
+
+	return currentData.fibLifecycle.outcomes.filter((o) => {
+		if (o.variantMode !== mode) return false
+		if (!(o.trigger === 'bos' ? showBos : showChoch)) return false
+		if (o.legAtrRatio != null && o.legAtrRatio < minAtr) return false
+		if (o.scenario === 'ote' ? o.stopMode !== oteStopMode : o.stopMode !== 'zero') return false
+		if (!['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario)) return false
+		if (scenarioFilter !== 'all' && o.scenario !== scenarioFilter) return false
+		if (outcomeFilter !== 'all' && outcomeKind(o) !== outcomeFilter) return false
+		if (regimeFilter !== 'all' && (regimePass(o) ? 'pass' : 'block') !== regimeFilter) return false
+		return true
+	})
+}
+
+function outcomeKind(o) {
+	if (!o.entered) return 'open'
+	if (o.state === 'tp2') return 'tp2'
+	if (o.state === 'stopped') return o.tp1Hit ? 'tp1sl' : 'sl'
+	return o.tp1Hit ? 'tp1sl' : 'open'
+}
+
+const OUTCOME_BADGE = {
+	tp2: { text: 'TP2', bg: '#1f6f3f', fg: '#7ee2a8' },
+	tp1sl: { text: 'TP1', bg: '#5a4a15', fg: '#e3c35b' },
+	sl: { text: 'SL', bg: '#6e2222', fg: '#ffa198' },
+	open: { text: 'open', bg: '#30363d', fg: '#8b949e' },
+}
+
+// Метрики режима сетапа (на createdAtIndex) и вердикт фильтра волны 2 —
+// та же логика и пороги, что regimeFilter.ts (пороги приходят с сервера).
+function setupRegime(o) {
+	return currentData?.regime?.byIndex?.[o.createdAtIndex] ?? null
+}
+
+function regimePass(o) {
+	const t = currentData?.regime?.thresholds
+	const m = setupRegime(o)
+	if (!t || !m) return true
+	const baseScenario = o.scenario === 'breaker161' ? 'breaker' : o.scenario
+	if (!t.scenarios.includes(baseScenario)) return true
+	if (m.atrRatio != null && m.atrRatio < t.minAtrRatio) return false
+	if (m.chochShare != null && m.chochShare >= t.maxChochShare) return false
+	return true
+}
+
+function renderGallery() {
+	const list = document.getElementById('galleryList')
+	if (!list || !currentData) return
+	const outcomes = galleryOutcomes()
+	document.getElementById('galCount').textContent = outcomes.length
+	list.innerHTML = ''
+	// Хронологически с конца: свежие сетапы сверху.
+	const sorted = [...outcomes].sort((a, b) => b.createdAtIndex - a.createdAtIndex)
+	for (const o of sorted) {
+		const key = `${o.candidateId}·${o.scenario}`
+		const badge = OUTCOME_BADGE[outcomeKind(o)]
+		const m = setupRegime(o)
+		const pass = regimePass(o)
+		const netR = o.entered && (o.tp1Hit || o.state === 'stopped')
+			? (o.tp1Hit ? (o.rTp1 ?? 0) : (o.rStop ?? -1))
+			: null
+		const row = document.createElement('div')
+		row.className = 'gal-row' + (selectedSetupKey === key ? ' selected' : '')
+		row.innerHTML =
+			`<span style="color:#8b949e; width:44px;">#${o.createdAtIndex}</span>` +
+			`<span style="width:64px;">${o.scenario}</span>` +
+			`<span style="color:${o.direction === 'long' ? '#3fb950' : '#f85149'}; width:34px;">${o.direction === 'long' ? 'LONG' : 'SHORT'}</span>` +
+			`<span class="gal-badge" style="background:${badge.bg}; color:${badge.fg};">${badge.text}</span>` +
+			(netR != null ? `<span style="color:${netR >= 0 ? '#3fb950' : '#f85149'}; width:40px;">${netR >= 0 ? '+' : ''}${netR.toFixed(1)}R</span>` : '<span style="width:40px;"></span>') +
+			`<span style="color:#8b949e; font-size:10px; margin-left:auto;">` +
+			`atr ${m?.atrRatio != null ? m.atrRatio.toFixed(2) : '—'} · ch ${m?.chochShare != null ? m.chochShare.toFixed(2) : '—'}</span>` +
+			`<span class="color-dot" title="${pass ? 'режим pass' : 'режим block'}" style="background:${pass ? '#3fb950' : '#f85149'};"></span>`
+		row.addEventListener('click', () => {
+			selectedSetupKey = selectedSetupKey === key ? null : key
+			renderAll(true)
+			if (selectedSetupKey) zoomToSetup(o)
+		})
+		list.appendChild(row)
+	}
+}
+
+function findSelectedSetup() {
+	if (!selectedSetupKey) return null
+	return galleryOutcomes().find((o) => `${o.candidateId}·${o.scenario}` === selectedSetupKey) ?? null
+}
+
+function setupResolveIndex(o) {
+	return o.stopIndex ?? o.tp2Index ?? o.tp1Index ?? o.entryIndex ?? o.createdAtIndex
+}
+
+function zoomToSetup(o) {
+	const candles = currentData.candles
+	const from = candles[Math.max(0, o.createdAtIndex - 30)]
+	const to = candles[Math.min(candles.length - 1, setupResolveIndex(o) + 30)]
+	if (from && to) {
+		chart.timeScale().setVisibleRange({
+			from: tsToChartTime(from.timestamp),
+			to: tsToChartTime(to.timestamp),
+		})
+	}
+}
+
+// Рисует выбранный сетап: линии входа/стопа/TP1/TP2 от входа до финала,
+// маркеры входа и исхода. Цены целей восстанавливаются из R-мультипликаторов.
+function renderSelectedSetup(o, candles) {
+	const startIdx = o.entryIndex ?? o.createdAtIndex
+	const endIdx = Math.min(candles.length - 1, setupResolveIndex(o) + 5)
+	const start = candles[startIdx]
+	const end = candles[endIdx]
+	if (!start || !end || startIdx >= endIdx) return
+
+	const dir = o.direction === 'long' ? 1 : -1
+	const lines = []
+	if (o.entryPrice != null) lines.push({ price: o.entryPrice, color: '#58a6ff', label: 'entry' })
+	lines.push({ price: o.stopPrice, color: '#f85149', label: 'SL' })
+	if (o.entryPrice != null && o.riskSize != null) {
+		if (o.rTp1 != null) lines.push({ price: o.entryPrice + dir * o.rTp1 * o.riskSize, color: '#3fb950', label: 'TP1' })
+		if (o.rTp2 != null) lines.push({ price: o.entryPrice + dir * o.rTp2 * o.riskSize, color: '#2ea043', label: 'TP2' })
+	}
+	for (const l of lines) {
+		const s = chart.addSeries(LightweightCharts.LineSeries, {
+			...SEGMENT_SERIES_OPTIONS,
+			color: l.color,
+			lineWidth: 2,
+			lineStyle: LightweightCharts.LineStyle.Solid,
+		})
+		s.setData([
+			{ time: tsToChartTime(start.timestamp), value: l.price },
+			{ time: tsToChartTime(end.timestamp), value: l.price },
+		])
+		LightweightCharts.createSeriesMarkers(s, [{
+			time: tsToChartTime(start.timestamp),
+			position: 'inBar',
+			color: l.color,
+			shape: 'circle',
+			size: 0,
+			text: `${l.label} ${l.price.toFixed(2)}`,
+		}])
+	}
+
+	// Маркеры ключевых свечей: вход и исход.
+	const markers = []
+	if (o.entryIndex != null && candles[o.entryIndex]) {
+		markers.push({
+			time: tsToChartTime(candles[o.entryIndex].timestamp),
+			position: o.direction === 'long' ? 'belowBar' : 'aboveBar',
+			color: '#58a6ff',
+			shape: o.direction === 'long' ? 'arrowUp' : 'arrowDown',
+			text: 'IN',
+		})
+	}
+	const exitIdx = o.state === 'stopped' ? o.stopIndex : o.state === 'tp2' ? o.tp2Index : o.tp1Index
+	if (exitIdx != null && candles[exitIdx]) {
+		const win = o.state === 'tp2' || o.tp1Hit
+		markers.push({
+			time: tsToChartTime(candles[exitIdx].timestamp),
+			position: o.direction === 'long' ? 'aboveBar' : 'belowBar',
+			color: win ? '#3fb950' : '#f85149',
+			shape: 'circle',
+			text: o.state === 'tp2' ? 'TP2' : o.state === 'stopped' ? (o.tp1Hit ? 'TP1→SL' : 'SL') : 'TP1',
+		})
+	}
+	if (markers.length > 0) {
+		const anchor = chart.addSeries(LightweightCharts.LineSeries, { ...SEGMENT_SERIES_OPTIONS, color: 'transparent' })
+		anchor.setData(markers.map((mk) => ({ time: mk.time, value: o.entryPrice ?? o.stopPrice })))
+		LightweightCharts.createSeriesMarkers(anchor, markers.sort((a, b) => a.time - b.time))
+	}
+}
+
 function renderAll(preserveViewport = false) {
 	if (!currentData) return
 	const visibleLogicalRange = preserveViewport && chart
@@ -489,6 +675,9 @@ function renderAll(preserveViewport = false) {
 	renderFibStats()
 	renderFibCandidates(visibleFib, currentData.candles)
 	renderProtectedSegments(currentData.protectedSegments ?? [], currentData.candles)
+	renderGallery()
+	const selected = findSelectedSetup()
+	if (selected) renderSelectedSetup(selected, currentData.candles)
 	if (visibleLogicalRange) chart.timeScale().setVisibleLogicalRange(visibleLogicalRange)
 	else chart.timeScale().fitContent()
 }
@@ -573,6 +762,7 @@ async function loadData(isFresh) {
 		const data = await res.json()
 		if (data.error) throw new Error(data.error)
 		currentData = data
+		selectedSetupKey = null
 		document.getElementById('datasetLabel').textContent =
 			`${isFresh ? 'fresh' : 'fixture'}: ${data.dataset.symbol} ${data.dataset.timeframe} ` +
 			`(${data.dataset.candleCount} candles, ${data.dataset.mode})`
@@ -615,6 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		'toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled',
 		'toggleFib', 'fibBos', 'fibChoch', 'fibLatest', 'fibLastN', 'fibMinAtr',
 		'fibAnchorLocal', 'fibAnchorGlobal', 'fibOteTightStop',
+		'galScenario', 'galOutcome', 'galRegime',
 	]) {
 		document.getElementById(id).addEventListener('change', () => renderAll(true))
 	}

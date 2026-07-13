@@ -12,6 +12,8 @@ import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, extname } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
+import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
+import { DEFAULT_REGIME_FILTER } from '../../src/core/analysis/regimeFilter.js'
 import { fetchCandlesPaginated } from '../shared/candleFetcher.js'
 import { probeSwingBreaches, type BreachMode } from './lastSwingBreachProbe.js'
 import {
@@ -193,6 +195,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					pipelineEvents: snapshot.events,
 					fib: snapshot.fib,
 					fibLifecycle: snapshot.fibLifecycle,
+					// Метрики режима (SPEC 7.15) на момент создания каждого сетапа —
+					// для галереи сетапов. Пороги фильтра — из волны 2 (regimeFilter.ts).
+					regime: buildRegimePayload(snapshot),
 				// Все protected-уровни для отрисовки сегментов (из breached + активные).
 				protectedSegments: buildProtectedSegments(
 					protectedBreaches,
@@ -243,6 +248,31 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 	res.writeHead(200, { 'Content-Type': mime })
 	res.end(body)
 })
+
+/**
+ * Метрики режима по индексам создания сетапов (не весь ряд — экономия
+ * трафика) плюс пороги фильтра волны 2, чтобы клиент показывал pass/block
+ * теми же константами, что и батч-раннер.
+ */
+function buildRegimePayload(snapshot: ReturnType<typeof runAnalysis>) {
+	const metrics = computeRegimeMetrics(
+		snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory,
+	)
+	const byIndex: Record<number, unknown> = {}
+	for (const o of snapshot.fibLifecycle.outcomes) {
+		if (byIndex[o.createdAtIndex] === undefined) {
+			byIndex[o.createdAtIndex] = metrics[o.createdAtIndex] ?? null
+		}
+	}
+	return {
+		byIndex,
+		thresholds: {
+			minAtrRatio: DEFAULT_REGIME_FILTER.minAtrRatio,
+			maxChochShare: DEFAULT_REGIME_FILTER.maxChochShare,
+			scenarios: [...DEFAULT_REGIME_FILTER.scenarios],
+		},
+	}
+}
 
 function countByType(events: { type: string }[]): { bos: number; choch: number; unlabeled: number } {
 	return events.reduce(

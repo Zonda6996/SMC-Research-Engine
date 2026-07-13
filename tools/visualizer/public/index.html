@@ -185,6 +185,29 @@
 			.diff-row:hover {
 				background: #21262d;
 			}
+			.gal-row {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 4px 6px;
+				font-size: 11px;
+				border-bottom: 1px solid #21262d;
+				cursor: pointer;
+				white-space: nowrap;
+			}
+			.gal-row:hover {
+				background: #21262d;
+			}
+			.gal-row.selected {
+				background: #1f2a3a;
+				outline: 1px solid #388bfd;
+			}
+			.gal-badge {
+				padding: 0 5px;
+				border-radius: 8px;
+				font-size: 10px;
+				font-weight: 600;
+			}
 			.loading {
 				position: absolute;
 				top: 50%;
@@ -405,6 +428,37 @@
 						OTE: стоп за 23.6 вместо 0%
 					</label>
 					<div id="fibStatsBody"></div>
+				</div>
+
+				<div class="panel">
+					<h2>Setup Gallery</h2>
+					<div style="font-size:11px; color:#8b949e; margin-bottom:6px; line-height:1.5;">
+						Все сетапы плейбука по текущим фильтрам Fib Lab. Клик — зум на
+						сделку с линиями входа/стопа/целей и метриками режима (SPEC 7.15).
+					</div>
+					<div style="display:flex; gap:6px; margin-bottom:6px; flex-wrap:wrap;">
+						<select id="galScenario" style="background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px; font-size:11px;">
+							<option value="all">Все сценарии</option>
+							<option value="ote">OTE</option>
+							<option value="deep">Deep</option>
+							<option value="breaker">Breaker</option>
+							<option value="breaker161">Breaker161</option>
+						</select>
+						<select id="galOutcome" style="background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px; font-size:11px;">
+							<option value="all">Все исходы</option>
+							<option value="tp2">TP2</option>
+							<option value="tp1sl">TP1 → SL/BE</option>
+							<option value="sl">SL</option>
+							<option value="open">Open / no entry</option>
+						</select>
+						<select id="galRegime" style="background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px; font-size:11px;">
+							<option value="all">Режим: все</option>
+							<option value="pass">Режим: pass</option>
+							<option value="block">Режим: block</option>
+						</select>
+					</div>
+					<div class="type-row"><span>Найдено</span><span id="galCount" style="font-weight:600;">0</span></div>
+					<div id="galleryList" style="max-height:260px; overflow-y:auto; margin-top:4px;"></div>
 				</div>
 
 				<div class="panel">
