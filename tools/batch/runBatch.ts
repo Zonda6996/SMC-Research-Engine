@@ -28,6 +28,10 @@
 //                 каждый отдельно (default: 1). Тест на затухание edge во
 //                 времени: настоящий edge должен быть виден в каждом отрезке,
 //                 а не только в одной удачной фазе рынка.
+//   --regime-csv  волна 1 фильтра режима (SPEC 7.15): дополнительный
+//                 per-outcome CSV (regime-<stamp>.csv) — строка на каждый
+//                 resolved-исход ядра плейбука с 4 метриками режима на момент
+//                 создания сетапа. Диагностика перед фильтром.
 //
 // Кэш свечей: tools/batch/cache/*.json — повторный прогон той же матрицы
 // не ходит на биржу (удалить каталог = скачать заново).
@@ -41,6 +45,7 @@ import { fetchCandlesPaginated, MAX_CANDLES, type MarketKind } from '../shared/c
 import type { Candle } from '../../src/models/price/Candle.js'
 import type { FibReachRecord, FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
 import { netFullR, netBeR } from '../../src/core/fib/fibCosts.js'
+import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
 
 // ---------- Свип детектора ----------
 
@@ -110,6 +115,13 @@ interface CliArgs {
 	untilMs: number | null
 	/** Человекочитаемая метка --until для имён файлов и кеша. */
 	untilLabel: string | null
+	/**
+	 * Волна 1 фильтра режима (SPEC 7.15): писать per-outcome CSV с метриками
+	 * режима на момент создания сетапа (ядро плейбука, zero-стоп). Диагностика
+	 * ПЕРЕД фильтром: сначала смотрим, разделяет ли хоть одна метрика
+	 * победителей и лоссы, порог выбираем по данным.
+	 */
+	regimeCsv: boolean
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -139,6 +151,7 @@ function parseArgs(argv: string[]): CliArgs {
 		split: Math.max(1, Math.min(6, Number(get('--split') ?? 1))),
 		untilMs,
 		untilLabel: untilRaw ? untilRaw.replace(/[:]/g, '-') : null,
+		regimeCsv: argv.includes('--regime-csv'),
 	}
 }
 
@@ -462,6 +475,89 @@ function sliceReach(symbol: string, timeframe: string, variant: string, period: 
 	return rows
 }
 
+// ---------- Волна 1 фильтра режима: per-outcome CSV (SPEC 7.15) ----------
+
+/**
+ * Строка на каждый resolved-исход ядра плейбука с метриками режима,
+ * измеренными на createdAtIndex сетапа (look-ahead-free: метрики зависят
+ * только от данных до этого индекса). Только диагностика — на отбор
+ * сетапов не влияет.
+ */
+interface RegimeRow {
+	symbol: string
+	timeframe: string
+	period: string
+	anchor: string
+	trigger: string
+	scenario: string
+	direction: string
+	state: string
+	tp1Hit: boolean
+	netBe: number | null
+	effRatio: number | null
+	atrRatio: number | null
+	chochShare: number | null
+	trendStability: number | null
+}
+
+/** Ядро плейбука для диагностики режима: тренд-сценарии, zero-стоп. */
+const REGIME_SCENARIOS = new Set(['ote', 'deep', 'breaker', 'breaker161'])
+
+function sliceRegime(
+	symbol: string,
+	timeframe: string,
+	period: string,
+	snapshot: import('../../src/models/analysis/AnalysisSnapshot.js').AnalysisSnapshot,
+): RegimeRow[] {
+	const metrics = computeRegimeMetrics(
+		snapshot.candles,
+		snapshot.atr,
+		snapshot.events,
+		snapshot.market.trendHistory,
+	)
+	const rows: RegimeRow[] = []
+	for (const o of snapshot.fibLifecycle.outcomes) {
+		if (!REGIME_SCENARIOS.has(o.scenario) || o.stopMode !== 'zero') continue
+		if (!o.entered || !(o.tp1Hit || o.state === 'stopped')) continue
+		const m = metrics[o.createdAtIndex]
+		if (!m) continue
+		rows.push({
+			symbol,
+			timeframe,
+			period,
+			anchor: o.variantMode,
+			trigger: o.trigger,
+			scenario: o.scenario,
+			direction: o.direction,
+			state: o.state,
+			tp1Hit: o.tp1Hit,
+			netBe: netBeR(o),
+			effRatio: m.effRatio,
+			atrRatio: m.atrRatio,
+			chochShare: m.chochShare,
+			trendStability: m.trendStability,
+		})
+	}
+	return rows
+}
+
+function regimeToCsv(rows: RegimeRow[]): string {
+	const header = [
+		'symbol', 'timeframe', 'period', 'anchor', 'trigger', 'scenario', 'direction',
+		'state', 'tp1_hit', 'net_be',
+		'eff_ratio', 'atr_ratio', 'choch_share', 'trend_stability',
+	]
+	const fmt = (v: number | null): string => (v == null ? '' : v.toFixed(4))
+	const lines = rows.map((r) =>
+		[
+			r.symbol, r.timeframe, r.period, r.anchor, r.trigger, r.scenario, r.direction,
+			r.state, r.tp1Hit ? 1 : 0, fmt(r.netBe),
+			fmt(r.effRatio), fmt(r.atrRatio), fmt(r.chochShare), fmt(r.trendStability),
+		].join(','),
+	)
+	return [header.join(','), ...lines].join('\n')
+}
+
 function reachToCsv(rows: ReachRow[]): string {
 	const header = [
 		'symbol', 'timeframe', 'variant', 'period', 'anchor', 'trigger', 'candidates',
@@ -627,6 +723,7 @@ async function main() {
 	const args = parseArgs(process.argv.slice(2))
 	const allRows: ResultRow[] = []
 	const allReach: ReachRow[] = []
+	const allRegime: RegimeRow[] = []
 	const failures: string[] = []
 
 	console.log(`\nBatch: ${args.symbols.join(', ')} × ${args.timeframes.join(', ')} × ${args.limit} candles (${args.market})${args.untilLabel ? ` until ${args.untilLabel}` : ''}`)
@@ -686,6 +783,11 @@ async function main() {
 						const snapshot = runAnalysis(chunk, { bosChoch: variant.config })
 						allRows.push(...sliceDataset(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.outcomes, args.atrThresholds))
 						allReach.push(...sliceReach(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.reach))
+						// Диагностика режима — только на базовом конфиге детектора,
+						// чтобы не плодить дубли исходов при --sweep.
+						if (args.regimeCsv && variant.id === 'base') {
+							allRegime.push(...sliceRegime(symbol, timeframe, period, snapshot))
+						}
 						console.log(`  ✓ ${vLabel}: ${chunk.length} candles, ${snapshot.fib.candidates.length} candidates (${((Date.now() - started) / 1000).toFixed(1)}s)`)
 					} catch (err) {
 						const message = err instanceof Error ? err.message : String(err)
@@ -710,6 +812,8 @@ async function main() {
 	writeFileSync(csvPath, toCsv(allRows))
 	const reachCsvPath = join(RESULTS_DIR, `reach-${stamp}${untilTag}.csv`)
 	if (allReach.length > 0) writeFileSync(reachCsvPath, reachToCsv(allReach))
+	const regimeCsvPath = join(RESULTS_DIR, `regime-${stamp}${untilTag}.csv`)
+	if (allRegime.length > 0) writeFileSync(regimeCsvPath, regimeToCsv(allRegime))
 
 	console.log(`\n=== Top by EV_be (In >= ${args.minIn}) ===\n`)
 	console.log(topLines(allRows, args.minIn))
@@ -723,6 +827,7 @@ async function main() {
 	}
 	console.log(`\nCSV (all ${allRows.length} rows): ${csvPath}`)
 	if (allReach.length > 0) console.log(`Reach CSV (${allReach.length} rows): ${reachCsvPath}`)
+	if (allRegime.length > 0) console.log(`Regime CSV (${allRegime.length} rows): ${regimeCsvPath}`)
 	if (failures.length > 0) {
 		console.log(`\nFailures:\n` + failures.map((f) => `  - ${f}`).join('\n'))
 	}
