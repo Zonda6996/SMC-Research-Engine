@@ -36,6 +36,12 @@
 //                 oteRegime/deepRegime — те же исходы минус созданные в
 //                 плохом режиме (atrRatio < 0.94 либо chochShare >= 0.5).
 //                 Сравнение до/после в одном CSV; breaker не фильтруется.
+//   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
+//                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
+//                 не создавать сетап пока предыдущая сделка жива), *DedupOp
+//                 (one-position — не входить при открытой позиции),
+//                 *DedupLo (latest-only — новая сетка отменяет невошедшую
+//                 старую). Плюс печать max одновременной экспозиции.
 //
 // Кэш свечей: tools/batch/cache/*.json — повторный прогон той же матрицы
 // не ходит на биржу (удалить каталог = скачать заново).
@@ -51,6 +57,7 @@ import type { FibReachRecord, FibSetupOutcome } from '../../src/models/fib/FibLi
 import { netFullR, netBeR } from '../../src/core/fib/fibCosts.js'
 import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
 import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analysis/regimeFilter.js'
+import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/analysis/dedupFilter.js'
 
 // ---------- Свип детектора ----------
 
@@ -134,6 +141,12 @@ interface CliArgs {
 	 * Сравнение до/после — в одном CSV на идентичных выборках.
 	 */
 	regimeFilter: boolean
+	/**
+	 * Волна 3 (SPEC 7.16): добавить в сводку дедуплицированные копии ядра
+	 * по трём правилам (суффиксы DedupCd/DedupOp/DedupLo) + напечатать
+	 * максимальную одновременную экспозицию до/после.
+	 */
+	dedup: boolean
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -165,6 +178,7 @@ function parseArgs(argv: string[]): CliArgs {
 		untilLabel: untilRaw ? untilRaw.replace(/[:]/g, '-') : null,
 		regimeCsv: argv.includes('--regime-csv'),
 		regimeFilter: argv.includes('--regime-filter'),
+		dedup: argv.includes('--dedup'),
 	}
 }
 
@@ -367,6 +381,15 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 			{ scenario: 'oteRegime', stopMode: 'zero' },
 			{ scenario: 'deepRegime', stopMode: 'zero' },
 		)
+	}
+	// Волна 3 дедупликации (SPEC 7.16): три правила × 4 сценария ядра,
+	// суффиксы Cd (cooldown), Op (one-position), Lo (latest-only).
+	if (outcomes.some((o) => /Dedup(Cd|Op|Lo)$/.test(o.scenario))) {
+		for (const s of ['ote', 'deep', 'breaker', 'breaker161']) {
+			for (const suffix of ['DedupCd', 'DedupOp', 'DedupLo']) {
+				scenarioSlices.push({ scenario: `${s}${suffix}`, stopMode: 'zero' })
+			}
+		}
 	}
 
 	for (const anchor of anchors) {
@@ -746,6 +769,12 @@ async function main() {
 	const allRows: ResultRow[] = []
 	const allReach: ReachRow[] = []
 	const allRegime: RegimeRow[] = []
+	// Худшая по датасетам одновременная экспозиция (сделок одной стратегии
+	// и направления открыто одновременно) — до дедупа и после каждого правила.
+	const dedupExposure = {
+		before: 0,
+		after: { 'cooldown': 0, 'one-position': 0, 'latest-only': 0 } as Record<string, number>,
+	}
 	const failures: string[] = []
 
 	console.log(`\nBatch: ${args.symbols.join(', ')} × ${args.timeframes.join(', ')} × ${args.limit} candles (${args.market})${args.untilLabel ? ` until ${args.untilLabel}` : ''}`)
@@ -819,9 +848,25 @@ async function main() {
 								// Релейбл выходит за союз FibScenario намеренно: синтетические
 								// имена живут только внутри сводки раннера, не в пайплайне.
 								.map((o) => ({ ...o, scenario: `${o.scenario}Regime` }) as unknown as FibSetupOutcome)
-							outcomesForSlicing = [...snapshot.fibLifecycle.outcomes, ...passed]
-						}
-						allRows.push(...sliceDataset(symbol, timeframe, variant.id, period, outcomesForSlicing, args.atrThresholds))
+								outcomesForSlicing = [...snapshot.fibLifecycle.outcomes, ...passed]
+							}
+							// Волна 3 (SPEC 7.16): дедуплицированные копии ядра по трём
+							// правилам + учёт максимальной одновременной экспозиции.
+							if (args.dedup && variant.id === 'base') {
+								const core = snapshot.fibLifecycle.outcomes.filter((o) =>
+									['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario) && o.stopMode === 'zero')
+								dedupExposure.before = Math.max(dedupExposure.before, maxConcurrentTrades(core))
+								const suffix = { 'cooldown': 'DedupCd', 'one-position': 'DedupOp', 'latest-only': 'DedupLo' } as const
+								const mixed: FibSetupOutcome[] = []
+								for (const rule of DEDUP_RULES) {
+									const surviving = applyDedup(core, rule)
+									dedupExposure.after[rule] = Math.max(dedupExposure.after[rule] ?? 0, maxConcurrentTrades(surviving))
+									mixed.push(...surviving.map((o) =>
+										({ ...o, scenario: `${o.scenario}${suffix[rule]}` }) as unknown as FibSetupOutcome))
+								}
+								outcomesForSlicing = [...outcomesForSlicing, ...mixed]
+							}
+							allRows.push(...sliceDataset(symbol, timeframe, variant.id, period, outcomesForSlicing, args.atrThresholds))
 						allReach.push(...sliceReach(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.reach))
 						// Диагностика режима — только на базовом конфиге детектора,
 						// чтобы не плодить дубли исходов при --sweep.
@@ -868,6 +913,11 @@ async function main() {
 	console.log(`\nCSV (all ${allRows.length} rows): ${csvPath}`)
 	if (allReach.length > 0) console.log(`Reach CSV (${allReach.length} rows): ${reachCsvPath}`)
 	if (allRegime.length > 0) console.log(`Regime CSV (${allRegime.length} rows): ${regimeCsvPath}`)
+	if (args.dedup) {
+		console.log(`\nMax concurrent same-direction trades (worst dataset):`)
+		console.log(`  before dedup:  ${dedupExposure.before}`)
+		for (const rule of DEDUP_RULES) console.log(`  ${rule.padEnd(13)}: ${dedupExposure.after[rule]}`)
+	}
 	if (failures.length > 0) {
 		console.log(`\nFailures:\n` + failures.map((f) => `  - ${f}`).join('\n'))
 	}
