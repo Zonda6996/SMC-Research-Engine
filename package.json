@@ -9,6 +9,7 @@
 		"start": "tsx src/index.ts",
 		"viz": "tsx tools/visualizer/server.ts",
 		"batch": "tsx tools/batch/runBatch.ts",
+		"portfolio": "tsx tools/batch/runBatch.ts --portfolio",
 		"multitf": "tsx tools/batch/runMultiTf.ts"
 	},
 	"keywords": [],

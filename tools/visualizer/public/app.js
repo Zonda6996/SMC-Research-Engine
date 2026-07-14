@@ -457,7 +457,8 @@ function galleryOutcomes() {
 	const oteStopMode = document.getElementById('fibOteTightStop')?.checked ? 'tight' : 'zero'
 	const scenarioFilter = document.getElementById('galScenario').value
 	const outcomeFilter = document.getElementById('galOutcome').value
-	const regimeFilter = document.getElementById('galRegime').value
+	const comboFilter = document.getElementById('galCombo').value
+	const directionFilter = document.getElementById('galDirection').value
 
 	return currentData.fibLifecycle.outcomes.filter((o) => {
 		if (o.variantMode !== mode) return false
@@ -467,13 +468,17 @@ function galleryOutcomes() {
 		if (!['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario)) return false
 		if (scenarioFilter !== 'all' && o.scenario !== scenarioFilter) return false
 		if (outcomeFilter !== 'all' && outcomeKind(o) !== outcomeFilter) return false
-		if (regimeFilter !== 'all' && (regimePass(o) ? 'pass' : 'block') !== regimeFilter) return false
+		if (directionFilter !== 'all' && o.direction !== directionFilter) return false
+		const status = comboStatus(o)
+		if (comboFilter === 'accepted' && !status.accepted) return false
+		if (comboFilter === 'rejected' && status.accepted) return false
+		if ((comboFilter === 'regime' || comboFilter === 'cooldown') && status.reason !== comboFilter) return false
 		return true
 	})
 }
 
 function outcomeKind(o) {
-	if (!o.entered) return 'open'
+	if (!o.entered) return o.state
 	if (o.state === 'tp2') return 'tp2'
 	if (o.state === 'stopped') return o.tp1Hit ? 'tp1sl' : 'sl'
 	return o.tp1Hit ? 'tp1sl' : 'open'
@@ -484,12 +489,20 @@ const OUTCOME_BADGE = {
 	tp1sl: { text: 'TP1', bg: '#5a4a15', fg: '#e3c35b' },
 	sl: { text: 'SL', bg: '#6e2222', fg: '#ffa198' },
 	open: { text: 'open', bg: '#30363d', fg: '#8b949e' },
+	'no-entry': { text: 'no entry', bg: '#30363d', fg: '#8b949e' },
+	expired: { text: 'expired', bg: '#30363d', fg: '#8b949e' },
+	invalidated: { text: 'invalid', bg: '#30363d', fg: '#8b949e' },
 }
 
 // Метрики режима сетапа (на createdAtIndex) и вердикт фильтра волны 2 —
 // та же логика и пороги, что regimeFilter.ts (пороги приходят с сервера).
 function setupRegime(o) {
 	return currentData?.regime?.byIndex?.[o.createdAtIndex] ?? null
+}
+
+function comboStatus(o) {
+	const key = `${o.candidateId}|${o.variantMode}|${o.scenario}|${o.stopMode}`
+	return currentData?.combo?.byKey?.[key] ?? { accepted: false, reason: 'unknown' }
 }
 
 function regimePass(o) {
@@ -515,10 +528,8 @@ function renderGallery() {
 		const key = `${o.candidateId}·${o.scenario}`
 		const badge = OUTCOME_BADGE[outcomeKind(o)]
 		const m = setupRegime(o)
-		const pass = regimePass(o)
-		const netR = o.entered && (o.tp1Hit || o.state === 'stopped')
-			? (o.tp1Hit ? (o.rTp1 ?? 0) : (o.rStop ?? -1))
-			: null
+		const status = comboStatus(o)
+		const netR = status.netR ?? null
 		const row = document.createElement('div')
 		row.className = 'gal-row' + (selectedSetupKey === key ? ' selected' : '')
 		row.innerHTML =
@@ -529,7 +540,7 @@ function renderGallery() {
 			(netR != null ? `<span style="color:${netR >= 0 ? '#3fb950' : '#f85149'}; width:40px;">${netR >= 0 ? '+' : ''}${netR.toFixed(1)}R</span>` : '<span style="width:40px;"></span>') +
 			`<span style="color:#8b949e; font-size:10px; margin-left:auto;">` +
 			`atr ${m?.atrRatio != null ? m.atrRatio.toFixed(2) : '—'} · ch ${m?.chochShare != null ? m.chochShare.toFixed(2) : '—'}</span>` +
-			`<span class="color-dot" title="${pass ? 'режим pass' : 'режим block'}" style="background:${pass ? '#3fb950' : '#f85149'};"></span>`
+			`<span class="gal-badge" title="combo: ${status.reason}" style="background:${status.accepted ? '#1f6f3f' : '#6e2222'}; color:${status.accepted ? '#7ee2a8' : '#ffa198'};">${status.accepted ? 'combo' : status.reason}</span>`
 		row.addEventListener('click', () => {
 			selectedSetupKey = selectedSetupKey === key ? null : key
 			renderAll(true)
@@ -542,6 +553,17 @@ function renderGallery() {
 function findSelectedSetup() {
 	if (!selectedSetupKey) return null
 	return galleryOutcomes().find((o) => `${o.candidateId}·${o.scenario}` === selectedSetupKey) ?? null
+}
+
+function selectAdjacentSetup(delta) {
+	const outcomes = [...galleryOutcomes()].sort((a, b) => b.createdAtIndex - a.createdAtIndex)
+	if (!outcomes.length) return
+	const index = outcomes.findIndex((o) => `${o.candidateId}·${o.scenario}` === selectedSetupKey)
+	const next = outcomes[(index < 0 ? 0 : (index + delta + outcomes.length) % outcomes.length)]
+	if (!next) return
+	selectedSetupKey = `${next.candidateId}·${next.scenario}`
+	renderAll(true)
+	zoomToSetup(next)
 }
 
 function setupResolveIndex(o) {
@@ -805,11 +827,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		'toggleA', 'toggleB', 'toggleC', 'toggleStruct', 'toggleProtected', 'toggleUnlabeled',
 		'toggleFib', 'fibBos', 'fibChoch', 'fibLatest', 'fibLastN', 'fibMinAtr',
 		'fibAnchorLocal', 'fibAnchorGlobal', 'fibOteTightStop',
-		'galScenario', 'galOutcome', 'galRegime',
+		'galScenario', 'galOutcome', 'galCombo', 'galDirection',
 	]) {
 		document.getElementById(id).addEventListener('change', () => renderAll(true))
 	}
-	// Ползунок ATR: live-обновление подписи и перерисовка при перетаскивании.
+	document.getElementById('galPrev').addEventListener('click', () => selectAdjacentSetup(-1))
+document.getElementById('galNext').addEventListener('click', () => selectAdjacentSetup(1))
+
+// Ползунок ATR: live-обновление подписи и перерисовка при перетаскивании.
 	document.getElementById('fibMinAtr').addEventListener('input', () => {
 		document.getElementById('fibMinAtrValue').textContent =
 			`${Number(document.getElementById('fibMinAtr').value).toFixed(1)}×`

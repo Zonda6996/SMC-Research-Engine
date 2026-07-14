@@ -449,15 +449,29 @@
 							<option value="tp2">TP2</option>
 							<option value="tp1sl">TP1 → SL/BE</option>
 							<option value="sl">SL</option>
-							<option value="open">Open / no entry</option>
+							<option value="open">Open</option>
+							<option value="no-entry">No entry</option>
+							<option value="expired">Expired</option>
+							<option value="invalidated">Invalidated</option>
 						</select>
-						<select id="galRegime" style="background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px; font-size:11px;">
-							<option value="all">Режим: все</option>
-							<option value="pass">Режим: pass</option>
-							<option value="block">Режим: block</option>
+						<select id="galCombo" style="background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px; font-size:11px;">
+							<option value="all">Core: все</option>
+							<option value="accepted">Combo accepted</option>
+							<option value="rejected">Combo rejected</option>
+							<option value="regime">Reject: regime</option>
+							<option value="cooldown">Reject: cooldown</option>
+						</select>
+						<select id="galDirection" style="background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:4px; padding:2px 6px; font-size:11px;">
+							<option value="all">Оба направления</option>
+							<option value="long">Long</option>
+							<option value="short">Short</option>
 						</select>
 					</div>
 					<div class="type-row"><span>Найдено</span><span id="galCount" style="font-weight:600;">0</span></div>
+					<div style="display:flex; gap:6px; margin-top:6px;">
+						<button id="galPrev" type="button">Previous</button>
+						<button id="galNext" type="button">Next</button>
+					</div>
 					<div id="galleryList" style="max-height:260px; overflow-y:auto; margin-top:4px;"></div>
 				</div>
 

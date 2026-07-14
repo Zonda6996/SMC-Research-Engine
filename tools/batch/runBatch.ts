@@ -64,6 +64,7 @@ import { netFullR, netBeR } from '../../src/core/fib/fibCosts.js'
 import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
 import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analysis/regimeFilter.js'
 import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/analysis/dedupFilter.js'
+import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
 
 // ---------- Свип детектора ----------
 
@@ -159,8 +160,15 @@ interface CliArgs {
 	 * созданные в сжатии/пиле, где ote/deep запрещены) и с инверсией+кулдауном
 	 * (*Combo). Гипотеза: fade — зеркальный сетап к deep по режиму.
 	 */
-	fade: boolean
-}
+		fade: boolean
+		/** Хронологический портфель канонического combo по всем датасетам. */
+		portfolio: boolean
+		initialEquity: number
+		riskPct: number
+		maxRiskPct: number
+		mcRuns: number
+		seed: number
+	}
 
 function parseArgs(argv: string[]): CliArgs {
 	const get = (flag: string): string | null => {
@@ -176,7 +184,7 @@ function parseArgs(argv: string[]): CliArgs {
 		untilMs = parsed
 	}
 	return {
-		symbols: (get('--symbols') ?? 'BTC/USDT,ETH/USDT,SOL/USDT').split(',').map((s) => s.trim()),
+			symbols: (get('--symbols') ?? 'BTC/USDT,ETH/USDT,SOL/USDT,XRP/USDT,BNB/USDT,DOGE/USDT,ADA/USDT,AVAX/USDT,LINK/USDT,SUI/USDT,TON/USDT,NEAR/USDT,APT/USDT,LTC/USDT').split(',').map((s) => s.trim()),
 		timeframes: (get('--timeframes') ?? '15m,30m,1h').split(',').map((s) => s.trim()),
 		limit: Math.min(Number(get('--limit') ?? MAX_CANDLES), MAX_CANDLES),
 		market: get('--market') === 'spot' ? 'spot' : 'futures',
@@ -193,6 +201,12 @@ function parseArgs(argv: string[]): CliArgs {
 		regimeFilter: argv.includes('--regime-filter'),
 		dedup: argv.includes('--dedup'),
 		fade: argv.includes('--fade'),
+		portfolio: argv.includes('--portfolio'),
+		initialEquity: Number(get('--initial-equity') ?? 10_000),
+		riskPct: Number(get('--risk-pct') ?? 1),
+		maxRiskPct: Number(get('--max-risk-pct') ?? 3),
+		mcRuns: Math.max(0, Number(get('--mc-runs') ?? 2_000)),
+		seed: Number(get('--seed') ?? 42),
 	}
 }
 
@@ -272,7 +286,7 @@ interface SliceStats {
 /**
  * EV на сделку в R для двух вариантов менеджмента — идентично формуле UI:
  * full — весь объём на TP1; be — 50% на TP1, безубыток, раннер до TP2.
- * Разрешённые сделки: TP1 либо стоп; открытые без TP1 исключаются.
+ * Р��зрешённые сделки: TP1 либо стоп; открытые без TP1 исключаются.
  * Net-варианты — те же формулы за вычетом издержек (fibCosts).
  */
 function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
@@ -794,6 +808,33 @@ function topLines(rows: ResultRow[], minIn: number, n = 10): string {
 		.join('\n')
 }
 
+function csvValue(value: unknown): string {
+	const text = value == null ? '' : String(value)
+	return /[,"\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
+}
+
+function recordsToCsv(rows: Record<string, unknown>[]): string {
+	if (!rows.length) return ''
+	const keys = Object.keys(rows[0]!)
+	return [keys.join(','), ...rows.map((row) => keys.map((key) => csvValue(row[key])).join(','))].join('\n')
+}
+
+function portfolioReport(result: ReturnType<typeof runPortfolioBacktest>, unresolved: number): string {
+	const s = result.summary
+	const pct = (n: number) => `${n.toFixed(2)}%`
+	const r = (n: number | null) => n == null ? '—' : `${n.toFixed(2)}R`
+	const mc = result.monteCarlo
+	return [
+		'=== Portfolio (canonical combo: regime → cooldown) ===',
+		`Equity: ${s.initialEquity.toFixed(2)} → ${s.finalEquity.toFixed(2)} (${pct(s.netReturnPct)})`,
+		`Accepted: ${s.accepted}; capacity rejected: ${s.capacityRejected}; unresolved excluded: ${unresolved}`,
+		`Total: ${r(s.totalR)}; EV: ${r(s.expectancyR)}; win rate: ${s.winRate == null ? '—' : pct(s.winRate * 100)}; PF: ${s.profitFactor == null ? '—' : s.profitFactor.toFixed(2)}`,
+		`Max DD: ${pct(s.maxDrawdownPct)} / ${s.maxDrawdownAmount.toFixed(2)} / ${r(s.maxDrawdownR)}; losing streak: ${s.maxLosingStreak}`,
+		`Max concurrent: ${s.maxConcurrent}; max open risk: ${pct(s.maxOpenRiskPct)}; recovery: ${s.recoveryFactor == null ? '—' : s.recoveryFactor.toFixed(2)}`,
+		mc ? `Monte Carlo (${mc.runs}, seed ${mc.seed}): return p05/med/p95 ${pct(mc.finalReturnPct.p05)} / ${pct(mc.finalReturnPct.median)} / ${pct(mc.finalReturnPct.p95)}; DD ${pct(mc.maxDrawdownPct.p05)} / ${pct(mc.maxDrawdownPct.median)} / ${pct(mc.maxDrawdownPct.p95)}` : '',
+	].filter(Boolean).join('\n')
+}
+
 // ---------- Main ----------
 
 async function main() {
@@ -801,6 +842,8 @@ async function main() {
 	const allRows: ResultRow[] = []
 	const allReach: ReachRow[] = []
 	const allRegime: RegimeRow[] = []
+	const portfolioTrades: PortfolioTrade[] = []
+	let portfolioUnresolved = 0
 	// Худшая по датасетам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -915,9 +958,24 @@ async function main() {
 										passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
 								const combo = applyDedup(regimePassed, 'cooldown').map((o) =>
 									({ ...o, scenario: `${o.scenario}Combo` }) as unknown as FibSetupOutcome)
-								comboExposure = Math.max(comboExposure, maxConcurrentTrades(combo))
-								outcomesForSlicing = [...outcomesForSlicing, ...combo]
-							}
+									comboExposure = Math.max(comboExposure, maxConcurrentTrades(combo))
+									outcomesForSlicing = [...outcomesForSlicing, ...combo]
+								}
+								// Portfolio всегда использует тот же канонический порядок: regime → cooldown.
+								// Берём только full/base, иначе split/sweep искусственно дублируют сделки.
+								if (args.portfolio && variant.id === 'base' && period === 'full') {
+									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
+									const eligible = snapshot.fibLifecycle.outcomes.filter((o) =>
+										['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario) && o.stopMode === 'zero' &&
+										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+									const combo = applyDedup(eligible, 'cooldown')
+									for (const outcome of combo) {
+										if (!outcome.entered) continue
+										const trade = outcomeToPortfolioTrade(symbol, timeframe, snapshot.candles, outcome)
+										if (trade) portfolioTrades.push(trade)
+										else portfolioUnresolved++
+									}
+								}
 							// Волна 5 (SPEC 7.19): fade — зеркальная гипотеза. Deep живёт
 							// в импульсе, fade должен жить там, где deep запрещён:
 							// *Inv — только сетапы, созданные в сжатии/пиле (инверсия
@@ -970,6 +1028,21 @@ async function main() {
 	if (allReach.length > 0) writeFileSync(reachCsvPath, reachToCsv(allReach))
 	const regimeCsvPath = join(RESULTS_DIR, `regime-${stamp}${untilTag}.csv`)
 	if (allRegime.length > 0) writeFileSync(regimeCsvPath, regimeToCsv(allRegime))
+	let portfolioFiles: string[] = []
+	if (args.portfolio) {
+		const result = runPortfolioBacktest(portfolioTrades, {
+			initialEquity: args.initialEquity, riskPct: args.riskPct, maxRiskPct: args.maxRiskPct,
+			mcRuns: args.mcRuns, seed: args.seed,
+		})
+		const prefix = join(RESULTS_DIR, `portfolio-${stamp}${untilTag}`)
+		const ledgerPath = `${prefix}-ledger.csv`, equityPath = `${prefix}-equity.csv`, monthlyPath = `${prefix}-monthly.csv`, breakdownPath = `${prefix}-breakdown.csv`
+		writeFileSync(ledgerPath, recordsToCsv(result.ledger as unknown as Record<string, unknown>[]))
+		writeFileSync(equityPath, recordsToCsv(result.equity as unknown as Record<string, unknown>[]))
+		writeFileSync(monthlyPath, recordsToCsv(result.monthly as unknown as Record<string, unknown>[]))
+		writeFileSync(breakdownPath, recordsToCsv(result.breakdown as unknown as Record<string, unknown>[]))
+		portfolioFiles = [ledgerPath, equityPath, monthlyPath, breakdownPath]
+		console.log(`\n${portfolioReport(result, portfolioUnresolved)}\n`)
+	}
 
 	console.log(`\n=== Top by EV_be (In >= ${args.minIn}) ===\n`)
 	console.log(topLines(allRows, args.minIn))
@@ -984,6 +1057,7 @@ async function main() {
 	console.log(`\nCSV (all ${allRows.length} rows): ${csvPath}`)
 	if (allReach.length > 0) console.log(`Reach CSV (${allReach.length} rows): ${reachCsvPath}`)
 	if (allRegime.length > 0) console.log(`Regime CSV (${allRegime.length} rows): ${regimeCsvPath}`)
+	if (portfolioFiles.length > 0) console.log(`Portfolio CSV:\n${portfolioFiles.map((p) => `  ${p}`).join('\n')}`)
 	if (args.dedup) {
 		console.log(`\nMax concurrent same-direction trades (worst dataset):`)
 		console.log(`  before dedup:  ${dedupExposure.before}`)

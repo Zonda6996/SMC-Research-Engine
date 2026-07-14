@@ -13,7 +13,9 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join, extname } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
-import { DEFAULT_REGIME_FILTER } from '../../src/core/analysis/regimeFilter.js'
+import { DEFAULT_REGIME_FILTER, passesRegimeFilter } from '../../src/core/analysis/regimeFilter.js'
+import { applyDedup } from '../../src/core/analysis/dedupFilter.js'
+import { netBeR } from '../../src/core/fib/fibCosts.js'
 import { fetchCandlesPaginated } from '../shared/candleFetcher.js'
 import { probeSwingBreaches, type BreachMode } from './lastSwingBreachProbe.js'
 import {
@@ -198,6 +200,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					// Метрики режима (SPEC 7.15) на момент создания каждого сетапа —
 					// для галереи сетапов. Пороги фильтра — из волны 2 (regimeFilter.ts).
 					regime: buildRegimePayload(snapshot),
+					combo: buildComboPayload(snapshot),
 				// Все protected-уровни для отрисовки сегментов (из breached + активные).
 				protectedSegments: buildProtectedSegments(
 					protectedBreaches,
@@ -272,6 +275,31 @@ function buildRegimePayload(snapshot: ReturnType<typeof runAnalysis>) {
 			scenarios: [...DEFAULT_REGIME_FILTER.scenarios],
 		},
 	}
+}
+
+function comboKey(o: { candidateId: string; variantMode: string; scenario: string; stopMode: string }): string {
+	return `${o.candidateId}|${o.variantMode}|${o.scenario}|${o.stopMode}`
+}
+
+/** Канонический статус каждой core-сетки: regime, затем cooldown. */
+function buildComboPayload(snapshot: ReturnType<typeof runAnalysis>) {
+	const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
+	const core = snapshot.fibLifecycle.outcomes.filter((o) =>
+		['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario) && o.stopMode === 'zero')
+	const regimePassed = core.filter((o) =>
+		!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex]))
+	const survivors = new Set(applyDedup(regimePassed, 'cooldown'))
+	const byKey: Record<string, { accepted: boolean; reason: 'accepted' | 'regime' | 'cooldown'; netR: number | null }> = {}
+	for (const outcome of core) {
+		const regimeOk = !DEFAULT_REGIME_FILTER.scenarios.has(outcome.scenario) || passesRegimeFilter(outcome.scenario, metrics[outcome.createdAtIndex])
+		const netR = netBeR(outcome)
+		byKey[comboKey(outcome)] = !regimeOk
+			? { accepted: false, reason: 'regime', netR }
+			: survivors.has(outcome)
+				? { accepted: true, reason: 'accepted', netR }
+				: { accepted: false, reason: 'cooldown', netR }
+	}
+	return { byKey, order: ['regime', 'cooldown'] }
 }
 
 function countByType(events: { type: string }[]): { bos: number; choch: number; unlabeled: number } {
