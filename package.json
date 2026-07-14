@@ -18,7 +18,8 @@
 	"type": "module",
 	"dependencies": {
 		"ccxt": "^4.5.62",
-		"lightweight-charts": "^5.2.0"
+		"lightweight-charts": "^5.2.0",
+		"xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
 	},
 	"devDependencies": {
 		"@types/node": "^26.0.1",
