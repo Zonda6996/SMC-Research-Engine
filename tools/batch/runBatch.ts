@@ -38,6 +38,10 @@
 //                 Сравнение до/после в одном CSV; breaker не фильтруется.
 //                 Вместе с --regime-filter добавляет также *Combo (волна 4,
 //                 SPEC 7.17): итоговый плейбук — regime-фильтр, затем cooldown.
+//   --fade        волна 5 (SPEC 7.19): вернуть fade141c/fade241nc в сводку и
+//                 добавить *Inv (только сетапы из сжатия/пилы — инверсия
+//                 фильтра 7.15) и *Combo (инверсия + cooldown). Гипотеза:
+//                 fade — зеркальный к deep сетап по режиму рынка.
 //   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
 //                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
 //                 не создавать сетап пока предыдущая сделка жива), *DedupOp
@@ -144,11 +148,18 @@ interface CliArgs {
 	 */
 	regimeFilter: boolean
 	/**
-	 * Волна 3 (SPEC 7.16): добавить в сводку дедуплицированные копии ядра
+	 * Волна 4 (SPEC 7.17): добавить в сводку дедуплицированные копии ядра
 	 * по трём правилам (суффиксы DedupCd/DedupOp/DedupLo) + напечатать
 	 * максимальную одновременную экспозицию до/после.
 	 */
 	dedup: boolean
+	/**
+	 * Волна 5 (SPEC 7.19): вернуть в сводку fade141c/fade241nc и добавить
+	 * их копии с ИНВЕРТИРОВАННЫМ фильтром режима (*Inv — только сетапы,
+	 * созданные в сжатии/пиле, где ote/deep запрещены) и с инверсией+кулдауном
+	 * (*Combo). Гипотеза: fade — зеркальный сетап к deep по режиму.
+	 */
+	fade: boolean
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -181,6 +192,7 @@ function parseArgs(argv: string[]): CliArgs {
 		regimeCsv: argv.includes('--regime-csv'),
 		regimeFilter: argv.includes('--regime-filter'),
 		dedup: argv.includes('--dedup'),
+		fade: argv.includes('--fade'),
 	}
 }
 
@@ -398,6 +410,18 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 		for (const s of ['ote', 'deep', 'breaker', 'breaker161']) {
 			scenarioSlices.push({ scenario: `${s}Combo`, stopMode: 'zero' })
 		}
+	}
+	// Волна 5 (SPEC 7.19): fade с инвертированным режимом (*Inv) и
+	// инверсия+кулдаун (*Combo). Оригиналы возвращены для сравнения.
+	if (outcomes.some((o) => o.scenario.endsWith('Inv'))) {
+		scenarioSlices.push(
+			{ scenario: 'fade141c', stopMode: 'far' },
+			{ scenario: 'fade241nc', stopMode: 'zoneAtr' },
+			{ scenario: 'fade141cInv', stopMode: 'far' },
+			{ scenario: 'fade241ncInv', stopMode: 'zoneAtr' },
+			{ scenario: 'fade141cCombo', stopMode: 'far' },
+			{ scenario: 'fade241ncCombo', stopMode: 'zoneAtr' },
+		)
 	}
 
 	for (const anchor of anchors) {
@@ -893,6 +917,25 @@ async function main() {
 									({ ...o, scenario: `${o.scenario}Combo` }) as unknown as FibSetupOutcome)
 								comboExposure = Math.max(comboExposure, maxConcurrentTrades(combo))
 								outcomesForSlicing = [...outcomesForSlicing, ...combo]
+							}
+							// Волна 5 (SPEC 7.19): fade — зеркальная гипотеза. Deep живёт
+							// в импульсе, fade должен жить там, где deep запрещён:
+							// *Inv — только сетапы, созданные в сжатии/пиле (инверсия
+							// фильтра 7.15), *Combo — инверсия + cooldown.
+							if (args.fade && variant.id === 'base') {
+								const metrics = computeRegimeMetrics(
+									snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory,
+								)
+								const fades = snapshot.fibLifecycle.outcomes.filter((o) =>
+									(o.scenario === 'fade141c' && o.stopMode === 'far') ||
+									(o.scenario === 'fade241nc' && o.stopMode === 'zoneAtr'))
+								// Инверсия: оставляем то, что фильтр deep ЗАБЛОКИРОВАЛ БЫ.
+								const inv = fades.filter((o) => !passesRegimeFilter('deep', metrics[o.createdAtIndex]))
+								const invLabeled = inv.map((o) =>
+									({ ...o, scenario: `${o.scenario}Inv` }) as unknown as FibSetupOutcome)
+								const fadeCombo = applyDedup(inv, 'cooldown').map((o) =>
+									({ ...o, scenario: `${o.scenario}Combo` }) as unknown as FibSetupOutcome)
+								outcomesForSlicing = [...outcomesForSlicing, ...invLabeled, ...fadeCombo]
 							}
 							allRows.push(...sliceDataset(symbol, timeframe, variant.id, period, outcomesForSlicing, args.atrThresholds))
 						allReach.push(...sliceReach(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.reach))
