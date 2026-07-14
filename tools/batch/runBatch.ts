@@ -268,7 +268,7 @@ interface SliceStats {
 	slPct: number | null
 	evFull: number | null
 	evBe: number | null
-	/** Net EV (комиссия + слиппедж, см. fibCosts) — gross не подменяется. */
+	/** Net EV (комиссия + слиппедж, см. fibCosts) — gross не подменяетс��. */
 	evFullNet: number | null
 	evBeNet: number | null
 	/** Доля stopped-сделок, где после стопа цена всё же дошла до TP1. */
@@ -976,14 +976,22 @@ async function main() {
 								}
 								// Portfolio всегда использует тот же канонический порядок: regime → cooldown.
 								// Берём только full/base, иначе split/sweep искусственно дублируют сделки.
+								// breaker161/breaker200 — альтернативные правила того же сетапа, не
+								// независимые сделки: в канонический портфель входит только breaker.
 								if (args.portfolio && variant.id === 'base' && period === 'full') {
 									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
 									const eligible = snapshot.fibLifecycle.outcomes.filter((o) =>
-										['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario) && o.stopMode === 'zero' &&
+										['ote', 'deep', 'breaker'].includes(o.scenario) && o.stopMode === 'zero' &&
 										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
 									const combo = applyDedup(eligible, 'cooldown')
+									// Одна экономическая позиция на сетку: local/global варианты одной
+									// сетки и сценария — это один сетап, а не две независимые сделки.
+									const takenGrids = new Set<string>()
 									for (const outcome of combo) {
 										if (!outcome.entered) continue
+										const gridKey = `${outcome.scenario}|${outcome.candidateId}`
+										if (takenGrids.has(gridKey)) continue
+										takenGrids.add(gridKey)
 										const trade = outcomeToPortfolioTrade(symbol, timeframe, snapshot.candles, outcome)
 										if (trade) portfolioTrades.push(trade)
 										else portfolioUnresolved++

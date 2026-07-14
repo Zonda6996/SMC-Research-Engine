@@ -42,6 +42,30 @@ test('tie breaks are deterministic by symbol', () => {
 	])
 })
 
+test('duplicate trade ids cannot change equity twice or hold two slots', () => {
+	const result = runPortfolioBacktest([
+		trade('dup', 1, 10, 2), trade('dup', 1, 10, 2), trade('b', 2, 10, 1),
+	], { initialEquity: 10_000, riskPct: 1, maxRiskPct: 3, mcRuns: 0 })
+	assert.equal(result.ledger.length, 2) // дубль исчез целиком, не стал reject
+	assert.equal(result.summary.accepted, 2)
+	assert.equal(result.summary.totalR, 3)
+	assert.equal(result.summary.maxConcurrent, 2)
+	assert.equal(result.summary.finalEquity.toFixed(2), '10300.00')
+})
+
+test('duplicates do not steal capacity from real trades', () => {
+	const result = runPortfolioBacktest([
+		trade('a', 1, 10, 1), trade('a', 1, 10, 1), trade('a', 1, 10, 1),
+		trade('b', 2, 10, 1), trade('c', 3, 10, 1), trade('d', 4, 10, 1),
+	], { initialEquity: 10_000, riskPct: 1, maxRiskPct: 3, mcRuns: 0 })
+	// без дедупа: 3 копии `a` заняли бы весь лимит и вытеснили b/c/d
+	assert.equal(result.summary.accepted, 3)
+	assert.equal(result.summary.capacityRejected, 1)
+	assert.deepEqual(result.ledger.map((r) => [r.id, r.status]), [
+		['a', 'accepted'], ['b', 'accepted'], ['c', 'accepted'], ['d', 'capacity-rejected'],
+	])
+})
+
 test('seeded Monte Carlo is reproducible', () => {
 	const trades = [trade('a', 1, 2, 1), trade('b', 3, 4, -1), trade('c', 5, 6, 2)]
 	const a = runPortfolioBacktest(trades, { mcRuns: 100, seed: 77 }).monteCarlo

@@ -87,10 +87,26 @@ function tradeOrder(a: PortfolioTrade, b: PortfolioTrade): number {
 	return a.entryAt - b.entryAt || a.symbol.localeCompare(b.symbol) || a.timeframe.localeCompare(b.timeframe) || a.scenario.localeCompare(b.scenario) || a.id.localeCompare(b.id)
 }
 
+/**
+ * Жёсткая дедупликация по id: одна экономическая сделка не может дважды
+ * менять equity и дважды занимать risk-slot. Дубли возникают, когда local-
+ * и global-варианты одной сетки дают одинаковый вход (одинаковый id).
+ */
+export function dedupePortfolioTrades(input: PortfolioTrade[]): PortfolioTrade[] {
+	const seen = new Set<string>()
+	const result: PortfolioTrade[] = []
+	for (const trade of input) {
+		if (seen.has(trade.id)) continue
+		seen.add(trade.id)
+		result.push(trade)
+	}
+	return result
+}
+
 export function runPortfolioBacktest(input: PortfolioTrade[], partial: Partial<PortfolioConfig> = {}): PortfolioResult {
 	const config = { ...DEFAULT_PORTFOLIO_CONFIG, ...partial }
 	if (config.initialEquity <= 0 || config.riskPct <= 0 || config.maxRiskPct < config.riskPct) throw new Error('Invalid portfolio risk configuration')
-	const trades = [...input].sort(tradeOrder)
+	const trades = dedupePortfolioTrades([...input].sort(tradeOrder))
 	const active: { trade: PortfolioTrade; riskPct: number; riskAmount: number; row: PortfolioLedgerRow }[] = []
 	const ledger: PortfolioLedgerRow[] = []
 	const equity: EquityPoint[] = [{ at: trades[0]?.entryAt ?? 0, equity: config.initialEquity, drawdownPct: 0 }]
