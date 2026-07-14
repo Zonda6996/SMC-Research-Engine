@@ -169,9 +169,15 @@ interface CliArgs {
 		mcRuns: number
 		seed: number
 		/** Research controls; null keeps the historical baseline unchanged. */
-		entryExpiryBars: number | null
-		tradeTimeStopBars: number | null
-		}
+	entryExpiryBars: number | null
+	tradeTimeStopBars: number | null
+	/**
+	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
+	 * По умолчанию полный канон: ote,deep,breaker. Неизвестные имена — ошибка,
+	 * чтобы опечатка не превращалась в молчаливый прогон полного набора.
+	 */
+	portfolioScenarios: string[]
+	}
 
 function parseArgs(argv: string[]): CliArgs {
 	const get = (flag: string): string | null => {
@@ -212,7 +218,21 @@ function parseArgs(argv: string[]): CliArgs {
 			seed: Number(get('--seed') ?? 42),
 			entryExpiryBars: get('--entry-expiry-bars') == null ? null : Math.max(0, Number(get('--entry-expiry-bars'))),
 			tradeTimeStopBars: get('--trade-time-stop-bars') == null ? null : Math.max(0, Number(get('--trade-time-stop-bars'))),
+			portfolioScenarios: resolvePortfolioScenarios(get('--scenarios')),
 		}
+}
+
+const CANONICAL_PORTFOLIO_SCENARIOS = ['ote', 'deep', 'breaker'] as const
+
+/** --scenarios ote,deep — подмножество канона; опечатки падают с ошибкой. */
+function resolvePortfolioScenarios(flag: string | null): string[] {
+	if (!flag) return [...CANONICAL_PORTFOLIO_SCENARIOS]
+	const requested = flag.split(',').map((s) => s.trim()).filter(Boolean)
+	const unknown = requested.filter((s) => !CANONICAL_PORTFOLIO_SCENARIOS.includes(s as never))
+	if (unknown.length > 0 || requested.length === 0) {
+		throw new Error(`Bad --scenarios: ${flag}. Allowed: ${CANONICAL_PORTFOLIO_SCENARIOS.join(', ')}`)
+	}
+	return requested
 }
 
 /** Без --sweep — только base; --sweep — все; --variants id,id — выборочно. */
@@ -268,7 +288,7 @@ interface SliceStats {
 	slPct: number | null
 	evFull: number | null
 	evBe: number | null
-	/** Net EV (комиссия + слиппедж, см. fibCosts) — gross не подменяетс��. */
+	/** Net EV (комиссия + слиппедж, см. fibCosts) — gross не подменяетс����. */
 	evFullNet: number | null
 	evBeNet: number | null
 	/** Доля stopped-сделок, где после стопа цена всё же дошла до TP1. */
@@ -863,7 +883,9 @@ async function main() {
 
 	console.log(`\nBatch: ${args.symbols.join(', ')} × ${args.timeframes.join(', ')} × ${args.limit} candles (${args.market})${args.untilLabel ? ` until ${args.untilLabel}` : ''}`)
 	console.log(`ATR thresholds: ${args.atrThresholds.join(', ')}; min In: ${args.minIn}${args.fixture ? '; FIXTURE MODE' : ''}`)
-	console.log(`Detector variants: ${args.variants.map((v) => v.id).join(', ')}${args.split > 1 ? `; time split: ${args.split}` : ''}\n`)
+	console.log(`Detector variants: ${args.variants.map((v) => v.id).join(', ')}${args.split > 1 ? `; time split: ${args.split}` : ''}`)
+	if (args.portfolio) console.log(`Portfolio scenarios: ${args.portfolioScenarios.join(', ')}`)
+	console.log('')
 
 	for (const symbol of args.symbols) {
 		for (const timeframe of args.timeframes) {
@@ -981,7 +1003,7 @@ async function main() {
 								if (args.portfolio && variant.id === 'base' && period === 'full') {
 									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
 									const eligible = snapshot.fibLifecycle.outcomes.filter((o) =>
-										['ote', 'deep', 'breaker'].includes(o.scenario) && o.stopMode === 'zero' &&
+										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
 										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
 									const combo = applyDedup(eligible, 'cooldown')
 									// Одна экономическая позиция на сетку: local/global варианты одной
