@@ -37,6 +37,7 @@ function makeOutcome(overrides: Partial<FibSetupOutcome>): FibSetupOutcome {
 		rStop: -1,
 		exposure: 1,
 		beAfterTp1: false,
+		beIndex: null,
 		mfeR: 4,
 		maeR: 0,
 		maxExtensionRatio: null,
@@ -79,6 +80,11 @@ describe('fibCosts', () => {
 		// 0.5×2 − (100×0.0007 + 0.5×120×0.0005 + 0.5×100×0.0007)/10
 		// = 1 − 0.0135 = 0.9865
 		close(netBeR(be), 0.9865)
+	})
+
+	it('netBeR: BE имеет приоритет над ошибочно сохранённым поздним TP2', () => {
+		const lateTp2 = makeOutcome({ beAfterTp1: true, beIndex: 3, tp2Hit: true, tp2Index: 4, state: 'tp2' })
+		close(netBeR(lateTp2), 0.9865)
 	})
 
 	it('netBeR: loss без TP1 = −1 минус издержки входа и стопа', () => {

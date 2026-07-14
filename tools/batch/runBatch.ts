@@ -168,7 +168,10 @@ interface CliArgs {
 		maxRiskPct: number
 		mcRuns: number
 		seed: number
-	}
+		/** Research controls; null keeps the historical baseline unchanged. */
+		entryExpiryBars: number | null
+		tradeTimeStopBars: number | null
+		}
 
 function parseArgs(argv: string[]): CliArgs {
 	const get = (flag: string): string | null => {
@@ -206,8 +209,10 @@ function parseArgs(argv: string[]): CliArgs {
 		riskPct: Number(get('--risk-pct') ?? 1),
 		maxRiskPct: Number(get('--max-risk-pct') ?? 3),
 		mcRuns: Math.max(0, Number(get('--mc-runs') ?? 2_000)),
-		seed: Number(get('--seed') ?? 42),
-	}
+			seed: Number(get('--seed') ?? 42),
+			entryExpiryBars: get('--entry-expiry-bars') == null ? null : Math.max(0, Number(get('--entry-expiry-bars'))),
+			tradeTimeStopBars: get('--trade-time-stop-bars') == null ? null : Math.max(0, Number(get('--trade-time-stop-bars'))),
+		}
 }
 
 /** Без --sweep — только base; --sweep — все; --variants id,id — выборочно. */
@@ -274,7 +279,7 @@ interface SliceStats {
 	ext241Pct: number | null
 	/**
 	 * MAE победителей (сделок, достигших TP1) — база для сокращения стопа:
-	 * медиана и p90 худшей просадки в R (maeR отрицателен; −1 = полный стоп).
+	 * медиана и p90 худшей просадки в R (maeR отрицателен; −1 = полн��й стоп).
 	 * Если 90% победителей не проседают глубже −0.5R, стоп можно вдвое короче
 	 * ценой ~10% побед — а R каждой сделки удваивается.
 	 */
@@ -304,7 +309,7 @@ function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
 		// Волна 4 (scale-in): лосс = rStop (< 1R по модулю, если добор не
 		// сработал); обычные сценарии несут rStop = −1 — формула эквивалентна.
 		fullSum += o.tp1Hit ? (o.rTp1 ?? 0) : (o.rStop ?? -1)
-		beSum += o.tp1Hit ? 0.5 * (o.rTp1 ?? 0) + (o.state === 'tp2' ? 0.5 * (o.rTp2 ?? 0) : 0) : (o.rStop ?? -1)
+		beSum += o.tp1Hit ? 0.5 * (o.rTp1 ?? 0) + (o.state === 'tp2' && o.beIndex == null && o.beAfterTp1 !== true ? 0.5 * (o.rTp2 ?? 0) : 0) : (o.rStop ?? -1)
 		fullNetSum += netFullR(o) ?? 0
 		beNetSum += netBeR(o) ?? 0
 	}
@@ -400,6 +405,8 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 		{ scenario: 'deep', stopMode: 'zero200' },
 		{ scenario: 'breaker', stopMode: 'zero' },
 		{ scenario: 'breaker161', stopMode: 'zero' },
+		// Исследовательский A/B: не входит в канонический combo-портфель.
+		{ scenario: 'breaker200', stopMode: 'zero' },
 	]
 	// Волна 2 фильтра режима: сравнение до/после на идентичных выборках.
 	// Строки появляются только когда main подмешал релейбленные исходы
@@ -908,7 +915,13 @@ async function main() {
 					const vLabel = `${label} [${variant.id}${period === 'full' ? '' : ` ${period}`}]`
 					try {
 						const started = Date.now()
-						const snapshot = runAnalysis(chunk, { bosChoch: variant.config })
+						const snapshot = runAnalysis(chunk, {
+					bosChoch: variant.config,
+					lifecycle: {
+						entryExpiryBars: args.entryExpiryBars,
+						tradeTimeStopBars: args.tradeTimeStopBars,
+					},
+				})
 						// Волна 2 фильтра режима: релейбленные копии прошедших фильтр
 						// исходов (oteRegime/deepRegime) подмешиваются к оригиналам —
 						// сравнение до/после в одной сводке. Только базовый конфиг.

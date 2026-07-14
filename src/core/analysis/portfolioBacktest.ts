@@ -62,11 +62,14 @@ export function outcomeToPortfolioTrade(symbol: string, timeframe: string, candl
 	const netR = netBeR(outcome)
 	if (netR == null || outcome.entryIndex == null) return null
 	const entry = candles[outcome.entryIndex]
-	const exitIndex = outcome.state === 'stopped'
-		? outcome.stopIndex
-		: outcome.state === 'tp2'
-			? outcome.tp2Index
-			: outcome.tp1Index
+	const exitIndex = outcome.beIndex
+		?? (outcome.state === 'stopped'
+			? outcome.stopIndex
+			: outcome.state === 'tp2'
+					? outcome.tp2Index
+					: outcome.state === 'timed-out'
+						? outcome.timeStopIndex
+						: outcome.tp1Index)
 	if (!entry || exitIndex == null || !candles[exitIndex]) return null
 	return {
 		id: `${symbol}|${timeframe}|${outcome.scenario}|${outcome.candidateId}|${outcome.entryIndex}`,

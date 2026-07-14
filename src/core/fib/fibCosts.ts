@@ -38,7 +38,7 @@ function isResolved(outcome: FibSetupOutcome): boolean {
 		outcome.entryPrice != null &&
 		outcome.riskSize != null &&
 		outcome.riskSize > 0 &&
-		(outcome.tp1Hit || outcome.state === 'stopped')
+		(outcome.tp1Hit || outcome.state === 'stopped' || outcome.state === 'timed-out')
 	)
 }
 
@@ -64,6 +64,9 @@ export function netFullR(outcome: FibSetupOutcome): number | null {
 		const tp1Price = targetPrice(outcome, outcome.rTp1 ?? 0)
 		return (outcome.rTp1 ?? 0) - entryCost - fillCostR(tp1Price, FEE_RATE, size, risk)
 	}
+	if (outcome.state === 'timed-out' && outcome.timeStopPrice != null && outcome.timeStopR != null) {
+		return outcome.timeStopR - entryCost - fillCostR(outcome.timeStopPrice, FEE_RATE + SLIP_RATE, size, risk)
+	}
 	return (outcome.rStop ?? -1) - entryCost - fillCostR(outcome.stopPrice, FEE_RATE + SLIP_RATE, size, risk)
 }
 
@@ -85,14 +88,19 @@ export function netBeR(outcome: FibSetupOutcome): number | null {
 	const entryCost = fillCostR(entry, FEE_RATE + SLIP_RATE, size, risk)
 
 	if (!outcome.tp1Hit) {
+		if (outcome.state === 'timed-out' && outcome.timeStopPrice != null && outcome.timeStopR != null) {
+			return outcome.timeStopR - entryCost - fillCostR(outcome.timeStopPrice, FEE_RATE + SLIP_RATE, size, risk)
+		}
 		return (outcome.rStop ?? -1) - entryCost - fillCostR(outcome.stopPrice, FEE_RATE + SLIP_RATE, size, risk)
 	}
 
 	const tp1Price = targetPrice(outcome, outcome.rTp1 ?? 0)
 	let net = 0.5 * (outcome.rTp1 ?? 0) - entryCost - fillCostR(tp1Price, FEE_RATE, 0.5 * size, risk)
-	if (outcome.state === 'tp2') {
+	if (outcome.state === 'tp2' && outcome.beIndex == null && outcome.beAfterTp1 !== true) {
 		const tp2Price = targetPrice(outcome, outcome.rTp2 ?? 0)
 		net += 0.5 * (outcome.rTp2 ?? 0) - fillCostR(tp2Price, FEE_RATE, 0.5 * size, risk)
+	} else if (outcome.state === 'timed-out' && outcome.timeStopPrice != null && outcome.timeStopR != null) {
+		net += 0.5 * outcome.timeStopR - fillCostR(outcome.timeStopPrice, FEE_RATE + SLIP_RATE, 0.5 * size, risk)
 	} else {
 		// Раннер закрыт BE-стопом по цене входа: gross 0, издержки рыночного филла.
 		net -= fillCostR(entry, FEE_RATE + SLIP_RATE, 0.5 * size, risk)

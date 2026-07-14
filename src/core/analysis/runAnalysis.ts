@@ -21,6 +21,10 @@ export interface RunAnalysisOptions {
 	 * совпадать с фактическим окном пивотов, иначе появится look-ahead.
 	 */
 	bosChoch?: Partial<BosChochConfig>
+	lifecycle?: {
+		entryExpiryBars?: number | null
+		tradeTimeStopBars?: number | null
+	}
 }
 
 /**
@@ -48,7 +52,7 @@ export function runAnalysis(candles: Candle[], options: RunAnalysisOptions = {})
 	const legStrength = new LegStrengthEngine().build(swingLegs, atr)
 	const events = new BosChochEngine({ ...options.bosChoch, pivotWindow }).build(structure, candles)
 	const fib = new FibGridEngine().build({ events, candles, atr })
-	const fibLifecycle = new FibLifecycleEngine().build({ candidates: fib.candidates, events, candles })
+	const fibLifecycle = new FibLifecycleEngine().build({ candidates: fib.candidates, events, candles, ...options.lifecycle })
 
 	return {
 		candles,

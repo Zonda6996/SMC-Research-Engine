@@ -43,6 +43,9 @@ export interface FibLifecycleInput {
 	candidates: FibGridCandidate[]
 	events: StructureEvent[]
 	candles: Candle[]
+	/** Необязательные research-ограничения; отсутствие сохраняет baseline. */
+	entryExpiryBars?: number | null
+	tradeTimeStopBars?: number | null
 }
 
 const ANCHOR_MODES: FibAnchorMode[] = ['local', 'global']
@@ -176,7 +179,7 @@ export class FibLifecycleEngine {
 		const away = long ? -1 : 1
 
 		// Индекс подтверждения первого противоположного события после создания —
-		// с этого бара невошедшие сетапы экспирируются.
+		// с этого бара не��ошедшие сетапы экспирируются.
 		const expiryIndex = this.firstOppositeConfirm(candidate.direction, candidate.createdAtIndex, input.events)
 
 		// Предусловие breaker: касание 141 ДО касания OTE-зоны (78.6).
@@ -277,10 +280,18 @@ export class FibLifecycleEngine {
 			// не эмитим вовсе (эквивалент expired, в EV не участвует).
 			const extBar = input.candles[extIndex]
 			const insta161 = extBar != null && (long ? extBar.high >= p161 : extBar.low <= p161)
-			if (!insta161) {
-				const spec = trend('breaker161', 'zero', p100, p0, extIndex + 1)
-				scenarios.push({ ...spec, cancelLevel: p161 })
-			}
+				if (!insta161) {
+					const spec = trend('breaker161', 'zero', p100, p0, extIndex + 1)
+					scenarios.push({ ...spec, cancelLevel: p161 })
+				}
+				// Исследовательский мягкий вариант: ретест 100 остаётся валидным
+				// только пока импульс не достиг расширения 200.
+				const insta200 = extBar != null && (long ? extBar.high >= p200 : extBar.low <= p200)
+				if (!insta200) {
+					const spec = trend('breaker200', 'zero', p100, p0, extIndex + 1)
+					scenarios.push({ ...spec, cancelLevel: p200 })
+				}
+
 		}
 		// Fade-зоны: стоп за дальней границей ('zone') и + 0.5 ATR ('zoneAtr').
 		// Дальняя граница лежит В НАПРАВЛЕНИИ сетки (против сделки), поэтому
@@ -324,8 +335,10 @@ export class FibLifecycleEngine {
 				extension: spec.trackExtension ? { p0, legSize: variant.legSize } : null,
 				confirmClose: spec.confirmClose ?? false,
 				cancelLevel: spec.cancelLevel ?? null,
-				addLevel: spec.addLevel ?? null,
-			}),
+					addLevel: spec.addLevel ?? null,
+					entryExpiryBars: input.entryExpiryBars ?? null,
+					tradeTimeStopBars: input.tradeTimeStopBars ?? null,
+				}),
 		)
 	}
 
@@ -387,8 +400,10 @@ export class FibLifecycleEngine {
 			 * Позиция 50/50, 1R = плановый риск полной позиции. Добор — только
 			 * до TP1. null — обычный сценарий одним объёмом.
 			 */
-			addLevel?: number | null
-		},
+				addLevel?: number | null
+				entryExpiryBars: number | null
+				tradeTimeStopBars: number | null
+			},
 	): FibSetupOutcome {
 		const base: FibSetupOutcome = {
 			candidateId: candidate.id,
@@ -417,8 +432,12 @@ export class FibLifecycleEngine {
 			rTp2: null,
 			rStop: null,
 			exposure: null,
-			beAfterTp1: null,
-			mfeR: null,
+				beAfterTp1: null,
+				beIndex: null,
+				timeStopIndex: null,
+				timeStopPrice: null,
+				timeStopR: null,
+				mfeR: null,
 			maeR: null,
 			maxExtensionRatio: null,
 			tpAfterStop: null,
@@ -436,8 +455,11 @@ export class FibLifecycleEngine {
 		let entryIndex = -1
 		let entryPriceActual = ctx.entryLevel
 		let touched = false
-		for (let i = ctx.fromIndex; i < candles.length; i++) {
-			// Экспирация проверяется на баре подтверждения противоположного события:
+			for (let i = ctx.fromIndex; i < candles.length; i++) {
+				if (ctx.entryExpiryBars != null && ctx.entryExpiryBars >= 0 && i - ctx.fromIndex >= ctx.entryExpiryBars) {
+					return { ...base, state: 'expired' }
+				}
+				// Экспирация проверяется на баре подтверждения противоположного события:
 			// сетап отменён структурным разворотом.
 			if (ctx.expiryIndex != null && i >= ctx.expiryIndex) {
 				return { ...base, state: 'expired' }
@@ -540,11 +562,15 @@ export class FibLifecycleEngine {
 		let tp1Index: number | null = null
 		let tp2Hit = false
 		let tp2Index: number | null = null
-		let stopIndex: number | null = null
+			let stopIndex: number | null = null
+			let timeStopIndex: number | null = null
+			let timeStopPrice: number | null = null
+			let timeStopR: number | null = null
 		// Для менеджмента «безубыток после TP1»: вернулась ли ��ена к входу
 		// раньше TP2. Бар касания TP1 проверяется консервативно (см. модель).
-		let beAfterTp1: boolean | null = null
-		let mfeR = 0
+			let beAfterTp1: boolean | null = null
+			let beIndex: number | null = null
+			let mfeR = 0
 		let maeR = 0
 		let finalIndex = candles.length - 1
 		let state: FibSetupOutcome['state'] = 'open'
@@ -581,34 +607,54 @@ export class FibLifecycleEngine {
 
 			const touchedEntryBack = long ? candle.low <= avgEntry : candle.high >= avgEntry
 
-			// Возврат к входу после TP1 (до TP2) — раннер при безубытке закрыт в 0.
-			if (tp1Hit && beAfterTp1 == null && !hitTp2 && touchedEntryBack) {
-				beAfterTp1 = true
-			}
+				// После уже взятого TP1 первый возврат к средней цене входа закрывает
+				// раннер в BE. При конфликте BE/TP2 внутри бара выбираем BE.
+				if (tp1Hit && touchedEntryBack) {
+					beAfterTp1 = true
+					beIndex = i
+					finalIndex = i
+					state = 'breakeven'
+					break
+				}
 
-			// Конфликт внутри бара: стоп имеет приоритет (консервативно лосс).
-			if (hitStop) {
-				stopIndex = i
-				finalIndex = i
-				state = 'stopped'
-				if (tp1Hit && beAfterTp1 == null) beAfterTp1 = true
-				break
+				// До TP1 конфликт внутри бара со стопом трактуется консервативно как лосс.
+				if (hitStop) {
+					stopIndex = i
+					finalIndex = i
+					state = 'stopped'
+					break
+				}
+				if (hitTp1 && !tp1Hit) {
+					tp1Hit = true
+					tp1Index = i
+					// Если свеча TP1 одновременно вернулась к входу, последовательность
+					// неизвестна: фиксируем консервативный немедленный BE раннера.
+					if (touchedEntryBack) {
+						beAfterTp1 = true
+						beIndex = i
+						finalIndex = i
+						state = 'breakeven'
+						break
+					}
+				}
+					if (hitTp2) {
+						tp2Hit = true
+						tp2Index = i
+						finalIndex = i
+						state = 'tp2'
+						beAfterTp1 = false
+						break
+					}
+					// Закрытие по close только после обработки intrabar stop/targets.
+					if (ctx.tradeTimeStopBars != null && ctx.tradeTimeStopBars >= 0 && i - entryIndex >= ctx.tradeTimeStopBars) {
+						timeStopIndex = i
+						timeStopPrice = candle.close
+						timeStopR = toR(candle.close)
+						finalIndex = i
+						state = 'timed-out'
+						break
+					}
 			}
-			if (hitTp1 && !tp1Hit) {
-				tp1Hit = true
-				tp1Index = i
-				// Консервативно: тень бара касания TP1 задела вход — считаем возврат.
-				if (!hitTp2 && touchedEntryBack) beAfterTp1 = true
-			}
-			if (hitTp2) {
-				tp2Hit = true
-				tp2Index = i
-				finalIndex = i
-				state = 'tp2'
-				if (beAfterTp1 == null) beAfterTp1 = false
-				break
-			}
-		}
 
 		return {
 			...base,
@@ -630,8 +676,12 @@ export class FibLifecycleEngine {
 			// половина без добора = меньше по модулю.
 			rStop: state === 'stopped' ? toR(ctx.stopLevel) : null,
 			exposure,
-			beAfterTp1,
-			mfeR,
+					beAfterTp1,
+					beIndex,
+					timeStopIndex,
+					timeStopPrice,
+					timeStopR,
+					mfeR,
 			maeR,
 			maxExtensionRatio: ctx.extension
 				? this.trackMaxExtension(candles, entryIndex, long, ctx.stopLevel, ctx.extension)

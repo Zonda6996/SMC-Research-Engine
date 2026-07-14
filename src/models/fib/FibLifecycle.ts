@@ -61,7 +61,7 @@ import type { StructureEventType } from '@/models/events/StructureEvent.js'
  * - 'breakerScale' — вход 100 (ретест), добор 78.6, стоп за 0.
  */
 export type FibScenario =
-	| 'ote' | 'deep' | 'breaker' | 'breaker161' | 'breaker78'
+	| 'ote' | 'deep' | 'breaker' | 'breaker161' | 'breaker200' | 'breaker78'
 	| 'oteScale' | 'deepScale' | 'breakerScale'
 	| 'fade141' | 'fade241' | 'fade241n' | 'fade200'
 	| 'fade141c' | 'fade241nc'
@@ -101,7 +101,7 @@ export type FibStopMode = 'zero' | 'tight' | 'wide05' | 'wide10' | 'zone' | 'zon
  * TP1 (141) записывается отдельным флагом: состояние 'stopped' с tp1Hit=true —
  * это «дошли до первой цели, потом вернулись в стоп».
  */
-export type FibSetupState = 'no-entry' | 'expired' | 'invalidated' | 'open' | 'stopped' | 'tp2'
+export type FibSetupState = 'no-entry' | 'expired' | 'invalidated' | 'open' | 'stopped' | 'breakeven' | 'timed-out' | 'tp2'
 
 /** Исход одного сетапа (кандидат × вариант якоря × сценарий × режим стопа). */
 export interface FibSetupOutcome {
@@ -161,6 +161,12 @@ export interface FibSetupOutcome {
 	 * тень задела вход, считаем возврат (внутрибарная последовательность неизвестна).
 	 */
 	beAfterTp1: boolean | null
+	/** Индекс бара фактического выхода раннера в безубыток после TP1. */
+	beIndex: number | null
+	/** Research time-stop: бар, цена закрытия и gross R всей оставшейся позиции. */
+	timeStopIndex: number | null
+	timeStopPrice: number | null
+	timeStopR: number | null
 
 	/** Максимальный ход в плюс/минус после входа, в R. */
 	mfeR: number | null

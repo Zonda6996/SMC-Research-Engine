@@ -163,6 +163,17 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(breaker?.entryIndex, 12)
 	})
 
+	it('breaker200: отменяется на 200, пока обычный breaker ждёт ретест', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 245, 210)) // 141
+		candles.push(candle(11, 305, 220)) // 200 до ретеста 100
+		candles.push(candle(12, 230, 195)) // поздний ретест
+		const result = run(longCandidate(9), candles)
+
+		assert.equal(outcome(result, 'breaker200')?.state, 'expired')
+		assert.equal(outcome(result, 'breaker')?.entered, true)
+	})
+
 	it('breaker161: без ухода за 161 входит как обычный breaker', () => {
 		const candles = flat(10, 205)
 		candles.push(candle(10, 245, 210)) // касание 141
@@ -349,6 +360,8 @@ describe('FibLifecycleEngine', () => {
 		const ote = outcome(result, 'ote')
 		assert.equal(ote?.tp1Hit, true)
 		assert.equal(ote?.beAfterTp1, true)
+		assert.equal(ote?.beIndex, 12)
+		assert.equal(ote?.state, 'breakeven')
 	})
 
 	it('beAfterTp1 = false, если TP2 достигнут без возврата к входу', () => {
@@ -510,7 +523,7 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(far?.entered, true)
 		assert.equal(far?.entryPrice, 241)
 		assert.equal(far?.stopPrice, 310) // 300 (уровень 200) + 0.5 × 20
-		assert.equal(far?.state, 'tp2')
+		assert.equal(far?.state, 'breakeven')
 		// Риск 69 (241→310), TP1 = 200 → rTp1 = 41/69.
 		assert.ok(Math.abs((far?.rTp1 ?? 0) - 41 / 69) < 1e-9)
 	})
@@ -573,7 +586,7 @@ describe('FibLifecycleEngine', () => {
 		assert.ok(Math.abs((z200?.rTp2 ?? 0) - 121.4 / 78.6) < 1e-9)
 
 		const zero = outcome(result, 'ote', 'zero')
-		assert.equal(zero?.state, 'stopped') // до 341 не дошли, вернулись в стоп
+		assert.equal(zero?.state, 'breakeven') // после TP1 раннер закрыт на возврате к входу
 		assert.equal(zero?.tp1Hit, true)
 	})
 
@@ -636,7 +649,7 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(confirm?.entryPrice, 320) // close свечи касания
 		assert.equal(confirm?.stopPrice, 371) // 361 (уровень 261) + 0.5 ATR
 		assert.equal(confirm?.tp1Index, 11)
-		assert.equal(confirm?.state, 'tp2')
+		assert.equal(confirm?.state, 'breakeven')
 	})
 
 	// ---- Гистограмма досягаемости: куда цена ходит после события,
