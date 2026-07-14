@@ -38,6 +38,9 @@ function makeOutcome(overrides: Partial<FibSetupOutcome>): FibSetupOutcome {
 		exposure: 1,
 		beAfterTp1: false,
 		beIndex: null,
+		timeStopIndex: null,
+		timeStopPrice: null,
+		timeStopR: null,
 		mfeR: 4,
 		maeR: 0,
 		maxExtensionRatio: null,
@@ -90,6 +93,16 @@ describe('fibCosts', () => {
 	it('netBeR: loss без TP1 = −1 минус издержки входа и стопа', () => {
 		const loss = makeOutcome({ state: 'stopped', tp1Hit: false, tp2Hit: false, stopIndex: 2 })
 		close(netBeR(loss), -1.0133)
+	})
+
+	it('time-stop до TP1 закрывает всю позицию по close с рыночными издержками', () => {
+		const timed = makeOutcome({
+			state: 'timed-out', tp1Hit: false, tp2Hit: false,
+			timeStopIndex: 3, timeStopPrice: 105, timeStopR: 0.5,
+		})
+		// 0.5 − (100×0.0007 + 105×0.0007)/10
+		close(netFullR(timed), 0.48565)
+		close(netBeR(timed), 0.48565)
 	})
 
 	it('null для неразрешённых сделок (нет входа, открыта без TP1)', () => {

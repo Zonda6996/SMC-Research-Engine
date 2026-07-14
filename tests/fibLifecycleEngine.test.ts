@@ -53,8 +53,13 @@ function longCandidate(createdAtIndex: number): FibGridCandidate {
 	}
 }
 
-function run(candidate: FibGridCandidate, candles: Candle[], events: StructureEvent[] = []) {
-	return new FibLifecycleEngine().build({ candidates: [candidate], events, candles })
+function run(
+	candidate: FibGridCandidate,
+	candles: Candle[],
+	events: StructureEvent[] = [],
+	controls: { entryExpiryBars?: number | null; tradeTimeStopBars?: number | null } = {},
+) {
+	return new FibLifecycleEngine().build({ candidates: [candidate], events, candles, ...controls })
 }
 
 function outcome(
@@ -650,6 +655,29 @@ describe('FibLifecycleEngine', () => {
 		assert.equal(confirm?.stopPrice, 371) // 361 (уровень 261) + 0.5 ATR
 		assert.equal(confirm?.tp1Index, 11)
 		assert.equal(confirm?.state, 'breakeven')
+	})
+
+	it('entry expiry: сетка без входа истекает по числу баров', () => {
+		const candles = flat(10, 205)
+		candles.push(candle(10, 210, 190))
+		candles.push(candle(11, 210, 190))
+		candles.push(candle(12, 210, 175)) // OTE было бы только после дедлайна
+		const result = run(longCandidate(9), candles, [], { entryExpiryBars: 2 })
+		assert.equal(outcome(result, 'ote')?.state, 'expired')
+		assert.equal(outcome(result, 'ote')?.entered, false)
+	})
+
+	it('trade time-stop: закрывает по close и сохраняет gross R', () => {
+		const candles = flat(10, 205)
+		candles.push(candleC(10, 205, 175, 180)) // OTE entry 178.6
+		candles.push(candleC(11, 210, 185, 200))
+		candles.push(candleC(12, 220, 190, 210)) // close через 2 бара
+		const result = run(longCandidate(9), candles, [], { tradeTimeStopBars: 2 })
+		const ote = outcome(result, 'ote')
+		assert.equal(ote?.state, 'timed-out')
+		assert.equal(ote?.timeStopIndex, 12)
+		assert.equal(ote?.timeStopPrice, 210)
+		assert.ok(ote?.timeStopR != null && ote.timeStopR > 0)
 	})
 
 	// ---- Гистограмма досягаемости: куда цена ходит после события,
