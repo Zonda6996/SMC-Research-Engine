@@ -36,6 +36,8 @@
 //                 oteRegime/deepRegime — те же исходы минус созданные в
 //                 плохом режиме (atrRatio < 0.94 либо chochShare >= 0.5).
 //                 Сравнение до/после в одном CSV; breaker не фильтруется.
+//                 Вместе с --regime-filter добавляет также *Combo (волна 4,
+//                 SPEC 7.17): итоговый плейбук — regime-фильтр, затем cooldown.
 //   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
 //                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
 //                 не создавать сетап пока предыдущая сделка жива), *DedupOp
@@ -391,6 +393,12 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 			}
 		}
 	}
+	// Волна 4 (SPEC 7.17): итоговый плейбук — regime + cooldown вместе.
+	if (outcomes.some((o) => o.scenario.endsWith('Combo'))) {
+		for (const s of ['ote', 'deep', 'breaker', 'breaker161']) {
+			scenarioSlices.push({ scenario: `${s}Combo`, stopMode: 'zero' })
+		}
+	}
 
 	for (const anchor of anchors) {
 		for (const trigger of triggers) {
@@ -641,7 +649,7 @@ function reachToCsv(rows: ReachRow[]): string {
 }
 
 function reachToMarkdown(rows: ReachRow[]): string {
-	const header = `| Dataset | Anchor | Trig | N | ≤78.6 | ≤61.8 | ≤50 | ≤38.2 | ≤23.6 | ≤0 | ≥141 | ≥200 | ≥241 | medRet | medExt |`
+	const header = `| Dataset | Anchor | Trig | N | ≤78.6 | ≤61.8 | ≤50 | ���38.2 | ≤23.6 | ≤0 | ≥141 | ≥200 | ≥241 | medRet | medExt |`
 	const sep = `|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|`
 	const pct = (v: number | undefined) => (v == null ? '—' : `${Math.round(v * 100)}%`)
 	const lines = rows.map((r) =>
@@ -775,6 +783,8 @@ async function main() {
 		before: 0,
 		after: { 'cooldown': 0, 'one-position': 0, 'latest-only': 0 } as Record<string, number>,
 	}
+	// Волна 4: экспозиция итогового плейбука (regime + cooldown).
+	let comboExposure = 0
 	const failures: string[] = []
 
 	console.log(`\nBatch: ${args.symbols.join(', ')} × ${args.timeframes.join(', ')} × ${args.limit} candles (${args.market})${args.untilLabel ? ` until ${args.untilLabel}` : ''}`)
@@ -866,6 +876,24 @@ async function main() {
 								}
 								outcomesForSlicing = [...outcomesForSlicing, ...mixed]
 							}
+							// Волна 4 (SPEC 7.17): совместный эффект принятых фильтров.
+							// Порядок: сначала regime (отсекаем плохой режим у ote/deep,
+							// breaker не трогаем), затем cooldown по выжившим — как вживую:
+							// незаторгованный сетап не занимает слот кулдауна.
+							if (args.regimeFilter && args.dedup && variant.id === 'base') {
+								const metrics = computeRegimeMetrics(
+									snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory,
+								)
+								const regimePassed = snapshot.fibLifecycle.outcomes.filter((o) =>
+									['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario) &&
+									o.stopMode === 'zero' &&
+									(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) ||
+										passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+								const combo = applyDedup(regimePassed, 'cooldown').map((o) =>
+									({ ...o, scenario: `${o.scenario}Combo` }) as unknown as FibSetupOutcome)
+								comboExposure = Math.max(comboExposure, maxConcurrentTrades(combo))
+								outcomesForSlicing = [...outcomesForSlicing, ...combo]
+							}
 							allRows.push(...sliceDataset(symbol, timeframe, variant.id, period, outcomesForSlicing, args.atrThresholds))
 						allReach.push(...sliceReach(symbol, timeframe, variant.id, period, snapshot.fibLifecycle.reach))
 						// Диагностика режима — только на базовом конфиге детектора,
@@ -917,6 +945,7 @@ async function main() {
 		console.log(`\nMax concurrent same-direction trades (worst dataset):`)
 		console.log(`  before dedup:  ${dedupExposure.before}`)
 		for (const rule of DEDUP_RULES) console.log(`  ${rule.padEnd(13)}: ${dedupExposure.after[rule]}`)
+		if (args.regimeFilter) console.log(`  combo (7.17) : ${comboExposure}`)
 	}
 	if (failures.length > 0) {
 		console.log(`\nFailures:\n` + failures.map((f) => `  - ${f}`).join('\n'))
