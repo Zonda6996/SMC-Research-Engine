@@ -444,7 +444,7 @@ interface ResultRow {
 	stats: SliceStats
 	/**
 	 * Разбивка ��о направлению сделки. Ключевой тест на пр��роду edge:
-	 * если EV положительный только у лонгов — это ставка на бычий режим
+	 * если EV пол��жительный только у лонгов — это ставка на бычий режим
 	 * периода; если у обеих сторон — структурное преимущество сетапа.
 	 */
 	long: SliceStats
@@ -1021,7 +1021,7 @@ async function main() {
 								outcomesForSlicing = [...snapshot.fibLifecycle.outcomes, ...passed]
 							}
 							// Волна 3 (SPEC 7.16): дедуплицированные копии ядра по трём
-							// правилам + учёт максимальной одновременной экспозиции.
+							// пра��илам + учёт максимальной одновременной экспозиции.
 							if (args.dedup && variant.id === 'base') {
 								const core = snapshot.fibLifecycle.outcomes.filter((o) =>
 									['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario) && o.stopMode === 'zero')
@@ -1215,34 +1215,12 @@ async function main() {
 		}
 	}
 
-	if (args.evalFilters && evalFilterRows.length > 0) {
-		// Пул-оценка: сравнение среднего netR срезанных и пропущенных сделок
-		// на ОДНОМ пуле. Хороший фильтр: avgR(cut) заметно ниже avgR(pass).
-		const evalCsvPath = join(RESULTS_DIR, `evalfilters-${stamp}${untilTag}.csv`)
-		writeFileSync(evalCsvPath, recordsToCsv(evalFilterRows as unknown as Record<string, unknown>[]))
-		console.log(`\n=== Filter pool evaluation (SPEC 7.20 iter 2, no portfolio) ===\n`)
-		const fmt = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(3)}`
-		const scenarios = [...new Set(evalFilterRows.map((r) => r.scenario))].sort()
-		for (const name of SETUP_FILTER_NAMES) {
-			const rows = evalFilterRows.filter((r) => r.filter === name)
-			const cut = rows.filter((r) => r.cut), pass = rows.filter((r) => !r.cut)
-			const avg = (xs: typeof rows) => (xs.length === 0 ? 0 : xs.reduce((s, r) => s + r.netR, 0) / xs.length)
-			console.log(`${name}: cut ${cut.length} (avgR ${fmt(avg(cut))}), pass ${pass.length} (avgR ${fmt(avg(pass))}), edge ${fmt(avg(pass) - avg(cut))}`)
-			for (const sc of scenarios) {
-				const sCut = cut.filter((r) => r.scenario === sc), sPass = pass.filter((r) => r.scenario === sc)
-				if (sCut.length === 0 && sPass.length === 0) continue
-				console.log(`  ${sc.padEnd(8)}: cut ${String(sCut.length).padStart(4)} (avgR ${fmt(avg(sCut))}), pass ${String(sPass.length).padStart(4)} (avgR ${fmt(avg(sPass))})`)
-			}
-		}
-		console.log(`\nEval CSV (${evalFilterRows.length} rows): ${evalCsvPath}`)
-	}
-
 	console.log(`\n=== Top by EV_be (In >= ${args.minIn}) ===\n`)
 	console.log(topLines(allRows, args.minIn))
 	console.log(`\n=== Full table (In >= ${args.minIn}) ===\n`)
 	console.log(toMarkdown(allRows, args.minIn))
 	if (allReach.length > 0) {
-		console.log(`\n=== Reach histogram (куда доходит цена после события, доля кандидатов) ===\n`)
+		console.log(`\n=== Reach histogram (куда доходит цена после события, доля кан��идатов) ===\n`)
 		console.log(reachToMarkdown(allReach))
 		console.log(`\n=== Fade-reach (после касания 141/241: → откат до, ↑ продолжение до) ===\n`)
 		console.log(fadeReachToMarkdown(allReach))
@@ -1259,6 +1237,34 @@ async function main() {
 	}
 	if (failures.length > 0) {
 		console.log(`\nFailures:\n` + failures.map((f) => `  - ${f}`).join('\n'))
+	}
+
+	// Пул-оценка фильтров — ПОСЛЕДНИЙ блок вывода: большие таблицы выше
+	// вытесняют его за буфер консоли (см. отчёт пользователя 15.07.2026).
+	// Сводка дублируется в .txt рядом с CSV — потерять её невозможно.
+	if (args.evalFilters && evalFilterRows.length > 0) {
+		const evalCsvPath = join(RESULTS_DIR, `evalfilters-${stamp}${untilTag}.csv`)
+		writeFileSync(evalCsvPath, recordsToCsv(evalFilterRows as unknown as Record<string, unknown>[]))
+		const fmt = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(3)}`
+		const scenarios = [...new Set(evalFilterRows.map((r) => r.scenario))].sort()
+		const lines: string[] = ['=== Filter pool evaluation (SPEC 7.20 iter 2, no portfolio) ===', '']
+		for (const name of SETUP_FILTER_NAMES) {
+			const rows = evalFilterRows.filter((r) => r.filter === name)
+			const cut = rows.filter((r) => r.cut), pass = rows.filter((r) => !r.cut)
+			const avg = (xs: typeof rows) => (xs.length === 0 ? 0 : xs.reduce((s, r) => s + r.netR, 0) / xs.length)
+			lines.push(`${name}: cut ${cut.length} (avgR ${fmt(avg(cut))}), pass ${pass.length} (avgR ${fmt(avg(pass))}), edge ${fmt(avg(pass) - avg(cut))}`)
+			for (const sc of scenarios) {
+				const sCut = cut.filter((r) => r.scenario === sc), sPass = pass.filter((r) => r.scenario === sc)
+				if (sCut.length === 0 && sPass.length === 0) continue
+				lines.push(`  ${sc.padEnd(8)}: cut ${String(sCut.length).padStart(4)} (avgR ${fmt(avg(sCut))}), pass ${String(sPass.length).padStart(4)} (avgR ${fmt(avg(sPass))})`)
+			}
+		}
+		const summary = lines.join('\n')
+		const evalTxtPath = join(RESULTS_DIR, `evalfilters-${stamp}${untilTag}.txt`)
+		writeFileSync(evalTxtPath, summary + '\n')
+		console.log(`\n${summary}`)
+		console.log(`\nEval CSV (${evalFilterRows.length} rows): ${evalCsvPath}`)
+		console.log(`Eval summary TXT: ${evalTxtPath}`)
 	}
 }
 
