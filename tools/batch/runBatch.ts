@@ -239,7 +239,7 @@ interface CliArgs {
 	 */
 	evalTakes: boolean
 	/**
-	 * Комбинированная пул-оценка (SPEC 7.23): --eval-combo. Соединяет три
+	 * Комбинированная пул-оц��нка (SPEC 7.23): --eval-combo. Соединяет три
 	 * подтверждённые находки на одном пуле: выходы t100-only (SPEC 7.22) +
 	 * фильтры chop и align (SPEC 7.20 iter 2). Каждая сделка размечается
 	 * chopCut/alignCut и получает netR для canon- и t100-only-выходов —
@@ -982,7 +982,11 @@ async function main() {
 	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
 	// с метками фильтров и netR обоих вариантов выходов. Комбинации
 	// собираются на этапе сводки из одного и того же состава сделок.
-	const evalComboRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; chopCut: boolean; alignCut: boolean; netRCanon: number; netRT100: number }[] = []
+	// sameBar = вход и стоп в одной свече (движок консервативно считает
+	// мгновенный −1R). Метка диагностическая: исключать такие сделки задним
+	// числом — look-ahead (в реале лимитка исполнится и словит стоп), но их
+	// доля и суммарный урон говорят, стоит ли переходить на confirmClose-вход.
+	const evalComboRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; chopCut: boolean; alignCut: boolean; sameBar: boolean; netRCanon: number; netRT100: number }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1111,7 +1115,7 @@ async function main() {
 								}
 								// Portfolio всегда использует тот же канонический поря��ок: regime → cooldown.
 								// Берём только full/base, иначе split/sweep искусственно дублируют сделки.
-								// breaker161/breaker200 — альтернативные правила того же сетапа, не
+								// breaker161/breaker200 — альтернативные правила того же ��етапа, не
 								// независимые сделки: в канонический портфель входит только breaker.
 								if (args.portfolio && variant.id === 'base' && period === 'full') {
 									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
@@ -1286,6 +1290,8 @@ async function main() {
 											symbol, timeframe, scenario: outcome.scenario, entryAt: entryCandle.timestamp,
 											chopCut: firstFailingFilter(outcome, ['chop'], filterCtx) != null,
 											alignCut: firstFailingFilter(outcome, ['align'], filterCtx) != null,
+											// Вход и стоп в одном баре: движок ставит stopIndex === entryIndex.
+											sameBar: outcome.stopIndex != null && outcome.stopIndex === outcome.entryIndex,
 											netRCanon, netRT100,
 										})
 									}
@@ -1520,6 +1526,12 @@ async function main() {
 			{ name: 't100 + chop + align', keep: (r) => !r.chopCut && !r.alignCut, exits: 't100' },
 		]
 		const lines: string[] = [`=== Combo pool evaluation (SPEC 7.23, no portfolio, pool ${evalComboRows.length} trades) ===`, '']
+		// Диагностика same-bar (вход и стоп в одной свече = консервативный −1R).
+		// НЕ фильтр: исключение задним числом — look-ahead. Показывает масштаб
+		// проблемы и потенциал перехода на confirmClose-вход.
+		const sameBarRows = evalComboRows.filter((r) => r.sameBar)
+		const sameBarTotal = sameBarRows.reduce((s, r) => s + r.netRT100, 0)
+		lines.push(`same-bar entry+stop: ${sameBarRows.length} trades (${((100 * sameBarRows.length) / evalComboRows.length).toFixed(1)}% of pool), totalR ${fmt(sameBarTotal)} (t100 exits)`, '')
 		const scenarios = [...new Set(evalComboRows.map((r) => r.scenario))].sort()
 		for (const combo of combos) {
 			const kept = evalComboRows.filter(combo.keep)
