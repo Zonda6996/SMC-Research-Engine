@@ -54,6 +54,11 @@
 //                 avgR срезанных vs пропущенных на одном пуле сделок.
 //                 Портфельная симуляция для оценки фильтров некорректна —
 //                 композиция (капасити/кулдауны) перемешивает состав сделок.
+//   --eval-htf    пул-оценка HTF-контекста (SPEC 7.21): разметка того же пула
+//                 состоянием старшего ТФ на момент входа — тренд HTF и
+//                 premium/discount (dealing range). Пары: 30m→1h+4h, 1h→4h,
+//                 4h→1d. HTF агрегируется из LTF-свечей, look-ahead-free
+//                 (знание = закрытие подтверждающей HTF-свечи).
 //   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
 //                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
 //                 не создавать сетап пока предыдущая сделка жива), *DedupOp
@@ -69,7 +74,8 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import type { BosChochConfig } from '../../src/core/events/BosChochEngine.js'
-import { fetchCandlesPaginated, MAX_CANDLES, type MarketKind } from '../shared/candleFetcher.js'
+import { fetchCandlesPaginated, aggregateCandles, MAX_CANDLES, TF_MS, type MarketKind } from '../shared/candleFetcher.js'
+import { buildHtfContext, htfContextAt } from '../../src/core/analysis/htfContext.js'
 import type { Candle } from '../../src/models/price/Candle.js'
 import type { FibReachRecord, FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
 import { netFullR, netBeR } from '../../src/core/fib/fibCosts.js'
@@ -207,6 +213,13 @@ interface CliArgs {
 	 * вопрос: отличается ли средний netR срезанных сделок от пропущенных.
 	 */
 	evalFilters: boolean
+	/**
+	 * Пул-оценка HTF-контекста (SPEC 7.21): --eval-htf. Размечает тот же пул
+	 * сделок метками старшего ТФ (тренд + premium/discount) без портфельной
+	 * симуляции. Пары: 30m → 1h и 4h, 1h → 4h, 4h → 1d. HTF-свечи агрегируются
+	 * из уже загруженных LTF — отдельная загрузка не нужна.
+	 */
+	evalHtf: boolean
 	}
 
 function parseArgs(argv: string[]): CliArgs {
@@ -258,6 +271,7 @@ function parseArgs(argv: string[]): CliArgs {
 			portfolioScenarios: resolvePortfolioScenarios(get('--scenarios')),
 			setupFilters: resolveSetupFilters(get('--filters')),
 			evalFilters: argv.includes('--eval-filters'),
+			evalHtf: argv.includes('--eval-htf'),
 		}
 }
 
@@ -444,7 +458,7 @@ interface ResultRow {
 	stats: SliceStats
 	/**
 	 * Разбивка ��о направлению сделки. Ключевой тест на пр��роду edge:
-	 * если EV пол��жительный только у лонгов — это ставка на бычий режим
+	 * если EV пол����жительный только у лонгов — это ставка на бычий режим
 	 * периода; если у обеих сторон — структурное преимущество сетапа.
 	 */
 	long: SliceStats
@@ -928,6 +942,11 @@ async function main() {
 	// Пул-оценка (--eval-filters): каждая строка — одна сделка пула × один
 	// фильтр, cut = фильтр её срезал бы. Без портфеля: netR как есть.
 	const evalFilterRows: { filter: SetupFilterName; symbol: string; timeframe: string; scenario: string; entryAt: number; cut: boolean; netR: number }[] = []
+	// Пул-оценка HTF (--eval-htf): одна сделка пула × одна пара LTF→HTF.
+	// trendAligned/pdAligned = null сериализуются как '' (контекста ещё нет).
+	const evalHtfRows: { htf: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; htfTrend: string; trendAligned: boolean | null; pdZone: string; pdAligned: boolean | null; netR: number }[] = []
+	// Пары LTF → старшие ТФ (по выбору пользователя, SPEC 7.21).
+	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1021,7 +1040,7 @@ async function main() {
 								outcomesForSlicing = [...snapshot.fibLifecycle.outcomes, ...passed]
 							}
 							// Волна 3 (SPEC 7.16): дедуплицированные копии ядра по трём
-							// пра��илам + учёт максимальной одновременной экспозиции.
+							// п��а��илам + учёт максимальной одновременной экспозиции.
 							if (args.dedup && variant.id === 'base') {
 								const core = snapshot.fibLifecycle.outcomes.filter((o) =>
 									['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario) && o.stopMode === 'zero')
@@ -1123,6 +1142,42 @@ async function main() {
 										for (const name of SETUP_FILTER_NAMES) {
 											const cut = firstFailingFilter(outcome, [name], filterCtx) != null
 											evalFilterRows.push({ filter: name, symbol, timeframe, scenario: outcome.scenario, entryAt: trade.entryAt, cut, netR: trade.netR })
+										}
+									}
+								}
+								// Пул-оценка HTF-контекста (SPEC 7.21): тот же пул, что
+								// --eval-filters, но метки — состояние старшего ТФ на момент
+								// входа (тренд + premium/discount). HTF-свечи агрегируются из
+								// LTF-чанка: HTF-состояние строится строго из тех же данных,
+								// что видел LTF-прогон, и ни свечой больше.
+								if (args.evalHtf && variant.id === 'base' && period === 'full') {
+									const htfs = HTF_PAIRS[timeframe] ?? []
+									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
+									const pool = snapshot.fibLifecycle.outcomes.filter((o) =>
+										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
+										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+									for (const htf of htfs) {
+										const htfCandles = aggregateCandles(chunk, timeframe, htf)
+										// Слишком мало HTF-свечей = структура не построится,
+										// разметка была бы шумом из 'none'.
+										if (htfCandles.length < 50) continue
+										const htfSnapshot = runAnalysis(htfCandles)
+										const htfCtx = buildHtfContext(htfSnapshot, TF_MS[htf]!)
+										const seenGrids = new Set<string>()
+										for (const outcome of pool) {
+											if (!outcome.entered || outcome.entryPrice == null) continue
+											const gridKey = `${outcome.scenario}|${outcome.candidateId}`
+											if (seenGrids.has(gridKey)) continue
+											seenGrids.add(gridKey)
+											const trade = outcomeToPortfolioTrade(symbol, timeframe, snapshot.candles, outcome)
+											if (!trade) continue
+											const labels = htfContextAt(htfCtx, trade.entryAt, outcome.entryPrice, trade.direction)
+											evalHtfRows.push({
+												htf, symbol, timeframe, scenario: outcome.scenario,
+												entryAt: trade.entryAt, direction: trade.direction,
+												htfTrend: labels.htfTrend, trendAligned: labels.trendAligned,
+												pdZone: labels.pdZone, pdAligned: labels.pdAligned, netR: trade.netR,
+											})
 										}
 									}
 								}
@@ -1265,6 +1320,49 @@ async function main() {
 		console.log(`\n${summary}`)
 		console.log(`\nEval CSV (${evalFilterRows.length} rows): ${evalCsvPath}`)
 		console.log(`Eval summary TXT: ${evalTxtPath}`)
+	}
+
+	// Пул-оценка HTF-контекста (SPEC 7.21) — тоже последним блоком + дубль
+	// в txt: большие таблицы выше вытесняют вывод за буфер консоли.
+	if (args.evalHtf && evalHtfRows.length > 0) {
+		const csvRows = evalHtfRows.map((r) => ({
+			...r,
+			trendAligned: r.trendAligned == null ? '' : String(r.trendAligned),
+			pdAligned: r.pdAligned == null ? '' : String(r.pdAligned),
+		}))
+		const htfCsvPath = join(RESULTS_DIR, `evalhtf-${stamp}${untilTag}.csv`)
+		writeFileSync(htfCsvPath, recordsToCsv(csvRows as unknown as Record<string, unknown>[]))
+		const fmt = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(3)}`
+		const avg = (xs: { netR: number }[]) => (xs.length === 0 ? 0 : xs.reduce((s, r) => s + r.netR, 0) / xs.length)
+		const lines: string[] = ['=== HTF context pool evaluation (SPEC 7.21, no portfolio) ===', '']
+		const pairs = [...new Set(evalHtfRows.map((r) => `${r.timeframe}->${r.htf}`))].sort()
+		for (const pair of pairs) {
+			const [ltf, htf] = pair.split('->')
+			const rows = evalHtfRows.filter((r) => r.timeframe === ltf && r.htf === htf)
+			lines.push(`--- ${pair} (${rows.length} trades) ---`)
+			const tAligned = rows.filter((r) => r.trendAligned === true)
+			const tAgainst = rows.filter((r) => r.trendAligned === false)
+			const tNone = rows.filter((r) => r.trendAligned == null)
+			lines.push(`trend : aligned ${String(tAligned.length).padStart(5)} (avgR ${fmt(avg(tAligned))}), against ${String(tAgainst.length).padStart(5)} (avgR ${fmt(avg(tAgainst))}), none ${tNone.length} (avgR ${fmt(avg(tNone))}), edge ${fmt(avg(tAligned) - avg(tAgainst))}`)
+			const pAligned = rows.filter((r) => r.pdAligned === true)
+			const pAgainst = rows.filter((r) => r.pdAligned === false)
+			lines.push(`p/d   : aligned ${String(pAligned.length).padStart(5)} (avgR ${fmt(avg(pAligned))}), against ${String(pAgainst.length).padStart(5)} (avgR ${fmt(avg(pAgainst))}), edge ${fmt(avg(pAligned) - avg(pAgainst))}`)
+			const both = rows.filter((r) => r.trendAligned === true && r.pdAligned === true)
+			const neither = rows.filter((r) => r.trendAligned === false && r.pdAligned === false)
+			lines.push(`both  : aligned ${String(both.length).padStart(5)} (avgR ${fmt(avg(both))}), against ${String(neither.length).padStart(5)} (avgR ${fmt(avg(neither))}), edge ${fmt(avg(both) - avg(neither))}`)
+			for (const sc of [...new Set(rows.map((r) => r.scenario))].sort()) {
+				const s = rows.filter((r) => r.scenario === sc)
+				const sa = s.filter((r) => r.trendAligned === true), sg = s.filter((r) => r.trendAligned === false)
+				lines.push(`  ${sc.padEnd(8)}: trend aligned ${String(sa.length).padStart(4)} (avgR ${fmt(avg(sa))}) vs against ${String(sg.length).padStart(4)} (avgR ${fmt(avg(sg))})`)
+			}
+			lines.push('')
+		}
+		const summary = lines.join('\n')
+		const htfTxtPath = join(RESULTS_DIR, `evalhtf-${stamp}${untilTag}.txt`)
+		writeFileSync(htfTxtPath, summary + '\n')
+		console.log(`\n${summary}`)
+		console.log(`HTF eval CSV (${evalHtfRows.length} rows): ${htfCsvPath}`)
+		console.log(`HTF eval summary TXT: ${htfTxtPath}`)
 	}
 }
 
