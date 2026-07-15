@@ -993,7 +993,7 @@ async function main() {
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
 	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
 	// одна сделка пула × одна лестница. netR = null (лестница не разрешилась
-	// до конца данных) ��сключает сделку из сравнения по ВСЕМ лестницам.
+	// до конца данны��) ��сключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
 	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
 	// с метками фильтров и netR обоих вариантов выходов. Комбинации
@@ -1006,7 +1006,7 @@ async function main() {
 	// Пул-оценка моделей входа (--eval-entry, SPEC 7.24): одна строка =
 	// одна сделка пула со статусами/netR всех трёх моделей (косты BingX,
 	// выходы t100-only) и меткой bigbar. netR missed-статусов = 0.
-	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number }[] = []
+	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1325,6 +1325,13 @@ async function main() {
 									const pool = snapshot.fibLifecycle.outcomes.filter((o) =>
 										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
 										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+									// Метки для финальной комбо-сводки (SPEC 7.25):
+									// chop/align — фильтры 7.20; dedup cooldown — 7.16 («одна идея —
+									// одна позиция»: серия BOS в одном тренде = один риск, не три).
+									const filterCtx = buildSetupFilterContext(
+										snapshot.candles, snapshot.events, snapshot.fib.candidates,
+										snapshot.market.trendHistory, metrics)
+									const dedupSurvivors = new Set(applyDedup(pool, 'cooldown'))
 									const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
 									// Входные зоны сетки (ratio): ote — 61.8–78.6, deep — 23.6–38.2
 									// (пары пользователя «78→61», «38→23»).
@@ -1355,8 +1362,11 @@ async function main() {
 											symbol, timeframe, scenario: outcome.scenario,
 											entryAt: entryCandle.timestamp, direction: outcome.direction,
 											// +1: свеча касания входит в окно — пользовательский кейс
-											// «одна свеча от 100 до 78» — это чаще всего она сама.
+											// «��дна свеча от 100 до 78» — это чаще всего она сама.
 											bigbar: bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex + 1, zoneNearPrice, zoneFarPrice),
+											chopCut: firstFailingFilter(outcome, ['chop'], filterCtx) != null,
+											alignCut: firstFailingFilter(outcome, ['align'], filterCtx) != null,
+											dedupCut: !dedupSurvivors.has(outcome),
 											touchStatus: touch!.status, touchNetR: touch!.netR ?? 0,
 											closeStatus: close!.status, closeNetR: close!.netR ?? 0,
 											confirmStatus: confirm!.status, confirmNetR: confirm!.netR ?? 0,
@@ -1478,7 +1488,7 @@ async function main() {
 
 	// Пул-оценка фильтров — ПОСЛЕДНИЙ блок вывода: большие таблицы выше
 	// вытесняют его за буфер консоли (см. отчёт пользователя 15.07.2026).
-	// Сводка дублируется в .txt рядом с CSV — потерять её невозможно.
+	// Сводка дубл��руется в .txt рядом с CSV — потерять её невозможно.
 	if (args.evalFilters && evalFilterRows.length > 0) {
 		const evalCsvPath = join(RESULTS_DIR, `evalfilters-${stamp}${untilTag}.csv`)
 		writeFileSync(evalCsvPath, recordsToCsv(evalFilterRows as unknown as Record<string, unknown>[]))
@@ -1667,6 +1677,33 @@ async function main() {
 		// Bigbar сам по себе: counterfactual срезанных сетапов (touch netR).
 		const cut = evalEntryRows.filter((r) => r.bigbar)
 		lines.push(`bigbar cut ${cut.length} setups (${((100 * cut.length) / evalEntryRows.length).toFixed(1)}% of pool), touch counterfactual totalR ${fmt(cut.reduce((s, r) => s + r.touchNetR, 0))} (positive = резал прибыльные)`)
+		// Финальная комбо-сводка (SPEC 7.25): складываются ли находки.
+		// Все комбинации на touch-модели (лимитка) — победителе базового
+		// сравнения. dedup cooldown = «одна идея — одна позиция»: серия BOS
+		// в одном тренде считается одним риском — это ближе к торгуемой
+		// реальности, чем сырой пул.
+		lines.push('', '=== Final combos (touch entries, t100 exits, BingX costs) ===')
+		type ERow = (typeof evalEntryRows)[number]
+		const finalCombos: { name: string; keep: (r: ERow) => boolean }[] = [
+			{ name: 'touch (raw pool)', keep: () => true },
+			{ name: '+ bigbar', keep: (r) => !r.bigbar },
+			{ name: '+ bigbar + chop', keep: (r) => !r.bigbar && !r.chopCut },
+			{ name: '+ bigbar + align', keep: (r) => !r.bigbar && !r.alignCut },
+			{ name: '+ bigbar + dedup', keep: (r) => !r.bigbar && !r.dedupCut },
+			{ name: '+ bigbar + align + dedup', keep: (r) => !r.bigbar && !r.alignCut && !r.dedupCut },
+		]
+		for (const combo of finalCombos) {
+			const kept = evalEntryRows.filter(combo.keep)
+			const total = kept.reduce((s, r) => s + r.touchNetR, 0)
+			const wins = kept.filter((r) => r.touchNetR > 0)
+			lines.push(`${combo.name.padEnd(26)}: ${String(kept.length).padStart(5)} trades, totalR ${fmt(total)}, avgR ${fmt(kept.length ? total / kept.length : 0)}, WR ${kept.length ? ((100 * wins.length) / kept.length).toFixed(1) : '0.0'}%`)
+			for (const sc of scenarios) {
+				const s = kept.filter((r) => r.scenario === sc)
+				if (s.length === 0) continue
+				const sTotal = s.reduce((sum, r) => sum + r.touchNetR, 0)
+				lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} trades, totalR ${fmt(sTotal)}, avgR ${fmt(sTotal / s.length)}`)
+			}
+		}
 		const summary = lines.join('\n')
 		const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)
 		writeFileSync(entryTxtPath, summary + '\n')
