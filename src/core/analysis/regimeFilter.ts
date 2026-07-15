@@ -25,6 +25,13 @@ export interface RegimeFilterConfig {
 	maxChochShare: number
 	/** Сценарии, к которым фильтр применяется. Breaker не трогаем. */
 	scenarios: ReadonlySet<string>
+	/**
+	 * Опционально: блокировать при effRatio ниже порога (пила по цене).
+	 * Не задан = не проверяется (базовый фильтр не меняется).
+	 */
+	minEffRatio?: number
+	/** Опционально: блокировать при trendStability ниже порога (чехарда трендов). */
+	minTrendStability?: number
 }
 
 /**
@@ -35,6 +42,23 @@ export const DEFAULT_REGIME_FILTER: RegimeFilterConfig = {
 	minAtrRatio: 0.94,
 	maxChochShare: 0.5,
 	scenarios: new Set(['ote', 'deep']),
+}
+
+/**
+ * Строгий пресет (SPEC 7.20, фильтр chop): формализация «боковик/АМД» из
+ * визуального ревью блока A. Ужесточает базовый фильтр и подключает метрики,
+ * которые он не использует: effRatio (пила по цене) и trendStability
+ * (чехарда трендов). Пороги — медианы соответствующих метрик на эпохах
+ * до-2024 (см. волну 1 в SPEC 7.15): режим хуже медианы = боковик.
+ * Применяется ко всем каноническим сценариям — ревью показало, что АМД
+ * поражает сетапы независимо от сценария.
+ */
+export const STRICT_REGIME_FILTER: RegimeFilterConfig = {
+	minAtrRatio: 0.94,
+	maxChochShare: 0.5,
+	scenarios: new Set(['ote', 'deep', 'breaker']),
+	minEffRatio: 0.2,
+	minTrendStability: 0.6,
 }
 
 /**
@@ -53,5 +77,7 @@ export function passesRegimeFilter(
 	if (!metrics) return true
 	if (metrics.atrRatio != null && metrics.atrRatio < config.minAtrRatio) return false
 	if (metrics.chochShare != null && metrics.chochShare >= config.maxChochShare) return false
+	if (config.minEffRatio != null && metrics.effRatio != null && metrics.effRatio < config.minEffRatio) return false
+	if (config.minTrendStability != null && metrics.trendStability != null && metrics.trendStability < config.minTrendStability) return false
 	return true
 }

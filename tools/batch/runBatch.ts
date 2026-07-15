@@ -42,6 +42,13 @@
 //                 добавить *Inv (только сетапы из сжатия/пилы — инверсия
 //                 фильтра 7.15) и *Combo (инверсия + cooldown). Гипотеза:
 //                 fade — зеркальный к deep сетап по режиму рынка.
+//   --filters     слой дискреционных фильтров (SPEC 7.20), только с --portfolio:
+//                 late,align,extreme,chop через запятую. Формализация визуального
+//                 ревью: late (вход у экстремума импульса), align (против
+//                 доминирующего тренда), extreme (event-level не экстремум
+//                 сегмента), chop (строгий режим-фильтр: effRatio/trendStability).
+//                 Отрезанные сделки — в ledger со status=filtered + filteredBy,
+//                 в консоли foregone netR по каждому фильтру.
 //   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
 //                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
 //                 не создавать сетап пока предыдущая сделка жива), *DedupOp
@@ -65,6 +72,7 @@ import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
 import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analysis/regimeFilter.js'
 import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/analysis/dedupFilter.js'
 import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
+import { buildSetupFilterContext, firstFailingFilter, SETUP_FILTER_NAMES, type SetupFilterName } from '../../src/core/analysis/setupFilters.js'
 
 // ---------- Свип детектора ----------
 
@@ -177,6 +185,13 @@ interface CliArgs {
 	 * чтобы опечатка не превращалась в молчаливый прогон полного набора.
 	 */
 	portfolioScenarios: string[]
+	/**
+	 * Слой дискреционных фильтров (SPEC 7.20): --filters late,align,extreme,chop.
+	 * Применяется к eligible-исходам ПЕРЕД портфелем; отрезанные попадают в
+	 * ledger со статусом filtered и именем фильтра в filteredBy. Пустой список
+	 * (без флага) = baseline без слоя. Опечатки — ошибка, как в --scenarios.
+	 */
+	setupFilters: SetupFilterName[]
 	}
 
 function parseArgs(argv: string[]): CliArgs {
@@ -219,7 +234,19 @@ function parseArgs(argv: string[]): CliArgs {
 			entryExpiryBars: get('--entry-expiry-bars') == null ? null : Math.max(0, Number(get('--entry-expiry-bars'))),
 			tradeTimeStopBars: get('--trade-time-stop-bars') == null ? null : Math.max(0, Number(get('--trade-time-stop-bars'))),
 			portfolioScenarios: resolvePortfolioScenarios(get('--scenarios')),
+			setupFilters: resolveSetupFilters(get('--filters')),
 		}
+}
+
+/** --filters late,align — подмножество слоя SPEC 7.20; опечатки падают с ошибкой. */
+function resolveSetupFilters(flag: string | null): SetupFilterName[] {
+	if (!flag) return []
+	const requested = flag.split(',').map((s) => s.trim()).filter(Boolean)
+	const unknown = requested.filter((s) => !SETUP_FILTER_NAMES.includes(s as SetupFilterName))
+	if (unknown.length > 0 || requested.length === 0) {
+		throw new Error(`Bad --filters: ${flag}. Allowed: ${SETUP_FILTER_NAMES.join(', ')}`)
+	}
+	return requested as SetupFilterName[]
 }
 
 const CANONICAL_PORTFOLIO_SCENARIOS = ['ote', 'deep', 'breaker'] as const
@@ -425,7 +452,7 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 		{ scenario: 'deep', stopMode: 'zero200' },
 		{ scenario: 'breaker', stopMode: 'zero' },
 		{ scenario: 'breaker161', stopMode: 'zero' },
-		// Исследовательский A/B: не входит в канонический combo-портфель.
+		// Исследо��ательский A/B: не входит в канонический combo-портфель.
 		{ scenario: 'breaker200', stopMode: 'zero' },
 	]
 	// Волна 2 фильтра режима: сравнение до/после на идентичных выборках.
@@ -871,6 +898,10 @@ async function main() {
 	const allRegime: RegimeRow[] = []
 	const portfolioTrades: PortfolioTrade[] = []
 	let portfolioUnresolved = 0
+	// Слой SPEC 7.20: сделки, отрезанные --filters, с именем сработавшего
+	// фильтра — для отчёта foregone («резали убыток или прибыль»).
+	const portfolioFiltered: { trade: PortfolioTrade; filteredBy: SetupFilterName }[] = []
+	const filteredGrids = new Set<string>()
 	// Худшая по датасетам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -885,6 +916,7 @@ async function main() {
 	console.log(`ATR thresholds: ${args.atrThresholds.join(', ')}; min In: ${args.minIn}${args.fixture ? '; FIXTURE MODE' : ''}`)
 	console.log(`Detector variants: ${args.variants.map((v) => v.id).join(', ')}${args.split > 1 ? `; time split: ${args.split}` : ''}`)
 	if (args.portfolio) console.log(`Portfolio scenarios: ${args.portfolioScenarios.join(', ')}`)
+	if (args.portfolio && args.setupFilters.length > 0) console.log(`Setup filters (7.20): ${args.setupFilters.join(', ')}`)
 	console.log('')
 
 	for (const symbol of args.symbols) {
@@ -1002,9 +1034,32 @@ async function main() {
 								// независимые сделки: в канонический портфель входит только breaker.
 								if (args.portfolio && variant.id === 'base' && period === 'full') {
 									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
-									const eligible = snapshot.fibLifecycle.outcomes.filter((o) =>
+									const preFilter = snapshot.fibLifecycle.outcomes.filter((o) =>
 										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
 										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+									// Слой SPEC 7.20: до cooldown, чтобы отрезанный сетап не
+									// блокировал кулдауном следующий (его не существует для портфеля).
+									let eligible = preFilter
+									if (args.setupFilters.length > 0) {
+										const filterCtx = buildSetupFilterContext(
+											snapshot.candles, snapshot.events, snapshot.fib.candidates,
+											snapshot.market.trendHistory, metrics)
+										eligible = []
+										for (const outcome of preFilter) {
+											const failed = firstFailingFilter(outcome, args.setupFilters, filterCtx)
+											if (failed == null) { eligible.push(outcome); continue }
+											// Foregone-учёт: что бы дала отрезанная сделка (для отчёта
+											// «резали убыток или прибыль»). Дедуп по gridKey — как в основном
+											// пути, но с symbol|tf: filteredGrids общий для всех датасетов,
+											// а candidateId уникален только внутри одного symbol × tf.
+											if (!outcome.entered) continue
+											const gridKey = `${symbol}|${timeframe}|${outcome.scenario}|${outcome.candidateId}`
+											if (filteredGrids.has(gridKey)) continue
+											filteredGrids.add(gridKey)
+											const trade = outcomeToPortfolioTrade(symbol, timeframe, snapshot.candles, outcome)
+											if (trade) portfolioFiltered.push({ trade, filteredBy: failed })
+										}
+									}
 									const combo = applyDedup(eligible, 'cooldown')
 									// Одна экономическая позиция на сетку: local/global варианты одной
 									// сетки и сценария — это один сетап, а не две независимые сделки.
@@ -1079,12 +1134,33 @@ async function main() {
 		})
 		const prefix = join(RESULTS_DIR, `portfolio-${stamp}${untilTag}`)
 		const ledgerPath = `${prefix}-ledger.csv`, equityPath = `${prefix}-equity.csv`, monthlyPath = `${prefix}-monthly.csv`, breakdownPath = `${prefix}-breakdown.csv`
-		writeFileSync(ledgerPath, recordsToCsv(result.ledger as unknown as Record<string, unknown>[]))
+		// Отрезанные --filters сделки дописываются в ledger со status=filtered:
+		// в одном файле видно и портфель, и что именно отрезал каждый фильтр.
+		const filteredRows = portfolioFiltered.map(({ trade, filteredBy }) => ({
+			...trade, status: 'filtered', equityBefore: '', equityAfter: '', pnl: '', openRiskPct: '', filteredBy,
+		}))
+		const ledgerRows = [
+			...result.ledger.map((r) => ({ ...r, filteredBy: '' })),
+			...filteredRows,
+		].sort((a, b) => Number(a.entryAt) - Number(b.entryAt))
+		writeFileSync(ledgerPath, recordsToCsv(ledgerRows as unknown as Record<string, unknown>[]))
 		writeFileSync(equityPath, recordsToCsv(result.equity as unknown as Record<string, unknown>[]))
 		writeFileSync(monthlyPath, recordsToCsv(result.monthly as unknown as Record<string, unknown>[]))
 		writeFileSync(breakdownPath, recordsToCsv(result.breakdown as unknown as Record<string, unknown>[]))
 		portfolioFiles = [ledgerPath, equityPath, monthlyPath, breakdownPath]
 		console.log(`\n${portfolioReport(result, portfolioUnresolved)}\n`)
+		if (args.setupFilters.length > 0) {
+			// Foregone-сводка: суммарный netR отрезанных сделок по фильтрам.
+			// Отрицательный foregone = фильтр резал убыток (хорошо).
+			console.log('=== Setup filters (SPEC 7.20) ===')
+			console.log(`Active: ${args.setupFilters.join(', ')}`)
+			for (const name of args.setupFilters) {
+				const cut = portfolioFiltered.filter((f) => f.filteredBy === name)
+				const foregone = cut.reduce((sum, f) => sum + f.trade.netR, 0)
+				console.log(`  ${name.padEnd(8)}: cut ${String(cut.length).padStart(4)} trades, foregone netR ${foregone >= 0 ? '+' : ''}${foregone.toFixed(2)}`)
+			}
+			console.log('')
+		}
 	}
 
 	console.log(`\n=== Top by EV_be (In >= ${args.minIn}) ===\n`)

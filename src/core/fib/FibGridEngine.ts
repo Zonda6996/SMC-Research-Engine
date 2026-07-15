@@ -44,7 +44,7 @@ export class FibGridEngine {
 		const result: FibGridResult = { candidates: [], skips: [] }
 
 		for (const event of input.events) {
-			const eventId = this.eventId(event)
+			const eventId = FibGridEngine.eventId(event)
 			if (event.type === 'unlabeled') {
 				result.skips.push(this.skip(event, eventId, 'unlabeled-event', 'Первое событие не имеет BOS/CHoCH-классификации'))
 				continue
@@ -87,7 +87,7 @@ export class FibGridEngine {
 
 		const variants: Record<FibAnchorMode, FibVariant | null> = {
 			local: this.buildVariant(event, direction, end, event.levelIndex, input.candles, atrAtBreach),
-			global: this.buildVariant(event, direction, end, this.globalWindowStart(event, input.events), input.candles, atrAtBreach),
+			global: this.buildVariant(event, direction, end, FibGridEngine.globalWindowStart(event, input.events), input.candles, atrAtBreach),
 		}
 
 		if (!variants.local && !variants.global) {
@@ -111,8 +111,10 @@ export class FibGridEngine {
 	/**
 	 * Начало окна для global-режима: пробой последнего события
 	 * противоположного направления (или начало данных, если его нет).
+	 * Статический и публичный: setupFilters (фильтр extreme) проверяет
+	 * экстремальность event-level в том же окне, что и global-якорь.
 	 */
-	private globalWindowStart(event: StructureEvent, events: StructureEvent[]): number {
+	static globalWindowStart(event: StructureEvent, events: StructureEvent[]): number {
 		let start = 0
 		for (const other of events) {
 			if (other.breachIndex >= event.breachIndex) break
@@ -188,7 +190,8 @@ export class FibGridEngine {
 		return event.direction === 'up' ? 'long' : 'short'
 	}
 
-	private eventId(event: StructureEvent): string {
+	/** Статический и публичный: setupFilters связывает outcome → candidate → event. */
+	static eventId(event: StructureEvent): string {
 		return `${event.confirmIndex}:${event.levelType}:${event.levelIndex}:${event.levelPrice}`
 	}
 
