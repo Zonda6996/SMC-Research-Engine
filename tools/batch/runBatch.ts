@@ -199,6 +199,13 @@ function parseArgs(argv: string[]): CliArgs {
 		const i = argv.indexOf(flag)
 		return i >= 0 && argv[i + 1] ? argv[i + 1]! : null
 	}
+	// Guard: --portfolio собирает сделки только на полной истории
+	// (period === 'full'), а --split убирает 'full' из прогонов — портфель
+	// молча получал 0 сделок и писал пустые CSV. Walk-forward для портфеля
+	// делается по monthly-CSV (даты уже в нём) или через --until.
+	if (argv.includes('--portfolio') && Number(get('--split') ?? 1) > 1) {
+		throw new Error('--portfolio is incompatible with --split: portfolio collects trades only on the full period. Use monthly CSV (per-epoch dates) or --until for walk-forward.')
+	}
 	// --until 2023-01-01 (или полный ISO): walk-forward на исторических окнах.
 	const untilRaw = get('--until')
 	let untilMs: number | null = null
@@ -420,7 +427,7 @@ interface ResultRow {
 	stopMode: string
 	stats: SliceStats
 	/**
-	 * Разбивка ��о направлению сделки. Ключевой тест на природу edge:
+	 * Разбивка ��о направлению сделки. Ключевой тест на пр��роду edge:
 	 * если EV положительный только у лонгов — это ставка на бычий режим
 	 * периода; если у обеих сторон — структурное преимущество сетапа.
 	 */
@@ -455,7 +462,7 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 		// Исследо��ательский A/B: не входит в канонический combo-портфель.
 		{ scenario: 'breaker200', stopMode: 'zero' },
 	]
-	// Волна 2 фильтра режима: сравнение до/после на идентичных выборках.
+	// Волна 2 фильтра режима: срав��ение до/после на идентичных выборках.
 	// Строки появляются только когда main подмешал релейбленные исходы
 	// (--regime-filter); иначе группы пусты и в вывод не попадают.
 	if (outcomes.some((o) => o.scenario.endsWith('Regime'))) {
@@ -902,7 +909,7 @@ async function main() {
 	// фильтра — для отчёта foregone («резали убыток или прибыль»).
 	const portfolioFiltered: { trade: PortfolioTrade; filteredBy: SetupFilterName }[] = []
 	const filteredGrids = new Set<string>()
-	// Худшая по датасетам одновременная экспозиция (сделок одной стратегии
+	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
 		before: 0,
@@ -1028,7 +1035,7 @@ async function main() {
 									comboExposure = Math.max(comboExposure, maxConcurrentTrades(combo))
 									outcomesForSlicing = [...outcomesForSlicing, ...combo]
 								}
-								// Portfolio всегда использует тот же канонический порядок: regime → cooldown.
+								// Portfolio всегда использует тот же канонический поря��ок: regime → cooldown.
 								// Берём только full/base, иначе split/sweep искусственно дублируют сделки.
 								// breaker161/breaker200 — альтернативные правила того же сетапа, не
 								// независимые сделки: в канонический портфель входит только breaker.
