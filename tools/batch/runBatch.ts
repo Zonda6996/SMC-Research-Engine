@@ -407,7 +407,7 @@ interface SliceStats {
 	ext241Pct: number | null
 	/**
 	 * MAE победителей (сделок, достигших TP1) — база для сокращения стопа:
-	 * медиана и p90 худшей просадки в R (maeR отрицателен; −1 = полн��й стоп).
+	 * медиана и p90 худшей просад��и в R (maeR отрицателен; −1 = полн��й стоп).
 	 * Если 90% победителей не проседают глубже −0.5R, стоп можно вдвое короче
 	 * ценой ~10% побед — а R каждой сделки удваивается.
 	 */
@@ -993,7 +993,7 @@ async function main() {
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
 	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
 	// одна сделка пула × одна лестница. netR = null (лестница не разрешилась
-	// до конца данных) исключает сделку из сравнения по ВСЕМ лестницам.
+	// до конца данных) ��сключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
 	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
 	// с метками фильтров и netR обоих вариантов выходов. Комбинации
@@ -1143,7 +1143,7 @@ async function main() {
 										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
 										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
 									// Слой SPEC 7.20: до cooldown, чтобы отрезанный сетап не
-									// блокировал кулдауном следующий (его не существует для портфеля).
+									// блокировал кулдауном следующий (его не существует для пор��феля).
 									let eligible = preFilter
 									if (args.setupFilters.length > 0) {
 										const filterCtx = buildSetupFilterContext(
@@ -1354,7 +1354,9 @@ async function main() {
 										evalEntryRows.push({
 											symbol, timeframe, scenario: outcome.scenario,
 											entryAt: entryCandle.timestamp, direction: outcome.direction,
-											bigbar: bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex, zoneNearPrice, zoneFarPrice),
+											// +1: свеча касания входит в окно — пользовательский кейс
+											// «одна свеча от 100 до 78» — это чаще всего она сама.
+											bigbar: bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex + 1, zoneNearPrice, zoneFarPrice),
 											touchStatus: touch!.status, touchNetR: touch!.netR ?? 0,
 											closeStatus: close!.status, closeNetR: close!.netR ?? 0,
 											confirmStatus: confirm!.status, confirmNetR: confirm!.netR ?? 0,
@@ -1591,7 +1593,7 @@ async function main() {
 			{ name: 't100 + chop + align', keep: (r) => !r.chopCut && !r.alignCut, exits: 't100' },
 		]
 		const lines: string[] = [`=== Combo pool evaluation (SPEC 7.23, no portfolio, pool ${evalComboRows.length} trades) ===`, '']
-		// Диагностика same-bar (вход и стоп в одной свече = консервативный −1R).
+		// Диагности��а same-bar (вход и стоп в одной свече = консервативный −1R).
 		// НЕ фильтр: исключение задним числом — look-ahead. Показывает масштаб
 		// проблемы и потенциал перехода на confirmClose-вход.
 		const sameBarRows = evalComboRows.filter((r) => r.sameBar)

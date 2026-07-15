@@ -160,7 +160,8 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>) {
 			level: outcome.entryPrice,
 			stop: outcome.stopPrice,
 			tp,
-			bigbar: bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex, zoneNearPrice, zoneFarPrice),
+			// +1: свеча касания входит в окно (тот же фикс, что в runBatch).
+			bigbar: bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex + 1, zoneNearPrice, zoneFarPrice),
 			gridLevels: cVariant.levels.map((l) => ({ ratio: l.ratio, price: l.price })),
 			legStart: { index: cVariant.start.index, price: cVariant.start.price },
 			legEnd: { index: candidate.end.index, price: candidate.end.price },
