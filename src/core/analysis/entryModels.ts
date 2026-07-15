@@ -69,6 +69,13 @@ export interface EntryReplayResult {
 	netR: number | null
 	/** Фактическая цена входа (для entered). */
 	entryPrice: number | null
+	/** Индекс бара фактического входа (для entered) — для отрисовки. */
+	entryIndex?: number | null
+	/** Индекс и цена бара выхода (для entered) — для отрисовки. */
+	exitIndex?: number | null
+	exitPrice?: number | null
+	/** Чем закрылась сделка: тейк или стоп (для entered). */
+	exitReason?: 'tp' | 'stop' | null
 }
 
 /** Стоимость филла в R: цена × ставка × доля / риск. */
@@ -89,7 +96,7 @@ function replayT100Exit(
 	stop: number,
 	tp: number,
 	risk: number,
-): { netR: number } | null {
+): { netR: number; exitIndex: number; exitPrice: number; exitReason: 'tp' | 'stop' } | null {
 	for (let i = startIndex; i < candles.length; i++) {
 		const candle = candles[i]
 		if (!candle) continue
@@ -99,11 +106,11 @@ function replayT100Exit(
 			// Конфликт в одном баре = стоп: зеркало консервативной конвенции
 			// FibLifecycleEngine/takeLadders.
 			const gross = (long ? stop - entry : entry - stop) / risk
-			return { netR: gross - fillCostR(stop, BINGX_TAKER_RATE + BINGX_SLIP_RATE, 1, risk) }
+			return { netR: gross - fillCostR(stop, BINGX_TAKER_RATE + BINGX_SLIP_RATE, 1, risk), exitIndex: i, exitPrice: stop, exitReason: 'stop' }
 		}
 		if (hitTp) {
 			const gross = (long ? tp - entry : entry - tp) / risk
-			return { netR: gross - fillCostR(tp, BINGX_MAKER_RATE, 1, risk) }
+			return { netR: gross - fillCostR(tp, BINGX_MAKER_RATE, 1, risk), exitIndex: i, exitPrice: tp, exitReason: 'tp' }
 		}
 	}
 	return null
