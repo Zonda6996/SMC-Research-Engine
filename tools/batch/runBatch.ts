@@ -992,7 +992,7 @@ async function main() {
 	// Пары LTF → старшие ТФ (по выбору пользователя, SPEC 7.21).
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
 	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
-	// одна сделка пула × одна лестница. netR = null (лестница не разрешилась
+	// одна сделка пула × одна лестница. netR = null (лестница не разре��илась
 	// до конца данны��) ��сключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
 	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
@@ -1006,7 +1006,7 @@ async function main() {
 	// Пул-оценка моделей входа (--eval-entry, SPEC 7.24): одна строка =
 	// одна сделка пула со статусами/netR всех трёх моделей (косты BingX,
 	// выходы t100-only) и меткой bigbar. netR missed-статусов = 0.
-	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null }[] = []
+	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1384,9 +1384,18 @@ async function main() {
 												touchStatus: touch!.status, touchNetR: touch!.netR ?? 0,
 												closeStatus: close!.status, closeNetR: close!.netR ?? 0,
 												confirmStatus: confirm!.status, confirmNetR: confirm!.netR ?? 0,
-												exit141R: ladderR('t141-only'),
-												exitCanonR: ladderR('canon'),
-											})
+													exit141R: ladderR('t141-only'),
+													exitCanonR: ladderR('canon'),
+													// SPEC 7.27: свежесть касания — баров от создания сетки
+													// до касания уровня (entryIndex канона = бар касания).
+													touchDelayBars: outcome.entryIndex - outcome.createdAtIndex,
+													// SPEC 7.27: близость тейка — |tp − entry| / |entry − stop|.
+													// Всё известно на момент выставления лимитки (плановые
+													// уровни сетки), заглядывания в будущее нет.
+													tpDistRatio: outcome.entryPrice != null && outcome.riskSize != null && outcome.riskSize > 0
+														? Math.abs(tp - outcome.entryPrice) / outcome.riskSize
+														: null,
+												})
 									}
 								}
 							// Волна 5 (SPEC 7.19): fade — зеркальная гипотеза. Deep живёт
@@ -1743,8 +1752,49 @@ async function main() {
 				lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} trades, totalR ${fmt(sTotal)}, avgR ${fmt(sTotal / s.length)}`)
 			}
 		}
-		const summary = lines.join('\n')
-		const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)
+			// SPEC 7.27: идеи фильтров «свежесть касания» и «близость тейка».
+			// Только диагностика (бакеты на каноне touch + bigbar, netR t100):
+			// сначала смотрим, есть ли монотонная зависимость avgR от параметра,
+			// порог вводим отдельным решением — защита от подгонки.
+			const canonPool = evalEntryRows.filter((r) => !r.bigbar)
+			const bucketReport = (
+				title: string,
+				buckets: { label: string; match: (r: ERow) => boolean }[],
+			) => {
+				lines.push('', title)
+				for (const b of buckets) {
+					const g = canonPool.filter(b.match)
+					if (g.length === 0) { lines.push(`${b.label.padEnd(14)}: 0 trades`); continue }
+					const total = g.reduce((s, r) => s + r.touchNetR, 0)
+					const wins = g.filter((r) => r.touchNetR > 0)
+					const parts = [`${b.label.padEnd(14)}: ${String(g.length).padStart(5)} trades, totalR ${fmt(total)}, avgR ${fmt(total / g.length)}, WR ${((100 * wins.length) / g.length).toFixed(1)}%`]
+					for (const sc of scenarios) {
+						const s = g.filter((r) => r.scenario === sc)
+						if (s.length === 0) continue
+						const sTotal = s.reduce((sum, r) => sum + r.touchNetR, 0)
+						parts.push(`  [${sc} ${s.length}: avgR ${fmt(sTotal / s.length)}]`)
+					}
+					lines.push(parts.join(''))
+				}
+			}
+			bucketReport('=== Touch freshness (SPEC 7.27): bars from grid creation to zone touch (canon pool: touch + bigbar) ===', [
+				{ label: '0-1 bars', match: (r) => r.touchDelayBars <= 1 },
+				{ label: '2-3 bars', match: (r) => r.touchDelayBars >= 2 && r.touchDelayBars <= 3 },
+				{ label: '4-7 bars', match: (r) => r.touchDelayBars >= 4 && r.touchDelayBars <= 7 },
+				{ label: '8-15 bars', match: (r) => r.touchDelayBars >= 8 && r.touchDelayBars <= 15 },
+				{ label: '16-31 bars', match: (r) => r.touchDelayBars >= 16 && r.touchDelayBars <= 31 },
+				{ label: '32+ bars', match: (r) => r.touchDelayBars >= 32 },
+			])
+			bucketReport('=== Take proximity (SPEC 7.27): |tp-entry| / |entry-stop| at limit placement (canon pool: touch + bigbar) ===', [
+				{ label: '< 0.50', match: (r) => r.tpDistRatio != null && r.tpDistRatio < 0.5 },
+				{ label: '0.50-0.75', match: (r) => r.tpDistRatio != null && r.tpDistRatio >= 0.5 && r.tpDistRatio < 0.75 },
+				{ label: '0.75-1.00', match: (r) => r.tpDistRatio != null && r.tpDistRatio >= 0.75 && r.tpDistRatio < 1.0 },
+				{ label: '1.00-1.50', match: (r) => r.tpDistRatio != null && r.tpDistRatio >= 1.0 && r.tpDistRatio < 1.5 },
+				{ label: '1.50-2.50', match: (r) => r.tpDistRatio != null && r.tpDistRatio >= 1.5 && r.tpDistRatio < 2.5 },
+				{ label: '2.50+', match: (r) => r.tpDistRatio != null && r.tpDistRatio >= 2.5 },
+			])
+			const summary = lines.join('\n')
+			const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)
 		writeFileSync(entryTxtPath, summary + '\n')
 		console.log(`\n${summary}`)
 		console.log(`\nEntry eval CSV (${evalEntryRows.length} rows): ${entryCsvPath}`)
