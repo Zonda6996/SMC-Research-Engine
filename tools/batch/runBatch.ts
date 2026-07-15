@@ -211,7 +211,7 @@ interface CliArgs {
 	tradeTimeStopBars: number | null
 	/**
 	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
-	 * По умолчанию полный канон: ote,deep,breaker. Неизвестные имена — ошибка,
+	 * По умолчанию полный канон: ote,deep,breaker. Неизвестные им��на — ошибка,
 	 * чтобы опечатка не превращалась в молчаливый прогон полного набора.
 	 */
 	portfolioScenarios: string[]
@@ -1011,8 +1011,10 @@ async function main() {
 	// одна сделка, netR по каждой валидной комбинации (ключ "stop|take" в
 	// ratio сетки). null = не разрешилась до конца данных; комбинации не на
 	// своей стороне от входа отсутствуют в map (для сценария невалидны).
-	const SWEEP_STOPS = [-15, 0, 15, 23.6, 50] as const
-	const SWEEP_TAKES = [50, 61.8, 88.6, 100, 120, 141, 161, 200, 241] as const
+	// v2: стопы 30 и 61.8 — ote-оптимум v1 упёрся в край сетки (стоп 50,
+	// тренд ещё рос); тейки 70 и 78.6 — уточнить хребет deep вокруг 61.8.
+	const SWEEP_STOPS = [-15, 0, 15, 23.6, 30, 50, 61.8] as const
+	const SWEEP_TAKES = [50, 61.8, 70, 78.6, 88.6, 100, 120, 141, 161, 200, 241] as const
 	const sweepRows: { symbol: string; timeframe: string; scenario: string; combos: Map<string, number | null> }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
@@ -1836,7 +1838,9 @@ async function main() {
 			// разрешились (иначе сравнение на разных множествах). Решение
 			// потом принимается по ПЛАТО соседних клеток, не по пику
 			// одиночной клетки (свип = data mining, пик = подгонка).
-			const sweepCsvRows: string[] = ['scenario,timeframe,stopRatio,takeRatio,n,totalR,avgR,wr']
+			// v2: колонка group = 'all' | таймфрейм | символ — разрез по активам
+			// обязателен для проверки робастности плато.
+			const sweepCsvRows: string[] = ['scenario,group,stopRatio,takeRatio,n,totalR,avgR,wr']
 			for (const scenario of scenarios) {
 				const scRows = sweepRows.filter((r) => r.scenario === scenario)
 				if (scRows.length === 0) continue
@@ -1857,13 +1861,16 @@ async function main() {
 						const total = vals.reduce((a, b) => a + b, 0)
 						const wr = vals.length ? (100 * vals.filter((v) => v > 0).length) / vals.length : 0
 						cells.push(`${(total / (vals.length || 1)).toFixed(3)}(${wr.toFixed(0)})`.padStart(9))
-						// CSV: сводка all + per-TF для проверки робастности плато.
-						for (const tf of ['all', ...new Set(resolved.map((r) => r.timeframe))]) {
-							const g = tf === 'all' ? resolved : resolved.filter((r) => r.timeframe === tf)
+						// CSV: сводка all + per-TF + per-symbol для проверки
+						// робастности плато по всем осям.
+						const groups: [string, typeof resolved][] = [['all', resolved]]
+						for (const tf of new Set(resolved.map((r) => r.timeframe))) groups.push([tf, resolved.filter((r) => r.timeframe === tf)])
+						for (const sym of new Set(resolved.map((r) => r.symbol))) groups.push([sym, resolved.filter((r) => r.symbol === sym)])
+						for (const [gName, g] of groups) {
 							const gv = g.map((r) => r.combos.get(key)!)
 							const gt = gv.reduce((a, b) => a + b, 0)
 							const gw = gv.length ? (100 * gv.filter((v) => v > 0).length) / gv.length : 0
-							sweepCsvRows.push(`${scenario},${tf},${sr},${tr},${gv.length},${gt.toFixed(3)},${(gt / (gv.length || 1)).toFixed(4)},${gw.toFixed(1)}`)
+							sweepCsvRows.push(`${scenario},${gName},${sr},${tr},${gv.length},${gt.toFixed(3)},${(gt / (gv.length || 1)).toFixed(4)},${gw.toFixed(1)}`)
 						}
 					}
 					lines.push(cells.join(' '))
