@@ -59,6 +59,11 @@
 //                 premium/discount (dealing range). Пары: 30m→1h+4h, 1h→4h,
 //                 4h→1d. HTF агрегируется из LTF-свечей, look-ahead-free
 //                 (знание = закрытие подтверждающей HTF-свечи).
+//   --eval-takes  пул-оценка лестниц тейков (SPEC 7.22): входы и стопы
+//                 канонические, реплеятся только выходы. Лестницы: canon
+//                 (50% на 141 + раннер 241), 100+241, 100+141+241,
+//                 100+161+241, всё на 100. Один пул для всех лестниц —
+//                 чистый эффект менеджмента без композиционного шума.
 //   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
 //                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
 //                 не создавать сетап пока предыдущая сделка жива), *DedupOp
@@ -84,6 +89,7 @@ import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analys
 import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/analysis/dedupFilter.js'
 import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
 import { buildSetupFilterContext, firstFailingFilter, SETUP_FILTER_NAMES, type SetupFilterName } from '../../src/core/analysis/setupFilters.js'
+import { replayLadder, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
 
 // ---------- Свип детектора ----------
 
@@ -110,7 +116,7 @@ const SWEEP_VARIANTS: SweepVariant[] = [
 	{ id: 'age0', config: { minLevelAge: 0 } },
 	{ id: 'age10', config: { minLevelAge: 10 } },
 	{ id: 'age40', config: { minLevelAge: 40 } },
-	// Dedup соседних уровней: выкл / агрессивнее базовых 1.2.
+	// Dedup соседних уровн��й: выкл / агрессивнее базовых 1.2.
 	{ id: 'dedupOff', config: { dedupAtrMultiple: null } },
 	{ id: 'dedup25', config: { dedupAtrMultiple: 2.5 } },
 	// Skip swept: выкл / мягче базовых 0.6 (уровень «прощает» глубокий свип).
@@ -220,6 +226,13 @@ interface CliArgs {
 	 * из уже загруженных LTF — отдельная загрузка не нужна.
 	 */
 	evalHtf: boolean
+	/**
+	 * Пул-оценка лестниц тейков (SPEC 7.22): --eval-takes. Входы и стопы
+	 * канонические, реплеятся ТОЛЬКО выходы — разные лестницы частичных
+	 * фиксаций (canon / 100+241 / 100+141+241 / 100+161+241 / всё на 100)
+	 * на одном и том же пуле сделок, без портфельной симуляции.
+	 */
+	evalTakes: boolean
 	}
 
 function parseArgs(argv: string[]): CliArgs {
@@ -272,6 +285,7 @@ function parseArgs(argv: string[]): CliArgs {
 			setupFilters: resolveSetupFilters(get('--filters')),
 			evalFilters: argv.includes('--eval-filters'),
 			evalHtf: argv.includes('--eval-htf'),
+			evalTakes: argv.includes('--eval-takes'),
 		}
 }
 
@@ -947,6 +961,10 @@ async function main() {
 	const evalHtfRows: { htf: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; htfTrend: string; trendAligned: boolean | null; pdZone: string; pdAligned: boolean | null; netR: number }[] = []
 	// Пары LTF → старшие ТФ (по выбору пользователя, SPEC 7.21).
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
+	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
+	// одна сделка пула × одна лестница. netR = null (лестница не разрешилась
+	// до конца данных) исключает сделку из сравнения по ВСЕМ лестницам.
+	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1181,6 +1199,42 @@ async function main() {
 										}
 									}
 								}
+								// Пул-оценка лестниц тейков (SPEC 7.22): тот же пул, входы
+								// и стопы канонические — реплеятся только выходы. Сделка
+								// попадает в сравнение, только если ВСЕ лестницы разрешились
+								// (иначе сравнение шло бы на разных пулах).
+								if (args.evalTakes && variant.id === 'base' && period === 'full') {
+									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
+									const pool = snapshot.fibLifecycle.outcomes.filter((o) =>
+										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
+										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+									const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
+									const seenGrids = new Set<string>()
+									for (const outcome of pool) {
+										if (!outcome.entered || outcome.entryIndex == null) continue
+										const gridKey = `${outcome.scenario}|${outcome.candidateId}`
+										if (seenGrids.has(gridKey)) continue
+										seenGrids.add(gridKey)
+										const cVariant = candidateById.get(outcome.candidateId)?.variants[outcome.variantMode]
+										if (!cVariant) continue
+										const levelPrice = (ratio: number): number | null =>
+											cVariant.levels.find((l) => l.ratio === ratio)?.price ?? null
+										const entryCandle = snapshot.candles[outcome.entryIndex]
+										if (!entryCandle) continue
+										const results = TAKE_LADDERS.map((ladder) => ({
+											ladder: ladder.id,
+											netR: replayLadder(snapshot.candles, outcome, levelPrice, ladder),
+										}))
+										// Пул идентичен по всем лестницам: одна нерешённая — сделка вон.
+										if (results.some((r) => r.netR == null)) continue
+										for (const r of results) {
+											evalTakeRows.push({
+												ladder: r.ladder, symbol, timeframe, scenario: outcome.scenario,
+												entryAt: entryCandle.timestamp, direction: outcome.direction, netR: r.netR!,
+											})
+										}
+									}
+								}
 							// Волна 5 (SPEC 7.19): fade — зеркальная гипотеза. Deep живёт
 							// в импульсе, fade должен жить там, где deep запрещён:
 							// *Inv — только сетапы, созданные в сжатии/пиле (инверсия
@@ -1363,6 +1417,37 @@ async function main() {
 		console.log(`\n${summary}`)
 		console.log(`HTF eval CSV (${evalHtfRows.length} rows): ${htfCsvPath}`)
 		console.log(`HTF eval summary TXT: ${htfTxtPath}`)
+	}
+
+	// Пул-оценка лестниц тейков (SPEC 7.22) — последним блоком + дубль в txt
+	// (большие таблицы выше вытесняют вывод за буфер консоли). Один и тот же
+	// пул сделок для всех лестниц: сравнение — чистый эффект менеджмента.
+	if (args.evalTakes && evalTakeRows.length > 0) {
+		const takesCsvPath = join(RESULTS_DIR, `evaltakes-${stamp}${untilTag}.csv`)
+		writeFileSync(takesCsvPath, recordsToCsv(evalTakeRows as unknown as Record<string, unknown>[]))
+		const fmt = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(3)}`
+		const avg = (xs: { netR: number }[]) => (xs.length === 0 ? 0 : xs.reduce((s, r) => s + r.netR, 0) / xs.length)
+		const sum = (xs: { netR: number }[]) => xs.reduce((s, r) => s + r.netR, 0)
+		const ladderIds = TAKE_LADDERS.map((l) => l.id)
+		const scenarios = [...new Set(evalTakeRows.map((r) => r.scenario))].sort()
+		const poolSize = evalTakeRows.length / ladderIds.length
+		const lines: string[] = [`=== Take ladder pool evaluation (SPEC 7.22, no portfolio, ${poolSize} trades) ===`, '']
+		for (const id of ladderIds) {
+			const rows = evalTakeRows.filter((r) => r.ladder === id)
+			const wins = rows.filter((r) => r.netR > 0)
+			lines.push(`${id.padEnd(14)}: totalR ${fmt(sum(rows))}, avgR ${fmt(avg(rows))}, WR ${rows.length ? ((100 * wins.length) / rows.length).toFixed(1) : '0.0'}%`)
+			for (const sc of scenarios) {
+				const s = rows.filter((r) => r.scenario === sc)
+				if (s.length === 0) continue
+				lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} trades, totalR ${fmt(sum(s))}, avgR ${fmt(avg(s))}`)
+			}
+		}
+		const summary = lines.join('\n')
+		const takesTxtPath = join(RESULTS_DIR, `evaltakes-${stamp}${untilTag}.txt`)
+		writeFileSync(takesTxtPath, summary + '\n')
+		console.log(`\n${summary}`)
+		console.log(`\nTakes eval CSV (${evalTakeRows.length} rows): ${takesCsvPath}`)
+		console.log(`Takes eval summary TXT: ${takesTxtPath}`)
 	}
 }
 
