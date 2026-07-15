@@ -147,6 +147,8 @@ export function replayEntryModel(
 			status: 'entered',
 			netR: exit.netR - fillCostR(level, BINGX_MAKER_RATE, 1, risk),
 			entryPrice: level,
+			entryIndex: touchIndex,
+			exitIndex: exit.exitIndex, exitPrice: exit.exitPrice, exitReason: exit.exitReason,
 		}
 	}
 
@@ -178,6 +180,8 @@ export function replayEntryModel(
 			status: 'entered',
 			netR: exit.netR - fillCostR(entry, BINGX_TAKER_RATE + BINGX_SLIP_RATE, 1, risk),
 			entryPrice: entry,
+			entryIndex: i,
+			exitIndex: exit.exitIndex, exitPrice: exit.exitPrice, exitReason: exit.exitReason,
 		}
 	}
 	// candleConfirm: подтверждение не пришло за отведённые бары.

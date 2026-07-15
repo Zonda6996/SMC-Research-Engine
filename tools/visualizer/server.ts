@@ -4,6 +4,15 @@
 // Отдаёт статический HTML/JS из public/ и endpoint /api/analyze.
 // НЕ часть пайплайна — измерительный инструмент (см. SPEC, раздел визуализатора).
 //
+// Переработан под текущий канон (SPEC 7.22–7.24, 15.07.2026):
+//   - сделки = пул ote+deep, стоп zero, regime-фильтр, дедуп по сетке —
+//     та же логика, что --eval-entry в runBatch;
+//   - три модели входа (touch / closeConfirm / candleConfirm) с костами
+//     BingX и выходами t100-only — из src/core/analysis/entryModels.ts;
+//   - bigbar-метка (тело одной свечи перекрыло входную зону);
+//   - старые слои A/B-пробников и cooldown-комбо УДАЛЕНЫ из ответа:
+//     они относились к закрытым исследованиям (SPEC 7.19 и раньше).
+//
 // Запуск: npx tsx tools/visualizer/server.ts
 // Открыть: http://localhost:7788
 
@@ -14,20 +23,12 @@ import { dirname, join, extname } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
 import { DEFAULT_REGIME_FILTER, passesRegimeFilter } from '../../src/core/analysis/regimeFilter.js'
-import { applyDedup } from '../../src/core/analysis/dedupFilter.js'
-import { netBeR } from '../../src/core/fib/fibCosts.js'
+import { replayEntryModel, bigbarCovered, type EntryModelId } from '../../src/core/analysis/entryModels.js'
 import { fetchCandlesPaginated } from '../shared/candleFetcher.js'
-import { probeSwingBreaches, type BreachMode } from './lastSwingBreachProbe.js'
-import {
-	probeProtectedBreaches,
-	classifyBreaches,
-	classifySwingBreaches as classifySwing,
-} from './breachClassifier.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PUBLIC_DIR = join(__dirname, 'public')
 const PORT = 7788
-const WINDOW = 2
 
 const MIME: Record<string, string> = {
 	'.html': 'text/html; charset=utf-8',
@@ -41,7 +42,6 @@ interface AnalyzeQuery {
 	symbol?: string | undefined
 	timeframe?: string | undefined
 	limit?: string | undefined
-	mode?: string | undefined
 	source?: string | undefined
 	market?: string | undefined
 }
@@ -52,7 +52,6 @@ function parseQuery(qs: string): AnalyzeQuery {
 		symbol: params.get('symbol') ?? undefined,
 		timeframe: params.get('timeframe') ?? undefined,
 		limit: params.get('limit') ?? undefined,
-		mode: params.get('mode') ?? undefined,
 		source: params.get('source') ?? undefined,
 		market: params.get('market') ?? undefined,
 	}
@@ -64,9 +63,6 @@ const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json'
 function loadFixtureCandles(): import('../../src/models/price/Candle.js').Candle[] {
 	return JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8'))
 }
-
-// Загрузка свечей вынесена в общий модуль — используется и batch-раннером.
-// (см. tools/shared/candleFetcher.ts)
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
 	const body = JSON.stringify(data)
@@ -80,14 +76,13 @@ const SYMBOLS_CACHE_TTL_MS = 60 * 60 * 1000
 
 /**
  * Топ-100 USDT-пар по суточному объёму с Binance USDT-M futures.
- * Публичный endpoint, без API-ключей. Fallback — статический список.
+ * Публичный endpoint, без API-ключей.
  */
 async function fetchTopSymbols(): Promise<string[]> {
 	if (symbolsCache && Date.now() - symbolsCache.fetchedAt < SYMBOLS_CACHE_TTL_MS) {
 		return symbolsCache.symbols
 	}
 	const { default: ccxt } = await import('ccxt')
-	// futures предпочтительнее (чище свечи у альтов), spot — fallback.
 	let tickers
 	try {
 		tickers = await new ccxt.binanceusdm().fetchTickers()
@@ -97,7 +92,6 @@ async function fetchTopSymbols(): Promise<string[]> {
 	const symbols = Object.values(tickers)
 		.filter((t) => t.symbol?.endsWith('/USDT:USDT') || t.symbol?.endsWith('/USDT'))
 		.map((t) => ({
-			// ccxt для перпов отдаёт 'BTC/USDT:USDT' — приводим к 'BTC/USDT'.
 			symbol: (t.symbol ?? '').replace(':USDT', ''),
 			volume: Number(t.quoteVolume ?? 0),
 		}))
@@ -109,13 +103,90 @@ async function fetchTopSymbols(): Promise<string[]> {
 	return symbols
 }
 
+/** Входные зоны сетки по сценариям — та же карта, что в runBatch --eval-entry. */
+const ENTRY_ZONES: Record<string, [number, number]> = { ote: [61.8, 78.6], deep: [23.6, 38.2] }
+const MODELS: EntryModelId[] = ['touch', 'closeConfirm', 'candleConfirm']
+
+/**
+ * Сделки канонического пула с тремя моделями входа — зеркало --eval-entry
+ * (SPEC 7.24). Каждая сделка несёт полный набор для отрисовки: уровни
+ * сетки, вход/стоп/тейк, индексы входа-выхода каждой модели, bigbar.
+ */
+function buildTrades(snapshot: ReturnType<typeof runAnalysis>) {
+	const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
+	const pool = snapshot.fibLifecycle.outcomes.filter((o) =>
+		(o.scenario === 'ote' || o.scenario === 'deep') && o.stopMode === 'zero' &&
+		(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+	const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
+	const seenGrids = new Set<string>()
+	const trades: unknown[] = []
+	for (const outcome of pool) {
+		if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null) continue
+		const gridKey = `${outcome.scenario}|${outcome.candidateId}`
+		if (seenGrids.has(gridKey)) continue
+		seenGrids.add(gridKey)
+		const candidate = candidateById.get(outcome.candidateId)
+		const cVariant = candidate?.variants[outcome.variantMode]
+		if (!candidate || !cVariant) continue
+		const levelPrice = (ratio: number): number | null =>
+			cVariant.levels.find((l) => l.ratio === ratio)?.price ?? null
+		const tp = levelPrice(100)
+		const zone = ENTRY_ZONES[outcome.scenario]
+		if (tp == null || zone == null) continue
+		const zoneNearPrice = levelPrice(zone[0])
+		const zoneFarPrice = levelPrice(zone[1])
+		if (zoneNearPrice == null || zoneFarPrice == null) continue
+		const models: Record<string, unknown> = {}
+		for (const m of MODELS) {
+			const r = replayEntryModel(snapshot.candles, outcome, tp, m)
+			models[m] = {
+				status: r.status,
+				netR: r.netR,
+				entryPrice: r.entryPrice,
+				entryIndex: r.entryIndex ?? null,
+				exitIndex: r.exitIndex ?? null,
+				exitPrice: r.exitPrice ?? null,
+				exitReason: r.exitReason ?? null,
+			}
+		}
+		trades.push({
+			id: gridKey,
+			candidateId: outcome.candidateId,
+			scenario: outcome.scenario,
+			direction: outcome.direction,
+			trigger: outcome.trigger,
+			createdAtIndex: outcome.createdAtIndex,
+			touchIndex: outcome.entryIndex,
+			level: outcome.entryPrice,
+			stop: outcome.stopPrice,
+			tp,
+			bigbar: bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex, zoneNearPrice, zoneFarPrice),
+			gridLevels: cVariant.levels.map((l) => ({ ratio: l.ratio, price: l.price })),
+			legStart: { index: cVariant.start.index, price: cVariant.start.price },
+			legEnd: { index: candidate.end.index, price: candidate.end.price },
+			models,
+		})
+	}
+	return trades
+}
+
+/** Protected-уровни: только активные из snapshot — без старых пробников. */
+function buildProtectedSegments(
+	snapshot: ReturnType<typeof runAnalysis>,
+): { price: number; type: 'high' | 'low'; startIndex: number; endIndex: number }[] {
+	const segments: { price: number; type: 'high' | 'low'; startIndex: number; endIndex: number }[] = []
+	const last = snapshot.candles.length - 1
+	const high = snapshot.market.protectedHigh
+	const low = snapshot.market.protectedLow
+	if (high) segments.push({ price: high.price, type: 'high', startIndex: high.index, endIndex: last })
+	if (low) segments.push({ price: low.price, type: 'low', startIndex: low.index, endIndex: last })
+	return segments
+}
+
 const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
 	const url = new URL(req.url ?? '/', `http://localhost:${PORT}`)
-
-	// CORS для локальной разработки (если HTML открывают отдельно).
 	res.setHeader('Access-Control-Allow-Origin', '*')
 
-	// /api/symbols — топ-100 USDT-пар по объёму для автодополнения.
 	if (url.pathname === '/api/symbols') {
 		try {
 			sendJson(res, 200, { symbols: await fetchTopSymbols() })
@@ -127,15 +198,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 		return
 	}
 
-	// /api/analyze?symbol=BTC/USDT&timeframe=15m&limit=500&mode=two
+	// /api/analyze?symbol=BTC/USDT&timeframe=30m&limit=2000&source=fresh
 	if (url.pathname === '/api/analyze') {
 		try {
 			const q = parseQuery(url.search)
 			const symbol = q.symbol ?? 'BTC/USDT'
-			const timeframe = q.timeframe ?? '15m'
-			const limit = Number(q.limit ?? 500)
-			const mode: BreachMode = q.mode === 'single' ? 'single' : 'two'
-			const market = q.market === 'futures' ? 'futures' : 'spot'
+			const timeframe = q.timeframe ?? '30m'
+			const limit = Number(q.limit ?? 2000)
+			const market = q.market === 'spot' ? 'spot' : 'futures'
 
 			const useFixture = q.source !== 'fresh'
 			const candles = useFixture
@@ -143,93 +213,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				: await fetchCandlesPaginated(symbol, timeframe, limit, market)
 			const snapshot = runAnalysis(candles)
 
-			// Слой A: protected-пробои. Эмулируем через probeProtectedBreaches с
-			// выбранным mode (совпадает со snapshot.market.breached при mode='two').
-			const protectedBreaches = probeProtectedBreaches(
-				snapshot.structure,
-				snapshot.candles,
-				WINDOW,
-				mode,
-			)
-			const layerA = classifyBreaches(
-				protectedBreaches,
-				snapshot.market.trendHistory,
-				'protected',
-			)
-
-			// Слой B: swing-пробои (изолированный пробник).
-			const swingBreaches = probeSwingBreaches(
-				snapshot.structure,
-				snapshot.candles,
-				WINDOW,
-				mode,
-			)
-			const layerB = classifySwing(swingBreaches, snapshot.market.trendHistory)
-
-			// Слой C берётся только из общего pipeline snapshot. Визуализатор не
-			// запускает BosChochEngine повторно и не может разойтись с runAnalysis().
-			const layerC = snapshot.events.map((event) => ({
-				...event,
-				source: 'pool' as const,
-				trend: event.direction === 'up' ? 'bullish' : 'bearish',
-				reason: `pipeline: направление ${event.direction}`,
-			}))
-
-			// Совпадения: одна и та же свеча подтверждения + тот же уровень цены.
-			const matched = layerA.filter((a) =>
-				layerB.some((b) => b.confirmIndex === a.confirmIndex && b.levelPrice === a.levelPrice),
-			)
-
-			// Уникальные для B (нет совпадения по confirmIndex+price в A).
-			const uniqueB = layerB.filter((b) =>
-				!layerA.some((a) => a.confirmIndex === b.confirmIndex && a.levelPrice === b.levelPrice),
-			)
-
 			sendJson(res, 200, {
-				dataset: { symbol, timeframe, limit, candleCount: candles.length, mode },
+				dataset: { symbol, timeframe, limit, candleCount: candles.length, source: useFixture ? 'fixture' : 'fresh' },
 				candles: snapshot.candles,
 				structure: snapshot.structure,
 				trendHistory: snapshot.market.trendHistory,
 				finalTrend: snapshot.market.trend,
-				protectedHigh: snapshot.market.protectedHigh ?? null,
-				protectedLow: snapshot.market.protectedLow ?? null,
-					// Канонические события и Fib Lab из единого pipeline snapshot.
-					pipelineEvents: snapshot.events,
-					fib: snapshot.fib,
-					fibLifecycle: snapshot.fibLifecycle,
-					// Метрики режима (SPEC 7.15) на момент создания каждого сетапа —
-					// для галереи сетапов. Пороги фильтра — из волны 2 (regimeFilter.ts).
-					regime: buildRegimePayload(snapshot),
-					combo: buildComboPayload(snapshot),
-				// Все protected-уровни для отрисовки сегментов (из breached + активные).
-				protectedSegments: buildProtectedSegments(
-					protectedBreaches,
-					snapshot.market.protectedHigh ?? null,
-					snapshot.market.protectedLow ?? null,
-					snapshot.candles.length,
-				),
-				layers: {
-					A: layerA,
-					B: layerB,
-					C: layerC,
-					matched,
-					uniqueB,
-					// Уникальные для C относительно A — то, что теряет вариант 1.
-					uniqueC: layerC.filter((c) =>
-						!layerA.some((a) => a.confirmIndex === c.confirmIndex && a.levelPrice === c.levelPrice),
-					),
-				},
-				counts: {
-					A: layerA.length,
-					B: layerB.length,
-						C: layerC.length,
-						CFiltered: layerC.length,
-					matched: matched.length,
-					uniqueB: uniqueB.length,
-					byTypeA: countByType(layerA),
-					byTypeB: countByType(layerB),
-					byTypeC: countByType(layerC),
-				},
+				events: snapshot.events,
+				protectedSegments: buildProtectedSegments(snapshot),
+				trades: buildTrades(snapshot),
 			})
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err)
@@ -240,7 +232,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 	}
 
 	// Статика из public/.
-	let filePath = join(PUBLIC_DIR, url.pathname === '/' ? 'index.html' : url.pathname)
+	const filePath = join(PUBLIC_DIR, url.pathname === '/' ? 'index.html' : url.pathname)
 	if (!existsSync(filePath)) {
 		sendJson(res, 404, { error: `Not found: ${url.pathname}` })
 		return
@@ -252,115 +244,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 	res.end(body)
 })
 
-/**
- * Метрики режима по индексам создания сетапов (не весь ряд — экономия
- * трафика) плюс пороги фильтра волны 2, чтобы клиент показывал pass/block
- * теми же константами, что и батч-раннер.
- */
-function buildRegimePayload(snapshot: ReturnType<typeof runAnalysis>) {
-	const metrics = computeRegimeMetrics(
-		snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory,
-	)
-	const byIndex: Record<number, unknown> = {}
-	for (const o of snapshot.fibLifecycle.outcomes) {
-		if (byIndex[o.createdAtIndex] === undefined) {
-			byIndex[o.createdAtIndex] = metrics[o.createdAtIndex] ?? null
-		}
-	}
-	return {
-		byIndex,
-		thresholds: {
-			minAtrRatio: DEFAULT_REGIME_FILTER.minAtrRatio,
-			maxChochShare: DEFAULT_REGIME_FILTER.maxChochShare,
-			scenarios: [...DEFAULT_REGIME_FILTER.scenarios],
-		},
-	}
-}
-
-function comboKey(o: { candidateId: string; variantMode: string; scenario: string; stopMode: string }): string {
-	return `${o.candidateId}|${o.variantMode}|${o.scenario}|${o.stopMode}`
-}
-
-/** Канонический статус каждой core-сетки: regime, затем cooldown. */
-function buildComboPayload(snapshot: ReturnType<typeof runAnalysis>) {
-	const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
-	const core = snapshot.fibLifecycle.outcomes.filter((o) =>
-		['ote', 'deep', 'breaker', 'breaker161'].includes(o.scenario) && o.stopMode === 'zero')
-	const regimePassed = core.filter((o) =>
-		!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex]))
-	const survivors = new Set(applyDedup(regimePassed, 'cooldown'))
-	const byKey: Record<string, { accepted: boolean; reason: 'accepted' | 'regime' | 'cooldown'; netR: number | null }> = {}
-	for (const outcome of core) {
-		const regimeOk = !DEFAULT_REGIME_FILTER.scenarios.has(outcome.scenario) || passesRegimeFilter(outcome.scenario, metrics[outcome.createdAtIndex])
-		const netR = netBeR(outcome)
-		byKey[comboKey(outcome)] = !regimeOk
-			? { accepted: false, reason: 'regime', netR }
-			: survivors.has(outcome)
-				? { accepted: true, reason: 'accepted', netR }
-				: { accepted: false, reason: 'cooldown', netR }
-	}
-	return { byKey, order: ['regime', 'cooldown'] }
-}
-
-function countByType(events: { type: string }[]): { bos: number; choch: number; unlabeled: number } {
-	return events.reduce(
-		(acc, e) => {
-			if (e.type === 'bos') acc.bos++
-			else if (e.type === 'choch') acc.choch++
-			else acc.unlabeled++
-			return acc
-		},
-		{ bos: 0, choch: 0, unlabeled: 0 },
-	)
-}
-
-/**
- * Строит сегменты protected-уровней для отрисовки:
- * { price, type, startIndex, endIndex } — от возникновения до слома/конца данных.
- */
-function buildProtectedSegments(
-	breaches: { level: { price: number; type: 'high' | 'low'; index: number }; confirmIndex: number }[],
-	activeHigh: { index: number; price: number; type: 'high' | 'low' } | null,
-	activeLow: { index: number; price: number; type: 'high' | 'low' } | null,
-	totalCandles: number,
-): { price: number; type: 'high' | 'low'; startIndex: number; endIndex: number }[] {
-	const segments: { price: number; type: 'high' | 'low'; startIndex: number; endIndex: number }[] = []
-
-	for (const b of breaches) {
-		segments.push({
-			price: b.level.price,
-			type: b.level.type,
-			startIndex: b.level.index,
-			endIndex: b.confirmIndex,
-		})
-	}
-
-	if (activeHigh) {
-		segments.push({
-			price: activeHigh.price,
-			type: 'high',
-			startIndex: activeHigh.index,
-			endIndex: totalCandles - 1,
-		})
-	}
-	if (activeLow) {
-		segments.push({
-			price: activeLow.price,
-			type: 'low',
-			startIndex: activeLow.index,
-			endIndex: totalCandles - 1,
-		})
-	}
-
-	return segments
-}
-
 server.on('error', (err: NodeJS.ErrnoException) => {
 	if (err.code === 'EADDRINUSE') {
-		console.error(`\n  Port ${PORT} is already in use. Kill it first:\n`)
-		console.error(`    Windows:  netstat -ano | findstr :${PORT}`)
-		console.error(`              taskkill /PID <pid> /F\n`)
-		console.error(`    Or change PORT in tools/visualizer/server.ts\n`)
+		console.error(`\n  Port ${PORT} is already in use. Kill it first or change PORT.\n`)
 	} else {
 		console.error('Server error:', err.message)
 	}
@@ -368,5 +254,5 @@ server.on('error', (err: NodeJS.ErrnoException) => {
 })
 
 server.listen(PORT, () => {
-	console.log(`\n  BOS/CHoCH visualizer → http://localhost:${PORT}\n`)
+	console.log(`\n  Fib Playbook visualizer → http://localhost:${PORT}\n`)
 })
