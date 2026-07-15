@@ -211,12 +211,12 @@ interface CliArgs {
 	tradeTimeStopBars: number | null
 	/**
 	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
-	 * По умолчанию полный канон: ote,deep,breaker. Неизвестные им��на — ошибка,
+	 * По умолчанию полный канон: ote,deep,breaker. Неизвестные им����на — ошибка,
 	 * чтобы опечатка не превращалась в молчаливый прогон полного набора.
 	 */
 	portfolioScenarios: string[]
 	/**
-	 * Слой дискреционных фильтров (SPEC 7.20): --filters late,align,extreme,chop.
+	 * Слой дискрец��онных фильтров (SPEC 7.20): --filters late,align,extreme,chop.
 	 * Применяется к eligible-исходам ПЕРЕД портфелем; отрезанные попадают в
 	 * ledger со статусом filtered и именем фильтра в filteredBy. Пустой список
 	 * (без флага) = baseline без слоя. Опечатки — ошибка, как в --scenarios.
@@ -992,7 +992,7 @@ async function main() {
 	// Пары LTF → старшие ТФ (по выбору пользователя, SPEC 7.21).
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
 	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
-	// одна сделка пула × одна лестница. netR = null (лестница не р����зре��илась
+	// одна сделка пула × одна лестница. netR = null (лестни��а не р����зре��илась
 	// до конца данны��) ��сключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
 	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
@@ -1013,9 +1013,12 @@ async function main() {
 	// своей стороне от входа отсутствуют в map (для сценария невалидны).
 	// v2: стопы 30 и 61.8 — ote-оптимум v1 упёрся в край сетки (стоп 50,
 	// тренд ещё рос); тейки 70 и 78.6 — уточнить хребет deep вокруг 61.8.
-	const SWEEP_STOPS = [-15, 0, 15, 23.6, 30, 50, 61.8] as const
+	// v3: стоп 70 — ote-оптимум v2 СНОВА на краю (61.8, тренд рос 50→61.8);
+	// 70 = 8.6% свинга от входа 78.6, ждём слом от костов/шума — надо увидеть
+	// обрыв, а не край. Плюс entryAt в строках — разрез H1/H2 по времени.
+	const SWEEP_STOPS = [-15, 0, 15, 23.6, 30, 50, 61.8, 70] as const
 	const SWEEP_TAKES = [50, 61.8, 70, 78.6, 88.6, 100, 120, 141, 161, 200, 241] as const
-	const sweepRows: { symbol: string; timeframe: string; scenario: string; combos: Map<string, number | null> }[] = []
+	const sweepRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; combos: Map<string, number | null> }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1343,7 +1346,7 @@ async function main() {
 									const dedupSurvivors = new Set(applyDedup(pool, 'cooldown'))
 									const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
 									// Входные зоны сетки (ratio): ote — 61.8–78.6, deep — 23.6–38.2
-									// (пары пользователя «78→61», «38→23»).
+									// (пары пользовате��я «78→61», «38→23»).
 									const ENTRY_ZONES: Record<string, [number, number]> = { ote: [61.8, 78.6], deep: [23.6, 38.2] }
 									const MODELS: EntryModelId[] = ['touch', 'closeConfirm', 'candleConfirm']
 									const seenGrids = new Set<string>()
@@ -1447,7 +1450,7 @@ async function main() {
 															if (stopOk && tpOk) combos.set(`${sr}|${tr}`, netR)
 														}
 													}
-													sweepRows.push({ symbol, timeframe, scenario: outcome.scenario, combos })
+													sweepRows.push({ symbol, timeframe, scenario: outcome.scenario, entryAt: lastRow.entryAt, combos })
 												}
 											}
 									}
@@ -1861,11 +1864,16 @@ async function main() {
 						const total = vals.reduce((a, b) => a + b, 0)
 						const wr = vals.length ? (100 * vals.filter((v) => v > 0).length) / vals.length : 0
 						cells.push(`${(total / (vals.length || 1)).toFixed(3)}(${wr.toFixed(0)})`.padStart(9))
-						// CSV: сводка all + per-TF + per-symbol для проверки
-						// робастности плато по всем осям.
+						// CSV: сводка all + per-TF + per-symbol + H1/H2 (первая и
+						// вторая половина периода по медиане entryAt) — проверка
+						// робастности плато по всем осям, включая время.
 						const groups: [string, typeof resolved][] = [['all', resolved]]
 						for (const tf of new Set(resolved.map((r) => r.timeframe))) groups.push([tf, resolved.filter((r) => r.timeframe === tf)])
 						for (const sym of new Set(resolved.map((r) => r.symbol))) groups.push([sym, resolved.filter((r) => r.symbol === sym)])
+						const sortedAt = resolved.map((r) => r.entryAt).sort((a, b) => a - b)
+						const midAt = sortedAt[Math.floor(sortedAt.length / 2)] ?? 0
+						groups.push(['H1', resolved.filter((r) => r.entryAt < midAt)])
+						groups.push(['H2', resolved.filter((r) => r.entryAt >= midAt)])
 						for (const [gName, g] of groups) {
 							const gv = g.map((r) => r.combos.get(key)!)
 							const gt = gv.reduce((a, b) => a + b, 0)
