@@ -64,6 +64,11 @@
 //                 (50% на 141 + раннер 241), 100+241, 100+141+241,
 //                 100+161+241, всё на 100. Один пул для всех лестниц —
 //                 чистый эффект менеджмента без композиционного шума.
+//   --eval-combo  комбо-оценка (SPEC 7.23): t100-only выходы + фильтры
+//                 chop/align на одном пуле. Сравнивает canon, t100-only,
+//                 t100+chop, t100+align, t100+chop+align — проверка, что
+//                 три подтверждённые находки складываются, а не режут
+//                 одни и те же сделки.
 //   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
 //                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
 //                 не создавать сетап пока предыдущая сделка жива), *DedupOp
@@ -215,7 +220,7 @@ interface CliArgs {
 	 * прогонов 15.07.2026: портфель (капасити, кулдауны, порядок заполнения
 	 * слотов) добавляет композиционный рандом — удаление одной сделки
 	 * каскадно переписывает состав всех последующих, и «эффект фильтра»
-	 * неотличим от перетасовки. Пул-оценка отвечает на единственный честный
+	 * не��тличим от перетасовки. Пул-оценка отвечает на единственный честный
 	 * вопрос: отличается ли средний netR срезанных сделок от пропущенных.
 	 */
 	evalFilters: boolean
@@ -233,6 +238,14 @@ interface CliArgs {
 	 * на одном и том же пуле сделок, без портфельной симуляции.
 	 */
 	evalTakes: boolean
+	/**
+	 * Комбинированная пул-оценка (SPEC 7.23): --eval-combo. Соединяет три
+	 * подтверждённые находки на одном пуле: выходы t100-only (SPEC 7.22) +
+	 * фильтры chop и align (SPEC 7.20 iter 2). Каждая сделка размечается
+	 * chopCut/alignCut и получает netR для canon- и t100-only-выходов —
+	 * сводка сравнивает все комбинации на идентичном составе сделок.
+	 */
+	evalCombo: boolean
 	}
 
 function parseArgs(argv: string[]): CliArgs {
@@ -286,6 +299,7 @@ function parseArgs(argv: string[]): CliArgs {
 			evalFilters: argv.includes('--eval-filters'),
 			evalHtf: argv.includes('--eval-htf'),
 			evalTakes: argv.includes('--eval-takes'),
+			evalCombo: argv.includes('--eval-combo'),
 		}
 }
 
@@ -872,7 +886,7 @@ function toMarkdown(rows: ResultRow[], minIn: number): string {
 
 function toCsv(rows: ResultRow[]): string {
 	// Новые колонки добавляются строго В КОНЕЦ — старые скрипты анализа CSV
-	// по позициям не ломаются.
+	// по позиц��ям не ломаются.
 	const header =
 		'symbol,timeframe,variant,period,anchor,trigger,atr,scenario,stop_mode,setups,entered,resolved,tp1_pct,tp2_pct,sl_pct,ev_full,ev_be,' +
 		'long_in,long_ev_full,long_ev_be,short_in,short_ev_full,short_ev_be,' +
@@ -965,6 +979,10 @@ async function main() {
 	// одна сделка пула × одна лестница. netR = null (лестница не разрешилась
 	// до конца данных) исключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
+	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
+	// с метками фильтров и netR обоих вариантов выходов. Комбинации
+	// собираются на этапе сводки из одного и того же состава сделок.
+	const evalComboRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; chopCut: boolean; alignCut: boolean; netRCanon: number; netRT100: number }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1113,7 +1131,7 @@ async function main() {
 											if (failed == null) { eligible.push(outcome); continue }
 											// Foregone-учёт: что бы дала отрезанная сделка (для отчёта
 											// «резали убыток или прибыль»). Дедуп по gridKey — как в основном
-											// пути, но с symbol|tf: filteredGrids общий для всех датасетов,
+											// пути, но с symbol|tf: filteredGrids о��щий для всех датасетов,
 											// а candidateId уникален только внутри одного symbol × tf.
 											if (!outcome.entered) continue
 											const gridKey = `${symbol}|${timeframe}|${outcome.scenario}|${outcome.candidateId}`
@@ -1233,6 +1251,43 @@ async function main() {
 												entryAt: entryCandle.timestamp, direction: outcome.direction, netR: r.netR!,
 											})
 										}
+									}
+								}
+								// Комбо-оценка (SPEC 7.23): t100-only выходы + метки chop/align
+								// на одном пуле. Логика пула идентична --eval-takes; сделка
+								// включается, только если canon и t100-only оба разрешились.
+								if (args.evalCombo && variant.id === 'base' && period === 'full') {
+									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
+									const pool = snapshot.fibLifecycle.outcomes.filter((o) =>
+										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
+										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+									const filterCtx = buildSetupFilterContext(
+										snapshot.candles, snapshot.events, snapshot.fib.candidates,
+										snapshot.market.trendHistory, metrics)
+									const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
+									const canonLadder = TAKE_LADDERS.find((l) => l.id === 'canon')!
+									const t100Ladder = TAKE_LADDERS.find((l) => l.id === 't100-only')!
+									const seenGrids = new Set<string>()
+									for (const outcome of pool) {
+										if (!outcome.entered || outcome.entryIndex == null) continue
+										const gridKey = `${outcome.scenario}|${outcome.candidateId}`
+										if (seenGrids.has(gridKey)) continue
+										seenGrids.add(gridKey)
+										const cVariant = candidateById.get(outcome.candidateId)?.variants[outcome.variantMode]
+										if (!cVariant) continue
+										const levelPrice = (ratio: number): number | null =>
+											cVariant.levels.find((l) => l.ratio === ratio)?.price ?? null
+										const entryCandle = snapshot.candles[outcome.entryIndex]
+										if (!entryCandle) continue
+										const netRCanon = replayLadder(snapshot.candles, outcome, levelPrice, canonLadder)
+										const netRT100 = replayLadder(snapshot.candles, outcome, levelPrice, t100Ladder)
+										if (netRCanon == null || netRT100 == null) continue
+										evalComboRows.push({
+											symbol, timeframe, scenario: outcome.scenario, entryAt: entryCandle.timestamp,
+											chopCut: firstFailingFilter(outcome, ['chop'], filterCtx) != null,
+											alignCut: firstFailingFilter(outcome, ['align'], filterCtx) != null,
+											netRCanon, netRT100,
+										})
 									}
 								}
 							// Волна 5 (SPEC 7.19): fade — зеркальная гипотеза. Deep живёт
@@ -1448,6 +1503,43 @@ async function main() {
 		console.log(`\n${summary}`)
 		console.log(`\nTakes eval CSV (${evalTakeRows.length} rows): ${takesCsvPath}`)
 		console.log(`Takes eval summary TXT: ${takesTxtPath}`)
+	}
+
+	// Комбо-оценка (SPEC 7.23) — последним блоком + дубль в txt. Все
+	// комбинации считаются из одного состава сделок: фильтр = подмножество.
+	if (args.evalCombo && evalComboRows.length > 0) {
+		const comboCsvPath = join(RESULTS_DIR, `evalcombo-${stamp}${untilTag}.csv`)
+		writeFileSync(comboCsvPath, recordsToCsv(evalComboRows as unknown as Record<string, unknown>[]))
+		const fmt = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(3)}`
+		type ComboRow = (typeof evalComboRows)[number]
+		const combos: { name: string; keep: (r: ComboRow) => boolean; exits: 'canon' | 't100' }[] = [
+			{ name: 'canon (baseline)', keep: () => true, exits: 'canon' },
+			{ name: 't100-only', keep: () => true, exits: 't100' },
+			{ name: 't100 + chop', keep: (r) => !r.chopCut, exits: 't100' },
+			{ name: 't100 + align', keep: (r) => !r.alignCut, exits: 't100' },
+			{ name: 't100 + chop + align', keep: (r) => !r.chopCut && !r.alignCut, exits: 't100' },
+		]
+		const lines: string[] = [`=== Combo pool evaluation (SPEC 7.23, no portfolio, pool ${evalComboRows.length} trades) ===`, '']
+		const scenarios = [...new Set(evalComboRows.map((r) => r.scenario))].sort()
+		for (const combo of combos) {
+			const kept = evalComboRows.filter(combo.keep)
+			const netR = (r: ComboRow) => (combo.exits === 'canon' ? r.netRCanon : r.netRT100)
+			const total = kept.reduce((s, r) => s + netR(r), 0)
+			const wins = kept.filter((r) => netR(r) > 0)
+			lines.push(`${combo.name.padEnd(20)}: ${String(kept.length).padStart(5)} trades, totalR ${fmt(total)}, avgR ${fmt(kept.length ? total / kept.length : 0)}, WR ${kept.length ? ((100 * wins.length) / kept.length).toFixed(1) : '0.0'}%`)
+			for (const sc of scenarios) {
+				const s = kept.filter((r) => r.scenario === sc)
+				if (s.length === 0) continue
+				const sTotal = s.reduce((sum, r) => sum + netR(r), 0)
+				lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} trades, totalR ${fmt(sTotal)}, avgR ${fmt(sTotal / s.length)}`)
+			}
+		}
+		const summary = lines.join('\n')
+		const comboTxtPath = join(RESULTS_DIR, `evalcombo-${stamp}${untilTag}.txt`)
+		writeFileSync(comboTxtPath, summary + '\n')
+		console.log(`\n${summary}`)
+		console.log(`\nCombo eval CSV (${evalComboRows.length} rows): ${comboCsvPath}`)
+		console.log(`Combo eval summary TXT: ${comboTxtPath}`)
 	}
 }
 
