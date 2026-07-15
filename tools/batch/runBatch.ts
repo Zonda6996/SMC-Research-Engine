@@ -69,6 +69,13 @@
 //                 t100+chop, t100+align, t100+chop+align — проверка, что
 //                 три подтверждённые находки складываются, а не режут
 //                 одни и те же сделки.
+//   --eval-entry  пул-оценка моделей входа (SPEC 7.24): косты BingX
+//                 (maker 0.02% / taker 0.05%), три модели входа — touch
+//                 (лимитка на уровне), closeConfirm (маркет по закрытию
+//                 свечи касания), candleConfirm (маркет по закрытию
+//                 подтверждающей свечи) + bigbar-фильтр (тело одной свечи
+//                 перекрыло входную зону — пропуск). Выходы t100-only.
+//                 Статистика упущенных/спасённых с counterfactual.
 //   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
 //                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
 //                 не создавать сетап пока предыдущая сделка жива), *DedupOp
@@ -95,6 +102,7 @@ import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/ana
 import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
 import { buildSetupFilterContext, firstFailingFilter, SETUP_FILTER_NAMES, type SetupFilterName } from '../../src/core/analysis/setupFilters.js'
 import { replayLadder, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
+import { replayEntryModel, bigbarCovered, type EntryModelId } from '../../src/core/analysis/entryModels.js'
 
 // ---------- Свип детектора ----------
 
@@ -246,6 +254,13 @@ interface CliArgs {
 	 * сводка сравнивает все комбинации на идентичном составе сделок.
 	 */
 	evalCombo: boolean
+	/**
+	 * Пул-оценка моделей входа (SPEC 7.24): --eval-entry. Косты BingX
+	 * (maker 0.02% / taker 0.05%), три модели входа (touch / closeConfirm /
+	 * candleConfirm), bigbar-фильтр, выходы t100-only. Полная статистика
+	 * упущенных/спасённых сделок с counterfactual netR touch-модели.
+	 */
+	evalEntry: boolean
 	}
 
 function parseArgs(argv: string[]): CliArgs {
@@ -300,6 +315,7 @@ function parseArgs(argv: string[]): CliArgs {
 			evalHtf: argv.includes('--eval-htf'),
 			evalTakes: argv.includes('--eval-takes'),
 			evalCombo: argv.includes('--eval-combo'),
+			evalEntry: argv.includes('--eval-entry'),
 		}
 }
 
@@ -987,6 +1003,10 @@ async function main() {
 	// числом — look-ahead (в реале лимитка исполнится и словит стоп), но их
 	// доля и суммарный урон говорят, стоит ли переходить на confirmClose-вход.
 	const evalComboRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; chopCut: boolean; alignCut: boolean; sameBar: boolean; netRCanon: number; netRT100: number }[] = []
+	// Пул-оценка моделей входа (--eval-entry, SPEC 7.24): одна строка =
+	// одна сделка пула со статусами/netR всех трёх моделей (косты BingX,
+	// выходы t100-only) и меткой bigbar. netR missed-статусов = 0.
+	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1296,6 +1316,51 @@ async function main() {
 										})
 									}
 								}
+								// Пул-оценка моделей входа (SPEC 7.24): косты BingX, три модели
+								// входа, bigbar-фильтр. Пул тот же, что --eval-takes/--eval-combo.
+								// Сделка включается, только если все модели разрешились
+								// (missed* — валидное разрешение, unresolved — нет).
+								if (args.evalEntry && variant.id === 'base' && period === 'full') {
+									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
+									const pool = snapshot.fibLifecycle.outcomes.filter((o) =>
+										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
+										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+									const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
+									// Входные зоны сетки (ratio): ote — 61.8–78.6, deep — 23.6–38.2
+									// (пары пользователя «78→61», «38→23»).
+									const ENTRY_ZONES: Record<string, [number, number]> = { ote: [61.8, 78.6], deep: [23.6, 38.2] }
+									const MODELS: EntryModelId[] = ['touch', 'closeConfirm', 'candleConfirm']
+									const seenGrids = new Set<string>()
+									for (const outcome of pool) {
+										if (!outcome.entered || outcome.entryIndex == null) continue
+										const gridKey = `${outcome.scenario}|${outcome.candidateId}`
+										if (seenGrids.has(gridKey)) continue
+										seenGrids.add(gridKey)
+										const cVariant = candidateById.get(outcome.candidateId)?.variants[outcome.variantMode]
+										if (!cVariant) continue
+										const levelPrice = (ratio: number): number | null =>
+											cVariant.levels.find((l) => l.ratio === ratio)?.price ?? null
+										const tp = levelPrice(100)
+										const zone = ENTRY_ZONES[outcome.scenario]
+										if (tp == null || zone == null) continue
+										const entryCandle = snapshot.candles[outcome.entryIndex]
+										if (!entryCandle) continue
+										const zoneNearPrice = levelPrice(zone[0])
+										const zoneFarPrice = levelPrice(zone[1])
+										if (zoneNearPrice == null || zoneFarPrice == null) continue
+										const results = MODELS.map((m) => replayEntryModel(snapshot.candles, outcome, tp, m))
+										if (results.some((r) => r.status === 'unresolved')) continue
+										const [touch, close, confirm] = results
+										evalEntryRows.push({
+											symbol, timeframe, scenario: outcome.scenario,
+											entryAt: entryCandle.timestamp, direction: outcome.direction,
+											bigbar: bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex, zoneNearPrice, zoneFarPrice),
+											touchStatus: touch!.status, touchNetR: touch!.netR ?? 0,
+											closeStatus: close!.status, closeNetR: close!.netR ?? 0,
+											confirmStatus: confirm!.status, confirmNetR: confirm!.netR ?? 0,
+										})
+									}
+								}
 							// Волна 5 (SPEC 7.19): fade — зеркальная гипотеза. Deep живёт
 							// в импульсе, fade должен жить там, где deep запрещён:
 							// *Inv — только сетапы, созданные в сжатии/пиле (инверсия
@@ -1552,6 +1617,60 @@ async function main() {
 		console.log(`\n${summary}`)
 		console.log(`\nCombo eval CSV (${evalComboRows.length} rows): ${comboCsvPath}`)
 		console.log(`Combo eval summary TXT: ${comboTxtPath}`)
+	}
+
+	// Пул-оценка моделей входа (SPEC 7.24) — последним блоком + дубль в txt.
+	// Косты BingX (maker 0.02 / taker 0.05), выходы t100-only. Сводка
+	// отвечает: сколько упустили (missed-tp), сколько спасли (missed-stop),
+	// что дал bigbar — с counterfactual netR touch-модели по каждой группе.
+	if (args.evalEntry && evalEntryRows.length > 0) {
+		const entryCsvPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.csv`)
+		writeFileSync(entryCsvPath, recordsToCsv(evalEntryRows as unknown as Record<string, unknown>[]))
+		const fmt = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(3)}`
+		type Row = (typeof evalEntryRows)[number]
+		const models: { name: string; status: (r: Row) => string; netR: (r: Row) => number }[] = [
+			{ name: 'touch (limit, BingX)', status: (r) => r.touchStatus, netR: (r) => r.touchNetR },
+			{ name: 'closeConfirm', status: (r) => r.closeStatus, netR: (r) => r.closeNetR },
+			{ name: 'candleConfirm', status: (r) => r.confirmStatus, netR: (r) => r.confirmNetR },
+		]
+		const lines: string[] = [`=== Entry model pool evaluation (SPEC 7.24, BingX costs, t100 exits, pool ${evalEntryRows.length} trades) ===`, '']
+		const scenarios = [...new Set(evalEntryRows.map((r) => r.scenario))].sort()
+		for (const bigbarOn of [false, true]) {
+			const rows = bigbarOn ? evalEntryRows.filter((r) => !r.bigbar) : evalEntryRows
+			lines.push(bigbarOn
+				? `--- with bigbar filter (cut ${evalEntryRows.length - rows.length} setups) ---`
+				: `--- no bigbar filter ---`)
+			for (const m of models) {
+				const entered = rows.filter((r) => m.status(r) === 'entered')
+				const total = entered.reduce((s, r) => s + m.netR(r), 0)
+				const wins = entered.filter((r) => m.netR(r) > 0)
+				const missedStop = rows.filter((r) => m.status(r) === 'missed-stop')
+				const missedTp = rows.filter((r) => m.status(r) === 'missed-tp')
+				const missedExp = rows.filter((r) => m.status(r) === 'missed-expired')
+				// Counterfactual: netR touch-модели у пропущенных сделок.
+				const cf = (xs: Row[]) => xs.reduce((s, r) => s + r.touchNetR, 0)
+				lines.push(`${m.name.padEnd(22)}: entered ${String(entered.length).padStart(5)}, totalR ${fmt(total)}, avgR ${fmt(entered.length ? total / entered.length : 0)}, WR ${entered.length ? ((100 * wins.length) / entered.length).toFixed(1) : '0.0'}%`)
+				if (missedStop.length + missedTp.length + missedExp.length > 0) {
+					lines.push(`${''.padEnd(22)}  saved-stop ${missedStop.length} (touch cf ${fmt(cf(missedStop))}), missed-tp ${missedTp.length} (touch cf ${fmt(cf(missedTp))}), expired ${missedExp.length} (touch cf ${fmt(cf(missedExp))})`)
+				}
+				for (const sc of scenarios) {
+					const s = entered.filter((r) => r.scenario === sc)
+					if (s.length === 0) continue
+					const sTotal = s.reduce((sum, r) => sum + m.netR(r), 0)
+					lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} entered, totalR ${fmt(sTotal)}, avgR ${fmt(sTotal / s.length)}`)
+				}
+			}
+			lines.push('')
+		}
+		// Bigbar сам по себе: counterfactual срезанных сетапов (touch netR).
+		const cut = evalEntryRows.filter((r) => r.bigbar)
+		lines.push(`bigbar cut ${cut.length} setups (${((100 * cut.length) / evalEntryRows.length).toFixed(1)}% of pool), touch counterfactual totalR ${fmt(cut.reduce((s, r) => s + r.touchNetR, 0))} (positive = резал прибыльные)`)
+		const summary = lines.join('\n')
+		const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)
+		writeFileSync(entryTxtPath, summary + '\n')
+		console.log(`\n${summary}`)
+		console.log(`\nEntry eval CSV (${evalEntryRows.length} rows): ${entryCsvPath}`)
+		console.log(`Entry eval summary TXT: ${entryTxtPath}`)
 	}
 }
 
