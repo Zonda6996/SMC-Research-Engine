@@ -154,3 +154,44 @@ export function replayLadder(
 	// Данные кончились с открытым остатком — сделка не разрешена.
 	return null
 }
+
+/**
+ * SPEC 7.29: реплей одной сделки с ПРОИЗВОЛЬНЫМИ стопом и тейком (полный
+ * вход/выход, без частичных и без BE) — для свипа стоп×тейк.
+ *
+ * Ключевое отличие от replayLadder: риск-единица R пересчитывается от
+ * НОВОГО стопа (risk = |entry − stop|). Трейдер, рискующий фиксированной
+ * суммой, сайзит позицию под свой стоп: и профит, и издержки в R зависят
+ * от выбранного стопа (узкий стоп → крупнее позиция → издержки в R выше).
+ *
+ * Конвенции — зеркало replayLadder: конфликт стоп/тейк в одном баре =
+ * стоп (консервативно); вход по outcome.entryPrice на outcome.entryIndex.
+ * null = стоп/тейк не на своей стороне от входа или данные кончились.
+ */
+export function replayStopTake(
+	candles: Candle[],
+	outcome: FibSetupOutcome,
+	stopPrice: number,
+	tpPrice: number,
+	costs: LadderCostRates = DEFAULT_LADDER_COSTS,
+): number | null {
+	if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null) return null
+	const long = outcome.direction === 'long'
+	const entry = outcome.entryPrice
+	// Стоп строго на адверс-стороне, тейк строго на профит-стороне.
+	if (long ? stopPrice >= entry : stopPrice <= entry) return null
+	if (long ? tpPrice <= entry : tpPrice >= entry) return null
+	const risk = Math.abs(entry - stopPrice)
+	if (risk <= 0) return null
+
+	let net = -fillCostR(entry, costs.entryRate, 1, risk)
+	for (let i = outcome.entryIndex; i < candles.length; i++) {
+		const candle = candles[i]
+		if (!candle) continue
+		const hitStop = long ? candle.low <= stopPrice : candle.high >= stopPrice
+		if (hitStop) return net - 1 - fillCostR(stopPrice, costs.stopRate, 1, risk)
+		const hitTp = long ? candle.high >= tpPrice : candle.low <= tpPrice
+		if (hitTp) return net + (long ? tpPrice - entry : entry - tpPrice) / risk - fillCostR(tpPrice, costs.takeRate, 1, risk)
+	}
+	return null
+}

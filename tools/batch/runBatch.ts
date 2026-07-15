@@ -101,7 +101,7 @@ import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analys
 import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/analysis/dedupFilter.js'
 import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
 import { buildSetupFilterContext, firstFailingFilter, SETUP_FILTER_NAMES, type SetupFilterName } from '../../src/core/analysis/setupFilters.js'
-import { replayLadder, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
+import { replayLadder, replayStopTake, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
 import { replayEntryModel, bigbarCovered, BINGX_MAKER_RATE, BINGX_TAKER_RATE, BINGX_SLIP_RATE, type EntryModelId } from '../../src/core/analysis/entryModels.js'
 
 // ---------- Свип детектора ----------
@@ -992,7 +992,7 @@ async function main() {
 	// Пары LTF → старшие ТФ (по выбору пользователя, SPEC 7.21).
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
 	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
-	// одна сделка пула × одна лестница. netR = null (лестница не р��зре��илась
+	// одна сделка пула × одна лестница. netR = null (лестница не р����зре��илась
 	// до конца данны��) ��сключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
 	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
@@ -1007,6 +1007,13 @@ async function main() {
 	// одна сделка пула со статусами/netR всех трёх моделей (косты BingX,
 	// выходы t100-only) и меткой bigbar. netR missed-статусов = 0.
 	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null; fixed1R: number | null; fixed15R: number | null; fixed2R: number | null; fixed3R: number | null }[] = []
+	// SPEC 7.29: свип стоп×тейк на канон-пуле touch+bigbar. Одна строка =
+	// одна сделка, netR по каждой валидной комбинации (ключ "stop|take" в
+	// ratio сетки). null = не разрешилась до конца данных; комбинации не на
+	// своей стороне от входа отсутствуют в map (для сценария невалидны).
+	const SWEEP_STOPS = [-15, 0, 15, 23.6, 50] as const
+	const SWEEP_TAKES = [50, 61.8, 88.6, 100, 120, 141, 161, 200, 241] as const
+	const sweepRows: { symbol: string; timeframe: string; scenario: string; combos: Map<string, number | null> }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1413,6 +1420,34 @@ async function main() {
 													fixed2R: fixedRR(2),
 													fixed3R: fixedRR(3),
 												})
+											// SPEC 7.29: свип стоп×тейк. Уровни сетки линейны по
+											// ratio — произвольный ratio интерполируется через 0/100.
+											// Только touch-вход, прошедший bigbar (канон-пул);
+											// невалидные для сценария комбинации (стоп/тейк не на
+											// своей стороне от entryPrice) replayStopTake вернёт null
+											// и они не попадают в map.
+											const lastRow = evalEntryRows[evalEntryRows.length - 1]!
+											if (lastRow.touchStatus === 'entered' && !lastRow.bigbar) {
+												const p0 = levelPrice(0)
+												if (p0 != null) {
+													const priceAt = (ratio: number): number => p0 + (ratio / 100) * (tp - p0)
+													const combos = new Map<string, number | null>()
+													for (const sr of SWEEP_STOPS) {
+														for (const tr of SWEEP_TAKES) {
+															const netR = replayStopTake(snapshot.candles, outcome, priceAt(sr), priceAt(tr), bingxCosts)
+															// Невалидная сторона отсеивается внутри replayStopTake
+															// возвратом null ДО реплея — но нам надо отличить
+															// «невалидно» от «не разрешилось». Проверяем сторону тут.
+															const long = outcome.direction === 'long'
+															const e = outcome.entryPrice!
+															const stopOk = long ? priceAt(sr) < e : priceAt(sr) > e
+															const tpOk = long ? priceAt(tr) > e : priceAt(tr) < e
+															if (stopOk && tpOk) combos.set(`${sr}|${tr}`, netR)
+														}
+													}
+													sweepRows.push({ symbol, timeframe, scenario: outcome.scenario, combos })
+												}
+											}
 									}
 								}
 							// Волна 5 (SPEC 7.19): fade — зеркальная гипотеза. Deep живёт
@@ -1796,6 +1831,46 @@ async function main() {
 					lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} trades, totalR ${fmt(sTotal)}, avgR ${fmt(sTotal / s.length)}, WR ${((100 * sWins.length) / s.length).toFixed(1)}%`)
 				}
 			}
+			// SPEC 7.29: свип стоп×тейк — карта «где лучшее соотношение».
+			// Пул per scenario: сделки, где ВСЕ валидные комбинации сценария
+			// разрешились (иначе сравнение на разных множествах). Решение
+			// потом принимается по ПЛАТО соседних клеток, не по пику
+			// одиночной клетки (свип = data mining, пик = подгонка).
+			const sweepCsvRows: string[] = ['scenario,timeframe,stopRatio,takeRatio,n,totalR,avgR,wr']
+			for (const scenario of scenarios) {
+				const scRows = sweepRows.filter((r) => r.scenario === scenario)
+				if (scRows.length === 0) continue
+				// Валидные комбинации сценария = ключи первой строки.
+				const comboKeys = [...(scRows[0]?.combos.keys() ?? [])]
+				const resolved = scRows.filter((r) => comboKeys.every((k) => r.combos.get(k) != null))
+				lines.push('', `=== Stop x Take sweep (SPEC 7.29): ${scenario}, canon pool touch+bigbar, full exits, BingX costs ===`)
+				lines.push(`pool: ${resolved.length} trades (of ${scRows.length}; all valid combos resolved), cells: avgR (WR%)`)
+				const stops = [...new Set(comboKeys.map((k) => k.split('|')[0]))]
+				const takes = [...new Set(comboKeys.map((k) => k.split('|')[1]))]
+				lines.push(['stop\\take', ...takes].map((s) => String(s).padStart(9)).join(' '))
+				for (const sr of stops) {
+					const cells = [String(sr).padStart(9)]
+					for (const tr of takes) {
+						const key = `${sr}|${tr}`
+						if (!comboKeys.includes(key)) { cells.push('—'.padStart(9)); continue }
+						const vals = resolved.map((r) => r.combos.get(key)!)
+						const total = vals.reduce((a, b) => a + b, 0)
+						const wr = vals.length ? (100 * vals.filter((v) => v > 0).length) / vals.length : 0
+						cells.push(`${(total / (vals.length || 1)).toFixed(3)}(${wr.toFixed(0)})`.padStart(9))
+						// CSV: сводка all + per-TF для проверки робастности плато.
+						for (const tf of ['all', ...new Set(resolved.map((r) => r.timeframe))]) {
+							const g = tf === 'all' ? resolved : resolved.filter((r) => r.timeframe === tf)
+							const gv = g.map((r) => r.combos.get(key)!)
+							const gt = gv.reduce((a, b) => a + b, 0)
+							const gw = gv.length ? (100 * gv.filter((v) => v > 0).length) / gv.length : 0
+							sweepCsvRows.push(`${scenario},${tf},${sr},${tr},${gv.length},${gt.toFixed(3)},${(gt / (gv.length || 1)).toFixed(4)},${gw.toFixed(1)}`)
+						}
+					}
+					lines.push(cells.join(' '))
+				}
+			}
+			const sweepCsvPath = join(RESULTS_DIR, `sweep-${stamp}${untilTag}.csv`)
+			writeFileSync(sweepCsvPath, sweepCsvRows.join('\n'))
 			// SPEC 7.27: идеи фильтров «свежесть касания» и «близость тейка».
 			// Только диагностика (бакеты на каноне touch + bigbar, netR t100):
 			// сначала смотрим, есть ли монотон��ая зависимость avgR от параметра,
