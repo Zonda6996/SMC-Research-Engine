@@ -9,6 +9,7 @@ import {
 	firstFailingFilter,
 	passesAlignFilter,
 	passesChopFilter,
+	passesChopOteFilter,
 	passesExtremeFilter,
 	passesLateFilter,
 	DEFAULT_SETUP_FILTER_CONFIG,
@@ -242,6 +243,24 @@ test('chop: низкий trendStability (чехарда трендов) блок
 test('chop: строгий пресет применяется и к breaker (канонический сценарий портфеля)', () => {
 	const ctx = makeContext({ metricsAt9: { ...goodMetrics, effRatio: 0.1 } })
 	assert.equal(passesChopFilter(makeOutcome({ scenario: 'breaker' }), ctx), false)
+})
+
+// ---------------------------------------------------------------------------
+// chop-ote (scoped: урок полноканонного OFAT — blanket-chop убивает deep)
+
+test('chop-ote: плохой режим блокирует ote', () => {
+	const ctx = makeContext({ metricsAt9: { ...goodMetrics, effRatio: 0.1 } })
+	assert.equal(passesChopOteFilter(makeOutcome({ scenario: 'ote' }), ctx), false)
+})
+
+test('chop-ote: deep и breaker проходят даже в плохом режиме', () => {
+	const ctx = makeContext({ metricsAt9: { ...goodMetrics, effRatio: 0.1, trendStability: 0.1 } })
+	assert.equal(passesChopOteFilter(makeOutcome({ scenario: 'deep' }), ctx), true)
+	assert.equal(passesChopOteFilter(makeOutcome({ scenario: 'breaker' }), ctx), true)
+})
+
+test('chop-ote: хороший режим пропускает ote', () => {
+	assert.equal(passesChopOteFilter(makeOutcome({ scenario: 'ote' }), makeContext()), true)
 })
 
 test('baseline не изменился: DEFAULT_REGIME_FILTER игнорирует effRatio/trendStability', () => {

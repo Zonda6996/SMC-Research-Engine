@@ -43,12 +43,13 @@
 //                 фильтра 7.15) и *Combo (инверсия + cooldown). Гипотеза:
 //                 fade — зеркальный к deep сетап по режиму рынка.
 //   --filters     слой дискреционных фильтров (SPEC 7.20), только с --portfolio:
-//                 late,align,extreme,chop через запятую. Формализация визуального
-//                 ревью: late (вход у экстремума импульса), align (против
-//                 доминирующего тренда), extreme (event-level не экстремум
-//                 сегмента), chop (строгий режим-фильтр: effRatio/trendStability).
-//                 Отрезанные сделки — в ledger со status=filtered + filteredBy,
-//                 в консоли foregone netR по каждому фильтру.
+//                 late,align,extreme,chop,chop-ote через запятую. Формализация
+//                 визуального ревью: late (вход у экстремума импульса), align
+//                 (против доминирующего тренда), extreme (event-level не экстремум
+//                 сегмента), chop (строгий режим-фильтр: effRatio/trendStability),
+//                 chop-ote (chop только для OTE — blanket-chop убивает deep,
+//                 см. setupFilters.ts). Отрезанные сделки — в ledger со
+//                 status=filtered + filteredBy, в консоли foregone netR.
 //   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
 //                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
 //                 не создавать сетап пока предыдущая сделка жива), *DedupOp
@@ -407,7 +408,7 @@ function aggregate(outcomes: FibSetupOutcome[]): SliceStats {
 		ext200Pct: extPct(200),
 		ext241Pct: extPct(241),
 		winMaeMed: quantile(winMae, 0.5),
-		// 10-й перцентиль по возрастанию = «90% победителей проседают НЕ глубже».
+		// 10-й перцентиль по возрастанию = «90% поб��дителей проседают НЕ глубже».
 		winMaeP90: quantile(winMae, 0.1),
 		resolved: resolved.length,
 	}
@@ -560,7 +561,7 @@ const EXTENSION_LEVELS = [100, 141, 161, 200, 241, 261] as const
 const F141_PULL_LEVELS = [120, 100, 78.6, 61.8, 38.2] as const
 /** Продолжение после касания 141 (fade141 SL-уровни). */
 const F141_GO_LEVELS = [161, 200, 241] as const
-/** Fade-цели после касания 241 (fade241n TP-уровни). */
+/** Fade-цели после касания 241 (fade241n TP-ур��вни). */
 const F241_PULL_LEVELS = [200, 141, 100, 78.6] as const
 /** Продолжение после касания 241 (fade241 SL-уровни). */
 const F241_GO_LEVELS = [261, 300, 350] as const
@@ -632,7 +633,7 @@ function sliceReach(symbol: string, timeframe: string, variant: string, period: 
 /**
  * Строка на каждый resolved-исход ядра плейбука с метриками режима,
  * измеренными на createdAtIndex сетапа (look-ahead-free: метрики зависят
- * только от данных до этого индекса). Только диагностика — на отбор
+ * только от дан��ых до этого индекса). Только диагностика — на отбор
  * сетапов не влияет.
  */
 interface RegimeRow {

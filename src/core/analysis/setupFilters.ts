@@ -37,9 +37,9 @@ import type { RegimeMetrics } from './regimeMetrics.js'
 import { passesRegimeFilter, STRICT_REGIME_FILTER, type RegimeFilterConfig } from './regimeFilter.js'
 import { FibGridEngine } from '@/core/fib/FibGridEngine.js'
 
-export type SetupFilterName = 'late' | 'align' | 'extreme' | 'chop'
+export type SetupFilterName = 'late' | 'align' | 'extreme' | 'chop' | 'chop-ote'
 
-export const SETUP_FILTER_NAMES: readonly SetupFilterName[] = ['late', 'align', 'extreme', 'chop']
+export const SETUP_FILTER_NAMES: readonly SetupFilterName[] = ['late', 'align', 'extreme', 'chop', 'chop-ote']
 
 export interface SetupFilterConfig {
 	/**
@@ -195,11 +195,30 @@ export function passesChopFilter(
 	return passesRegimeFilter(outcome.scenario, ctx.metrics[outcome.createdAtIndex], config.chop)
 }
 
+/**
+ * chop-ote: chop, применённый только к OTE-сетапам; deep и breaker проходят
+ * без проверки. Урок полноканонного OFAT-прогона (15.07.2026): blanket-chop
+ * на полном каноне порезал deep с 418 сделок до 75 и уничтожил его вклад
+ * (+40.6R → −4R) — deep как глубокий ретрейсмент живёт именно в тех
+ * «мусорных» режимах, которые chop вырезает. Рубка — яд для OTE, но среда
+ * обитания для deep. Ревью блока A, породившее chop, тоже делалось только
+ * по OTE-сетапам, так что узкий скоуп честнее исходных данных.
+ */
+export function passesChopOteFilter(
+	outcome: FibSetupOutcome,
+	ctx: SetupFilterContext,
+	config: SetupFilterConfig = DEFAULT_SETUP_FILTER_CONFIG,
+): boolean {
+	if (outcome.scenario !== 'ote') return true
+	return passesChopFilter(outcome, ctx, config)
+}
+
 const FILTER_FNS: Record<SetupFilterName, (o: FibSetupOutcome, ctx: SetupFilterContext, cfg: SetupFilterConfig) => boolean> = {
 	late: passesLateFilter,
 	align: passesAlignFilter,
 	extreme: passesExtremeFilter,
 	chop: passesChopFilter,
+	'chop-ote': passesChopOteFilter,
 }
 
 /**
