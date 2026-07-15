@@ -50,6 +50,10 @@
 //                 chop-ote (chop только для OTE — blanket-chop убивает deep,
 //                 см. setupFilters.ts). Отрезанные сделки — в ledger со
 //                 status=filtered + filteredBy, в консоли foregone netR.
+//   --eval-filters  пул-оценка ВСЕХ фильтров без портфеля (SPEC 7.20 iter 2):
+//                 avgR срезанных vs пропущенных на одном пуле сделок.
+//                 Портфельная симуляция для оценки фильтров некорректна —
+//                 композиция (капасити/кулдауны) перемешивает состав сделок.
 //   --dedup       волна 3 (SPEC 7.16): дедупликация пересекающихся сетапов.
 //                 Добавляет копии ядра по трём правилам: *DedupCd (cooldown —
 //                 не создавать сетап пока предыдущая сделка жива), *DedupOp
@@ -114,7 +118,7 @@ const SWEEP_VARIANTS: SweepVariant[] = [
 	{ id: 'swp5', config: { oppositeSweepLookback: 5 } },
 	{ id: 'swp10', config: { oppositeSweepLookback: 10 } },
 	{ id: 'swp50', config: { oppositeSweepLookback: 50 } },
-	// Комбинации-кандидаты по итогам OFAT на 1h/2h (age0 — главная ручка,
+	// Комбинаци��-кандидаты по итогам OFAT на 1h/2h (age0 — главная ручка,
 	// single — второй кандидат): проверка на синергию против одиночных эффектов.
 	{ id: 'age0single', config: { minLevelAge: 0, breachMode: 'single' } },
 	{ id: 'age0swp10', config: { minLevelAge: 0, oppositeSweepLookback: 10 } },
@@ -193,6 +197,16 @@ interface CliArgs {
 	 * (без флага) = baseline без слоя. Опечатки — ошибка, как в --scenarios.
 	 */
 	setupFilters: SetupFilterName[]
+	/**
+	 * Пул-оценка фильтров (SPEC 7.20, итерация 2): --eval-filters. Оценивает
+	 * ВСЕ фильтры на уровне пула сделок БЕЗ портфельной симуляции. Урок
+	 * прогонов 15.07.2026: портфель (капасити, кулдауны, порядок заполнения
+	 * слотов) добавляет композиционный рандом — удаление одной сделки
+	 * каскадно переписывает состав всех последующих, и «эффект фильтра»
+	 * неотличим от перетасовки. Пул-оценка отвечает на единственный честный
+	 * вопрос: отличается ли средний netR срезанных сделок от пропущенных.
+	 */
+	evalFilters: boolean
 	}
 
 function parseArgs(argv: string[]): CliArgs {
@@ -243,6 +257,7 @@ function parseArgs(argv: string[]): CliArgs {
 			tradeTimeStopBars: get('--trade-time-stop-bars') == null ? null : Math.max(0, Number(get('--trade-time-stop-bars'))),
 			portfolioScenarios: resolvePortfolioScenarios(get('--scenarios')),
 			setupFilters: resolveSetupFilters(get('--filters')),
+			evalFilters: argv.includes('--eval-filters'),
 		}
 }
 
@@ -910,6 +925,9 @@ async function main() {
 	// фильтра — для отчёта foregone («резали убыток или прибыль»).
 	const portfolioFiltered: { trade: PortfolioTrade; filteredBy: SetupFilterName }[] = []
 	const filteredGrids = new Set<string>()
+	// Пул-оценка (--eval-filters): каждая строка — одна сделка пула × один
+	// фильтр, cut = фильтр её срезал бы. Без портфеля: netR как есть.
+	const evalFilterRows: { filter: SetupFilterName; symbol: string; timeframe: string; scenario: string; entryAt: number; cut: boolean; netR: number }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1082,6 +1100,32 @@ async function main() {
 										else portfolioUnresolved++
 									}
 								}
+								// Пул-оценка фильтров (--eval-filters): БЕЗ портфеля и БЕЗ
+								// кулдауна — каждая сделка пула независима, композиционный
+								// рандом исключён. Каждый фильтр оценивается на одном и том же
+								// пуле: cut/pass — просто разметка, а не изменение состава.
+								if (args.evalFilters && variant.id === 'base' && period === 'full') {
+									const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
+									const pool = snapshot.fibLifecycle.outcomes.filter((o) =>
+										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
+										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
+									const filterCtx = buildSetupFilterContext(
+										snapshot.candles, snapshot.events, snapshot.fib.candidates,
+										snapshot.market.trendHistory, metrics)
+									const seenGrids = new Set<string>()
+									for (const outcome of pool) {
+										if (!outcome.entered) continue
+										const gridKey = `${outcome.scenario}|${outcome.candidateId}`
+										if (seenGrids.has(gridKey)) continue
+										seenGrids.add(gridKey)
+										const trade = outcomeToPortfolioTrade(symbol, timeframe, snapshot.candles, outcome)
+										if (!trade) continue
+										for (const name of SETUP_FILTER_NAMES) {
+											const cut = firstFailingFilter(outcome, [name], filterCtx) != null
+											evalFilterRows.push({ filter: name, symbol, timeframe, scenario: outcome.scenario, entryAt: trade.entryAt, cut, netR: trade.netR })
+										}
+									}
+								}
 							// Волна 5 (SPEC 7.19): fade — зеркальная гипотеза. Deep живёт
 							// в импульсе, fade должен жить там, где deep запрещён:
 							// *Inv — только сетапы, созданные в сжатии/пиле (инверсия
@@ -1169,6 +1213,28 @@ async function main() {
 			}
 			console.log('')
 		}
+	}
+
+	if (args.evalFilters && evalFilterRows.length > 0) {
+		// Пул-оценка: сравнение среднего netR срезанных и пропущенных сделок
+		// на ОДНОМ пуле. Хороший фильтр: avgR(cut) заметно ниже avgR(pass).
+		const evalCsvPath = join(RESULTS_DIR, `evalfilters-${stamp}${untilTag}.csv`)
+		writeFileSync(evalCsvPath, recordsToCsv(evalFilterRows as unknown as Record<string, unknown>[]))
+		console.log(`\n=== Filter pool evaluation (SPEC 7.20 iter 2, no portfolio) ===\n`)
+		const fmt = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(3)}`
+		const scenarios = [...new Set(evalFilterRows.map((r) => r.scenario))].sort()
+		for (const name of SETUP_FILTER_NAMES) {
+			const rows = evalFilterRows.filter((r) => r.filter === name)
+			const cut = rows.filter((r) => r.cut), pass = rows.filter((r) => !r.cut)
+			const avg = (xs: typeof rows) => (xs.length === 0 ? 0 : xs.reduce((s, r) => s + r.netR, 0) / xs.length)
+			console.log(`${name}: cut ${cut.length} (avgR ${fmt(avg(cut))}), pass ${pass.length} (avgR ${fmt(avg(pass))}), edge ${fmt(avg(pass) - avg(cut))}`)
+			for (const sc of scenarios) {
+				const sCut = cut.filter((r) => r.scenario === sc), sPass = pass.filter((r) => r.scenario === sc)
+				if (sCut.length === 0 && sPass.length === 0) continue
+				console.log(`  ${sc.padEnd(8)}: cut ${String(sCut.length).padStart(4)} (avgR ${fmt(avg(sCut))}), pass ${String(sPass.length).padStart(4)} (avgR ${fmt(avg(sPass))})`)
+			}
+		}
+		console.log(`\nEval CSV (${evalFilterRows.length} rows): ${evalCsvPath}`)
 	}
 
 	console.log(`\n=== Top by EV_be (In >= ${args.minIn}) ===\n`)
