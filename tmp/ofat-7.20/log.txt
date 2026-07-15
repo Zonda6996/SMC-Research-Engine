@@ -1,0 +1,1394 @@
+=== FILTER: align ===
+
+Batch: BTC/USDT, ETH/USDT, SOL/USDT, XRP/USDT, BNB/USDT, DOGE/USDT, ADA/USDT, AVAX/USDT, LINK/USDT, SUI/USDT, TON/USDT, NEAR/USDT, APT/USDT, LTC/USDT × 15m, 30m, 1h × 20000 candles (futures)
+ATR thresholds: 0, 5; min In: 20
+Detector variants: base; time split: 3
+Portfolio scenarios: ote
+Setup filters (7.20): align
+
+  ✗ BTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+
+No results. All datasets failed:
+  - BTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.18.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.18.0
+npm notice To update run: npm install -g npm@11.18.0
+npm notice
+=== DONE: align ===
+=== FILTER: late ===
+
+Batch: BTC/USDT, ETH/USDT, SOL/USDT, XRP/USDT, BNB/USDT, DOGE/USDT, ADA/USDT, AVAX/USDT, LINK/USDT, SUI/USDT, TON/USDT, NEAR/USDT, APT/USDT, LTC/USDT × 15m, 30m, 1h × 20000 candles (futures)
+ATR thresholds: 0, 5; min In: 20
+Detector variants: base; time split: 3
+Portfolio scenarios: ote
+Setup filters (7.20): late
+
+  ✗ BTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+
+No results. All datasets failed:
+  - BTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+=== DONE: late ===
+=== FILTER: extreme ===
+
+Batch: BTC/USDT, ETH/USDT, SOL/USDT, XRP/USDT, BNB/USDT, DOGE/USDT, ADA/USDT, AVAX/USDT, LINK/USDT, SUI/USDT, TON/USDT, NEAR/USDT, APT/USDT, LTC/USDT × 15m, 30m, 1h × 20000 candles (futures)
+ATR thresholds: 0, 5; min In: 20
+Detector variants: base; time split: 3
+Portfolio scenarios: ote
+Setup filters (7.20): extreme
+
+  ✗ BTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+
+No results. All datasets failed:
+  - BTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+=== DONE: extreme ===
+=== FILTER: chop ===
+
+Batch: BTC/USDT, ETH/USDT, SOL/USDT, XRP/USDT, BNB/USDT, DOGE/USDT, ADA/USDT, AVAX/USDT, LINK/USDT, SUI/USDT, TON/USDT, NEAR/USDT, APT/USDT, LTC/USDT × 15m, 30m, 1h × 20000 candles (futures)
+ATR thresholds: 0, 5; min In: 20
+Detector variants: base; time split: 3
+Portfolio scenarios: ote
+Setup filters (7.20): chop
+
+  ✗ BTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ETH/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SOL/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ XRP/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ BNB/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ DOGE/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ ADA/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ AVAX/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LINK/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ SUI/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ TON/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ NEAR/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ APT/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  ✗ LTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+
+No results. All datasets failed:
+  - BTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ETH/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SOL/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - XRP/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - BNB/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - DOGE/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - ADA/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - AVAX/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LINK/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - SUI/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - TON/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - NEAR/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - APT/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 15m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 30m: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+  - LTC/USDT 1h: binanceusdm GET https://fapi.binance.com/fapi/v1/exchangeInfo 451 Unavailable For Legal Reasons {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+=== DONE: chop ===
+ALL RUNS COMPLETE
