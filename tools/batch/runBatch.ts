@@ -102,7 +102,7 @@ import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/ana
 import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
 import { buildSetupFilterContext, firstFailingFilter, SETUP_FILTER_NAMES, type SetupFilterName } from '../../src/core/analysis/setupFilters.js'
 import { replayLadder, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
-import { replayEntryModel, bigbarCovered, type EntryModelId } from '../../src/core/analysis/entryModels.js'
+import { replayEntryModel, bigbarCovered, BINGX_MAKER_RATE, BINGX_TAKER_RATE, BINGX_SLIP_RATE, type EntryModelId } from '../../src/core/analysis/entryModels.js'
 
 // ---------- Свип детектора ----------
 
@@ -1006,7 +1006,7 @@ async function main() {
 	// Пул-оценка моделей входа (--eval-entry, SPEC 7.24): одна строка =
 	// одна сделка пула со статусами/netR всех трёх моделей (косты BingX,
 	// выходы t100-only) и меткой bigbar. netR missed-статусов = 0.
-	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number }[] = []
+	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1355,9 +1355,23 @@ async function main() {
 										const zoneNearPrice = levelPrice(zone[0])
 										const zoneFarPrice = levelPrice(zone[1])
 										if (zoneNearPrice == null || zoneFarPrice == null) continue
-										const results = MODELS.map((m) => replayEntryModel(snapshot.candles, outcome, tp, m))
-										if (results.some((r) => r.status === 'unresolved')) continue
-										const [touch, close, confirm] = results
+											const results = MODELS.map((m) => replayEntryModel(snapshot.candles, outcome, tp, m))
+											if (results.some((r) => r.status === 'unresolved')) continue
+											const [touch, close, confirm] = results
+											// SPEC 7.26: схемы выхода на touch-входе, косты BingX
+											// (вход/тейк лимиткой maker, стоп/BE рыночный taker+slip).
+											// null (не разрешилась до конца данных) исключает сделку
+											// из сравнения СХЕМ, но не из сравнения моделей входа.
+											const bingxCosts = {
+												entryRate: BINGX_MAKER_RATE,
+												takeRate: BINGX_MAKER_RATE,
+												stopRate: BINGX_TAKER_RATE + BINGX_SLIP_RATE,
+											}
+											const ladderR = (id: string): number | null => {
+												const ladder = TAKE_LADDERS.find((l) => l.id === id)
+												if (!ladder) return null
+												return replayLadder(snapshot.candles, outcome, levelPrice, ladder, bingxCosts)
+											}
 										evalEntryRows.push({
 											symbol, timeframe, scenario: outcome.scenario,
 											entryAt: entryCandle.timestamp, direction: outcome.direction,
@@ -1367,10 +1381,12 @@ async function main() {
 											chopCut: firstFailingFilter(outcome, ['chop'], filterCtx) != null,
 											alignCut: firstFailingFilter(outcome, ['align'], filterCtx) != null,
 											dedupCut: !dedupSurvivors.has(outcome),
-											touchStatus: touch!.status, touchNetR: touch!.netR ?? 0,
-											closeStatus: close!.status, closeNetR: close!.netR ?? 0,
-											confirmStatus: confirm!.status, confirmNetR: confirm!.netR ?? 0,
-										})
+												touchStatus: touch!.status, touchNetR: touch!.netR ?? 0,
+												closeStatus: close!.status, closeNetR: close!.netR ?? 0,
+												confirmStatus: confirm!.status, confirmNetR: confirm!.netR ?? 0,
+												exit141R: ladderR('t141-only'),
+												exitCanonR: ladderR('canon'),
+											})
 									}
 								}
 							// Волна 5 (SPEC 7.19): fade — зеркальная гипотеза. Deep живёт
@@ -1701,6 +1717,29 @@ async function main() {
 				const s = kept.filter((r) => r.scenario === sc)
 				if (s.length === 0) continue
 				const sTotal = s.reduce((sum, r) => sum + r.touchNetR, 0)
+				lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} trades, totalR ${fmt(sTotal)}, avgR ${fmt(sTotal / s.length)}`)
+			}
+		}
+		// SPEC 7.26: схемы выхода на каноне (touch + bigbar). Сравнение
+		// только на сделках, где ВСЕ три схемы разрешились (t100 разрешён
+		// по построению пула; t141/canon могли не разрешиться до конца
+		// данных) — иначе схемы сравнивались бы на разных множествах.
+		lines.push('', '=== Exit schemes on canon pool (touch + bigbar, BingX costs) ===')
+		const exitPool = evalEntryRows.filter((r) => !r.bigbar && r.exit141R != null && r.exitCanonR != null)
+		const exitSchemes: { name: string; netR: (r: ERow) => number }[] = [
+			{ name: 'full @100 (t100, canon)', netR: (r) => r.touchNetR },
+			{ name: 'full @141', netR: (r) => r.exit141R ?? 0 },
+			{ name: '50% @141 + 50% @241 (BE)', netR: (r) => r.exitCanonR ?? 0 },
+		]
+		lines.push(`pool: ${exitPool.length} trades (all three schemes resolved)`)
+		for (const scheme of exitSchemes) {
+			const total = exitPool.reduce((s, r) => s + scheme.netR(r), 0)
+			const wins = exitPool.filter((r) => scheme.netR(r) > 0)
+			lines.push(`${scheme.name.padEnd(26)}: totalR ${fmt(total)}, avgR ${fmt(exitPool.length ? total / exitPool.length : 0)}, WR ${exitPool.length ? ((100 * wins.length) / exitPool.length).toFixed(1) : '0.0'}%`)
+			for (const sc of scenarios) {
+				const s = exitPool.filter((r) => r.scenario === sc)
+				if (s.length === 0) continue
+				const sTotal = s.reduce((sum, r) => sum + scheme.netR(r), 0)
 				lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} trades, totalR ${fmt(sTotal)}, avgR ${fmt(sTotal / s.length)}`)
 			}
 		}

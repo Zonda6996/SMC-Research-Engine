@@ -47,11 +47,34 @@ export const TAKE_LADDERS: readonly TakeLadder[] = [
 	{ id: 't100-141-241', steps: [{ ratio: 100, fraction: 1 / 3 }, { ratio: 141, fraction: 1 / 3 }, { ratio: 241, fraction: 1 / 3 }] },
 	{ id: 't100-161-241', steps: [{ ratio: 100, fraction: 1 / 3 }, { ratio: 161, fraction: 1 / 3 }, { ratio: 241, fraction: 1 / 3 }] },
 	{ id: 't100-only', steps: [{ ratio: 100, fraction: 1 }] },
+	// SPEC 7.26: фулл на 141 (запрос пользователя — сравнение с t100 на
+	// новой базе bigbar + косты BingX).
+	{ id: 't141-only', steps: [{ ratio: 141, fraction: 1 }] },
 ]
 
 /** Стоимость филла в R (модель fibCosts). */
 function fillCostR(price: number, rate: number, fraction: number, risk: number): number {
 	return (price * rate * fraction) / risk
+}
+
+/**
+ * Ставки издержек реплея. По умолчанию — историческая модель fibCosts
+ * (вход рыночный), для SPEC 7.26 передаются ставки BingX: вход лимиткой
+ * (maker), тейки лимитками (maker), стоп/BE рыночные (taker+slip).
+ */
+export interface LadderCostRates {
+	/** Вход (доля цены). */
+	entryRate: number
+	/** Тейк лимиткой (доля цены). */
+	takeRate: number
+	/** Стоп/BE рыночный со слипом (доля цены). */
+	stopRate: number
+}
+
+const DEFAULT_LADDER_COSTS: LadderCostRates = {
+	entryRate: FEE_RATE + SLIP_RATE,
+	takeRate: FEE_RATE,
+	stopRate: FEE_RATE + SLIP_RATE,
 }
 
 /**
@@ -68,6 +91,7 @@ export function replayLadder(
 	outcome: FibSetupOutcome,
 	levelPrice: (ratio: number) => number | null,
 	ladder: TakeLadder,
+	costs: LadderCostRates = DEFAULT_LADDER_COSTS,
 ): number | null {
 	if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null || outcome.riskSize == null || outcome.riskSize <= 0) return null
 	const long = outcome.direction === 'long'
@@ -87,7 +111,7 @@ export function replayLadder(
 	const toR = (fraction: number, price: number): number =>
 		(fraction * (long ? price - entry : entry - price)) / risk
 
-	let net = -fillCostR(entry, FEE_RATE + SLIP_RATE, 1, risk)
+	let net = -fillCostR(entry, costs.entryRate, 1, risk)
 	let remaining = 1
 	let filledAny = false
 
@@ -100,12 +124,12 @@ export function replayLadder(
 		// После первой фиксации стоп в BE: возврат к входу закрывает остаток.
 		// Конфликт BE/тейк внутри бара — консервативно BE.
 		if (filledAny && touchedEntry) {
-			net -= fillCostR(entry, FEE_RATE + SLIP_RATE, remaining, risk)
+			net -= fillCostR(entry, costs.stopRate, remaining, risk)
 			return net
 		}
 		// До первой фиксации конфликт стоп/тейк — консервативно стоп.
 		if (!filledAny && hitStop) {
-			net += toR(remaining, stop) - fillCostR(stop, FEE_RATE + SLIP_RATE, remaining, risk)
+			net += toR(remaining, stop) - fillCostR(stop, costs.stopRate, remaining, risk)
 			return net
 		}
 
@@ -115,7 +139,7 @@ export function replayLadder(
 			if (!hitTp) continue
 			step.filled = true
 			filledAny = true
-			net += toR(step.fraction, step.price) - fillCostR(step.price, FEE_RATE, step.fraction, risk)
+			net += toR(step.fraction, step.price) - fillCostR(step.price, costs.takeRate, step.fraction, risk)
 			remaining -= step.fraction
 		}
 		if (remaining <= 1e-9) return net
@@ -123,7 +147,7 @@ export function replayLadder(
 		// Бар взял тейк и коснулся входа: тейк засчитан, остаток — BE
 		// (последовательность внутри бара неизвестна, зеркало engine).
 		if (filledAny && touchedEntry) {
-			net -= fillCostR(entry, FEE_RATE + SLIP_RATE, remaining, risk)
+			net -= fillCostR(entry, costs.stopRate, remaining, risk)
 			return net
 		}
 	}
