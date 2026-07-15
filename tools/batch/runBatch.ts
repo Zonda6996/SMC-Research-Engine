@@ -992,7 +992,7 @@ async function main() {
 	// Пары LTF → старшие ТФ (по выбору пользователя, SPEC 7.21).
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
 	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
-	// одна сделка пула × одна лестница. netR = null (лестница не разре��илась
+	// одна сделка пула × одна лестница. netR = null (лестница не р��зре��илась
 	// до конца данны��) ��сключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
 	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
@@ -1006,7 +1006,7 @@ async function main() {
 	// Пул-оценка моделей входа (--eval-entry, SPEC 7.24): одна строка =
 	// одна сделка пула со статусами/netR всех трёх моделей (косты BingX,
 	// выходы t100-only) и меткой bigbar. netR missed-статусов = 0.
-	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null }[] = []
+	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null; fixed1R: number | null; fixed15R: number | null; fixed2R: number | null; fixed3R: number | null }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1372,6 +1372,19 @@ async function main() {
 												if (!ladder) return null
 												return replayLadder(snapshot.candles, outcome, levelPrice, ladder, bingxCosts)
 											}
+											// SPEC 7.28: фиксированный R:R — тейк на k×риск от входа,
+											// а не на уровне сетки. Мотивация: sim-тейк ote на 100 —
+											// это константа 0.272R (геометрия сетки), а 100/141 —
+											// «воздушные» уровни экстремума свинга, где цена
+											// разворачивается. Полный выход, без BE. Реплей тот же
+											// replayLadder (те же конвенции интрабара и косты BingX).
+											const fixedRR = (k: number): number | null => {
+												if (outcome.entryPrice == null || outcome.riskSize == null || outcome.riskSize <= 0) return null
+												const dir = outcome.direction === 'long' ? 1 : -1
+												const tpPrice = outcome.entryPrice + dir * k * outcome.riskSize
+												return replayLadder(snapshot.candles, outcome, () => tpPrice,
+													{ id: `fixed-${k}`, steps: [{ ratio: 0, fraction: 1 }] }, bingxCosts)
+											}
 										evalEntryRows.push({
 											symbol, timeframe, scenario: outcome.scenario,
 											entryAt: entryCandle.timestamp, direction: outcome.direction,
@@ -1395,6 +1408,10 @@ async function main() {
 													tpDistRatio: outcome.entryPrice != null && outcome.riskSize != null && outcome.riskSize > 0
 														? Math.abs(tp - outcome.entryPrice) / outcome.riskSize
 														: null,
+													fixed1R: fixedRR(1),
+													fixed15R: fixedRR(1.5),
+													fixed2R: fixedRR(2),
+													fixed3R: fixedRR(3),
 												})
 									}
 								}
@@ -1752,9 +1769,36 @@ async function main() {
 				lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} trades, totalR ${fmt(sTotal)}, avgR ${fmt(sTotal / s.length)}`)
 			}
 		}
+			// SPEC 7.28: фиксированные R:R против сеточного t100 (запрос
+			// пользователя: тейк ote на 100 = 0.272R — «так никто не торгует»;
+			// проверяем тейк на k×риск). Пул — только сделки, где ВСЕ схемы
+			// разрешились, иначе сравнение на разных множествах.
+			lines.push('', '=== Fixed R:R exits vs grid t100 (SPEC 7.28, canon pool: touch + bigbar, BingX costs) ===')
+			const fixedPool = evalEntryRows.filter((r) => !r.bigbar &&
+				r.fixed1R != null && r.fixed15R != null && r.fixed2R != null && r.fixed3R != null)
+			const fixedSchemes: { name: string; netR: (r: ERow) => number }[] = [
+				{ name: 'grid t100 (canon)', netR: (r) => r.touchNetR },
+				{ name: 'fixed 1:1', netR: (r) => r.fixed1R ?? 0 },
+				{ name: 'fixed 1:1.5', netR: (r) => r.fixed15R ?? 0 },
+				{ name: 'fixed 1:2', netR: (r) => r.fixed2R ?? 0 },
+				{ name: 'fixed 1:3', netR: (r) => r.fixed3R ?? 0 },
+			]
+			lines.push(`pool: ${fixedPool.length} trades (all fixed schemes resolved)`)
+			for (const scheme of fixedSchemes) {
+				const total = fixedPool.reduce((s, r) => s + scheme.netR(r), 0)
+				const wins = fixedPool.filter((r) => scheme.netR(r) > 0)
+				lines.push(`${scheme.name.padEnd(26)}: totalR ${fmt(total)}, avgR ${fmt(fixedPool.length ? total / fixedPool.length : 0)}, WR ${fixedPool.length ? ((100 * wins.length) / fixedPool.length).toFixed(1) : '0.0'}%`)
+				for (const sc of scenarios) {
+					const s = fixedPool.filter((r) => r.scenario === sc)
+					if (s.length === 0) continue
+					const sTotal = s.reduce((sum, r) => sum + scheme.netR(r), 0)
+					const sWins = s.filter((r) => scheme.netR(r) > 0)
+					lines.push(`  ${sc.padEnd(8)}: ${String(s.length).padStart(5)} trades, totalR ${fmt(sTotal)}, avgR ${fmt(sTotal / s.length)}, WR ${((100 * sWins.length) / s.length).toFixed(1)}%`)
+				}
+			}
 			// SPEC 7.27: идеи фильтров «свежесть касания» и «близость тейка».
 			// Только диагностика (бакеты на каноне touch + bigbar, netR t100):
-			// сначала смотрим, есть ли монотонная зависимость avgR от параметра,
+			// сначала смотрим, есть ли монотон��ая зависимость avgR от параметра,
 			// порог вводим отдельным решением — защита от подгонки.
 			const canonPool = evalEntryRows.filter((r) => !r.bigbar)
 			const bucketReport = (
