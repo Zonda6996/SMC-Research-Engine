@@ -212,7 +212,7 @@ interface CliArgs {
 	/**
 	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
 	 * П���� умолчанию полный канон: ote,deep,breaker. Неизвестные им������на — ошибка,
-	 * чтобы опечатка не превращалась в м����лчаливый прогон ��олного набора.
+	 * чтобы опечатка не превращалас�� в м����лчаливый прогон ��олного набора.
 	 */
 	portfolioScenarios: string[]
 	/**
@@ -1059,7 +1059,7 @@ async function main() {
 	// 141 наступает ПОСЛЕ (сетка в universe через 78.6-touch), т.е. это
 	// «пост-ote breaker», родственный, но другой сетап.
 	const REV_SWEEPS: { stream: string; entry: number; stops: readonly number[]; takes: readonly number[]; reversed: boolean; cancel: number }[] = [
-		// mirror: реверс на ретесте 100 (после ote-входа).
+		// mirror: реверс на рет��сте 100 (после ote-входа).
 		{ stream: 'mirror', entry: 100, stops: [105, 110, 115, 120, 128.6, 141], takes: [88.6, 78.6, 70.6, 61.8, 50], reversed: true, cancel: 0 },
 		// fade141: контртренд по первому касанию 141.
 		{ stream: 'fade141', entry: 141, stops: [150, 161.8, 176, 200], takes: [120, 110, 100, 88.6, 78.6, 61.8], reversed: true, cancel: 0 },
@@ -1933,7 +1933,7 @@ async function main() {
 	}
 
 	// Пул-оценка фильтров — ПОСЛЕДНИЙ блок вывода: большие таблицы выше
-	// вытесняют его за буфер консоли (см. отчёт пользователя 15.07.2026).
+	// вытесняют его ��а буфер консоли (см. отчёт пользователя 15.07.2026).
 	// Сводка дубл����руется в .txt рядом с CSV — потерять её невозможно.
 	if (args.evalFilters && evalFilterRows.length > 0) {
 		const evalCsvPath = join(RESULTS_DIR, `evalfilters-${stamp}${untilTag}.csv`)
@@ -2320,7 +2320,7 @@ async function main() {
 			}
 			// SPEC 7.27: идеи фильтров «свежесть касания» и «близость тейка».
 			// Только диагностика (бакеты на каноне touch + bigbar, netR t100):
-			// сначала смотрим, есть ли монотон��ая зависимость avgR от параметра,
+			// сначала смотрим, есть ли моното����ая зависимость avgR от параметра,
 			// порог вводим отдельным решением — защита от подгонки.
 			const canonPool = evalEntryRows.filter((r) => !r.bigbar)
 			const bucketReport = (
@@ -2667,8 +2667,52 @@ async function main() {
 					lines.push(`  ${v.name.padEnd(19)}: n ${String(all.length).padStart(5)}, totalR ${fmt(total)}, avgR ${fmt(all.length ? total / all.length : 0)}, WR ${wr.toFixed(1)}% | H1 ${fmt(avgOf(g.filter((r) => r.entryAt < midAt)))} / H2 ${fmt(avgOf(g.filter((r) => r.entryAt >= midAt)))}`)
 				}
 			}
-			// SPEC 7.41-1: слип стопа. Малый объём -> слип ~0. Сравнение
-			// канона (stop taker+slip) с no-slip (stop чистый taker).
+				// SPEC 7.44: сайзинг реверс-потока. Канон масштабируется
+				// стеком fresh×compact (7.35), реверс идёт флэтом 1.0 при
+				// avgR выше канона. Проверяем те же оси на реверсе
+				// (first-fill-wins): свежесть канон-касания (touchDelayBars)
+				// и компактность сетки (swingAtr vs медиана ote) — оба
+				// атрибута сетки известны ДО филла реверса, look-ahead нет.
+				lines.push('', '=== Reverse-stream sizing probe: fresh x compact on first-fill-wins (SPEC 7.44) ===')
+				{
+					const g = ncPool.filter((r) => r.scenario === 'ote' && (r.mirrorBest != null || r.fadeBest != null))
+					const pick = (r: (typeof g)[number]): number => {
+						if (r.mirrorBest && r.fadeBest) return r.mirrorBest.entryIndex <= r.fadeBest.entryIndex ? r.mirrorBest.netR : r.fadeBest.netR
+						return r.mirrorBest ? r.mirrorBest.netR : r.fadeBest!.netR
+					}
+					const sortedAt = g.map((r) => r.entryAt).sort((a, b) => a - b)
+					const midAt = sortedAt[Math.floor(sortedAt.length / 2)] ?? 0
+					const med = swingMedianBySc.get('ote') ?? null
+					const stat = (gg: typeof g): string => {
+						if (gg.length === 0) return 'n     0'
+						const vals = gg.map(pick)
+						const total = vals.reduce((a, b) => a + b, 0)
+						const wr = (100 * vals.filter((x) => x > 0).length) / vals.length
+						const avg = (hh: typeof g): number => {
+							const vs = hh.map(pick)
+							return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : 0
+						}
+						return `n ${String(gg.length).padStart(5)}, avgR ${fmt(total / gg.length)}, WR ${wr.toFixed(1)}% | H1 ${fmt(avg(gg.filter((r) => r.entryAt < midAt)))} (n ${gg.filter((r) => r.entryAt < midAt).length}) / H2 ${fmt(avg(gg.filter((r) => r.entryAt >= midAt)))} (n ${gg.filter((r) => r.entryAt >= midAt).length})`
+					}
+					const freshBuckets: [string, (r: (typeof g)[number]) => boolean][] = [
+						['fresh <=3 bars ', (r) => r.touchDelayBars <= 3],
+						['normal 4-15    ', (r) => r.touchDelayBars > 3 && r.touchDelayBars <= 15],
+						['stale >=16     ', (r) => r.touchDelayBars > 15],
+					]
+					lines.push('-- freshness of canon touch --')
+					for (const [name, test] of freshBuckets) lines.push(`  ${name}: ${stat(g.filter(test))}`)
+					lines.push(`-- grid compactness (swingAtr vs ote median ${med?.toFixed(2) ?? '-'}) --`)
+					lines.push(`  compact (<=med): ${stat(g.filter((r) => r.swingAtr != null && med != null && r.swingAtr <= med))}`)
+					lines.push(`  wide    (> med): ${stat(g.filter((r) => r.swingAtr != null && med != null && r.swingAtr > med))}`)
+					lines.push('-- cross-matrix fresh x compact --')
+					for (const [name, test] of freshBuckets) {
+						const fg = g.filter(test)
+						lines.push(`  ${name} x compact: ${stat(fg.filter((r) => r.swingAtr != null && med != null && r.swingAtr <= med))}`)
+						lines.push(`  ${name} x wide   : ${stat(fg.filter((r) => r.swingAtr != null && med != null && r.swingAtr > med))}`)
+					}
+				}
+				// SPEC 7.41-1: слип стопа. Малый объём -> слип ~0. Сравнение
+				// канона (stop taker+slip) с no-slip (stop чистый taker).
 			lines.push('', '=== Stop-slip sensitivity: taker+slip vs pure taker (SPEC 7.41) ===')
 			for (const sc of scenarios) {
 				const g = ncPool.filter((r) => r.scenario === sc && r.noSlipR != null)
