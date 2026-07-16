@@ -212,7 +212,7 @@ interface CliArgs {
 	/**
 	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
 	 * П���� умолчанию полный канон: ote,deep,breaker. Неизвестные им������на — ошибка,
-	 * чтобы опечатка не превращалась в м��лчаливый прогон ��олного набора.
+	 * чтобы опечатка не превращалась в м����лчаливый прогон ��олного набора.
 	 */
 	portfolioScenarios: string[]
 	/**
@@ -1013,7 +1013,10 @@ async function main() {
 		honestR: number | null;
 		noSlipR: number | null;
 		mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null;
-		fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null }[] = []
+		fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null;
+		volRatio: number | null;
+		htfAlign: boolean | null;
+		deepMirrorR: number | null }[] = []
 	// SPEC 7.29: свип стоп×тейк на канон-пуле touch+bigbar. Одна строка =
 	// одна сделка, netR по каждой валидной комбинации (ключ "stop|take" в
 	// ratio сетки). null = не разрешилась до конца данных; комбинации не на
@@ -1393,6 +1396,15 @@ async function main() {
 										snapshot.market.trendHistory, metrics)
 										const dedupSurvivors = new Set(applyDedup(pool, 'cooldown'))
 										const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
+										// SPEC 7.43: HTF-контекст для слоя-кандидата сайзинга —
+										// один старший ТФ на ТФ (look-ahead-free, как в 7.21).
+										const HTF_OF: Record<string, string> = { '15m': '1h', '30m': '4h', '1h': '4h' }
+										const htfName = HTF_OF[timeframe]
+										let htfCtx: ReturnType<typeof buildHtfContext> | null = null
+										if (htfName) {
+											const htfCandles = aggregateCandles(chunk, timeframe, htfName)
+											if (htfCandles.length >= 50) htfCtx = buildHtfContext(runAnalysis(htfCandles), TF_MS[htfName]!)
+										}
 										// SPEC 7.34: ATR по индексу бара. Точки разрежены — берём
 										// последнюю с p.index <= i (точки отсортированы по index).
 										const atrAt = (i: number): number | null => {
@@ -1648,8 +1660,27 @@ async function main() {
 													// SPEC 7.38: (1) честный intrabar на клетке канона;
 													// (2) утверждённые реверс-клетки 7.37 с индексами
 													// филла/выхода — для дедуп-анализа mirror×fade.
-													...((): { honestR: number | null; noSlipR: number | null; mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null; fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null } => {
-														const empty = { honestR: null, noSlipR: null, mirrorBest: null, fadeBest: null }
+													// SPEC 7.43: три слоя-кандидата сайзинга на канон-пуле.
+													// volRatio: объём свечи касания / SMA20 объёма до неё.
+													// htfAlign: направление сделки совпадает с HTF-трендом.
+													// deepMirrorR: зеркальный реверс для deep-сеток (шорт с
+													// ретеста 61.8 после deep-входа, stop 78.6 × tp 38.2 —
+													// та же логика «от следующего уровня к входу», что mirror).
+													volRatio: ((): number | null => {
+														const i = outcome.entryIndex!
+														if (i < 20) return null
+														let sum = 0
+														for (let k = i - 20; k < i; k++) sum += snapshot.candles[k]!.volume
+														const avg = sum / 20
+														return avg > 0 ? entryCandle.volume / avg : null
+													})(),
+													htfAlign: ((): boolean | null => {
+														if (!htfCtx) return null
+														const labels = htfContextAt(htfCtx, entryCandle.timestamp, outcome.entryPrice!, outcome.direction)
+														return labels.trendAligned
+													})(),
+													...((): { honestR: number | null; noSlipR: number | null; deepMirrorR: number | null; mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null; fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null } => {
+														const empty = { honestR: null, noSlipR: null, deepMirrorR: null, mirrorBest: null, fadeBest: null }
 														const p0 = levelPrice(0)
 														if (p0 == null || outcome.entryPrice == null || outcome.entryIndex == null) return empty
 														const atL = (ratio: number): number => p0 + (ratio / 100) * (tp - p0)
@@ -1664,15 +1695,21 @@ async function main() {
 														const noSlipR = isDeep
 															? replayStopTake(snapshot.candles, outcome, atL(15), atL(61.8), noSlipCosts)
 															: replayStopTake(snapshot.candles, outcome, atL(61.8), atL(100), noSlipCosts)
-														if (isDeep) return { honestR, noSlipR, mirrorBest: null, fadeBest: null }
-														const revDir = outcome.direction === 'long' ? 'short' : 'long'
+														const revDirAll = outcome.direction === 'long' ? 'short' : 'long'
+														if (isDeep) {
+															// SPEC 7.43: зеркало deep — реверс с ретеста 61.8
+															// (тейка deep-канона), stop 78.6 × tp 38.2.
+															const dm = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDirAll, atL(61.8), atL(78.6), atL(38.2), atL(0), bingxCosts)
+															return { honestR, noSlipR, deepMirrorR: dm.status === 'entered' ? dm.netR : null, mirrorBest: null, fadeBest: null }
+														}
 														// mirror: утверждённая клетка 7.37 stop 120 × tp 78.6
-														const m = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDir, atL(100), atL(120), atL(78.6), atL(0), bingxCosts)
+														const m = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDirAll, atL(100), atL(120), atL(78.6), atL(0), bingxCosts)
 														// fade141: утверждённая клетка 7.37 stop 176 × tp 78.6
-														const f = replayEntryStopTake(snapshot.candles, outcome.createdAtIndex, revDir, atL(141), atL(176), atL(78.6), atL(0), bingxCosts)
+														const f = replayEntryStopTake(snapshot.candles, outcome.createdAtIndex, revDirAll, atL(141), atL(176), atL(78.6), atL(0), bingxCosts)
 														return {
 															honestR,
 															noSlipR,
+															deepMirrorR: null,
 															mirrorBest: m.status === 'entered' && m.netR != null && m.entryIndex != null && m.exitIndex != null
 																? { netR: m.netR, entryIndex: m.entryIndex, exitIndex: m.exitIndex } : null,
 															fadeBest: f.status === 'entered' && f.netR != null && f.entryIndex != null && f.exitIndex != null
@@ -2469,7 +2506,7 @@ async function main() {
 				}
 			}
 			// (2) симуляция стеков: R/unit = sum(m·r)/sum(m); нормировка на
-			// риск-бюджет неявная (метрика инвариантна к масштабу множителей).
+			// риск-бюджет неявная (метрика инвариантна к ��асштабу множителей).
 			const freshMult = (r: (typeof xPool)[number]): number => (r.touchDelayBars <= 3 ? 2.0 : r.touchDelayBars <= 15 ? 1.0 : 0.5)
 			const swingMult = (r: (typeof xPool)[number]): number => (isCompact(r) ? 1.4 : 0.7)
 			const sessMult = (r: (typeof xPool)[number]): number => (isUsSession(r) ? 1.2 : 1.0)
@@ -2722,6 +2759,53 @@ async function main() {
 					lines.push(`  walk-forward: n ${wfN}, totalR ${fmt(wfTotal)}, avgR ${fmt(wfN ? wfTotal / wfN : 0)}`)
 					lines.push(`  canon fixed : n ${canonN}, totalR ${fmt(canonTotal)}, avgR ${fmt(canonN ? canonTotal / canonN : 0)}`)
 					lines.push(`  oracle ${oracleKey ?? '-'} (in-sample bound): n ${oracleN}, totalR ${fmt(oracleTotal)}, avgR ${fmt(oracleN ? oracleTotal / oracleN : 0)}`)
+				}
+			}
+			// SPEC 7.43: три слоя-кандидата. Методика 7.34/7.35: бакеты по
+			// avgR + H1/H2 (полупериоды по entryAt) — кандидат в сайзинг
+			// годен, только если разница бакетов держится в обеих половинах.
+			{
+				const halfStat = (g: typeof ncPool): string => {
+					if (g.length === 0) return 'n 0'
+					const at = ncPool.map((r) => r.entryAt).sort((a, b) => a - b)
+					const mid = at[Math.floor(at.length / 2)] ?? 0
+					const avg = (gg: typeof g): number => (gg.length ? gg.reduce((a, r) => a + r.newCanonR!, 0) / gg.length : 0)
+					const h1 = g.filter((r) => r.entryAt < mid)
+					const h2 = g.filter((r) => r.entryAt >= mid)
+					return `n ${String(g.length).padStart(5)}, avgR ${fmt(avg(g))} | H1 ${fmt(avg(h1))} (n ${h1.length}) / H2 ${fmt(avg(h2))} (n ${h2.length})`
+				}
+				lines.push('', '=== Volume at touch: entry candle vol / SMA20 vol (SPEC 7.43) ===')
+				for (const sc of scenarios) {
+					lines.push(`-- ${sc} --`)
+					const g = ncPool.filter((r) => r.scenario === sc && r.volRatio != null)
+					const buckets: [string, (v: number) => boolean][] = [
+						['vol <0.7 (тихое касание)', (v) => v < 0.7],
+						['vol 0.7-1.3 (обычное)   ', (v) => v >= 0.7 && v < 1.3],
+						['vol 1.3-2.0 (повышенное)', (v) => v >= 1.3 && v < 2.0],
+						['vol >=2.0 (всплеск)     ', (v) => v >= 2.0],
+					]
+					for (const [name, test] of buckets) lines.push(`  ${name}: ${halfStat(g.filter((r) => test(r.volRatio!)))}`)
+				}
+				lines.push('', '=== HTF trend alignment: 15m->1h, 30m/1h->4h (SPEC 7.43) ===')
+				for (const sc of scenarios) {
+					lines.push(`-- ${sc} --`)
+					const g = ncPool.filter((r) => r.scenario === sc)
+					lines.push(`  по тренду HTF : ${halfStat(g.filter((r) => r.htfAlign === true))}`)
+					lines.push(`  против тренда : ${halfStat(g.filter((r) => r.htfAlign === false))}`)
+					lines.push(`  нет контекста : ${halfStat(g.filter((r) => r.htfAlign == null))}`)
+				}
+				lines.push('', '=== Deep mirror: reverse from 61.8 retest, stop 78.6 x tp 38.2 (SPEC 7.43) ===')
+				{
+					const g = ncPool.filter((r) => r.scenario === 'deep' && r.deepMirrorR != null)
+					if (g.length === 0) lines.push('  пусто')
+					else {
+						const at = ncPool.map((r) => r.entryAt).sort((a, b) => a - b)
+						const mid = at[Math.floor(at.length / 2)] ?? 0
+						const avg = (gg: typeof g): number => (gg.length ? gg.reduce((a, r) => a + r.deepMirrorR!, 0) / gg.length : 0)
+						const total = g.reduce((a, r) => a + r.deepMirrorR!, 0)
+						const wr = (100 * g.filter((r) => r.deepMirrorR! > 0).length) / g.length
+						lines.push(`  n ${g.length}, totalR ${fmt(total)}, avgR ${fmt(avg(g))}, WR ${wr.toFixed(1)}% | H1 ${fmt(avg(g.filter((r) => r.entryAt < mid)))} / H2 ${fmt(avg(g.filter((r) => r.entryAt >= mid)))}`)
+					}
 				}
 			}
 			const summary = lines.join('\n')
