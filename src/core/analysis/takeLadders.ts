@@ -197,6 +197,99 @@ export function replayStopTake(
 }
 
 /**
+ * SPEC 7.36 (ось d): replayStopTake + тайм-стоп. Если за maxBars от входа
+ * не взят ни стоп, ни тейк — закрытие по close бара (маркет, stopRate).
+ * Возвращает netR и bars (длительность до выхода) для метрики R/время.
+ * null — только если данные кончились раньше maxBars без резолва.
+ */
+export function replayStopTakeTimed(
+	candles: Candle[],
+	outcome: FibSetupOutcome,
+	stopPrice: number,
+	tpPrice: number,
+	maxBars: number,
+	costs: LadderCostRates = DEFAULT_LADDER_COSTS,
+): { netR: number; bars: number } | null {
+	if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null) return null
+	const long = outcome.direction === 'long'
+	const entry = outcome.entryPrice
+	if (long ? stopPrice >= entry : stopPrice <= entry) return null
+	if (long ? tpPrice <= entry : tpPrice >= entry) return null
+	const risk = Math.abs(entry - stopPrice)
+	if (risk <= 0) return null
+
+	let net = -fillCostR(entry, costs.entryRate, 1, risk)
+	for (let i = outcome.entryIndex; i < candles.length; i++) {
+		const candle = candles[i]
+		if (!candle) continue
+		const bars = i - outcome.entryIndex
+		const hitStop = long ? candle.low <= stopPrice : candle.high >= stopPrice
+		if (hitStop) return { netR: net - 1 - fillCostR(stopPrice, costs.stopRate, 1, risk), bars }
+		const hitTp = long ? candle.high >= tpPrice : candle.low <= tpPrice
+		if (hitTp) return { netR: net + (long ? tpPrice - entry : entry - tpPrice) / risk - fillCostR(tpPrice, costs.takeRate, 1, risk), bars }
+		if (bars >= maxBars)
+			return { netR: net + (long ? candle.close - entry : entry - candle.close) / risk - fillCostR(candle.close, costs.stopRate, 1, risk), bars }
+	}
+	return null
+}
+
+/**
+ * SPEC 7.36 (ось c): трейлинг-стоп по уровням сетки, полная позиция без
+ * частичных фиксаций. levels — цены ступеней в порядке движения профита;
+ * при касании ступени k стоп переносится на ступень k−trailBehind
+ * (k<trailBehind → на вход). Выход: по текущему стопу или по последней
+ * ступени (финальный тейк). Конвенции: конфликт стоп/уровень в баре =
+ * стоп (стоп проверяется по состоянию НА НАЧАЛО бара — перенос стопа
+ * применяется после закрытия бара, внутрибарные апгрейды не помогают);
+ * выход по стопу/трейлу — stopRate (маркет), по финалу — takeRate.
+ * null = не разрешилась или невалидная геометрия.
+ */
+export function replayTrailLadder(
+	candles: Candle[],
+	outcome: FibSetupOutcome,
+	stopPrice: number,
+	levels: number[],
+	trailBehind: number,
+	costs: LadderCostRates = DEFAULT_LADDER_COSTS,
+): number | null {
+	if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null) return null
+	const long = outcome.direction === 'long'
+	const entry = outcome.entryPrice
+	if (long ? stopPrice >= entry : stopPrice <= entry) return null
+	if (levels.length === 0) return null
+	for (const l of levels) if (long ? l <= entry : l >= entry) return null
+	const risk = Math.abs(entry - stopPrice)
+	if (risk <= 0) return null
+	const last = levels[levels.length - 1]!
+
+	let net = -fillCostR(entry, costs.entryRate, 1, risk)
+	let curStop = stopPrice
+	let reached = -1 // индекс максимальной достигнутой ступени
+	const exitAt = (price: number, rate: number): number =>
+		net + (long ? price - entry : entry - price) / risk - fillCostR(price, rate, 1, risk)
+	for (let i = outcome.entryIndex; i < candles.length; i++) {
+		const candle = candles[i]
+		if (!candle) continue
+		// 1) стоп по состоянию на начало бара — первым (пессимистично).
+		if (long ? candle.low <= curStop : candle.high >= curStop) return exitAt(curStop, costs.stopRate)
+		// 2) финальная ступень — тейк.
+		if (long ? candle.high >= last : candle.low <= last) return exitAt(last, costs.takeRate)
+		// 3) обновляем достигнутые ступени и переносим стоп (после бара).
+		for (let k = reached + 1; k < levels.length; k++) {
+			const lv = levels[k]!
+			if (long ? candle.high >= lv : candle.low <= lv) reached = k
+			else break
+		}
+		if (reached >= 0) {
+			const anchor = reached - trailBehind
+			const newStop = anchor < 0 ? entry : levels[anchor]!
+			if (long ? newStop > curStop : newStop < curStop) curStop = newStop
+		}
+	}
+	return null
+}
+
+/**
  * SPEC 7.31: лестница с ПРОИЗВОЛЬНЫМ стопом и произвольными ступенями
  * тейков (в ценах), опциональный перенос в BE после первой фиксации.
  *

@@ -101,7 +101,7 @@ import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analys
 import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/analysis/dedupFilter.js'
 import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
 import { buildSetupFilterContext, firstFailingFilter, SETUP_FILTER_NAMES, type SetupFilterName } from '../../src/core/analysis/setupFilters.js'
-import { fillCostR, replayCustomLadder, replayEntryStopTake, replayLadder, replayStopTake, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
+import { fillCostR, replayCustomLadder, replayEntryStopTake, replayLadder, replayStopTake, replayStopTakeTimed, replayTrailLadder, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
 import { replayEntryModel, bigbarCovered, BINGX_MAKER_RATE, BINGX_TAKER_RATE, BINGX_SLIP_RATE, type EntryModelId } from '../../src/core/analysis/entryModels.js'
 
 // ---------- Свип детектора ----------
@@ -1007,7 +1007,9 @@ async function main() {
 	// одна сделка пула со статусами/netR всех трёх моделей (косты BingX,
 	// выходы t100-only) и меткой bigbar. netR missed-статусов = 0.
 	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null; fixed1R: number | null; fixed15R: number | null; fixed2R: number | null; fixed3R: number | null; newCanonR: number | null;
-		approachAtr: number | null; touchWickFrac: number | null; swingAtr: number | null; reentryR: number | null }[] = []
+		approachAtr: number | null; touchWickFrac: number | null; swingAtr: number | null; reentryR: number | null;
+		canonBars: number | null; t20R: number | null; t50R: number | null; trail1R: number | null; trail2R: number | null;
+		mirror618R: number | null; mirror786R: number | null; scale100R: number | null; scale886R: number | null }[] = []
 	// SPEC 7.29: свип стоп×тейк на канон-пуле touch+bigbar. Одна строка =
 	// одна сделка, netR по каждой валидной комбинации (ключ "stop|take" в
 	// ratio сетки). null = не разрешилась до конца данных; комбинации не на
@@ -1493,7 +1495,7 @@ async function main() {
 															: (c.high - Math.max(c.open, c.close)) / range
 													})(),
 													// SPEC 7.34 идея #3: высота свинга в ATR на момент
-													// создания сетки — ��икро-шум vs гигант.
+													// создания сетки — ����икро-шум vs гигант.
 													swingAtr: (() => {
 														const p0 = levelPrice(0)
 														const a = atrAt(outcome.createdAtIndex)
@@ -1540,11 +1542,89 @@ async function main() {
 															if (long ? c.low <= stopPrice : c.high >= stopPrice)
 																return net - 1 - fillCostR(stopPrice, bingxCosts.stopRate, 1, risk)
 															if (long ? c.high >= tpPrice : c.low <= tpPrice)
-																return net + Math.abs(tpPrice - entry) / risk - fillCostR(tpPrice, bingxCosts.takeRate, 1, risk)
-														}
-														return null
-													})(),
-												})
+																	return net + Math.abs(tpPrice - entry) / risk - fillCostR(tpPrice, bingxCosts.takeRate, 1, risk)
+															}
+															return null
+														})(),
+														// SPEC 7.36: оси c/d/e и зеркало #4. Все поля на ценах
+														// уровней сетки (atL). null там, где p0 недоступен или
+														// вариант не применим к сценарию/не разрешился.
+														...((): { canonBars: number | null; t20R: number | null; t50R: number | null; trail1R: number | null; trail2R: number | null; mirror618R: number | null; mirror786R: number | null; scale100R: number | null; scale886R: number | null } => {
+															const empty = { canonBars: null, t20R: null, t50R: null, trail1R: null, trail2R: null, mirror618R: null, mirror786R: null, scale100R: null, scale886R: null }
+															const p0 = levelPrice(0)
+															if (p0 == null || outcome.entryPrice == null || outcome.entryIndex == null) return empty
+															const atL = (ratio: number): number => p0 + (ratio / 100) * (tp - p0)
+															const isDeep = outcome.scenario === 'deep'
+															const stopP = isDeep ? atL(15) : atL(61.8)
+															const tpP = isDeep ? atL(61.8) : atL(100)
+															// Ось d: тайм-стоп на клетке канона. bars из timed с
+															// maxBars=∞-суррогатом (10^6) = длительность канона.
+															const tInf = replayStopTakeTimed(snapshot.candles, outcome, stopP, tpP, 1_000_000, bingxCosts)
+															const t20 = replayStopTakeTimed(snapshot.candles, outcome, stopP, tpP, 20, bingxCosts)
+															const t50 = replayStopTakeTimed(snapshot.candles, outcome, stopP, tpP, 50, bingxCosts)
+															// Ось c: трейлинг по уровням, финал 141. trail1 —
+															// стоп на 1 ступень позади, trail2 — на 2.
+															const levels = isDeep ? [61.8, 78.6, 88.6, 100, 120, 141].map(atL) : [88.6, 100, 120, 141].map(atL)
+															const trail1 = replayTrailLadder(snapshot.candles, outcome, stopP, levels, 1, bingxCosts)
+															const trail2 = replayTrailLadder(snapshot.candles, outcome, stopP, levels, 2, bingxCosts)
+															// Зеркало #4 (только ote): после касания 78.6 ждём
+															// возврата к 100 → вход ПРОТИВ (реверс direction),
+															// стоп 115, тейк 61.8/78.6; отмена за уровнем 0.
+															const revDir = outcome.direction === 'long' ? 'short' : 'long'
+															const m618 = isDeep ? null : replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDir, atL(100), atL(115), atL(61.8), atL(0), bingxCosts).netR
+															const m786 = isDeep ? null : replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDir, atL(100), atL(115), atL(78.6), atL(0), bingxCosts).netR
+															// Ось e (только ote): скейл-ин 0.5@78.6 + 0.5@38.2,
+															// общий стоп 15. R-единица = плановый максимум риска
+															// обеих ног (консервативно: без филла второй ноги
+															// профит недо-заявлен, но знаменатель постоянен).
+															const scale = (tpRatio: number): number | null => {
+																if (isDeep) return null
+																const long = outcome.direction === 'long'
+																const e1 = outcome.entryPrice!
+																const e2 = atL(38.2)
+																const sP = atL(15)
+																const tP = atL(tpRatio)
+																if (long ? sP >= e2 : sP <= e2) return null
+																if (long ? tP <= e1 : tP >= e1) return null
+																const planRisk = 0.5 * Math.abs(e1 - sP) + 0.5 * Math.abs(e2 - sP)
+																if (planRisk <= 0) return null
+																let net = -fillCostR(e1, bingxCosts.entryRate, 0.5, planRisk)
+																let leg2 = false
+																for (let i = outcome.entryIndex!; i < snapshot.candles.length; i++) {
+																	const c = snapshot.candles[i]!
+																	// стоп первым (пессимистично), закрывает обе ноги
+																	if (long ? c.low <= sP : c.high >= sP) {
+																		net += (0.5 * (long ? sP - e1 : e1 - sP)) / planRisk - fillCostR(sP, bingxCosts.stopRate, 0.5, planRisk)
+																		if (leg2) net += (0.5 * (long ? sP - e2 : e2 - sP)) / planRisk - fillCostR(sP, bingxCosts.stopRate, 0.5, planRisk)
+																		return net
+																	}
+																	if (!leg2 && (long ? c.low <= e2 : c.high >= e2)) {
+																		leg2 = true
+																		net -= fillCostR(e2, bingxCosts.entryRate, 0.5, planRisk)
+																	}
+																	if (long ? c.high >= tP : c.low <= tP) {
+																		net += (0.5 * (long ? tP - e1 : e1 - tP)) / planRisk - fillCostR(tP, bingxCosts.takeRate, 0.5, planRisk)
+																		if (leg2) net += (0.5 * (long ? tP - e2 : e2 - tP)) / planRisk - fillCostR(tP, bingxCosts.takeRate, 0.5, planRisk)
+																		return net
+																	}
+																}
+																return null
+															}
+															return {
+																canonBars: tInf?.bars ?? null,
+																t20R: t20?.netR ?? null,
+																t50R: t50?.netR ?? null,
+																trail1R: trail1,
+																trail2R: trail2,
+																mirror618R: m618,
+																mirror786R: m786,
+																scale100R: scale(100),
+																// тейк ДОЛЖЕН быть выше входа первой ноги (78.6),
+																// иначе мгновенный «тейк» на баре входа: 88.6.
+																scale886R: scale(88.6),
+															}
+														})(),
+													})
 											// SPEC 7.29: свип стоп×тейк. Уровни сетки линейны по
 											// ratio — произвольный ratio интерполируется через 0/100.
 											// Только touch-вход, прошедший bigbar (канон-пул);
@@ -1713,7 +1793,7 @@ async function main() {
 	if (allReach.length > 0) {
 		console.log(`\n=== Reach histogram (куда доходит цена после события, доля кан��идатов) ===\n`)
 		console.log(reachToMarkdown(allReach))
-		console.log(`\n=== Fade-reach (после касания 141/241: → отк��т до, ↑ продолжение до) ===\n`)
+		console.log(`\n=== Fade-reach (после касания 141/241: → о��к��т до, ↑ продолжение до) ===\n`)
 		console.log(fadeReachToMarkdown(allReach))
 	}
 	console.log(`\nCSV (all ${allRows.length} rows): ${csvPath}`)
@@ -2327,6 +2407,64 @@ async function main() {
 					return riskSum ? total / riskSum : 0
 				}
 				lines.push(`${st.name.padEnd(21)}: R/unit ${fmt(calc(xPool))} | H1 ${fmt(calc(xPool.filter((r) => r.entryAt < midAtAll)))} / H2 ${fmt(calc(xPool.filter((r) => r.entryAt >= midAtAll)))}`)
+			}
+			// SPEC 7.36: последние оси. Каждый блок — на своём пуле
+			// (required-all-resolved внутри сравнения), с H1/H2.
+			lines.push('', '=== Last axes: time-stop, trail, mirror, scale-in (SPEC 7.36, new canon cells) ===')
+			const half = <T extends { entryAt: number }>(g: T[]): [T[], T[]] => {
+				const sorted = g.map((r) => r.entryAt).sort((a, b) => a - b)
+				const mid = sorted[Math.floor(sorted.length / 2)] ?? 0
+				return [g.filter((r) => r.entryAt < mid), g.filter((r) => r.entryAt >= mid)]
+			}
+			const line = (name: string, g: { entryAt: number }[], get: (r: never) => number): void => {
+				const vals = (g as never[]).map(get)
+				const total = vals.reduce((a, b) => a + b, 0)
+				const wr = vals.length ? (100 * vals.filter((v) => v > 0).length) / vals.length : 0
+				const [h1, h2] = half(g)
+				const avg = (gg: { entryAt: number }[]): number => {
+					const vv = (gg as never[]).map(get)
+					return vv.length ? vv.reduce((a, b) => a + b, 0) / vv.length : 0
+				}
+				lines.push(`${name.padEnd(26)}: n ${String(vals.length).padStart(5)}, totalR ${fmt(total)}, avgR ${fmt(vals.length ? total / vals.length : 0)}, WR ${wr.toFixed(1)}% | H1 ${fmt(avg(h1))} / H2 ${fmt(avg(h2))}`)
+			}
+			// Ось d: тайм-стоп. Пул: t20/t50/canon все != null; R/bar — avgR
+			// делённый на средние бары удержания (аллокативная метрика).
+			for (const sc of scenarios) {
+				const g = ncPool.filter((r) => r.scenario === sc && r.t20R != null && r.t50R != null && r.canonBars != null)
+				if (g.length === 0) continue
+				const avgBars = g.reduce((a, r) => a + r.canonBars!, 0) / g.length
+				lines.push(`-- ${sc}: time-stop (canon avg hold ${avgBars.toFixed(1)} bars) --`)
+				line('  canon (no time-stop)', g, (r: (typeof g)[number]) => r.newCanonR!)
+				line('  time-stop 50 bars', g, (r: (typeof g)[number]) => r.t50R!)
+				line('  time-stop 20 bars', g, (r: (typeof g)[number]) => r.t20R!)
+			}
+			// Ось c: трейлинг. Пул: trail1/trail2/canon != null.
+			for (const sc of scenarios) {
+				const g = ncPool.filter((r) => r.scenario === sc && r.trail1R != null && r.trail2R != null)
+				if (g.length === 0) continue
+				lines.push(`-- ${sc}: trail ladder to 141 --`)
+				line('  canon (fixed tp)', g, (r: (typeof g)[number]) => r.newCanonR!)
+				line('  trail 1 behind', g, (r: (typeof g)[number]) => r.trail1R!)
+				line('  trail 2 behind', g, (r: (typeof g)[number]) => r.trail2R!)
+			}
+			// Зеркало #4: только ote; отдельный поток сделок — сравнение
+			// не с каноном, а сам по себе (n = разрешившиеся входы).
+			{
+				const g618 = ncPool.filter((r) => r.mirror618R != null)
+				const g786 = ncPool.filter((r) => r.mirror786R != null)
+				lines.push('-- mirror from extreme (ote grids, reversed direction, stop 115) --')
+				if (g618.length > 0) line('  mirror tp 61.8', g618, (r: (typeof g618)[number]) => r.mirror618R!)
+				if (g786.length > 0) line('  mirror tp 78.6', g786, (r: (typeof g786)[number]) => r.mirror786R!)
+			}
+			// Ось e: скейл-ин. Пул: оба варианта и канон != null (ote).
+			{
+				const g = ncPool.filter((r) => r.scale100R != null && r.scale886R != null)
+				if (g.length > 0) {
+					lines.push('-- ote: scale-in 0.5@78.6 + 0.5@38.2, stop 15 --')
+					line('  canon ote (61.8x100)', g, (r: (typeof g)[number]) => r.newCanonR!)
+					line('  scale-in tp 100', g, (r: (typeof g)[number]) => r.scale100R!)
+					line('  scale-in tp 88.6', g, (r: (typeof g)[number]) => r.scale886R!)
+				}
 			}
 			const summary = lines.join('\n')
 			const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)
