@@ -212,7 +212,7 @@ interface CliArgs {
 	/**
 	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
 	 * П���� умолчанию полный канон: ote,deep,breaker. Неизвестные им������на — ошибка,
-	 * чтобы опечатка не превращалась в молчаливый прогон ��олного набора.
+	 * чтобы опечатка не превращалась в м��лчаливый прогон ��олного набора.
 	 */
 	portfolioScenarios: string[]
 	/**
@@ -1011,6 +1011,7 @@ async function main() {
 		canonBars: number | null; t20R: number | null; t50R: number | null; trail1R: number | null; trail2R: number | null;
 		mirror618R: number | null; mirror786R: number | null; scale100R: number | null; scale886R: number | null;
 		honestR: number | null;
+		noSlipR: number | null;
 		mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null;
 		fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null }[] = []
 	// SPEC 7.29: свип стоп×тейк на канон-пуле touch+bigbar. Одна строка =
@@ -1647,8 +1648,8 @@ async function main() {
 													// SPEC 7.38: (1) честный intrabar на клетке канона;
 													// (2) утверждённые реверс-клетки 7.37 с индексами
 													// филла/выхода — для дедуп-анализа mirror×fade.
-													...((): { honestR: number | null; mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null; fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null } => {
-														const empty = { honestR: null, mirrorBest: null, fadeBest: null }
+													...((): { honestR: number | null; noSlipR: number | null; mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null; fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null } => {
+														const empty = { honestR: null, noSlipR: null, mirrorBest: null, fadeBest: null }
 														const p0 = levelPrice(0)
 														if (p0 == null || outcome.entryPrice == null || outcome.entryIndex == null) return empty
 														const atL = (ratio: number): number => p0 + (ratio / 100) * (tp - p0)
@@ -1656,7 +1657,14 @@ async function main() {
 														const honestR = isDeep
 															? replayStopTakeHonest(snapshot.candles, outcome, atL(15), atL(61.8), bingxCosts)
 															: replayStopTakeHonest(snapshot.candles, outcome, atL(61.8), atL(100), bingxCosts)
-														if (isDeep) return { honestR, mirrorBest: null, fadeBest: null }
+														// SPEC 7.41: чувствительность к слипу стопа. Малые
+														// объёмы (до ~$1k на мажорах) — слип стопа ≈ 0,
+														// стоп-кост = чистый taker 0.05%.
+														const noSlipCosts = { entryRate: BINGX_MAKER_RATE, takeRate: BINGX_MAKER_RATE, stopRate: BINGX_TAKER_RATE }
+														const noSlipR = isDeep
+															? replayStopTake(snapshot.candles, outcome, atL(15), atL(61.8), noSlipCosts)
+															: replayStopTake(snapshot.candles, outcome, atL(61.8), atL(100), noSlipCosts)
+														if (isDeep) return { honestR, noSlipR, mirrorBest: null, fadeBest: null }
 														const revDir = outcome.direction === 'long' ? 'short' : 'long'
 														// mirror: утверждённая клетка 7.37 stop 120 × tp 78.6
 														const m = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDir, atL(100), atL(120), atL(78.6), atL(0), bingxCosts)
@@ -1664,6 +1672,7 @@ async function main() {
 														const f = replayEntryStopTake(snapshot.candles, outcome.createdAtIndex, revDir, atL(141), atL(176), atL(78.6), atL(0), bingxCosts)
 														return {
 															honestR,
+															noSlipR,
 															mirrorBest: m.status === 'entered' && m.netR != null && m.entryIndex != null && m.exitIndex != null
 																? { netR: m.netR, entryIndex: m.entryIndex, exitIndex: m.exitIndex } : null,
 															fadeBest: f.status === 'entered' && f.netR != null && f.entryIndex != null && f.exitIndex != null
@@ -2619,6 +2628,100 @@ async function main() {
 						return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0
 					}
 					lines.push(`  ${v.name.padEnd(19)}: n ${String(all.length).padStart(5)}, totalR ${fmt(total)}, avgR ${fmt(all.length ? total / all.length : 0)}, WR ${wr.toFixed(1)}% | H1 ${fmt(avgOf(g.filter((r) => r.entryAt < midAt)))} / H2 ${fmt(avgOf(g.filter((r) => r.entryAt >= midAt)))}`)
+				}
+			}
+			// SPEC 7.41-1: слип стопа. Малый объём -> слип ~0. Сравнение
+			// канона (stop taker+slip) с no-slip (stop чистый taker).
+			lines.push('', '=== Stop-slip sensitivity: taker+slip vs pure taker (SPEC 7.41) ===')
+			for (const sc of scenarios) {
+				const g = ncPool.filter((r) => r.scenario === sc && r.noSlipR != null)
+				if (g.length === 0) continue
+				const base = g.reduce((a, r) => a + r.newCanonR!, 0)
+				const ns = g.reduce((a, r) => a + r.noSlipR!, 0)
+				lines.push(`${sc.padEnd(6)}: n ${g.length}, with-slip ${fmt(base)} (avg ${fmt(base / g.length)}) -> no-slip ${fmt(ns)} (avg ${fmt(ns / g.length)}), delta ${fmt(ns - base)}`)
+			}
+			// SPEC 7.41-2: rolling walk-forward на sweepRows. K окон по
+			// времени (глобальные границы по квантилям entryAt канон-пула).
+			// Для окна i клетка выбирается по avgR на окнах 1..i-1
+			// (expanding train, min 200 сделок сценария в трейне), торгуется
+			// на окне i. Сравнение: walk-forward vs фиксированный канон vs
+			// oracle (лучшая клетка полного периода, верхняя граница).
+			// Разница wf-канон ~0 => канон-клетки стабильны во времени.
+			lines.push('', '=== Rolling walk-forward: stop x take cell picked on past windows only (SPEC 7.41) ===')
+			{
+				const K = 6
+				const allAt = sweepRows.map((r) => r.entryAt).sort((a, b) => a - b)
+				const bounds: number[] = []
+				for (let k = 1; k < K; k++) bounds.push(allAt[Math.floor((k * allAt.length) / K)] ?? Infinity)
+				const winOf = (at: number): number => {
+					let w = 0
+					for (const b of bounds) if (at >= b) w++
+					return w
+				}
+				const canonKey: Record<string, string> = { deep: '15|61.8', ote: '61.8|100' }
+				for (const sc of ['deep', 'ote']) {
+					const rows = sweepRows.filter((r) => r.scenario === sc)
+					if (rows.length === 0) continue
+					const cellStats = (rs: typeof rows): Map<string, { n: number; total: number }> => {
+						const m = new Map<string, { n: number; total: number }>()
+						for (const r of rs) {
+							for (const [key, v] of r.combos) {
+								if (v == null) continue
+								const s = m.get(key) ?? { n: 0, total: 0 }
+								s.n++
+								s.total += v
+								m.set(key, s)
+							}
+						}
+						return m
+					}
+					let wfTotal = 0
+					let wfN = 0
+					let canonTotal = 0
+					let canonN = 0
+					const picks: string[] = []
+					for (let w = 1; w < K; w++) {
+						const train = rows.filter((r) => winOf(r.entryAt) < w)
+						const test = rows.filter((r) => winOf(r.entryAt) === w)
+						if (test.length === 0) continue
+						const stats = cellStats(train)
+						let bestKey: string | null = null
+						let bestAvg = -Infinity
+						for (const [key, s] of stats) {
+							if (s.n < 200) continue
+							const avg = s.total / s.n
+							if (avg > bestAvg) { bestAvg = avg; bestKey = key }
+						}
+						if (bestKey == null) continue
+						picks.push(`w${w + 1}:${bestKey}`)
+						for (const r of test) {
+							const wf = r.combos.get(bestKey)
+							if (wf != null) { wfTotal += wf; wfN++ }
+							const cn = r.combos.get(canonKey[sc]!)
+							if (cn != null) { canonTotal += cn; canonN++ }
+						}
+					}
+					// oracle: лучшая клетка полного периода на тех же тестовых окнах
+					const fullStats = cellStats(rows)
+					let oracleKey: string | null = null
+					let oracleAvg = -Infinity
+					for (const [key, s] of fullStats) {
+						if (s.n < 500) continue
+						if (s.total / s.n > oracleAvg) { oracleAvg = s.total / s.n; oracleKey = key }
+					}
+					let oracleTotal = 0
+					let oracleN = 0
+					if (oracleKey != null) {
+						for (const r of rows.filter((rr) => winOf(rr.entryAt) >= 1)) {
+							const v = r.combos.get(oracleKey)
+							if (v != null) { oracleTotal += v; oracleN++ }
+						}
+					}
+					lines.push(`-- ${sc} (canon cell ${canonKey[sc]}) --`)
+					lines.push(`  picks per window: ${picks.join(' ')}`)
+					lines.push(`  walk-forward: n ${wfN}, totalR ${fmt(wfTotal)}, avgR ${fmt(wfN ? wfTotal / wfN : 0)}`)
+					lines.push(`  canon fixed : n ${canonN}, totalR ${fmt(canonTotal)}, avgR ${fmt(canonN ? canonTotal / canonN : 0)}`)
+					lines.push(`  oracle ${oracleKey ?? '-'} (in-sample bound): n ${oracleN}, totalR ${fmt(oracleTotal)}, avgR ${fmt(oracleN ? oracleTotal / oracleN : 0)}`)
 				}
 			}
 			const summary = lines.join('\n')
