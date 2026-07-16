@@ -101,7 +101,7 @@ import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analys
 import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/analysis/dedupFilter.js'
 import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
 import { buildSetupFilterContext, firstFailingFilter, SETUP_FILTER_NAMES, type SetupFilterName } from '../../src/core/analysis/setupFilters.js'
-import { replayCustomLadder, replayEntryStopTake, replayLadder, replayStopTake, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
+import { fillCostR, replayCustomLadder, replayEntryStopTake, replayLadder, replayStopTake, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
 import { replayEntryModel, bigbarCovered, BINGX_MAKER_RATE, BINGX_TAKER_RATE, BINGX_SLIP_RATE, type EntryModelId } from '../../src/core/analysis/entryModels.js'
 
 // ---------- Свип детектора ----------
@@ -233,7 +233,7 @@ interface CliArgs {
 	 */
 	evalFilters: boolean
 	/**
-	 * Пул-оценка HTF-контекст�� (SPEC 7.21): --eval-htf. Размечает тот же пул
+	 * Пул-оценка HTF-контекст���� (SPEC 7.21): --eval-htf. Размечает тот же пул
 	 * сделок метками старшего ТФ (тренд + premium/discount) без портфельной
 	 * симуляции. Пары: 30m → 1h и 4h, 1h → 4h, 4h → 1d. HTF-свечи агрегируются
 	 * из уже загруженных LTF — отдельная загрузка не нужна.
@@ -1006,7 +1006,8 @@ async function main() {
 	// Пул-оценка моделей входа (--eval-entry, SPEC 7.24): одна строка =
 	// одна сделка пула со статусами/netR всех трёх моделей (косты BingX,
 	// выходы t100-only) и меткой bigbar. netR missed-статусов = 0.
-	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null; fixed1R: number | null; fixed15R: number | null; fixed2R: number | null; fixed3R: number | null; newCanonR: number | null }[] = []
+	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null; fixed1R: number | null; fixed15R: number | null; fixed2R: number | null; fixed3R: number | null; newCanonR: number | null;
+		approachAtr: number | null; touchWickFrac: number | null; swingAtr: number | null; reentryR: number | null }[] = []
 	// SPEC 7.29: свип стоп×тейк на канон-пуле touch+bigbar. Одна строка =
 	// одна сделка, netR по каждой валидной комбинации (ключ "stop|take" в
 	// ratio сетки). null = не разрешилась до конца данных; комбинации не на
@@ -1118,7 +1119,7 @@ async function main() {
 					},
 				})
 						// Волна 2 фильтра режима: релейбленные копии прошедших фильтр
-						// исходов (oteRegime/deepRegime) подмешиваются к оригиналам —
+						// исходов (oteRegime/deepRegime) подмешиваются к оригинал��м —
 						// сравнение до/после в одной сводке. Только базовый конф��г.
 						let outcomesForSlicing = snapshot.fibLifecycle.outcomes
 						if (args.regimeFilter && variant.id === 'base') {
@@ -1367,10 +1368,20 @@ async function main() {
 									const filterCtx = buildSetupFilterContext(
 										snapshot.candles, snapshot.events, snapshot.fib.candidates,
 										snapshot.market.trendHistory, metrics)
-									const dedupSurvivors = new Set(applyDedup(pool, 'cooldown'))
-									const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
-									// Входные зоны сетки (ratio): ote — 61.8–78.6, deep — 23.6–38.2
-									// (пары пользовате��я «78→61», «38→23»).
+										const dedupSurvivors = new Set(applyDedup(pool, 'cooldown'))
+										const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
+										// SPEC 7.34: ATR по индексу бара. Точки разрежены — берём
+										// последнюю с p.index <= i (точки отсортированы по index).
+										const atrAt = (i: number): number | null => {
+											let best: number | null = null
+											for (const p of snapshot.atr) {
+												if (p.index > i) break
+												best = p.value
+											}
+											return best
+										}
+										// Входные зоны сетки (ratio): ote — 61.8–78.6, deep — 23.6–38.2
+										// (пары пользовате��я «78→61», «38→23»).
 									const ENTRY_ZONES: Record<string, [number, number]> = { ote: [61.8, 78.6], deep: [23.6, 38.2] }
 									const MODELS: EntryModelId[] = ['touch', 'closeConfirm', 'candleConfirm']
 									const seenGrids = new Set<string>()
@@ -1459,6 +1470,79 @@ async function main() {
 														return outcome.scenario === 'deep'
 															? replayStopTake(snapshot.candles, outcome, at(15), at(61.8), bingxCosts)
 															: replayStopTake(snapshot.candles, outcome, at(61.8), at(100), bingxCosts)
+													})(),
+													// SPEC 7.34 идея #2: скорость подхода к зоне. Путь цены
+													// за 3 бара ДО касания / ATR — spike (импульс в зону)
+													// vs drift (сползание). Всё до бара входа, без будущего.
+													approachAtr: (() => {
+														const a = atrAt(outcome.entryIndex)
+														const c1 = snapshot.candles[outcome.entryIndex - 1]
+														const c4 = snapshot.candles[outcome.entryIndex - 4]
+														if (a == null || a <= 0 || !c1 || !c4) return null
+														return Math.abs(c1.close - c4.close) / a
+													})(),
+													// SPEC 7.34 идея #2b: доля отвергающего фитиля свечи
+													// касания (для long — нижний хвост). Известна на закрытии
+													// бара входа; для touch-модели это диагностика пост-факт.
+													touchWickFrac: (() => {
+														const c = entryCandle
+														const range = c.high - c.low
+														if (range <= 0) return null
+														return outcome.direction === 'long'
+															? (Math.min(c.open, c.close) - c.low) / range
+															: (c.high - Math.max(c.open, c.close)) / range
+													})(),
+													// SPEC 7.34 идея #3: высота свинга в ATR на момент
+													// создания сетки — микро-шум vs гигант.
+													swingAtr: (() => {
+														const p0 = levelPrice(0)
+														const a = atrAt(outcome.createdAtIndex)
+														if (p0 == null || a == null || a <= 0) return null
+														return Math.abs(tp - p0) / a
+													})(),
+													// SPEC 7.34 идея #5: реэнтри после стоп-аута новой клетки.
+													// Если первый трейд клетки взял стоп — одна повторная
+													// попытка: филл при возврате цены к уровню входа (для
+													// long: high >= entry после стопа), отмена при уходе за
+													// уровень 0 (структура сломана). Конфликты в баре филла —
+													// стоп первым (пессимистично, конвенция проекта).
+													reentryR: (() => {
+														const p0 = levelPrice(0)
+														if (p0 == null || outcome.entryPrice == null) return null
+														const at = (ratio: number): number => p0 + (ratio / 100) * (tp - p0)
+														const stopPrice = outcome.scenario === 'deep' ? at(15) : at(61.8)
+														const tpPrice = outcome.scenario === 'deep' ? at(61.8) : at(100)
+														const entry = outcome.entryPrice
+														const long = outcome.direction === 'long'
+														if (long ? stopPrice >= entry : stopPrice <= entry) return null
+														const risk = Math.abs(entry - stopPrice)
+														if (risk <= 0) return null
+														// 1) исход первого трейда: ищем бар стопа.
+														let stopIdx = -1
+														for (let i = outcome.entryIndex!; i < snapshot.candles.length; i++) {
+															const c = snapshot.candles[i]!
+															if (long ? c.low <= stopPrice : c.high >= stopPrice) { stopIdx = i; break }
+															if (long ? c.high >= tpPrice : c.low <= tpPrice) return null // тейк — реэнтри не нужен
+														}
+														if (stopIdx < 0) return null
+														// 2) ждём возврата к входу; отмена за уровнем 0.
+														let fillIdx = -1
+														for (let i = stopIdx + 1; i < snapshot.candles.length; i++) {
+															const c = snapshot.candles[i]!
+															if (long ? c.low <= p0 : c.high >= p0) return null // структура сломана
+															if (long ? c.high >= entry : c.low <= entry) { fillIdx = i; break }
+														}
+														if (fillIdx < 0) return null
+														// 3) реплей второй попытки, стоп первым в конфликте.
+														let net = -fillCostR(entry, bingxCosts.entryRate, 1, risk)
+														for (let i = fillIdx; i < snapshot.candles.length; i++) {
+															const c = snapshot.candles[i]!
+															if (long ? c.low <= stopPrice : c.high >= stopPrice)
+																return net - 1 - fillCostR(stopPrice, bingxCosts.stopRate, 1, risk)
+															if (long ? c.high >= tpPrice : c.low <= tpPrice)
+																return net + Math.abs(tpPrice - entry) / risk - fillCostR(tpPrice, bingxCosts.takeRate, 1, risk)
+														}
+														return null
 													})(),
 												})
 											// SPEC 7.29: свип стоп×тейк. Уровни сетки линейны по
@@ -1648,7 +1732,7 @@ async function main() {
 
 	// Пул-оценка фильтров — ПОСЛЕДНИЙ блок вывода: большие таблицы выше
 	// вытесняют его за буфер консоли (см. отчёт пользователя 15.07.2026).
-	// Сводка дубл��руется в .txt рядом с CSV — потерять её невозможно.
+	// Сводка дубл����руется в .txt рядом с CSV — потерять её невозможно.
 	if (args.evalFilters && evalFilterRows.length > 0) {
 		const evalCsvPath = join(RESULTS_DIR, `evalfilters-${stamp}${untilTag}.csv`)
 		writeFileSync(evalCsvPath, recordsToCsv(evalFilterRows as unknown as Record<string, unknown>[]))
@@ -1866,7 +1950,7 @@ async function main() {
 		}
 		// SPEC 7.26: схемы выхода на каноне (touch + bigbar). Сравнение
 		// только на сделках, где ВСЕ три схемы разрешились (t100 разрешён
-		// по построению пула; t141/canon могли не разрешиться до конца
+		// по построению пула; t141/canon могли не разрешиться до конц��
 		// данных) — иначе схемы сравнивались бы на разных множествах.
 		lines.push('', '=== Exit schemes on canon pool (touch + bigbar, BingX costs) ===')
 		const exitPool = evalEntryRows.filter((r) => !r.bigbar && r.exit141R != null && r.exitCanonR != null)
@@ -2124,6 +2208,59 @@ async function main() {
 				const g = ncPool.filter((r) => match(hourOf(r)))
 				const s = ncStat(g)
 				lines.push(`${label.padEnd(11)}: ${String(s.n).padStart(5)} trades, totalR ${fmt(s.total)}, avgR ${fmt(s.n ? s.total / s.n : 0)}, WR ${s.wr.toFixed(1)}%`)
+			}
+			// SPEC 7.34, идеи #2/#3: квартильные бакеты newCanonR по фичам,
+			// известным на входе. Квартили per scenario (масштабы deep/ote
+			// различаются). Решение по каждой фиче — только при монотонном
+			// градиенте на обеих половинах периода (как freshness в 7.27).
+			lines.push('', '=== Feature buckets on newCanonR (SPEC 7.34, canon pool, quartiles per scenario) ===')
+			const features: { name: string; get: (r: (typeof ncPool)[number]) => number | null }[] = [
+				{ name: 'approachAtr (3-bar path to zone / ATR)', get: (r) => r.approachAtr },
+				{ name: 'touchWickFrac (rejection wick share)', get: (r) => r.touchWickFrac },
+				{ name: 'swingAtr (swing height / ATR)', get: (r) => r.swingAtr },
+			]
+			for (const sc of scenarios) {
+				const scPool = ncPool.filter((r) => r.scenario === sc)
+				if (scPool.length === 0) continue
+				lines.push(`--- ${sc} (${scPool.length} trades) ---`)
+				for (const f of features) {
+					const withVal = scPool.filter((r) => f.get(r) != null)
+					if (withVal.length < 20) { lines.push(`${f.name}: too few values (${withVal.length})`); continue }
+					const sorted = withVal.map((r) => f.get(r)!).sort((a, b) => a - b)
+					const q = (p: number): number => sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))]!
+					const edges = [q(0.25), q(0.5), q(0.75)]
+					lines.push(`${f.name} [q25 ${edges[0]!.toFixed(2)} | q50 ${edges[1]!.toFixed(2)} | q75 ${edges[2]!.toFixed(2)}]:`)
+					const sortedAt = withVal.map((r) => r.entryAt).sort((a, b) => a - b)
+					const midAt = sortedAt[Math.floor(sortedAt.length / 2)] ?? 0
+					for (let b = 0; b < 4; b++) {
+						const lo = b === 0 ? Number.NEGATIVE_INFINITY : edges[b - 1]!
+						const hi = b === 3 ? Number.POSITIVE_INFINITY : edges[b]!
+						const g = withVal.filter((r) => { const v = f.get(r)!; return v >= lo && v < hi })
+						const s = ncStat(g)
+						const gh1 = ncStat(g.filter((r) => r.entryAt < midAt))
+						const gh2 = ncStat(g.filter((r) => r.entryAt >= midAt))
+						lines.push(`  Q${b + 1}: ${String(s.n).padStart(5)} trades, avgR ${fmt(s.n ? s.total / s.n : 0)}, WR ${s.wr.toFixed(1)}% | H1 ${fmt(gh1.n ? gh1.total / gh1.n : 0)} / H2 ${fmt(gh2.n ? gh2.total / gh2.n : 0)}`)
+					}
+				}
+			}
+			// SPEC 7.34, идея #5: реэнтри после стоп-аута новой клетки.
+			// reentryR != null — вторая попытка состоялась и разрешилась.
+			// Система = канон + реэнтри: totalR добавкой (риск-юнит тот же).
+			lines.push('', '=== Re-entry after stop-out (SPEC 7.34, new canon cells) ===')
+			for (const sc of scenarios) {
+				const scPool = ncPool.filter((r) => r.scenario === sc)
+				const stopped = scPool.filter((r) => r.newCanonR! < 0)
+				const reentered = scPool.filter((r) => r.reentryR != null)
+				const reTotal = reentered.reduce((a, r) => a + r.reentryR!, 0)
+				const reWr = reentered.length ? (100 * reentered.filter((r) => r.reentryR! > 0).length) / reentered.length : 0
+				const baseTotal = scPool.reduce((a, r) => a + r.newCanonR!, 0)
+				const sortedAt = scPool.map((r) => r.entryAt).sort((a, b) => a - b)
+				const midAt = sortedAt[Math.floor(sortedAt.length / 2)] ?? 0
+				const reH1 = reentered.filter((r) => r.entryAt < midAt)
+				const reH2 = reentered.filter((r) => r.entryAt >= midAt)
+				const avgH = (g: typeof reentered): number => (g.length ? g.reduce((a, r) => a + r.reentryR!, 0) / g.length : 0)
+				lines.push(`${sc.padEnd(6)}: stopped ${stopped.length}, re-entered ${reentered.length}, re avgR ${fmt(reentered.length ? reTotal / reentered.length : 0)}, re WR ${reWr.toFixed(1)}% | H1 ${fmt(avgH(reH1))} / H2 ${fmt(avgH(reH2))}`)
+				lines.push(`       system: canon ${fmt(baseTotal)} -> canon+reentry ${fmt(baseTotal + reTotal)} (${fmt(reTotal)})`)
 			}
 			const summary = lines.join('\n')
 			const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)

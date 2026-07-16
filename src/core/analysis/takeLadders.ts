@@ -52,8 +52,8 @@ export const TAKE_LADDERS: readonly TakeLadder[] = [
 	{ id: 't141-only', steps: [{ ratio: 141, fraction: 1 }] },
 ]
 
-/** Стоимость филла в R (модель fibCosts). */
-function fillCostR(price: number, rate: number, fraction: number, risk: number): number {
+/** Стоимость филла в R (модель fibCosts). Экспорт для реэнтри-реплея 7.34. */
+export function fillCostR(price: number, rate: number, fraction: number, risk: number): number {
 	return (price * rate * fraction) / risk
 }
 
