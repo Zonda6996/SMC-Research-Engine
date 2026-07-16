@@ -101,7 +101,7 @@ import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analys
 import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/analysis/dedupFilter.js'
 import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
 import { buildSetupFilterContext, firstFailingFilter, SETUP_FILTER_NAMES, type SetupFilterName } from '../../src/core/analysis/setupFilters.js'
-import { fillCostR, replayCustomLadder, replayEntryStopTake, replayLadder, replayStopTake, replayStopTakeTimed, replayTrailLadder, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
+import { fillCostR, replayCustomLadder, replayEntryStopTake, replayLadder, replayStopTake, replayStopTakeHonest, replayStopTakeTimed, replayTrailLadder, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
 import { replayEntryModel, bigbarCovered, BINGX_MAKER_RATE, BINGX_TAKER_RATE, BINGX_SLIP_RATE, type EntryModelId } from '../../src/core/analysis/entryModels.js'
 
 // ---------- Свип детектора ----------
@@ -211,7 +211,7 @@ interface CliArgs {
 	tradeTimeStopBars: number | null
 	/**
 	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
-	 * П�� умолчанию полный канон: ote,deep,breaker. Неизвестные им������на — ошибка,
+	 * П���� умолчанию полный канон: ote,deep,breaker. Неизвестные им������на — ошибка,
 	 * чтобы опечатка не превращалась в молчаливый прогон ��олного набора.
 	 */
 	portfolioScenarios: string[]
@@ -1009,7 +1009,10 @@ async function main() {
 	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null; fixed1R: number | null; fixed15R: number | null; fixed2R: number | null; fixed3R: number | null; newCanonR: number | null;
 		approachAtr: number | null; touchWickFrac: number | null; swingAtr: number | null; reentryR: number | null;
 		canonBars: number | null; t20R: number | null; t50R: number | null; trail1R: number | null; trail2R: number | null;
-		mirror618R: number | null; mirror786R: number | null; scale100R: number | null; scale886R: number | null }[] = []
+		mirror618R: number | null; mirror786R: number | null; scale100R: number | null; scale886R: number | null;
+		honestR: number | null;
+		mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null;
+		fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null }[] = []
 	// SPEC 7.29: свип стоп×тейк на канон-пуле touch+bigbar. Одна строка =
 	// одна сделка, netR по каждой валидной комбинации (ключ "stop|take" в
 	// ratio сетки). null = не разрешилась до конца данных; комбинации не на
@@ -1638,10 +1641,36 @@ async function main() {
 																scale100R: scale(100),
 																// тейк ДОЛЖЕН быть выше входа первой ноги (78.6),
 																// иначе мгновенный «тейк» на баре входа: 88.6.
-																scale886R: scale(88.6),
-															}
-														})(),
-													})
+															scale886R: scale(88.6),
+														}
+													})(),
+													// SPEC 7.38: (1) честный intrabar на клетке канона;
+													// (2) утверждённые реверс-клетки 7.37 с индексами
+													// филла/выхода — для дедуп-анализа mirror×fade.
+													...((): { honestR: number | null; mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null; fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null } => {
+														const empty = { honestR: null, mirrorBest: null, fadeBest: null }
+														const p0 = levelPrice(0)
+														if (p0 == null || outcome.entryPrice == null || outcome.entryIndex == null) return empty
+														const atL = (ratio: number): number => p0 + (ratio / 100) * (tp - p0)
+														const isDeep = outcome.scenario === 'deep'
+														const honestR = isDeep
+															? replayStopTakeHonest(snapshot.candles, outcome, atL(15), atL(61.8), bingxCosts)
+															: replayStopTakeHonest(snapshot.candles, outcome, atL(61.8), atL(100), bingxCosts)
+														if (isDeep) return { honestR, mirrorBest: null, fadeBest: null }
+														const revDir = outcome.direction === 'long' ? 'short' : 'long'
+														// mirror: утверждённая клетка 7.37 stop 120 × tp 78.6
+														const m = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDir, atL(100), atL(120), atL(78.6), atL(0), bingxCosts)
+														// fade141: утверждённая клетка 7.37 stop 176 × tp 78.6
+														const f = replayEntryStopTake(snapshot.candles, outcome.createdAtIndex, revDir, atL(141), atL(176), atL(78.6), atL(0), bingxCosts)
+														return {
+															honestR,
+															mirrorBest: m.status === 'entered' && m.netR != null && m.entryIndex != null && m.exitIndex != null
+																? { netR: m.netR, entryIndex: m.entryIndex, exitIndex: m.exitIndex } : null,
+															fadeBest: f.status === 'entered' && f.netR != null && f.entryIndex != null && f.exitIndex != null
+																? { netR: f.netR, entryIndex: f.entryIndex, exitIndex: f.exitIndex } : null,
+														}
+													})(),
+												})
 											// SPEC 7.29: свип стоп×тейк. Уровни сетки линейны по
 											// ratio — произвольный ratio интерполируется через 0/100.
 											// Только touch-вход, прошедший bigbar (канон-пул);
@@ -1709,7 +1738,7 @@ async function main() {
 															}
 														}
 														entrySweepRows.push({ symbol, timeframe, entryAt: lastRow.entryAt, combos: entryCombos })
-														// SPEC 7.37: реверс-потоки. mirror/fade: лимитка на
+														// SPEC 7.37: реверс-потоки. mirror/fade: лим��тка на
 														// уровне entry с бара ote-входа (mirror) или создания
 														// сетки (fade — филл естественно случится на первом
 														// касании 141/241). breaker: филл на ретесте 100
@@ -2052,7 +2081,7 @@ async function main() {
 		// Все комбинации на touch-модели (лимитка) — победителе базового
 		// сравнения. dedup cooldown = «одна идея — одна позиция»: серия BOS
 		// в одном тренде считается одним риском — это ближе к торгуемой
-		// реальности, чем сырой пул.
+		// реальности, чем сырой ��ул.
 		lines.push('', '=== Final combos (touch entries, t100 exits, BingX costs) ===')
 		type ERow = (typeof evalEntryRows)[number]
 		const finalCombos: { name: string; keep: (r: ERow) => boolean }[] = [
@@ -2338,7 +2367,7 @@ async function main() {
 			}
 			// SPEC 7.34, идеи #2/#3: квартильные бакеты newCanonR по фичам,
 			// известным на входе. Квартили per scenario (масштабы deep/ote
-			// различаются). Решение по каждой фиче — только при монотонном
+			// различаются). Реше��ие по каждой фиче — только при монотонном
 			// градиенте на обеих половинах периода (как freshness в 7.27).
 			lines.push('', '=== Feature buckets on newCanonR (SPEC 7.34, canon pool, quartiles per scenario) ===')
 			const features: { name: string; get: (r: (typeof ncPool)[number]) => number | null }[] = [
@@ -2541,6 +2570,56 @@ async function main() {
 				cells.sort((a, b) => b.total - a.total)
 				for (const c of cells)
 					lines.push(`  stop ${c.key.split('|')[0]!.padStart(5)} x tp ${c.key.split('|')[1]!.padStart(5)}: n ${String(c.n).padStart(5)}, totalR ${fmt(c.total)}, avgR ${fmt(c.n ? c.total / c.n : 0)}, WR ${c.wr.toFixed(1)}% | H1 ${fmt(c.h1)} / H2 ${fmt(c.h2)}`)
+			}
+			// SPEC 7.38-1: честный intrabar. Пул: канон-сделки, где обе
+			// модели разрешились. Дельта > 0 = возврат интрабар-пессимизма.
+			lines.push('', '=== Honest intrabar (OHLC path) vs pessimistic (SPEC 7.38) ===')
+			for (const sc of scenarios) {
+				const g = ncPool.filter((r) => r.scenario === sc && r.honestR != null)
+				if (g.length === 0) continue
+				const pess = g.reduce((a, r) => a + r.newCanonR!, 0)
+				const hon = g.reduce((a, r) => a + r.honestR!, 0)
+				const flips = g.filter((r) => r.newCanonR! < 0 && r.honestR! > 0).length
+				const wrP = (100 * g.filter((r) => r.newCanonR! > 0).length) / g.length
+				const wrH = (100 * g.filter((r) => r.honestR! > 0).length) / g.length
+				lines.push(`${sc.padEnd(6)}: n ${g.length}, pessimistic ${fmt(pess)} (avg ${fmt(pess / g.length)}, WR ${wrP.toFixed(1)}%) -> honest ${fmt(hon)} (avg ${fmt(hon / g.length)}, WR ${wrH.toFixed(1)}%), delta ${fmt(hon - pess)}, loss->win flips ${flips}`)
+			}
+			// SPEC 7.38-2: дедуп mirror×fade. Обе клетки — утверждённые
+			// 7.37. Варианты портфеля на ote-сетках: mirror-only, fade-only,
+			// both (2 позиции), first-fill-wins (кто раньше зафиллился),
+			// fade-priority (fade есть -> mirror пропущен).
+			lines.push('', '=== Mirror x fade141 dedup on same grid (SPEC 7.38, approved cells) ===')
+			{
+				const g = ncPool.filter((r) => r.scenario === 'ote')
+				const both = g.filter((r) => r.mirrorBest != null && r.fadeBest != null)
+				const mOnly = g.filter((r) => r.mirrorBest != null && r.fadeBest == null)
+				const fOnly = g.filter((r) => r.mirrorBest == null && r.fadeBest != null)
+				lines.push(`ote grids ${g.length}: both fills ${both.length}, mirror-only ${mOnly.length}, fade-only ${fOnly.length}, neither ${g.length - both.length - mOnly.length - fOnly.length}`)
+				const concurrent = both.filter((r) =>
+					r.fadeBest!.entryIndex <= r.mirrorBest!.exitIndex && r.mirrorBest!.entryIndex <= r.fadeBest!.exitIndex).length
+				lines.push(`both-fill grids with overlapping open positions: ${concurrent} (${both.length ? ((100 * concurrent) / both.length).toFixed(1) : '0.0'}%)`)
+				const sortedAt = g.map((r) => r.entryAt).sort((a, b) => a - b)
+				const midAt = sortedAt[Math.floor(sortedAt.length / 2)] ?? 0
+				const variants: { name: string; pick: (r: (typeof g)[number]) => number[] }[] = [
+					{ name: 'mirror only', pick: (r) => (r.mirrorBest ? [r.mirrorBest.netR] : []) },
+					{ name: 'fade only', pick: (r) => (r.fadeBest ? [r.fadeBest.netR] : []) },
+					{ name: 'both (2 positions)', pick: (r) => [...(r.mirrorBest ? [r.mirrorBest.netR] : []), ...(r.fadeBest ? [r.fadeBest.netR] : [])] },
+					{ name: 'first-fill-wins', pick: (r) => {
+						if (r.mirrorBest && r.fadeBest) return [r.mirrorBest.entryIndex <= r.fadeBest.entryIndex ? r.mirrorBest.netR : r.fadeBest.netR]
+						return r.mirrorBest ? [r.mirrorBest.netR] : r.fadeBest ? [r.fadeBest.netR] : []
+					} },
+					{ name: 'fade-priority', pick: (r) => (r.fadeBest ? [r.fadeBest.netR] : r.mirrorBest ? [r.mirrorBest.netR] : []) },
+				]
+				for (const v of variants) {
+					const all = g.flatMap((r) => v.pick(r))
+					const total = all.reduce((a, b) => a + b, 0)
+					const wr = all.length ? (100 * all.filter((x) => x > 0).length) / all.length : 0
+					const avgOf = (gg: typeof g): number => {
+						const vals = gg.flatMap((r) => v.pick(r))
+						return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0
+					}
+					lines.push(`  ${v.name.padEnd(19)}: n ${String(all.length).padStart(5)}, totalR ${fmt(total)}, avgR ${fmt(all.length ? total / all.length : 0)}, WR ${wr.toFixed(1)}% | H1 ${fmt(avgOf(g.filter((r) => r.entryAt < midAt)))} / H2 ${fmt(avgOf(g.filter((r) => r.entryAt >= midAt)))}`)
+				}
 			}
 			const summary = lines.join('\n')
 			const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)

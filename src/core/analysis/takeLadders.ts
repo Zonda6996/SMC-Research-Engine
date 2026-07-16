@@ -197,6 +197,88 @@ export function replayStopTake(
 }
 
 /**
+ * SPEC 7.38: честная intrabar-модель. Путь цены внутри свечи:
+ * бычья (close >= open): open → low → high → close;
+ * медвежья: open → high → low → close.
+ * Возвращает, что коснуто ПЕРВЫМ вдоль пути: 'stop' | 'tp' | null.
+ * armAt — уровень активации (цена входа): события до пересечения armAt
+ * вдоль пути игнорируются (нельзя взять стоп до того, как случился филл).
+ * Эвристика стандартная для OHLC-бэктестов; истинный порядок неизвестен,
+ * но систематический перекос «стоп всегда первым» она убирает.
+ */
+export function intrabarFirstHit(
+	candle: Candle,
+	stopPrice: number,
+	tpPrice: number,
+	armAt: number | null,
+): 'stop' | 'tp' | null {
+	const pts = candle.close >= candle.open
+		? [candle.open, candle.low, candle.high, candle.close]
+		: [candle.open, candle.high, candle.low, candle.close]
+	let armed = armAt == null
+	for (let s = 1; s < pts.length; s++) {
+		const from = pts[s - 1]!
+		const to = pts[s]!
+		const lo = Math.min(from, to)
+		const hi = Math.max(from, to)
+		const asc = to >= from
+		const events: { kind: 'arm' | 'stop' | 'tp'; price: number }[] = []
+		if (!armed && armAt != null && armAt >= lo && armAt <= hi) events.push({ kind: 'arm', price: armAt })
+		if (stopPrice >= lo && stopPrice <= hi) events.push({ kind: 'stop', price: stopPrice })
+		if (tpPrice >= lo && tpPrice <= hi) events.push({ kind: 'tp', price: tpPrice })
+		// Вдоль направления сегмента; при равной цене arm первым
+		// (филл и стоп на одной цене = филл состоялся раньше).
+		events.sort((a, b) => (asc ? a.price - b.price : b.price - a.price) || (a.kind === 'arm' ? -1 : b.kind === 'arm' ? 1 : 0))
+		for (const e of events) {
+			if (e.kind === 'arm') { armed = true; continue }
+			if (armed) return e.kind
+		}
+	}
+	return null
+}
+
+/**
+ * SPEC 7.38: replayStopTake с честным intrabar-резолвом. Отличие от
+ * пессимистичной версии — ТОЛЬКО в барах, где коснуты И стоп, И тейк
+ * (включая бар входа: события до пересечения entry игнорируются через
+ * armAt). Однозначные бары дают идентичный результат.
+ */
+export function replayStopTakeHonest(
+	candles: Candle[],
+	outcome: FibSetupOutcome,
+	stopPrice: number,
+	tpPrice: number,
+	costs: LadderCostRates = DEFAULT_LADDER_COSTS,
+): number | null {
+	if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null) return null
+	const long = outcome.direction === 'long'
+	const entry = outcome.entryPrice
+	if (long ? stopPrice >= entry : stopPrice <= entry) return null
+	if (long ? tpPrice <= entry : tpPrice >= entry) return null
+	const risk = Math.abs(entry - stopPrice)
+	if (risk <= 0) return null
+
+	let net = -fillCostR(entry, costs.entryRate, 1, risk)
+	const stopExit = (): number => net - 1 - fillCostR(stopPrice, costs.stopRate, 1, risk)
+	const tpExit = (): number => net + (long ? tpPrice - entry : entry - tpPrice) / risk - fillCostR(tpPrice, costs.takeRate, 1, risk)
+	for (let i = outcome.entryIndex; i < candles.length; i++) {
+		const candle = candles[i]
+		if (!candle) continue
+		const hitStop = long ? candle.low <= stopPrice : candle.high >= stopPrice
+		const hitTp = long ? candle.high >= tpPrice : candle.low <= tpPrice
+		if (hitStop && hitTp) {
+			const first = intrabarFirstHit(candle, stopPrice, tpPrice, i === outcome.entryIndex ? entry : null)
+			if (first === 'tp') return tpExit()
+			// 'stop' или неразрешённый путь — пессимистично стоп.
+			return stopExit()
+		}
+		if (hitStop) return stopExit()
+		if (hitTp) return tpExit()
+	}
+	return null
+}
+
+/**
  * SPEC 7.36 (ось d): replayStopTake + тайм-стоп. Если за maxBars от входа
  * не взят ни стоп, ни тейк — закрытие по close бара (маркет, stopRate).
  * Возвращает netR и bars (длительность до выхода) для метрики R/время.
@@ -295,7 +377,7 @@ export function replayTrailLadder(
  *
  * Отличия от replayLadder: риск-единица от нового стопа (как в
  * replayStopTake — сайзинг под свой стоп); BE управляемый (канонические
- * лестницы 7.22 всегда BE, здесь сравниваем оба варианта).
+ * лестницы 7.22 ��сегда BE, здесь сравниваем оба варианта).
  * Конвенции те же: конфликт стоп/тейк в баре = стоп; после BE конфликт
  * BE/тейк = BE; бар, взявший тейк и коснувшийся входа, — тейк засчитан,
  * остаток BE. null = не разрешилась / нет валидных ступеней.
@@ -374,30 +456,32 @@ export function replayEntryStopTake(
 	tpPrice: number,
 	cancelPrice: number,
 	costs: LadderCostRates = DEFAULT_LADDER_COSTS,
-): { status: 'entered' | 'missed' | 'unresolved'; netR: number | null } {
+	): { status: 'entered' | 'missed' | 'unresolved'; netR: number | null; entryIndex: number | null; exitIndex: number | null } {
 	const long = direction === 'long'
-	if (long ? stopPrice >= entryPrice : stopPrice <= entryPrice) return { status: 'unresolved', netR: null }
-	if (long ? tpPrice <= entryPrice : tpPrice >= entryPrice) return { status: 'unresolved', netR: null }
+	const none = (status: 'missed' | 'unresolved'): { status: 'missed' | 'unresolved'; netR: null; entryIndex: null; exitIndex: null } =>
+		({ status, netR: null, entryIndex: null, exitIndex: null })
+	if (long ? stopPrice >= entryPrice : stopPrice <= entryPrice) return none('unresolved')
+	if (long ? tpPrice <= entryPrice : tpPrice >= entryPrice) return none('unresolved')
 	const risk = Math.abs(entryPrice - stopPrice)
-	if (risk <= 0) return { status: 'unresolved', netR: null }
+	if (risk <= 0) return none('unresolved')
 
 	let entryIndex = -1
 	for (let i = fromIndex; i < candles.length; i++) {
 		const candle = candles[i]
 		if (!candle) continue
 		if (long ? candle.low <= entryPrice : candle.high >= entryPrice) { entryIndex = i; break }
-		if (long ? candle.high >= cancelPrice : candle.low <= cancelPrice) return { status: 'missed', netR: null }
+		if (long ? candle.high >= cancelPrice : candle.low <= cancelPrice) return none('missed')
 	}
-	if (entryIndex < 0) return { status: 'unresolved', netR: null }
+	if (entryIndex < 0) return none('unresolved')
 
 	let net = -fillCostR(entryPrice, costs.entryRate, 1, risk)
 	for (let i = entryIndex; i < candles.length; i++) {
 		const candle = candles[i]
 		if (!candle) continue
 		const hitStop = long ? candle.low <= stopPrice : candle.high >= stopPrice
-		if (hitStop) return { status: 'entered', netR: net - 1 - fillCostR(stopPrice, costs.stopRate, 1, risk) }
+		if (hitStop) return { status: 'entered', netR: net - 1 - fillCostR(stopPrice, costs.stopRate, 1, risk), entryIndex, exitIndex: i }
 		const hitTp = long ? candle.high >= tpPrice : candle.low <= tpPrice
-		if (hitTp) return { status: 'entered', netR: net + (long ? tpPrice - entryPrice : entryPrice - tpPrice) / risk - fillCostR(tpPrice, costs.takeRate, 1, risk) }
+		if (hitTp) return { status: 'entered', netR: net + (long ? tpPrice - entryPrice : entryPrice - tpPrice) / risk - fillCostR(tpPrice, costs.takeRate, 1, risk), entryIndex, exitIndex: i }
 	}
-	return { status: 'unresolved', netR: null }
+	return { status: 'unresolved', netR: null, entryIndex: null, exitIndex: null }
 }
