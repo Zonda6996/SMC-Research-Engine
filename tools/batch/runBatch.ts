@@ -211,8 +211,8 @@ interface CliArgs {
 	tradeTimeStopBars: number | null
 	/**
 	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
-	 * По умолчанию полный канон: ote,deep,breaker. Неизвестные им������на — ошибка,
-	 * чтобы опечатка не превращалась в молчаливый прогон полного набора.
+	 * П�� умолчанию полный канон: ote,deep,breaker. Неизвестные им������на — ошибка,
+	 * чтобы опечатка не превращалась в молчаливый прогон ��олного набора.
 	 */
 	portfolioScenarios: string[]
 	/**
@@ -1046,6 +1046,23 @@ async function main() {
 	const ENTRY_SWEEP_STOPS = [-15, 0, 15, 23.6, 38.2, 50, 61.8] as const
 	const ENTRY_SWEEP_TAKES = [61.8, 78.6, 88.6, 100, 120, 141] as const
 	const entrySweepRows: { symbol: string; timeframe: string; entryAt: number; combos: Map<string, { status: string; netR: number | null }> }[] = []
+	// SPEC 7.37: полный свип стоп×тейк для реверс-потоков (mirror/fade/
+	// breaker). Universe тот же (ote-сетки канон-пула). Оговорка для
+	// breaker: канонический breaker требует 141 ДО касания OTE — здесь
+	// 141 наступает ПОСЛЕ (сетка в universe через 78.6-touch), т.е. это
+	// «пост-ote breaker», родственный, но другой сетап.
+	const REV_SWEEPS: { stream: string; entry: number; stops: readonly number[]; takes: readonly number[]; reversed: boolean; cancel: number }[] = [
+		// mirror: реверс на ретесте 100 (после ote-входа).
+		{ stream: 'mirror', entry: 100, stops: [105, 110, 115, 120, 128.6, 141], takes: [88.6, 78.6, 70.6, 61.8, 50], reversed: true, cancel: 0 },
+		// fade141: контртренд по первому касанию 141.
+		{ stream: 'fade141', entry: 141, stops: [150, 161.8, 176, 200], takes: [120, 110, 100, 88.6, 78.6, 61.8], reversed: true, cancel: 0 },
+		// fade241: контртренд по первому касанию 241.
+		{ stream: 'fade241', entry: 241, stops: [261.8, 280, 300], takes: [200, 176, 161.8, 141, 120, 100], reversed: true, cancel: 0 },
+		// breaker: по тренду от ретеста 100 ПОСЛЕ касания 141; отмена,
+		// если цена ушла за 161.8 до ретеста (правило breaker161 из 7.12).
+		{ stream: 'breaker', entry: 100, stops: [78.6, 61.8, 50, 38.2, 23.6, 0], takes: [120, 141, 161.8], reversed: false, cancel: 161.8 },
+	]
+	const revSweepRows: { stream: string; symbol: string; timeframe: string; entryAt: number; combos: Map<string, { status: string; netR: number | null }> }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1182,7 +1199,7 @@ async function main() {
 										args.portfolioScenarios.includes(o.scenario) && o.stopMode === 'zero' &&
 										(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
 									// Слой SPEC 7.20: до cooldown, чтобы отрезанный сетап не
-									// блокировал кулдауном следующий (его не существует для пор��феля).
+									// блокировал кулдауном следующий (его не существует для ��ор��феля).
 									let eligible = preFilter
 									if (args.setupFilters.length > 0) {
 										const filterCtx = buildSetupFilterContext(
@@ -1692,6 +1709,36 @@ async function main() {
 															}
 														}
 														entrySweepRows.push({ symbol, timeframe, entryAt: lastRow.entryAt, combos: entryCombos })
+														// SPEC 7.37: реверс-потоки. mirror/fade: лимитка на
+														// уровне entry с бара ote-входа (mirror) или создания
+														// сетки (fade — филл естественно случится на первом
+														// касании 141/241). breaker: филл на ретесте 100
+														// строго ПОСЛЕ первого касания 141 (пре-скан).
+														const revDir = long ? 'short' : 'long'
+														for (const rs of REV_SWEEPS) {
+															let fromIndex: number
+															if (rs.stream === 'breaker') {
+																let t141 = -1
+																for (let i = outcome.createdAtIndex; i < snapshot.candles.length; i++) {
+																	const c = snapshot.candles[i]!
+																	if (long ? c.high >= priceAt(141) : c.low <= priceAt(141)) { t141 = i; break }
+																}
+																if (t141 < 0) continue
+																fromIndex = t141
+															} else {
+																fromIndex = rs.stream === 'mirror' ? outcome.entryIndex! : outcome.createdAtIndex
+															}
+															const dir = rs.reversed ? revDir : outcome.direction
+															const combosRev = new Map<string, { status: string; netR: number | null }>()
+															for (const sr of rs.stops) {
+																for (const trr of rs.takes) {
+																	combosRev.set(`${sr}|${trr}`, replayEntryStopTake(
+																		snapshot.candles, fromIndex, dir,
+																		priceAt(rs.entry), priceAt(sr), priceAt(trr), priceAt(rs.cancel), bingxCosts))
+																}
+															}
+															revSweepRows.push({ stream: rs.stream, symbol, timeframe, entryAt: lastRow.entryAt, combos: combosRev })
+														}
 													}
 												}
 											}
@@ -1793,7 +1840,7 @@ async function main() {
 	if (allReach.length > 0) {
 		console.log(`\n=== Reach histogram (куда доходит цена после события, доля кан��идатов) ===\n`)
 		console.log(reachToMarkdown(allReach))
-		console.log(`\n=== Fade-reach (после касания 141/241: → о��к��т до, ↑ продолжение до) ===\n`)
+		console.log(`\n=== Fade-reach (после касания 141/241: → о��к��т до, ↑ ��родолжение до) ===\n`)
 		console.log(fadeReachToMarkdown(allReach))
 	}
 	console.log(`\nCSV (all ${allRows.length} rows): ${csvPath}`)
@@ -2343,7 +2390,7 @@ async function main() {
 				lines.push(`       system: canon ${fmt(baseTotal)} -> canon+reentry ${fmt(baseTotal + reTotal)} (${fmt(reTotal)})`)
 			}
 			// SPEC 7.35: комбинированный сайзинг-стек. Два вопроса:
-			// (1) независимы ли слои (freshness × swingAtr) — кросс-матрица
+			// (1) неза��исимы ли слои (freshness × swingAtr) — кросс-матрица
 			//     2×2: если градиент по каждой оси сохраняется внутри строк
 			//     и столбцов, фичи несут разную информацию;
 			// (2) складываются ли слои в стек — R/unit комбинаций против
@@ -2465,6 +2512,35 @@ async function main() {
 					line('  scale-in tp 100', g, (r: (typeof g)[number]) => r.scale100R!)
 					line('  scale-in tp 88.6', g, (r: (typeof g)[number]) => r.scale886R!)
 				}
+			}
+			// SPEC 7.37: свипы реверс-потоков. Каждая клетка — независимый
+			// реплей; n = разрешившиеся филлы (для fade/breaker филл сам по
+			// себе редкий — цена должна дойти до 141/241). Сортировка по
+			// totalR. Решение: клетка жива, если avgR > 0 на H1 И H2 и
+			// totalR ощутим; иначе поток остаётся мёртвым.
+			lines.push('', '=== Reverse-stream sweeps: mirror / fade141 / fade241 / breaker (SPEC 7.37) ===')
+			lines.push('NOTE: breaker here is POST-ote (141 after 78.6 touch), not the canonical pre-ote breaker')
+			for (const rs of REV_SWEEPS) {
+				const rows = revSweepRows.filter((r) => r.stream === rs.stream)
+				if (rows.length === 0) continue
+				const sortedAt = rows.map((r) => r.entryAt).sort((a, b) => a - b)
+				const midAt = sortedAt[Math.floor(sortedAt.length / 2)] ?? 0
+				lines.push(`-- ${rs.stream} (entry ${rs.entry}, ${rs.reversed ? 'counter-trend' : 'trend'}, cancel ${rs.cancel}; grids ${rows.length}) --`)
+				const cells: { key: string; n: number; total: number; wr: number; h1: number; h2: number }[] = []
+				for (const sr of rs.stops) {
+					for (const trr of rs.takes) {
+						const key = `${sr}|${trr}`
+						const res = rows.map((r) => ({ entryAt: r.entryAt, v: r.combos.get(key)?.netR ?? null })).filter((x) => x.v != null)
+						if (res.length === 0) continue
+						const total = res.reduce((a, x) => a + x.v!, 0)
+						const wr = (100 * res.filter((x) => x.v! > 0).length) / res.length
+						const avgOf = (g: typeof res): number => (g.length ? g.reduce((a, x) => a + x.v!, 0) / g.length : 0)
+						cells.push({ key, n: res.length, total, wr, h1: avgOf(res.filter((x) => x.entryAt < midAt)), h2: avgOf(res.filter((x) => x.entryAt >= midAt)) })
+					}
+				}
+				cells.sort((a, b) => b.total - a.total)
+				for (const c of cells)
+					lines.push(`  stop ${c.key.split('|')[0]!.padStart(5)} x tp ${c.key.split('|')[1]!.padStart(5)}: n ${String(c.n).padStart(5)}, totalR ${fmt(c.total)}, avgR ${fmt(c.n ? c.total / c.n : 0)}, WR ${c.wr.toFixed(1)}% | H1 ${fmt(c.h1)} / H2 ${fmt(c.h2)}`)
 			}
 			const summary = lines.join('\n')
 			const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)
