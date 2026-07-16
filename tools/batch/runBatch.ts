@@ -1493,7 +1493,7 @@ async function main() {
 															: (c.high - Math.max(c.open, c.close)) / range
 													})(),
 													// SPEC 7.34 идея #3: высота свинга в ATR на момент
-													// создания сетки — микро-шум vs гигант.
+													// создания сетки — ��икро-шум vs гигант.
 													swingAtr: (() => {
 														const p0 = levelPrice(0)
 														const a = atrAt(outcome.createdAtIndex)
@@ -1713,7 +1713,7 @@ async function main() {
 	if (allReach.length > 0) {
 		console.log(`\n=== Reach histogram (куда доходит цена после события, доля кан��идатов) ===\n`)
 		console.log(reachToMarkdown(allReach))
-		console.log(`\n=== Fade-reach (после касания 141/241: → откат до, ↑ продолжение до) ===\n`)
+		console.log(`\n=== Fade-reach (после касания 141/241: → отк��т до, ↑ продолжение до) ===\n`)
 		console.log(fadeReachToMarkdown(allReach))
 	}
 	console.log(`\nCSV (all ${allRows.length} rows): ${csvPath}`)
@@ -2261,6 +2261,72 @@ async function main() {
 				const avgH = (g: typeof reentered): number => (g.length ? g.reduce((a, r) => a + r.reentryR!, 0) / g.length : 0)
 				lines.push(`${sc.padEnd(6)}: stopped ${stopped.length}, re-entered ${reentered.length}, re avgR ${fmt(reentered.length ? reTotal / reentered.length : 0)}, re WR ${reWr.toFixed(1)}% | H1 ${fmt(avgH(reH1))} / H2 ${fmt(avgH(reH2))}`)
 				lines.push(`       system: canon ${fmt(baseTotal)} -> canon+reentry ${fmt(baseTotal + reTotal)} (${fmt(reTotal)})`)
+			}
+			// SPEC 7.35: комбинированный сайзинг-стек. Два вопроса:
+			// (1) независимы ли слои (freshness × swingAtr) — кросс-матрица
+			//     2×2: если градиент по каждой оси сохраняется внутри строк
+			//     и столбцов, фичи несут разную информацию;
+			// (2) складываются ли слои в стек — R/unit комбинаций против
+			//     одиночных слоёв. Пороги swingAtr — медиана per scenario
+			//     (в бою вычислима онлайн по прошлым сеткам, не заглядывание:
+			//     здесь оценка сверху, боевая версия — скользящая медиана).
+			lines.push('', '=== Sizing stack: layer independence + combined simulation (SPEC 7.35) ===')
+			const swingMedianBySc = new Map<string, number>()
+			for (const sc of scenarios) {
+				const vals = ncPool.filter((r) => r.scenario === sc && r.swingAtr != null).map((r) => r.swingAtr!).sort((a, b) => a - b)
+				if (vals.length > 0) swingMedianBySc.set(sc, vals[Math.floor(vals.length / 2)]!)
+			}
+			const isFresh = (r: (typeof ncPool)[number]): boolean => r.touchDelayBars <= 3
+			const isCompact = (r: (typeof ncPool)[number]): boolean | null => {
+				const med = swingMedianBySc.get(r.scenario)
+				return r.swingAtr == null || med == null ? null : r.swingAtr <= med
+			}
+			const isUsSession = (r: (typeof ncPool)[number]): boolean => {
+				const h = new Date(r.entryAt).getUTCHours()
+				return h >= 15 && h < 20
+			}
+			// (1) кросс-матрица freshness × swingAtr per scenario, с H1/H2.
+			const xPool = ncPool.filter((r) => isCompact(r) != null)
+			for (const sc of scenarios) {
+				const scPool = xPool.filter((r) => r.scenario === sc)
+				if (scPool.length === 0) continue
+				const sortedAt = scPool.map((r) => r.entryAt).sort((a, b) => a - b)
+				const midAt = sortedAt[Math.floor(sortedAt.length / 2)] ?? 0
+				lines.push(`-- ${sc}: freshness x swing cross-matrix (median swingAtr ${swingMedianBySc.get(sc)?.toFixed(2)}) --`)
+				for (const [fLabel, fMatch] of [['fresh(<=3)', true], ['stale(>3) ', false]] as const) {
+					for (const [cLabel, cMatch] of [['compact', true], ['wide   ', false]] as const) {
+						const g = scPool.filter((r) => isFresh(r) === fMatch && isCompact(r) === cMatch)
+						const s = ncStat(g)
+						const h1 = ncStat(g.filter((r) => r.entryAt < midAt))
+						const h2 = ncStat(g.filter((r) => r.entryAt >= midAt))
+						lines.push(`  ${fLabel} x ${cLabel}: ${String(s.n).padStart(5)} trades, avgR ${fmt(s.n ? s.total / s.n : 0)}, WR ${s.wr.toFixed(1)}% | H1 ${fmt(h1.n ? h1.total / h1.n : 0)} / H2 ${fmt(h2.n ? h2.total / h2.n : 0)}`)
+					}
+				}
+			}
+			// (2) симуляция стеков: R/unit = sum(m·r)/sum(m); нормировка на
+			// риск-бюджет неявная (метрика инвариантна к масштабу множителей).
+			const freshMult = (r: (typeof xPool)[number]): number => (r.touchDelayBars <= 3 ? 2.0 : r.touchDelayBars <= 15 ? 1.0 : 0.5)
+			const swingMult = (r: (typeof xPool)[number]): number => (isCompact(r) ? 1.4 : 0.7)
+			const sessMult = (r: (typeof xPool)[number]): number => (isUsSession(r) ? 1.2 : 1.0)
+			const stacks: { name: string; mult: (r: (typeof xPool)[number]) => number }[] = [
+				{ name: 'flat (baseline)', mult: () => 1 },
+				{ name: 'freshness only', mult: freshMult },
+				{ name: 'swing only', mult: swingMult },
+				{ name: 'session only', mult: sessMult },
+				{ name: 'fresh x swing', mult: (r) => freshMult(r) * swingMult(r) },
+				{ name: 'fresh x swing x sess', mult: (r) => freshMult(r) * swingMult(r) * sessMult(r) },
+			]
+			lines.push('-- stack simulation (pool with swingAtr, R per risk unit) --')
+			const sortedAtAll = xPool.map((r) => r.entryAt).sort((a, b) => a - b)
+			const midAtAll = sortedAtAll[Math.floor(sortedAtAll.length / 2)] ?? 0
+			for (const st of stacks) {
+				const calc = (g: typeof xPool): number => {
+					let total = 0
+					let riskSum = 0
+					for (const r of g) { const m = st.mult(r); total += m * r.newCanonR!; riskSum += m }
+					return riskSum ? total / riskSum : 0
+				}
+				lines.push(`${st.name.padEnd(21)}: R/unit ${fmt(calc(xPool))} | H1 ${fmt(calc(xPool.filter((r) => r.entryAt < midAtAll)))} / H2 ${fmt(calc(xPool.filter((r) => r.entryAt >= midAtAll)))}`)
 			}
 			const summary = lines.join('\n')
 			const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)
