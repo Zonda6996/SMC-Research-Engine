@@ -45,3 +45,6 @@ next-env.d.ts
 # batch runner artifacts (кэш свечей и результаты прогонов)
 tools/batch/cache/
 tools/batch/results/
+
+# forward runner artifacts (журнал сигналов и стейт — локальные данные)
+tmp/forward/
