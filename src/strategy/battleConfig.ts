@@ -84,11 +84,30 @@ export const BATTLE_CONFIG = {
 	},
 
 	/**
-	 * Реверс-поток сайзингом не масштабируется (слои считались на каноне);
-	 * один юнит на сетку до отдельного исследования.
+	 * SPEC 7.44: сайзинг реверс-потока — свежесть КАНОН-касания сетки
+	 * (монотонная лесенка avgR 0.586 / 0.480 / 0.184, устойчива H1/H2).
+	 * Компактность на реверсе НЕ работает (кросс-матрица противоречива) —
+	 * слой один. Если канон ещё не вошёл к моменту филла реверса
+	 * (fade раньше отката), свежесть неизвестна — флэт 1.0 (без look-ahead).
 	 */
-	reverseSizing: 1.0,
+	reverseSizing: {
+		freshness: [
+			{ maxBars: 3, mult: 1.5 },
+			{ maxBars: 15, mult: 1.0 },
+			{ maxBars: Number.POSITIVE_INFINITY, mult: 0.5 },
+		],
+	},
 } as const
+
+/**
+ * Множитель риска реверс-сделки (SPEC 7.44): свежесть канон-касания.
+ * @param freshBars баров от создания сетки до канон-касания; null —
+ *                  канон ещё не вошёл к моменту филла реверса (флэт 1.0)
+ */
+export function reverseRiskMultiplier(freshBars: number | null): number {
+	if (freshBars == null) return 1.0
+	return BATTLE_CONFIG.reverseSizing.freshness.find((b) => freshBars <= b.maxBars)?.mult ?? 1
+}
 
 /**
  * Множитель риска канон-сделки по сайзинг-стеку (SPEC 7.35).

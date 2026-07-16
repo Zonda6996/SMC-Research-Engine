@@ -36,7 +36,7 @@ import { fileURLToPath } from 'node:url'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { bigbarCovered, BINGX_MAKER_RATE, BINGX_SLIP_RATE, BINGX_TAKER_RATE } from '../../src/core/analysis/entryModels.js'
 import { fillCostR } from '../../src/core/analysis/takeLadders.js'
-import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
+import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice, reverseRiskMultiplier } from '../../src/strategy/battleConfig.js'
 import { fetchCandlesPaginated, TF_MS } from '../shared/candleFetcher.js'
 import type { Candle } from '../../src/models/price/Candle.js'
 
@@ -260,18 +260,23 @@ function processWindow(
 		const res = winner.res
 		if (res.status !== 'done' && res.status !== 'open') continue
 		const fillBar = snapshot.candles[res.fillIndex!]!
+		// SPEC 7.44: сайзинг реверса — свежесть канон-касания. Если реверс
+		// зафиллился ДО канон-входа (fade раньше отката), свежесть на тот
+		// момент неизвестна — флэт 1.0 (look-ahead исключён).
+		const revFresh = res.fillIndex! >= outcome.entryIndex ? outcome.entryIndex - outcome.createdAtIndex : null
+		const revMult = reverseRiskMultiplier(revFresh)
 		emit({
 			type: 'signal', id: `sig|rev|${gridId}`, at: new Date(fillBar.timestamp).toISOString(),
 			symbol, timeframe, stream: winner.stream, direction: revLong ? 'long' : 'short',
 			entry: atL(winner.cfg.entry), stop: atL(winner.cfg.stop), take: atL(winner.cfg.take),
-			riskMult: BATTLE_CONFIG.reverseSizing,
+			riskMult: revMult,
 		})
 		if (res.status === 'done') {
 			emit({
 				type: 'outcome', id: `out|rev|${gridId}`, at: new Date(snapshot.candles[res.exitIndex]!.timestamp).toISOString(),
 				symbol, timeframe, stream: winner.stream, direction: revLong ? 'long' : 'short',
 				entry: atL(winner.cfg.entry), stop: atL(winner.cfg.stop), take: atL(winner.cfg.take),
-				riskMult: BATTLE_CONFIG.reverseSizing,
+				riskMult: revMult,
 				result: res.result, netR: Number(res.netR.toFixed(3)), holdBars: res.exitIndex - res.fillIndex,
 			})
 		}
