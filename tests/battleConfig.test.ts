@@ -24,7 +24,7 @@ describe('BATTLE_CONFIG geometry', () => {
 		}
 	})
 
-	it('approved cells match SPEC 7.34/7.37', () => {
+	it('approved cells match SPEC 7.34/7.37/7.45', () => {
 		const deep = BATTLE_CONFIG.canon.find((s) => s.scenario === 'deep')!
 		const ote = BATTLE_CONFIG.canon.find((s) => s.scenario === 'ote')!
 		assert.deepEqual([deep.entry, deep.stop, deep.take], [38.2, 15, 61.8])
@@ -32,9 +32,11 @@ describe('BATTLE_CONFIG geometry', () => {
 		assert.equal(ote.timeStopBars, 20)
 		assert.equal(deep.timeStopBars, null)
 		const mirror = BATTLE_CONFIG.reverse.find((s) => s.stream === 'mirror')!
-		const fade = BATTLE_CONFIG.reverse.find((s) => s.stream === 'fade141')!
 		assert.deepEqual([mirror.entry, mirror.stop, mirror.take], [100, 120, 78.6])
-		assert.deepEqual([fade.entry, fade.stop, fade.take], [141, 176, 78.6])
+		// SPEC 7.45: fade141 удалён — без look-ahead неисполним
+		// (mirror на 100 всегда филлится раньше 141).
+		assert.equal(BATTLE_CONFIG.reverse.length, 1)
+		assert.ok(!BATTLE_CONFIG.reverse.some((s) => s.stream === 'fade141'))
 	})
 })
 

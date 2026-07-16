@@ -373,13 +373,16 @@ function printReport(): void {
 	for (const [title, pool] of pools) {
 		console.log(`\n=== ${title} ===`)
 		if (pool.length === 0) { console.log('  пусто'); continue }
+		// fade141 оставлен в списке для чтения легаси-записей журнала
+		// (до SPEC 7.45); новых fade-исходов раннер не пишет.
 		for (const stream of ['deep', 'ote', 'mirror', 'fade141']) {
 			const g = pool.filter((e) => e.stream === stream)
 			if (g.length === 0) continue
 			const total = g.reduce((a, e) => a + e.netR!, 0)
 			const wr = (100 * g.filter((e) => e.netR! > 0).length) / g.length
 			const wTotal = g.reduce((a, e) => a + e.netR! * e.riskMult, 0)
-			console.log(`  ${stream.padEnd(8)}: n ${g.length}, totalR ${total.toFixed(1)}, avgR ${(total / g.length).toFixed(3)} (ожид. ${expected[stream]!.toFixed(3)}), WR ${wr.toFixed(1)}% | weighted totalR ${wTotal.toFixed(1)}`)
+			const exp = expected[stream] != null ? ` (ожид. ${expected[stream].toFixed(3)})` : ' (легаси, удалён 7.45)'
+			console.log(`  ${stream.padEnd(8)}: n ${g.length}, totalR ${total.toFixed(1)}, avgR ${(total / g.length).toFixed(3)}${exp}, WR ${wr.toFixed(1)}% | weighted totalR ${wTotal.toFixed(1)}`)
 		}
 	}
 }
