@@ -316,13 +316,17 @@ function processWindow(
 			})
 		}
 
-		// Реверс-поток: только ote-сетки, после канон-входа (SPEC 7.37/7.38).
+		// Реверс-поток: только ote-сетки, обе заявки СТРОГО ПОСЛЕ
+		// канон-входа. SPEC 7.45: fade с бара создания сетки — look-ahead
+		// (слепая зона «канон не вошёл» даёт -0.508 avgR при WR 19%);
+		// реализуемый вариант — fade-лимитка ставится вместе с mirror
+		// после канон-филла, как «выброс после отката».
 		if (outcome.scenario !== 'ote') continue
 		const revLong = !long
 		const [mirrorCfg, fadeCfg] = [BATTLE_CONFIG.reverse[0]!, BATTLE_CONFIG.reverse[1]!]
 		const mirror = replayTrade(snapshot.candles, outcome.entryIndex, revLong,
 			atL(mirrorCfg.entry), atL(mirrorCfg.stop), atL(mirrorCfg.take), atL(mirrorCfg.cancelBeyond), null)
-		const fade = replayTrade(snapshot.candles, outcome.createdAtIndex + 1, revLong,
+		const fade = replayTrade(snapshot.candles, outcome.entryIndex, revLong,
 			atL(fadeCfg.entry), atL(fadeCfg.stop), atL(fadeCfg.take), atL(fadeCfg.cancelBeyond), null)
 		// first-fill-wins: побеждает более ранний филл.
 		const mFill = 'fillIndex' in mirror && mirror.fillIndex != null ? mirror.fillIndex : Infinity
@@ -334,10 +338,9 @@ function processWindow(
 		const res = winner.res
 		if (res.status !== 'done' && res.status !== 'open') continue
 		const fillBar = snapshot.candles[res.fillIndex!]!
-		// SPEC 7.44: сайзинг реверса — свежесть канон-касания. Если реверс
-		// зафиллился ДО канон-входа (fade раньше отката), свежесть на тот
-		// момент неизвестна — флэт 1.0 (look-ahead исключён).
-		const revFresh = res.fillIndex! >= outcome.entryIndex ? outcome.entryIndex - outcome.createdAtIndex : null
+		// SPEC 7.44: сайзинг реверса — свежесть канон-касания. Обе заявки
+		// теперь после канон-входа, свежесть всегда известна на момент филла.
+		const revFresh = outcome.entryIndex - outcome.createdAtIndex
 		const revMult = reverseRiskMultiplier(revFresh)
 		emit({
 			type: 'signal', id: `sig|rev|${gridId}`, at: new Date(fillBar.timestamp).toISOString(),

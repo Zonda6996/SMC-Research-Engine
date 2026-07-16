@@ -1061,7 +1061,7 @@ async function main() {
 	// SPEC 7.37: полный свип стоп×тейк для реверс-потоков (mirror/fade/
 	// breaker). Universe тот же (ote-сетки канон-пула). Оговорка для
 	// breaker: канонический breaker требует 141 ДО касания OTE — здесь
-	// 141 наступает ПОСЛЕ (сетка в universe через 78.6-touch), т.е. это
+	// 141 наступает ПОСЛ�� (сетка в universe через 78.6-touch), т.е. это
 	// «пост-ote breaker», родственный, но другой сетап.
 	const REV_SWEEPS: { stream: string; entry: number; stops: readonly number[]; takes: readonly number[]; reversed: boolean; cancel: number }[] = [
 		// mirror: реверс на р��т��сте 100 (после ote-входа).
@@ -1737,8 +1737,10 @@ async function main() {
 														}
 														// mirror: утверждённая клетка 7.37 stop 120 × tp 78.6
 														const m = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDirAll, atL(100), atL(120), atL(78.6), atL(0), bingxCosts)
-														// fade141: утверждённая клетка 7.37 stop 176 × tp 78.6
-														const f = replayEntryStopTake(snapshot.candles, outcome.createdAtIndex, revDirAll, atL(141), atL(176), atL(78.6), atL(0), bingxCosts)
+														// fade141: клетка 7.37 stop 176 × tp 78.6; SPEC 7.45 —
+														// лимитка ПОСЛЕ канон-входа (с createdAtIndex был
+														// look-ahead: слепая зона -0.508 avgR)
+														const f = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDirAll, atL(141), atL(176), atL(78.6), atL(0), bingxCosts)
 														return {
 															honestR,
 															noSlipR,
@@ -2284,7 +2286,7 @@ async function main() {
 			const sweepCsvPath = join(RESULTS_DIR, `sweep-${stamp}${untilTag}.csv`)
 			writeFileSync(sweepCsvPath, sweepCsvRows.join('\n'))
 			// SPEC 7.31: частичные фиксации от новых клеток. Пул per scenario:
-			// все схемы сценария разрешились. H1/H2 — медиана entryAt пула.
+			// все схемы сц��нария разрешились. H1/H2 — медиана entryAt пула.
 			const partialCsvRows: string[] = ['scheme,scenario,group,n,totalR,avgR,wr']
 			lines.push('', '=== Partial exits from 7.29 cells (SPEC 7.31, canon pool touch+bigbar, BingX costs) ===')
 			for (const scenario of scenarios) {
