@@ -70,7 +70,14 @@ interface RunnerState {
 }
 
 interface SignalEvent {
-	type: 'signal' | 'outcome'
+	/**
+	 * setup — сетка создана, СТАВЬ ЛИМИТКУ заранее (до касания);
+	 * cancel — сетка умерла/отфильтрована до входа, СНИМАЙ ЛИМИТКУ;
+	 * signal — лимитка зафиллилась (касание уровня);
+	 * outcome — сделка закрыта (tp/stop/timestop).
+	 * В статистику (--report) идут только signal/outcome.
+	 */
+	type: 'setup' | 'cancel' | 'signal' | 'outcome'
 	id: string
 	at: string
 	symbol: string
@@ -156,9 +163,20 @@ async function notifyTelegram(events: SignalEvent[]): Promise<void> {
 	const fresh = events.filter((e) => now - Date.parse(e.at) < NOTIFY_MAX_AGE_MS)
 	for (const e of fresh) {
 		const arrow = e.direction === 'long' ? 'LONG' : 'SHORT'
-		const text = e.type === 'signal'
-			? `SIGNAL ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nentry ${e.entry}\nstop ${e.stop}\ntake ${e.take}\nrisk x${e.riskMult}`
-			: `RESULT ${e.stream} ${arrow} ${e.symbol} ${e.timeframe}\n${e.result} ${e.netR!.toFixed(2)}R (${e.holdBars} bars)`
+		let text: string
+		switch (e.type) {
+			case 'setup':
+				text = `SETUP ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nставь лимитку: ${e.entry}\nстоп ${e.stop}\nтейк ${e.take}\nриск ~x${e.riskMult} (финальный при касании)`
+				break
+			case 'cancel':
+				text = `CANCEL ${e.stream} ${arrow} ${e.symbol} ${e.timeframe}\nсетап отменён — снимай лимитку ${e.entry}`
+				break
+			case 'signal':
+				text = `FILL ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nвход ${e.entry}\nстоп ${e.stop}\nтейк ${e.take}\nриск x${e.riskMult}`
+				break
+			default:
+				text = `RESULT ${e.stream} ${arrow} ${e.symbol} ${e.timeframe}\n${e.result} ${e.netR!.toFixed(2)}R (${e.holdBars} bars)`
+		}
 		try {
 			await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
 				method: 'POST',
@@ -193,7 +211,6 @@ function processWindow(
 	// Один исход на сетку×сценарий (как seenGrids в eval-entry).
 	const seenGrids = new Set<string>()
 	for (const outcome of snapshot.fibLifecycle.outcomes) {
-		if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null) continue
 		if (outcome.stopMode !== 'zero') continue
 		if (outcome.scenario !== 'ote' && outcome.scenario !== 'deep') continue
 		const gridKey = `${outcome.scenario}|${outcome.candidateId}`
@@ -207,17 +224,74 @@ function processWindow(
 		if (p0 == null || p100 == null) continue
 		const atL = (ratio: number): number => gridLevelPrice(p0, p100, ratio)
 		const zone = ENTRY_ZONES[outcome.scenario]!
-		// bigbar-фильтр канона (BATTLE_CONFIG.bigbarFilter).
-		if (BATTLE_CONFIG.bigbarFilter &&
-			bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex + 1, atL(zone[0]), atL(zone[1]))) continue
-
 		const setup = BATTLE_CONFIG.canon.find((c) => c.scenario === outcome.scenario)!
 		const long = outcome.direction === 'long'
+		const createdBar = snapshot.candles[outcome.createdAtIndex]!
+		// Идентичность сетки для пре-тач событий — бар СОЗДАНИЯ (вход мог
+		// ещё не случиться); сигналы/исходы сохраняют старую схему id по
+		// бару входа (обратная совместимость с накопленным журналом).
+		const baseGrid = `${symbol}|${timeframe}|${outcome.scenario}|${createdBar.timestamp}|${outcome.direction}`
+
+		// SETUP (пре-тач): сетка создана — ставь лимитку ЗАРАНЕЕ, до
+		// касания. Сайзинг предварительный (свежесть узнаем при касании):
+		// считаем от normal-бакета, финальный mult придёт в signal-событии.
+		const med = median(swingPool)
+		const prelimMult = canonRiskMultiplier(4, outcome.legAtrRatio, med)
+		emit({
+			type: 'setup', id: `setup|${baseGrid}`, at: new Date(createdBar.timestamp).toISOString(),
+			symbol, timeframe, stream: outcome.scenario, direction: outcome.direction,
+			entry: atL(setup.entry), stop: atL(setup.stop), take: atL(setup.take),
+			riskMult: Number(prelimMult.toFixed(2)),
+		})
+
+		// CANCEL до входа: цена ушла за 0 (invalidated) или bigbar накрыл
+		// зону — лимитку надо снять. Сканируем окно от создания до входа
+		// (или до конца данных, если входа не было).
+		const preEnd = outcome.entered && outcome.entryIndex != null ? outcome.entryIndex : snapshot.candles.length - 1
+		let cancelIdx = -1
+		for (let i = outcome.createdAtIndex + 1; i <= preEnd; i++) {
+			const c = snapshot.candles[i]!
+			if (long ? c.low <= p0 : c.high >= p0) { cancelIdx = i; break }
+			if (BATTLE_CONFIG.bigbarFilter &&
+				bigbarCovered(snapshot.candles, outcome.createdAtIndex, i + 1, atL(zone[0]), atL(zone[1]))) { cancelIdx = i; break }
+		}
+		const entryBeforeCancel = outcome.entered && outcome.entryIndex != null &&
+			(cancelIdx < 0 || outcome.entryIndex <= cancelIdx)
+		if (cancelIdx >= 0 && !entryBeforeCancel) {
+			emit({
+				type: 'cancel', id: `cancel|${baseGrid}`, at: new Date(snapshot.candles[cancelIdx]!.timestamp).toISOString(),
+				symbol, timeframe, stream: outcome.scenario, direction: outcome.direction,
+				entry: atL(setup.entry), stop: atL(setup.stop), take: atL(setup.take), riskMult: 0,
+			})
+			continue
+		}
+		// Смерть сетки без касания 0 и без bigbar (expired: структура
+		// развернулась) — тоже снимаем заявку.
+		if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null) {
+			if (outcome.state === 'expired') {
+				emit({
+					type: 'cancel', id: `cancel|${baseGrid}`, at: new Date(snapshot.candles[preEnd]!.timestamp).toISOString(),
+					symbol, timeframe, stream: outcome.scenario, direction: outcome.direction,
+					entry: atL(setup.entry), stop: atL(setup.stop), take: atL(setup.take), riskMult: 0,
+				})
+			}
+			continue
+		}
+		// bigbar в самом баре входа (проверка бэктеста включает entryIndex+1).
+		if (BATTLE_CONFIG.bigbarFilter &&
+			bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex + 1, atL(zone[0]), atL(zone[1]))) {
+			emit({
+				type: 'cancel', id: `cancel|${baseGrid}`, at: new Date(snapshot.candles[outcome.entryIndex]!.timestamp).toISOString(),
+				symbol, timeframe, stream: outcome.scenario, direction: outcome.direction,
+				entry: atL(setup.entry), stop: atL(setup.stop), take: atL(setup.take), riskMult: 0,
+			})
+			continue
+		}
+
 		const entryBar = snapshot.candles[outcome.entryIndex]!
 		const gridId = `${symbol}|${timeframe}|${outcome.scenario}|${entryBar.timestamp}|${outcome.direction}`
 
 		// Сайзинг: свежесть + компактность против скользящей медианы пула.
-		const med = median(swingPool)
 		const mult = canonRiskMultiplier(outcome.entryIndex - outcome.createdAtIndex, outcome.legAtrRatio, med)
 		if (outcome.legAtrRatio != null) {
 			swingPool.push(outcome.legAtrRatio)
@@ -289,8 +363,10 @@ function printReport(): void {
 	const lines = readFileSync(JOURNAL_PATH, 'utf8').trim().split('\n').map((l) => JSON.parse(l) as SignalEvent)
 	const outcomes = lines.filter((e) => e.type === 'outcome')
 	const signals = lines.filter((e) => e.type === 'signal')
+	const setups = lines.filter((e) => e.type === 'setup')
+	const cancels = lines.filter((e) => e.type === 'cancel')
 	const firstRunAt = loadState().firstRunAt!
-	console.log(`сигналов: ${signals.length}, исходов: ${outcomes.length}, открыто: ${signals.length - outcomes.length}`)
+	console.log(`сетапов: ${setups.length} (отменено: ${cancels.length}), филлов: ${signals.length}, исходов: ${outcomes.length}, открыто: ${signals.length - outcomes.length}`)
 	console.log(`граница форварда (первый запуск): ${firstRunAt}`)
 	const expected: Record<string, number> = { deep: 0.358, ote: 0.244, mirror: 0.347, fade141: 0.347 }
 	const pools: [string, SignalEvent[]][] = [

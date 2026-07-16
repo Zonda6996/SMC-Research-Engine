@@ -212,7 +212,7 @@ interface CliArgs {
 	/**
 	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
 	 * П���� умолчанию полный канон: ote,deep,breaker. Неизвестные им������на — ошибка,
-	 * чтобы опечатка не превращалас�� в м����лчаливый прогон ��олного набора.
+	 * чтобы опечатка не превращалас���� в м����лчаливый прогон ��олного набора.
 	 */
 	portfolioScenarios: string[]
 	/**
@@ -991,7 +991,7 @@ async function main() {
 	const evalHtfRows: { htf: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; htfTrend: string; trendAligned: boolean | null; pdZone: string; pdAligned: boolean | null; netR: number }[] = []
 	// Пары LTF → старшие ТФ (по выбору пользователя, SPEC 7.21).
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
-	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
+	// Пул-��ценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
 	// одна сдел��а пула × одна лестница. netR = null (л��стни��а не р����зре��илась
 	// до конца данны��) ��сключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
@@ -1017,6 +1017,11 @@ async function main() {
 		volRatio: number | null;
 		htfAlign: boolean | null;
 		deepMirrorR: number | null }[] = []
+	// SPEC 7.45: fade141 БЕЗ условия канон-входа. Вся статистика fade
+	// считалась на пуле сеток, где канон вошёл — но fade-лимитка ставится
+	// при СОЗДАНИИ сетки, когда вход канона ещё неизвестен (подозрение на
+	// look-ahead в отборе). Пул: все ote-сетки, fade по боевой клетке.
+	const fadeAllPool: { at: number; enteredCanon: boolean; netR: number }[] = []
 	// SPEC 7.29: свип стоп×тейк на канон-пуле touch+bigbar. Одна строка =
 	// одна сделка, netR по каждой валидной комбинации (ключ "stop|take" в
 	// ratio сетки). null = не разрешилась до конца данных; комбинации не на
@@ -1059,7 +1064,7 @@ async function main() {
 	// 141 наступает ПОСЛЕ (сетка в universe через 78.6-touch), т.е. это
 	// «пост-ote breaker», родственный, но другой сетап.
 	const REV_SWEEPS: { stream: string; entry: number; stops: readonly number[]; takes: readonly number[]; reversed: boolean; cancel: number }[] = [
-		// mirror: реверс на рет��сте 100 (после ote-входа).
+		// mirror: реверс на р��т��сте 100 (после ote-входа).
 		{ stream: 'mirror', entry: 100, stops: [105, 110, 115, 120, 128.6, 141], takes: [88.6, 78.6, 70.6, 61.8, 50], reversed: true, cancel: 0 },
 		// fade141: контртренд по первому касанию 141.
 		{ stream: 'fade141', entry: 141, stops: [150, 161.8, 176, 200], takes: [120, 110, 100, 88.6, 78.6, 61.8], reversed: true, cancel: 0 },
@@ -1282,7 +1287,7 @@ async function main() {
 									for (const htf of htfs) {
 										const htfCandles = aggregateCandles(chunk, timeframe, htf)
 										// Слишком мало HTF-свечей = структура не построится,
-										// разметка была бы шумом из 'none'.
+										// размет��а была бы шумом из 'none'.
 										if (htfCandles.length < 50) continue
 										const htfSnapshot = runAnalysis(htfCandles)
 										const htfCtx = buildHtfContext(htfSnapshot, TF_MS[htf]!)
@@ -1418,8 +1423,36 @@ async function main() {
 										// Входные зоны сетки (ratio): ote — 61.8–78.6, deep — 23.6–38.2
 										// (пары пользовате��я «78→61», «38→23»).
 									const ENTRY_ZONES: Record<string, [number, number]> = { ote: [61.8, 78.6], deep: [23.6, 38.2] }
-									const MODELS: EntryModelId[] = ['touch', 'closeConfirm', 'candleConfirm']
-									const seenGrids = new Set<string>()
+										const MODELS: EntryModelId[] = ['touch', 'closeConfirm', 'candleConfirm']
+										// SPEC 7.45: fade141 по ВСЕМ ote-сеткам (включая те, где канон
+										// не вошёл) — боевая клетка entry 141 / stop 176 / take 78.6,
+										// отмена за 0, лимитка с бара создания сетки.
+										{
+											const seenFade = new Set<string>()
+											const fadeCosts = {
+												entryRate: BINGX_MAKER_RATE,
+												takeRate: BINGX_MAKER_RATE,
+												stopRate: BINGX_TAKER_RATE + BINGX_SLIP_RATE,
+											}
+											for (const oc of pool) {
+												if (oc.scenario !== 'ote' || oc.stopMode !== 'zero') continue
+												if (seenFade.has(oc.candidateId)) continue
+												seenFade.add(oc.candidateId)
+												const v = candidateById.get(oc.candidateId)?.variants[oc.variantMode]
+												if (!v) continue
+												const fp0 = v.levels.find((l) => l.ratio === 0)?.price
+												const fp100 = v.levels.find((l) => l.ratio === 100)?.price
+												if (fp0 == null || fp100 == null) continue
+												const fAt = (r: number): number => fp0 + ((fp100 - fp0) * r) / 100
+												const fDir = oc.direction === 'long' ? 'short' : 'long'
+												const f = replayEntryStopTake(snapshot.candles, oc.createdAtIndex + 1, fDir, fAt(141), fAt(176), fAt(78.6), fAt(0), fadeCosts)
+												if (f.status !== 'entered' || f.netR == null) continue
+												const createdBar = snapshot.candles[oc.createdAtIndex]
+												if (!createdBar) continue
+												fadeAllPool.push({ at: createdBar.timestamp, enteredCanon: oc.entered, netR: f.netR })
+											}
+										}
+										const seenGrids = new Set<string>()
 									for (const outcome of pool) {
 										if (!outcome.entered || outcome.entryIndex == null) continue
 										const gridKey = `${outcome.scenario}|${outcome.candidateId}`
@@ -1760,7 +1793,7 @@ async function main() {
 													// - уровни ≥78.6 лежат НА ПУТИ ретрейса к 78.6 —
 													//   филл в universe гарантирован, отмена не нужна
 													//   (сканируем с создания сетки; отмену от 100 тут
-													//   ставить нельзя — на баре создания цена ещё у
+													//   ставить нель��я — на баре создания цена ещё у
 													//   экстремума и high >= p100 тривиально);
 													// - уровни глубже 78.6: лимитка с бара канонического
 													//   касания (цена уже на 78.6), отмена при возврате
@@ -2320,8 +2353,8 @@ async function main() {
 			}
 			// SPEC 7.27: идеи фильтров «свежесть касания» и «близость тейка».
 			// Только диагностика (бакеты на каноне touch + bigbar, netR t100):
-			// сначала смотрим, есть ли моното����ая зависимость avgR от параметра,
-			// порог вводим отдельным решением — защита от подгонки.
+			// сначала смотрим, есть ли ��оното����ая зависимость avgR от параметра,
+			// порог вводим отдельным решением — защита от подгон��и.
 			const canonPool = evalEntryRows.filter((r) => !r.bigbar)
 			const bucketReport = (
 				title: string,
@@ -2711,6 +2744,23 @@ async function main() {
 						lines.push(`  ${name} x wide   : ${stat(fg.filter((r) => r.swingAtr != null && med != null && r.swingAtr > med))}`)
 					}
 				}
+				// SPEC 7.45: fade141 без условия канон-входа — валидация
+				// боевого потока на look-ahead в отборе сеток.
+				lines.push('', '=== Fade141 unconditional: all ote grids vs canon-entered-only (SPEC 7.45) ===')
+				{
+					const fSorted = fadeAllPool.map((r) => r.at).sort((a, b) => a - b)
+					const fMid = fSorted[Math.floor(fSorted.length / 2)] ?? 0
+					const fStat = (g: typeof fadeAllPool): string => {
+						if (g.length === 0) return 'n     0'
+						const total = g.reduce((a, r) => a + r.netR, 0)
+						const wr = (100 * g.filter((r) => r.netR > 0).length) / g.length
+						const avg = (h: typeof g): number => (h.length ? h.reduce((a, r) => a + r.netR, 0) / h.length : 0)
+						return `n ${String(g.length).padStart(5)}, totalR ${fmt(total)}, avgR ${fmt(total / g.length)}, WR ${wr.toFixed(1)}% | H1 ${fmt(avg(g.filter((r) => r.at < fMid)))} / H2 ${fmt(avg(g.filter((r) => r.at >= fMid)))}`
+					}
+					lines.push(`  все сетки (боевой пул)   : ${fStat(fadeAllPool)}`)
+					lines.push(`  канон вошёл (стар. пул)  : ${fStat(fadeAllPool.filter((r) => r.enteredCanon))}`)
+					lines.push(`  канон НЕ вошёл (слепая з): ${fStat(fadeAllPool.filter((r) => !r.enteredCanon))}`)
+				}
 				// SPEC 7.41-1: слип стопа. Малый объём -> слип ~0. Сравнение
 				// канона (stop taker+slip) с no-slip (stop чистый taker).
 			lines.push('', '=== Stop-slip sensitivity: taker+slip vs pure taker (SPEC 7.41) ===')
@@ -2782,7 +2832,7 @@ async function main() {
 							if (cn != null) { canonTotal += cn; canonN++ }
 						}
 					}
-					// oracle: лучшая клетка полного периода на тех же тестовых окнах
+					// oracle: лучшая клетка ��олного периода на тех же тестовых окнах
 					const fullStats = cellStats(rows)
 					let oracleKey: string | null = null
 					let oracleAvg = -Infinity
