@@ -101,7 +101,7 @@ import { passesRegimeFilter, DEFAULT_REGIME_FILTER } from '../../src/core/analys
 import { applyDedup, maxConcurrentTrades, DEDUP_RULES } from '../../src/core/analysis/dedupFilter.js'
 import { outcomeToPortfolioTrade, runPortfolioBacktest, type PortfolioTrade } from '../../src/core/analysis/portfolioBacktest.js'
 import { buildSetupFilterContext, firstFailingFilter, SETUP_FILTER_NAMES, type SetupFilterName } from '../../src/core/analysis/setupFilters.js'
-import { replayLadder, replayStopTake, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
+import { replayCustomLadder, replayEntryStopTake, replayLadder, replayStopTake, TAKE_LADDERS } from '../../src/core/analysis/takeLadders.js'
 import { replayEntryModel, bigbarCovered, BINGX_MAKER_RATE, BINGX_TAKER_RATE, BINGX_SLIP_RATE, type EntryModelId } from '../../src/core/analysis/entryModels.js'
 
 // ---------- Свип детектора ----------
@@ -211,12 +211,12 @@ interface CliArgs {
 	tradeTimeStopBars: number | null
 	/**
 	 * Подмножество канонических сценариев для портфеля (--scenarios ote,deep).
-	 * По умолчанию полный канон: ote,deep,breaker. Неизвестные им����на — ошибка,
+	 * По умолчанию полный канон: ote,deep,breaker. Неизвестные им������на — ошибка,
 	 * чтобы опечатка не превращалась в молчаливый прогон полного набора.
 	 */
 	portfolioScenarios: string[]
 	/**
-	 * Слой дискрец��онных фильтров (SPEC 7.20): --filters late,align,extreme,chop.
+	 * Слой диск��ец��онных фильтров (SPEC 7.20): --filters late,align,extreme,chop.
 	 * Применяется к eligible-исходам ПЕРЕД портфелем; отрезанные попадают в
 	 * ledger со статусом filtered и именем фильтра в filteredBy. Пустой список
 	 * (без флага) = baseline без слоя. Опечатки — ошибка, как в --scenarios.
@@ -992,7 +992,7 @@ async function main() {
 	// Пары LTF → старшие ТФ (по выбору пользователя, SPEC 7.21).
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
 	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
-	// одна сделка пула × одна лестница. netR = null (лестни��а не р����зре��илась
+	// одна сделка пула × одна лестница. netR = null (л��стни��а не р����зре��илась
 	// до конца данны��) ��сключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
 	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
@@ -1019,6 +1019,30 @@ async function main() {
 	const SWEEP_STOPS = [-15, 0, 15, 23.6, 30, 50, 61.8, 70] as const
 	const SWEEP_TAKES = [50, 61.8, 70, 78.6, 88.6, 100, 120, 141, 161, 200, 241] as const
 	const sweepRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; combos: Map<string, number | null> }[] = []
+	// SPEC 7.31: частичные фиксации от новых клеток 7.29 (deep стоп 15,
+	// ote стоп 61.8). Схемы с раннером на 141/241 — запрос пользователя
+	// «тянуть позицию»; *-full-* — референсы (клетки 7.29 тем же реплеем).
+	const PARTIAL_SCHEMES: { id: string; scenario: string; stop: number; steps: { ratio: number; fraction: number }[]; be: boolean }[] = [
+		{ id: 'deep-full-61.8 (ref)', scenario: 'deep', stop: 15, steps: [{ ratio: 61.8, fraction: 1 }], be: false },
+		{ id: 'deep-50@61.8+50@100 BE', scenario: 'deep', stop: 15, steps: [{ ratio: 61.8, fraction: 0.5 }, { ratio: 100, fraction: 0.5 }], be: true },
+		{ id: 'deep-50@61.8+50@100 noBE', scenario: 'deep', stop: 15, steps: [{ ratio: 61.8, fraction: 0.5 }, { ratio: 100, fraction: 0.5 }], be: false },
+		{ id: 'deep-50@61.8+50@141 BE', scenario: 'deep', stop: 15, steps: [{ ratio: 61.8, fraction: 0.5 }, { ratio: 141, fraction: 0.5 }], be: true },
+		{ id: 'deep-75@61.8+25@241 BE', scenario: 'deep', stop: 15, steps: [{ ratio: 61.8, fraction: 0.75 }, { ratio: 241, fraction: 0.25 }], be: true },
+		{ id: 'ote-full-100 (ref)', scenario: 'ote', stop: 61.8, steps: [{ ratio: 100, fraction: 1 }], be: false },
+		{ id: 'ote-50@88.6+50@100 BE', scenario: 'ote', stop: 61.8, steps: [{ ratio: 88.6, fraction: 0.5 }, { ratio: 100, fraction: 0.5 }], be: true },
+		{ id: 'ote-50@100+50@141 BE', scenario: 'ote', stop: 61.8, steps: [{ ratio: 100, fraction: 0.5 }, { ratio: 141, fraction: 0.5 }], be: true },
+		{ id: 'ote-50@100+50@141 noBE', scenario: 'ote', stop: 61.8, steps: [{ ratio: 100, fraction: 0.5 }, { ratio: 141, fraction: 0.5 }], be: false },
+		{ id: 'ote-75@100+25@241 BE', scenario: 'ote', stop: 61.8, steps: [{ ratio: 100, fraction: 0.75 }, { ratio: 241, fraction: 0.25 }], be: true },
+	]
+	const partialRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; results: Map<string, number | null> }[] = []
+	// SPEC 7.32: свип уровня входа (вход × стоп × тейк). Universe — ote-сетки
+	// канон-пула (78.6 touched + bigbar): deep-сетки — их подмножество.
+	// Оговорка: для входов мельче 78.6 (88.6) оценка ПЕССИМИСТИЧНА — сетки,
+	// отскочившие от 88.6 без касания 78.6 (чистые победы), вне universe.
+	const ENTRY_SWEEP_ENTRIES = [30, 38.2, 50, 61.8, 70.6, 78.6, 88.6] as const
+	const ENTRY_SWEEP_STOPS = [-15, 0, 15, 23.6, 38.2, 50, 61.8] as const
+	const ENTRY_SWEEP_TAKES = [61.8, 78.6, 88.6, 100, 120, 141] as const
+	const entrySweepRows: { symbol: string; timeframe: string; entryAt: number; combos: Map<string, { status: string; netR: number | null }> }[] = []
 	// Худшая по дата��етам одновременная экспозиция (сделок одной стратегии
 	// и направления открыто одновременно) — до дедупа и после каждого правила.
 	const dedupExposure = {
@@ -1095,7 +1119,7 @@ async function main() {
 				})
 						// Волна 2 фильтра режима: релейбленные копии прошедших фильтр
 						// исходов (oteRegime/deepRegime) подмешиваются к оригиналам —
-						// сравнение до/после в одной сводке. Только базовый конфиг.
+						// сравнение до/после в одной сводке. Только базовый конф��г.
 						let outcomesForSlicing = snapshot.fibLifecycle.outcomes
 						if (args.regimeFilter && variant.id === 'base') {
 							const metrics = computeRegimeMetrics(
@@ -1451,6 +1475,48 @@ async function main() {
 														}
 													}
 													sweepRows.push({ symbol, timeframe, scenario: outcome.scenario, entryAt: lastRow.entryAt, combos })
+													// SPEC 7.31: частичные лестницы от новых клеток
+													// (вход канонический, стоп/тейки — уровни свипа).
+													const partialResults = new Map<string, number | null>()
+													for (const sch of PARTIAL_SCHEMES) {
+														if (sch.scenario !== outcome.scenario) continue
+														partialResults.set(sch.id, replayCustomLadder(
+															snapshot.candles, outcome, priceAt(sch.stop),
+															sch.steps.map((s) => ({ price: priceAt(s.ratio), fraction: s.fraction })),
+															sch.be, bingxCosts))
+													}
+													partialRows.push({ symbol, timeframe, scenario: outcome.scenario, entryAt: lastRow.entryAt, results: partialResults })
+													// SPEC 7.32: свип уровня входа. Только ote-сетки
+													// (universe: 78.6 touched; deep — подмножество,
+													// дубли сеток не нужны). Семантика отмены:
+													// - уровни ≥78.6 лежат НА ПУТИ ретрейса к 78.6 —
+													//   филл в universe гарантирован, отмена не нужна
+													//   (сканируем с создания сетки; отмену от 100 тут
+													//   ставить нельзя — на баре создания цена ещё у
+													//   экстремума и high >= p100 тривиально);
+													// - уровни глубже 78.6: лимитка с бара канонического
+													//   касания (цена уже на 78.6), отмена при возврате
+													//   в 100 до филла — зеркало missed-tp канона.
+													if (outcome.scenario === 'ote') {
+														const long = outcome.direction === 'long'
+														const noCancel = long ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY
+														const entryCombos = new Map<string, { status: string; netR: number | null }>()
+														for (const el of ENTRY_SWEEP_ENTRIES) {
+															const onPath = el >= 78.6
+															const fromIndex = onPath ? outcome.createdAtIndex : outcome.entryIndex!
+															const cancelPrice = onPath ? noCancel : priceAt(100)
+															for (const sr of ENTRY_SWEEP_STOPS) {
+																if (sr >= el) continue
+																for (const trr of ENTRY_SWEEP_TAKES) {
+																	if (trr <= el) continue
+																	entryCombos.set(`${el}|${sr}|${trr}`, replayEntryStopTake(
+																		snapshot.candles, fromIndex, outcome.direction,
+																		priceAt(el), priceAt(sr), priceAt(trr), cancelPrice, bingxCosts))
+																}
+															}
+														}
+														entrySweepRows.push({ symbol, timeframe, entryAt: lastRow.entryAt, combos: entryCombos })
+													}
 												}
 											}
 									}
@@ -1516,7 +1582,7 @@ async function main() {
 		const prefix = join(RESULTS_DIR, `portfolio-${stamp}${untilTag}`)
 		const ledgerPath = `${prefix}-ledger.csv`, equityPath = `${prefix}-equity.csv`, monthlyPath = `${prefix}-monthly.csv`, breakdownPath = `${prefix}-breakdown.csv`
 		// Отрезанные --filters сделки дописываются в ledger со status=filtered:
-		// в одном файле видно и портфель, и что именно отрезал каждый фильтр.
+		// в одном файле видно и портфель, и что и��енно отрезал каждый фильтр.
 		const filteredRows = portfolioFiltered.map(({ trade, filteredBy }) => ({
 			...trade, status: 'filtered', equityBefore: '', equityAfter: '', pnl: '', openRiskPct: '', filteredBy,
 		}))
@@ -1842,7 +1908,7 @@ async function main() {
 			// потом принимается по ПЛАТО соседних клеток, не по пику
 			// одиночной клетки (свип = data mining, пик = подгонка).
 			// v2: колонка group = 'all' | таймфрейм | символ — разрез по активам
-			// обязателен для проверки робастности плато.
+			// обязателен д��я проверки робастности плато.
 			const sweepCsvRows: string[] = ['scenario,group,stopRatio,takeRatio,n,totalR,avgR,wr']
 			for (const scenario of scenarios) {
 				const scRows = sweepRows.filter((r) => r.scenario === scenario)
@@ -1886,6 +1952,74 @@ async function main() {
 			}
 			const sweepCsvPath = join(RESULTS_DIR, `sweep-${stamp}${untilTag}.csv`)
 			writeFileSync(sweepCsvPath, sweepCsvRows.join('\n'))
+			// SPEC 7.31: частичные фиксации от новых клеток. Пул per scenario:
+			// все схемы сценария разрешились. H1/H2 — медиана entryAt пула.
+			const partialCsvRows: string[] = ['scheme,scenario,group,n,totalR,avgR,wr']
+			lines.push('', '=== Partial exits from 7.29 cells (SPEC 7.31, canon pool touch+bigbar, BingX costs) ===')
+			for (const scenario of scenarios) {
+				const scRows = partialRows.filter((r) => r.scenario === scenario)
+				const ids = PARTIAL_SCHEMES.filter((s) => s.scenario === scenario).map((s) => s.id)
+				if (scRows.length === 0 || ids.length === 0) continue
+				const resolved = scRows.filter((r) => ids.every((id) => r.results.get(id) != null))
+				const sortedAt = resolved.map((r) => r.entryAt).sort((a, b) => a - b)
+				const midAt = sortedAt[Math.floor(sortedAt.length / 2)] ?? 0
+				lines.push(`--- ${scenario}: ${resolved.length} trades (of ${scRows.length}) ---`)
+				for (const id of ids) {
+					const stat = (g: typeof resolved): { n: number; total: number; wr: number } => {
+						const vals = g.map((r) => r.results.get(id)!)
+						const total = vals.reduce((a, b) => a + b, 0)
+						return { n: vals.length, total, wr: vals.length ? (100 * vals.filter((v) => v > 0).length) / vals.length : 0 }
+					}
+					const all = stat(resolved)
+					const h1 = stat(resolved.filter((r) => r.entryAt < midAt))
+					const h2 = stat(resolved.filter((r) => r.entryAt >= midAt))
+					lines.push(`${id.padEnd(28)}: totalR ${fmt(all.total)}, avgR ${fmt(all.n ? all.total / all.n : 0)}, WR ${all.wr.toFixed(1)}% | H1 ${fmt(h1.n ? h1.total / h1.n : 0)} / H2 ${fmt(h2.n ? h2.total / h2.n : 0)}`)
+					const groups: [string, typeof resolved][] = [['all', resolved], ['H1', resolved.filter((r) => r.entryAt < midAt)], ['H2', resolved.filter((r) => r.entryAt >= midAt)]]
+					for (const tf of new Set(resolved.map((r) => r.timeframe))) groups.push([tf, resolved.filter((r) => r.timeframe === tf)])
+					for (const sym of new Set(resolved.map((r) => r.symbol))) groups.push([sym, resolved.filter((r) => r.symbol === sym)])
+					for (const [gName, g] of groups) {
+						const s = stat(g)
+						partialCsvRows.push(`${id},${scenario},${gName},${s.n},${s.total.toFixed(3)},${(s.n ? s.total / s.n : 0).toFixed(4)},${s.wr.toFixed(1)}`)
+					}
+				}
+			}
+			writeFileSync(join(RESULTS_DIR, `partials-${stamp}${untilTag}.csv`), partialCsvRows.join('\n'))
+			// SPEC 7.32: свип уровня входа. Пулы клеток различаются по
+			// построению (филлы разные) — required-all-resolved невозможен;
+			// unresolved исключаются per cell. totalR — по universe.
+			const entryCsvRows: string[] = ['entry,stop,take,group,n,totalR,avgR,wr']
+			lines.push('', '=== Entry level sweep (SPEC 7.32, universe: ote grids touch+bigbar, full exits, BingX costs) ===')
+			lines.push(`universe: ${entrySweepRows.length} grids; NOTE: entries shallower than 78.6 are pessimistic (grids bouncing before 78.6 not in universe)`)
+			const entrySortedAt = entrySweepRows.map((r) => r.entryAt).sort((a, b) => a - b)
+			const entryMidAt = entrySortedAt[Math.floor(entrySortedAt.length / 2)] ?? 0
+			const allEntryKeys = [...new Set(entrySweepRows.flatMap((r) => [...r.combos.keys()]))]
+			type CellStat = { key: string; n: number; missed: number; total: number; wr: number }
+			const cellStats: CellStat[] = []
+			for (const key of allEntryKeys) {
+				const groups: [string, typeof entrySweepRows][] = [['all', entrySweepRows], ['H1', entrySweepRows.filter((r) => r.entryAt < entryMidAt)], ['H2', entrySweepRows.filter((r) => r.entryAt >= entryMidAt)]]
+				for (const tf of new Set(entrySweepRows.map((r) => r.timeframe))) groups.push([tf, entrySweepRows.filter((r) => r.timeframe === tf)])
+				for (const sym of new Set(entrySweepRows.map((r) => r.symbol))) groups.push([sym, entrySweepRows.filter((r) => r.symbol === sym)])
+				for (const [gName, g] of groups) {
+					const cells = g.map((r) => r.combos.get(key)).filter((c): c is { status: string; netR: number | null } => c != null)
+					const entered = cells.filter((c) => c.status === 'entered' && c.netR != null)
+					const missed = cells.filter((c) => c.status === 'missed').length
+					const total = entered.reduce((a, c) => a + c.netR!, 0)
+					const wr = entered.length ? (100 * entered.filter((c) => c.netR! > 0).length) / entered.length : 0
+					const [el, sr, trr] = key.split('|')
+					entryCsvRows.push(`${el},${sr},${trr},${gName},${entered.length},${total.toFixed(3)},${(entered.length ? total / entered.length : 0).toFixed(4)},${wr.toFixed(1)}`)
+					if (gName === 'all') cellStats.push({ key, n: entered.length, missed, total, wr })
+				}
+			}
+			writeFileSync(join(RESULTS_DIR, `entrysweep-${stamp}${untilTag}.csv`), entryCsvRows.join('\n'))
+			// txt: филл-статистика по уровням входа + топ-10 клеток по totalR.
+			for (const el of ENTRY_SWEEP_ENTRIES) {
+				const anyKey = cellStats.find((c) => c.key.startsWith(`${el}|`))
+				if (anyKey) lines.push(`entry ${String(el).padEnd(5)}: fills ${anyKey.n}, missed ${anyKey.missed}`)
+			}
+			lines.push('top cells by totalR (entry|stop|take):')
+			for (const c of [...cellStats].sort((a, b) => b.total - a.total).slice(0, 10)) {
+				lines.push(`  ${c.key.padEnd(16)}: n ${String(c.n).padStart(5)}, totalR ${fmt(c.total)}, avgR ${fmt(c.n ? c.total / c.n : 0)}, WR ${c.wr.toFixed(1)}%`)
+			}
 			// SPEC 7.27: идеи фильтров «свежесть касания» и «близость тейка».
 			// Только диагностика (бакеты на каноне touch + bigbar, netR t100):
 			// сначала смотрим, есть ли монотон��ая зависимость avgR от параметра,

@@ -195,3 +195,116 @@ export function replayStopTake(
 	}
 	return null
 }
+
+/**
+ * SPEC 7.31: лестница с ПРОИЗВОЛЬНЫМ стопом и произвольными ступенями
+ * тейков (в ценах), опциональный перенос в BE после первой фиксации.
+ *
+ * Отличия от replayLadder: риск-единица от нового стопа (как в
+ * replayStopTake — сайзинг под свой стоп); BE управляемый (канонические
+ * лестницы 7.22 всегда BE, здесь сравниваем оба варианта).
+ * Конвенции те же: конфликт стоп/тейк в баре = стоп; после BE конфликт
+ * BE/тейк = BE; бар, взявший тейк и коснувшийся входа, — тейк засчитан,
+ * остаток BE. null = не разрешилась / нет валидных ступеней.
+ */
+export function replayCustomLadder(
+	candles: Candle[],
+	outcome: FibSetupOutcome,
+	stopPrice: number,
+	steps: { price: number; fraction: number }[],
+	breakEven: boolean,
+	costs: LadderCostRates = DEFAULT_LADDER_COSTS,
+): number | null {
+	if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null) return null
+	const long = outcome.direction === 'long'
+	const entry = outcome.entryPrice
+	if (long ? stopPrice >= entry : stopPrice <= entry) return null
+	const risk = Math.abs(entry - stopPrice)
+	if (risk <= 0) return null
+	const raw = steps.filter((s) => (long ? s.price > entry : s.price < entry))
+	if (raw.length === 0) return null
+	const totalFraction = raw.reduce((sum, s) => sum + s.fraction, 0)
+	const legs = raw.map((s) => ({ price: s.price, fraction: s.fraction / totalFraction, filled: false }))
+	const toR = (fraction: number, price: number): number =>
+		(fraction * (long ? price - entry : entry - price)) / risk
+
+	let net = -fillCostR(entry, costs.entryRate, 1, risk)
+	let remaining = 1
+	let filledAny = false
+	for (let i = outcome.entryIndex; i < candles.length; i++) {
+		const candle = candles[i]
+		if (!candle) continue
+		const touchedEntry = long ? candle.low <= entry : candle.high >= entry
+		const hitStop = long ? candle.low <= stopPrice : candle.high >= stopPrice
+		// BE активен: возврат к входу закрывает остаток (конфликт BE/тейк = BE).
+		if (breakEven && filledAny && touchedEntry) {
+			net -= fillCostR(entry, costs.stopRate, remaining, risk)
+			return net
+		}
+		// Стоп действует до первой фиксации всегда; без BE — всю жизнь сделки.
+		if ((!filledAny || !breakEven) && hitStop) {
+			net += toR(remaining, stopPrice) - fillCostR(stopPrice, costs.stopRate, remaining, risk)
+			return net
+		}
+		for (const leg of legs) {
+			if (leg.filled) continue
+			const hitTp = long ? candle.high >= leg.price : candle.low <= leg.price
+			if (!hitTp) continue
+			leg.filled = true
+			filledAny = true
+			net += toR(leg.fraction, leg.price) - fillCostR(leg.price, costs.takeRate, leg.fraction, risk)
+			remaining -= leg.fraction
+		}
+		if (remaining <= 1e-9) return net
+		if (breakEven && filledAny && touchedEntry) {
+			net -= fillCostR(entry, costs.stopRate, remaining, risk)
+			return net
+		}
+	}
+	return null
+}
+
+/**
+ * SPEC 7.32: свип уровня входа. Симулирует лимитку на произвольном уровне
+ * с момента создания сетки: филл при касании уровня; отмена, если цена
+ * дошла до cancelPrice (уровень 100 — сетка отыграла) раньше филла.
+ * После филла — полный выход по стоп/тейк (конвенции replayStopTake,
+ * риск от нового стопа). Конфликт филл/отмена в одном баре = филл
+ * (зеркало канонической touch-модели, вход+стоп в одном баре допустим).
+ */
+export function replayEntryStopTake(
+	candles: Candle[],
+	fromIndex: number,
+	direction: 'long' | 'short',
+	entryPrice: number,
+	stopPrice: number,
+	tpPrice: number,
+	cancelPrice: number,
+	costs: LadderCostRates = DEFAULT_LADDER_COSTS,
+): { status: 'entered' | 'missed' | 'unresolved'; netR: number | null } {
+	const long = direction === 'long'
+	if (long ? stopPrice >= entryPrice : stopPrice <= entryPrice) return { status: 'unresolved', netR: null }
+	if (long ? tpPrice <= entryPrice : tpPrice >= entryPrice) return { status: 'unresolved', netR: null }
+	const risk = Math.abs(entryPrice - stopPrice)
+	if (risk <= 0) return { status: 'unresolved', netR: null }
+
+	let entryIndex = -1
+	for (let i = fromIndex; i < candles.length; i++) {
+		const candle = candles[i]
+		if (!candle) continue
+		if (long ? candle.low <= entryPrice : candle.high >= entryPrice) { entryIndex = i; break }
+		if (long ? candle.high >= cancelPrice : candle.low <= cancelPrice) return { status: 'missed', netR: null }
+	}
+	if (entryIndex < 0) return { status: 'unresolved', netR: null }
+
+	let net = -fillCostR(entryPrice, costs.entryRate, 1, risk)
+	for (let i = entryIndex; i < candles.length; i++) {
+		const candle = candles[i]
+		if (!candle) continue
+		const hitStop = long ? candle.low <= stopPrice : candle.high >= stopPrice
+		if (hitStop) return { status: 'entered', netR: net - 1 - fillCostR(stopPrice, costs.stopRate, 1, risk) }
+		const hitTp = long ? candle.high >= tpPrice : candle.low <= tpPrice
+		if (hitTp) return { status: 'entered', netR: net + (long ? tpPrice - entryPrice : entryPrice - tpPrice) / risk - fillCostR(tpPrice, costs.takeRate, 1, risk) }
+	}
+	return { status: 'unresolved', netR: null }
+}
