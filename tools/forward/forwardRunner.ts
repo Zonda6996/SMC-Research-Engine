@@ -61,6 +61,12 @@ interface RunnerState {
 	emitted: string[]
 	/** Скользящий пул swing/ATR последних сеток per symbol|tf (кап 200). */
 	swingPool: Record<string, number[]>
+	/**
+	 * ISO-время первого запуска. События с барами ДО этого момента —
+	 * бэкфилл (мини-бэктест окна), ПОСЛЕ — честный форвард. Отчёт
+	 * разделяет эти пулы: в зачёт форварда идёт только второй.
+	 */
+	firstRunAt?: string
 }
 
 interface SignalEvent {
@@ -82,8 +88,12 @@ interface SignalEvent {
 }
 
 function loadState(): RunnerState {
-	if (existsSync(STATE_PATH)) return JSON.parse(readFileSync(STATE_PATH, 'utf8')) as RunnerState
-	return { emitted: [], swingPool: {} }
+	const state: RunnerState = existsSync(STATE_PATH)
+		? (JSON.parse(readFileSync(STATE_PATH, 'utf8')) as RunnerState)
+		: { emitted: [], swingPool: {} }
+	// Миграция стейтов до firstRunAt: считаем форвардом всё с этого момента.
+	if (state.firstRunAt == null) state.firstRunAt = new Date().toISOString()
+	return state
 }
 
 function saveState(state: RunnerState): void {
@@ -274,14 +284,25 @@ function printReport(): void {
 	const lines = readFileSync(JOURNAL_PATH, 'utf8').trim().split('\n').map((l) => JSON.parse(l) as SignalEvent)
 	const outcomes = lines.filter((e) => e.type === 'outcome')
 	const signals = lines.filter((e) => e.type === 'signal')
+	const firstRunAt = loadState().firstRunAt!
 	console.log(`сигналов: ${signals.length}, исходов: ${outcomes.length}, открыто: ${signals.length - outcomes.length}`)
-	for (const stream of ['deep', 'ote', 'mirror', 'fade141']) {
-		const g = outcomes.filter((e) => e.stream === stream)
-		if (g.length === 0) continue
-		const total = g.reduce((a, e) => a + e.netR!, 0)
-		const wr = (100 * g.filter((e) => e.netR! > 0).length) / g.length
-		const wTotal = g.reduce((a, e) => a + e.netR! * e.riskMult, 0)
-		console.log(`${stream.padEnd(8)}: n ${g.length}, totalR ${total.toFixed(1)}, avgR ${(total / g.length).toFixed(3)}, WR ${wr.toFixed(1)}% | weighted totalR ${wTotal.toFixed(1)}`)
+	console.log(`граница форварда (первый запуск): ${firstRunAt}`)
+	const expected: Record<string, number> = { deep: 0.358, ote: 0.244, mirror: 0.347, fade141: 0.347 }
+	const pools: [string, SignalEvent[]][] = [
+		['BACKFILL (окно до первого запуска — мини-бэктест, НЕ форвард)', outcomes.filter((e) => e.at < firstRunAt)],
+		['FORWARD (после первого запуска — честный зачёт)', outcomes.filter((e) => e.at >= firstRunAt)],
+	]
+	for (const [title, pool] of pools) {
+		console.log(`\n=== ${title} ===`)
+		if (pool.length === 0) { console.log('  пусто'); continue }
+		for (const stream of ['deep', 'ote', 'mirror', 'fade141']) {
+			const g = pool.filter((e) => e.stream === stream)
+			if (g.length === 0) continue
+			const total = g.reduce((a, e) => a + e.netR!, 0)
+			const wr = (100 * g.filter((e) => e.netR! > 0).length) / g.length
+			const wTotal = g.reduce((a, e) => a + e.netR! * e.riskMult, 0)
+			console.log(`  ${stream.padEnd(8)}: n ${g.length}, totalR ${total.toFixed(1)}, avgR ${(total / g.length).toFixed(3)} (ожид. ${expected[stream]!.toFixed(3)}), WR ${wr.toFixed(1)}% | weighted totalR ${wTotal.toFixed(1)}`)
+		}
 	}
 }
 
