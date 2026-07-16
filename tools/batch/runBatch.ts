@@ -233,7 +233,7 @@ interface CliArgs {
 	 */
 	evalFilters: boolean
 	/**
-	 * Пул-оценка HTF-контекста (SPEC 7.21): --eval-htf. Размечает тот же пул
+	 * Пул-оценка HTF-контекст�� (SPEC 7.21): --eval-htf. Размечает тот же пул
 	 * сделок метками старшего ТФ (тренд + premium/discount) без портфельной
 	 * симуляции. Пары: 30m → 1h и 4h, 1h → 4h, 4h → 1d. HTF-свечи агрегируются
 	 * из уже загруженных LTF — отдельная загрузка не нужна.
@@ -521,7 +521,7 @@ function sliceDataset(symbol: string, timeframe: string, variant: string, period
 	const rows: ResultRow[] = []
 	const anchors = ['local', 'global'] as const
 	const triggers = ['bos', 'choch'] as const
-	// Только плейбук (итоги волн 1–4, SPEC 7.10–7.13): ядро ote/deep/breaker
+	// Только ��лейбук (итоги волн 1–4, SPEC 7.10–7.13): ядро ote/deep/breaker
 	// со стопом за 0, вариант TP2=200 (цели 141/200/241 остаются в работе)
 	// и принятый фильтр breaker161. Отклонённые сценарии (fade-семейство,
 	// breaker78, breaker tight, wide-стопы, scale-добор) из батча убраны,
@@ -992,7 +992,7 @@ async function main() {
 	// Пары LTF → старшие ТФ (по выбору пользователя, SPEC 7.21).
 	const HTF_PAIRS: Record<string, string[]> = { '30m': ['1h', '4h'], '1h': ['4h'], '4h': ['1d'] }
 	// Пул-оценка лестниц тейков (--eval-takes, SPEC 7.22): одна строка =
-	// одна сделка пула × одна лестница. netR = null (л��стни��а не р����зре��илась
+	// одна сдел��а пула × одна лестница. netR = null (л��стни��а не р����зре��илась
 	// до конца данны��) ��сключает сделку из сравнения по ВСЕМ лестницам.
 	const evalTakeRows: { ladder: string; symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; netR: number }[] = []
 	// Комбо-оценка (--eval-combo, SPEC 7.23): одна строка = одна сделка пула
@@ -1006,7 +1006,7 @@ async function main() {
 	// Пул-оценка моделей входа (--eval-entry, SPEC 7.24): одна строка =
 	// одна сделка пула со статусами/netR всех трёх моделей (косты BingX,
 	// выходы t100-only) и меткой bigbar. netR missed-статусов = 0.
-	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null; fixed1R: number | null; fixed15R: number | null; fixed2R: number | null; fixed3R: number | null }[] = []
+	const evalEntryRows: { symbol: string; timeframe: string; scenario: string; entryAt: number; direction: string; bigbar: boolean; chopCut: boolean; alignCut: boolean; dedupCut: boolean; touchStatus: string; touchNetR: number; closeStatus: string; closeNetR: number; confirmStatus: string; confirmNetR: number; exit141R: number | null; exitCanonR: number | null; touchDelayBars: number; tpDistRatio: number | null; fixed1R: number | null; fixed15R: number | null; fixed2R: number | null; fixed3R: number | null; newCanonR: number | null }[] = []
 	// SPEC 7.29: свип стоп×тейк на канон-пуле touch+bigbar. Одна строка =
 	// одна сделка, netR по каждой валидной комбинации (ключ "stop|take" в
 	// ratio сетки). null = не разрешилась до конца данных; комбинации не на
@@ -1448,6 +1448,18 @@ async function main() {
 													fixed15R: fixedRR(1.5),
 													fixed2R: fixedRR(2),
 													fixed3R: fixedRR(3),
+													// SPEC 7.33: netR сделки по НОВОМУ канону (клетки 7.29:
+													// deep стоп 15 × тейк 61.8, ote стоп 61.8 × тейк 100).
+													// Тот же replayStopTake, что в свипе — прогон должен
+													// воспроизвести цифры 7.29 (контроль корректности).
+													newCanonR: (() => {
+														const p0 = levelPrice(0)
+														if (p0 == null || outcome.entryPrice == null) return null
+														const at = (ratio: number): number => p0 + (ratio / 100) * (tp - p0)
+														return outcome.scenario === 'deep'
+															? replayStopTake(snapshot.candles, outcome, at(15), at(61.8), bingxCosts)
+															: replayStopTake(snapshot.candles, outcome, at(61.8), at(100), bingxCosts)
+													})(),
 												})
 											// SPEC 7.29: свип стоп×тейк. Уровни сетки линейны по
 											// ratio — произвольный ratio интерполируется через 0/100.
@@ -2061,6 +2073,58 @@ async function main() {
 				{ label: '1.50-2.50', match: (r) => r.tpDistRatio != null && r.tpDistRatio >= 1.5 && r.tpDistRatio < 2.5 },
 				{ label: '2.50+', match: (r) => r.tpDistRatio != null && r.tpDistRatio >= 2.5 },
 			])
+			// SPEC 7.33: новый канон per-trade + сайзинг по свежести + сессии.
+			const ncPool = evalEntryRows.filter((r) => r.touchStatus === 'entered' && !r.bigbar && r.newCanonR != null)
+			const ncStat = (g: typeof ncPool): { n: number; total: number; wr: number } => {
+				const vals = g.map((r) => r.newCanonR!)
+				const total = vals.reduce((a, b) => a + b, 0)
+				return { n: g.length, total, wr: g.length ? (100 * vals.filter((v) => v > 0).length) / g.length : 0 }
+			}
+			lines.push('', '=== New canon per-trade check (SPEC 7.33: deep 15x61.8, ote 61.8x100) — must match 7.29 ===')
+			for (const sc of scenarios) {
+				const s = ncStat(ncPool.filter((r) => r.scenario === sc))
+				lines.push(`${sc.padEnd(6)}: ${s.n} trades, totalR ${fmt(s.total)}, avgR ${fmt(s.n ? s.total / s.n : 0)}, WR ${s.wr.toFixed(1)}%`)
+			}
+			// Сайзинг по свежести: риск-множитель по touchDelayBars. Метрики:
+			// totalR (взвеш.) и R НА ЕДИНИЦУ РИСКА = sum(m*r)/sum(m) — главная:
+			// показывает качество аллокации, а не просто рост общего риска.
+			lines.push('', '=== Freshness sizing simulation (SPEC 7.33, newCanonR, canon pool) ===')
+			const sizingVariants: { name: string; mult: (d: number) => number }[] = [
+				{ name: 'flat 1.0 (baseline)', mult: () => 1 },
+				{ name: 'mild 1.5/1.0/0.7', mult: (d) => (d <= 3 ? 1.5 : d <= 15 ? 1.0 : 0.7) },
+				{ name: 'strong 2.0/1.0/0.5', mult: (d) => (d <= 3 ? 2.0 : d <= 15 ? 1.0 : 0.5) },
+			]
+			for (const v of sizingVariants) {
+				let total = 0
+				let riskSum = 0
+				for (const r of ncPool) {
+					const m = v.mult(r.touchDelayBars)
+					total += m * r.newCanonR!
+					riskSum += m
+				}
+				lines.push(`${v.name.padEnd(22)}: totalR ${fmt(total)}, risk units ${riskSum.toFixed(0)}, R/unit ${fmt(riskSum ? total / riskSum : 0)}`)
+			}
+			// Сессионные окна: бакеты по часу суток UTC на newCanonR.
+			// Только диагностика — фильтр вводим лишь при стабильно
+			// убыточном окне (проверka H1/H2 обязательна перед решением).
+			lines.push('', '=== Session windows (SPEC 7.33, newCanonR, canon pool, UTC) ===')
+			const hourOf = (r: (typeof ncPool)[number]): number => new Date(r.entryAt).getUTCHours()
+			lines.push('-- 3h blocks --')
+			for (let h = 0; h < 24; h += 3) {
+				const g = ncPool.filter((r) => hourOf(r) >= h && hourOf(r) < h + 3)
+				const s = ncStat(g)
+				lines.push(`${String(h).padStart(2, '0')}-${String(h + 2).padStart(2, '0')}h: ${String(s.n).padStart(5)} trades, totalR ${fmt(s.total)}, avgR ${fmt(s.n ? s.total / s.n : 0)}, WR ${s.wr.toFixed(1)}%`)
+			}
+			lines.push('-- funding-relative (hours since last 00/08/16 UTC funding) --')
+			for (const [label, match] of [
+				['0-1h after', (h: number) => h % 8 <= 1],
+				['2-4h after', (h: number) => h % 8 >= 2 && h % 8 <= 4],
+				['5-7h after', (h: number) => h % 8 >= 5],
+			] as const) {
+				const g = ncPool.filter((r) => match(hourOf(r)))
+				const s = ncStat(g)
+				lines.push(`${label.padEnd(11)}: ${String(s.n).padStart(5)} trades, totalR ${fmt(s.total)}, avgR ${fmt(s.n ? s.total / s.n : 0)}, WR ${s.wr.toFixed(1)}%`)
+			}
 			const summary = lines.join('\n')
 			const entryTxtPath = join(RESULTS_DIR, `evalentry-${stamp}${untilTag}.txt`)
 		writeFileSync(entryTxtPath, summary + '\n')
