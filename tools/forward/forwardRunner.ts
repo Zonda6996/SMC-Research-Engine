@@ -316,27 +316,19 @@ function processWindow(
 			})
 		}
 
-		// Реверс-поток: только ote-сетки, обе заявки СТРОГО ПОСЛЕ
-		// канон-входа. SPEC 7.45: fade с бара создания сетки — look-ahead
-		// (слепая зона «канон не вошёл» даёт -0.508 avgR при WR 19%);
-		// реализуемый вариант — fade-лимитка ставится вместе с mirror
-		// после канон-филла, как «выброс после отката».
+		// Реверс-поток: только ote-сетки, ТОЛЬКО mirror (SPEC 7.45:
+		// fade141 удалён — без look-ahead неисполним: заявка после
+		// канон-входа, а цена не доходит до 141, не пройдя 100, поэтому
+		// mirror всегда филлится первым; слепая зона fade -0.508 avgR).
 		if (outcome.scenario !== 'ote') continue
 		const revLong = !long
-		const [mirrorCfg, fadeCfg] = [BATTLE_CONFIG.reverse[0]!, BATTLE_CONFIG.reverse[1]!]
+		const mirrorCfg = BATTLE_CONFIG.reverse[0]!
 		const mirror = replayTrade(snapshot.candles, outcome.entryIndex, revLong,
 			atL(mirrorCfg.entry), atL(mirrorCfg.stop), atL(mirrorCfg.take), atL(mirrorCfg.cancelBeyond), null)
-		const fade = replayTrade(snapshot.candles, outcome.entryIndex, revLong,
-			atL(fadeCfg.entry), atL(fadeCfg.stop), atL(fadeCfg.take), atL(fadeCfg.cancelBeyond), null)
-		// first-fill-wins: побеждает более ранний филл.
-		const mFill = 'fillIndex' in mirror && mirror.fillIndex != null ? mirror.fillIndex : Infinity
-		const fFill = 'fillIndex' in fade && fade.fillIndex != null ? fade.fillIndex : Infinity
-		if (mFill === Infinity && fFill === Infinity) continue
-		const winner = mFill <= fFill
-			? { cfg: mirrorCfg, res: mirror, stream: 'mirror' as const }
-			: { cfg: fadeCfg, res: fade, stream: 'fade141' as const }
+		const winner = { cfg: mirrorCfg, res: mirror, stream: 'mirror' as const }
 		const res = winner.res
 		if (res.status !== 'done' && res.status !== 'open') continue
+		if (res.fillIndex == null) continue
 		const fillBar = snapshot.candles[res.fillIndex!]!
 		// SPEC 7.44: сайзинг реверса — свежесть канон-касания. Обе заявки
 		// теперь после канон-входа, свежесть всегда известна на момент филла.
@@ -371,7 +363,9 @@ function printReport(): void {
 	const firstRunAt = loadState().firstRunAt!
 	console.log(`сетапов: ${setups.length} (отменено: ${cancels.length}), филлов: ${signals.length}, исходов: ${outcomes.length}, открыто: ${signals.length - outcomes.length}`)
 	console.log(`граница форварда (первый запуск): ${firstRunAt}`)
-	const expected: Record<string, number> = { deep: 0.358, ote: 0.244, mirror: 0.347, fade141: 0.347 }
+	// SPEC 7.45: mirror-ожидание с пофикшенного пула (без look-ahead
+	// fade); fade141 удалён из боевого потока.
+	const expected: Record<string, number> = { deep: 0.358, ote: 0.244, mirror: 0.172 }
 	const pools: [string, SignalEvent[]][] = [
 		['BACKFILL (окно до первого запуска — мини-бэктест, НЕ форвард)', outcomes.filter((e) => e.at < firstRunAt)],
 		['FORWARD (после первого запуска — честный зачёт)', outcomes.filter((e) => e.at >= firstRunAt)],
