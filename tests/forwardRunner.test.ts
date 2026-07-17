@@ -47,11 +47,14 @@ describe('forward runner v2', () => {
 			event({ type: 'signal', id: 's-new', orderId: 'new', stream: 'deep', forwardEligible: true }),
 			event({ type: 'outcome', id: 'o-new', orderId: 'new', stream: 'deep', forwardEligible: true, netR: -1, result: 'stop' }),
 			event({ type: 'setup', id: 'setup-p', orderId: 'pending', stream: 'ote', forwardEligible: true }),
-			event({ type: 'signal', id: 's-open', orderId: 'open', stream: 'mirror', forwardEligible: true }),
+			event({ type: 'signal', id: 's-open', orderId: 'open', stream: 'deep', forwardEligible: true }),
+			event({ type: 'signal', id: 's-shadow', orderId: 'shadow', stream: 'mirror', forwardEligible: true, shadow: true, riskMult: 0 }),
+			event({ type: 'outcome', id: 'o-shadow', orderId: 'shadow', stream: 'mirror', forwardEligible: true, shadow: true, riskMult: 0, netR: 1, result: 'tp' }),
 		]
 		const report = buildForwardReport(rows)
 		assert.deepEqual(report.forwardOutcomes.map((e) => e.orderId), ['new'])
 		assert.deepEqual(report.backfillOutcomes.map((e) => e.orderId), ['old'])
+		assert.deepEqual(report.shadowOutcomes.map((e) => e.orderId), ['shadow'])
 		assert.deepEqual(report.pendingOrders.map((e) => e.orderId), ['pending'])
 		assert.deepEqual(report.openTrades.map((e) => e.orderId), ['open'])
 	})

@@ -21,9 +21,9 @@ import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, extname } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
-import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
-import { DEFAULT_REGIME_FILTER, passesRegimeFilter } from '../../src/core/analysis/regimeFilter.js'
-import { replayEntryModel, bigbarCovered, type EntryModelId } from '../../src/core/analysis/entryModels.js'
+import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
+import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice, reverseRiskMultiplier } from '../../src/strategy/battleConfig.js'
+import { buildCausalMedianByCandidate, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
 import { fetchCandlesPaginated } from '../shared/candleFetcher.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -103,69 +103,91 @@ async function fetchTopSymbols(): Promise<string[]> {
 	return symbols
 }
 
-/** Входные зоны сетки по сценариям — та же карта, что в runBatch --eval-entry. */
-const ENTRY_ZONES: Record<string, [number, number]> = { ote: [61.8, 78.6], deep: [23.6, 38.2] }
-const MODELS: EntryModelId[] = ['touch', 'closeConfirm', 'candleConfirm']
+/** Bigbar остаётся диагностической меткой, а не фильтром. */
+const ENTRY_ZONES: Record<'ote' | 'deep', readonly [number, number]> = {
+	ote: [61.8, 78.6],
+	deep: [23.6, 38.2],
+}
 
-/**
- * Сделки канонического пула с тремя моделями входа — зеркало --eval-entry
- * (SPEC 7.24). Каждая сделка несёт полный набор для отрисовки: уровни
- * сетки, вход/стоп/тейк, индексы входа-выхода каждой модели, bigbar.
- */
 function buildTrades(snapshot: ReturnType<typeof runAnalysis>) {
-	const metrics = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
-	const pool = snapshot.fibLifecycle.outcomes.filter((o) =>
-		(o.scenario === 'ote' || o.scenario === 'deep') && o.stopMode === 'zero' &&
-		(!DEFAULT_REGIME_FILTER.scenarios.has(o.scenario) || passesRegimeFilter(o.scenario, metrics[o.createdAtIndex])))
 	const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
-	const seenGrids = new Set<string>()
-	const trades: unknown[] = []
-	for (const outcome of pool) {
-		if (!outcome.entered || outcome.entryIndex == null || outcome.entryPrice == null) continue
-		const gridKey = `${outcome.scenario}|${outcome.candidateId}`
-		if (seenGrids.has(gridKey)) continue
-		seenGrids.add(gridKey)
+	const seen = new Set<string>()
+	const canonOutcomes = snapshot.fibLifecycle.outcomes
+		.filter((o) => o.stopMode === 'zero' && (o.scenario === 'ote' || o.scenario === 'deep'))
+		.filter((o) => {
+			const key = `${o.scenario}|${o.candidateId}`
+			if (seen.has(key)) return false
+			seen.add(key)
+			return true
+		})
+	const medians = buildCausalMedianByCandidate(canonOutcomes)
+	const trades: Record<string, unknown>[] = []
+
+	for (const outcome of canonOutcomes) {
+		if (!outcome.entered || outcome.entryIndex == null) continue
+		const scenario = outcome.scenario as 'ote' | 'deep'
+		const config = BATTLE_CONFIG.canon.find((x) => x.scenario === scenario)
 		const candidate = candidateById.get(outcome.candidateId)
-		const cVariant = candidate?.variants[outcome.variantMode]
-		if (!candidate || !cVariant) continue
-		const levelPrice = (ratio: number): number | null =>
-			cVariant.levels.find((l) => l.ratio === ratio)?.price ?? null
-		const tp = levelPrice(100)
-		const zone = ENTRY_ZONES[outcome.scenario]
-		if (tp == null || zone == null) continue
-		const zoneNearPrice = levelPrice(zone[0])
-		const zoneFarPrice = levelPrice(zone[1])
-		if (zoneNearPrice == null || zoneFarPrice == null) continue
-		const models: Record<string, unknown> = {}
-		for (const m of MODELS) {
-			const r = replayEntryModel(snapshot.candles, outcome, tp, m)
-			models[m] = {
-				status: r.status,
-				netR: r.netR,
-				entryPrice: r.entryPrice,
-				entryIndex: r.entryIndex ?? null,
-				exitIndex: r.exitIndex ?? null,
-				exitPrice: r.exitPrice ?? null,
-				exitReason: r.exitReason ?? null,
-			}
-		}
+		const variant = candidate?.variants[outcome.variantMode]
+		if (!config || !candidate || !variant) continue
+		const p0 = variant.levels.find((l) => l.ratio === 0)?.price
+		const p100 = variant.levels.find((l) => l.ratio === 100)?.price
+		if (p0 == null || p100 == null) continue
+		const at = (ratio: number): number => gridLevelPrice(p0, p100, ratio)
+		const entry = at(config.entry), stop = at(config.stop), take = at(config.take)
+		const long = outcome.direction === 'long'
+		const replay = replayTrade(snapshot.candles, outcome.entryIndex, long, entry, stop, take, null, config.timeStopBars)
+		if (replay.status !== 'open' && replay.status !== 'done') continue
+		const bigbar = bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex + 1,
+			at(ENTRY_ZONES[scenario][0]), at(ENTRY_ZONES[scenario][1]))
+		const freshBars = outcome.entryIndex - outcome.createdAtIndex
+		const riskMult = canonRiskMultiplier(freshBars, outcome.legAtrRatio, medians.get(outcome.candidateId) ?? null)
+		const id = `${scenario}|${outcome.candidateId}`
+		const exitIndex = replay.status === 'done' ? replay.exitIndex : null
+		const exitPrice = replay.status === 'done'
+			? replay.result === 'stop' ? stop : replay.result === 'tp' ? take : snapshot.candles[replay.exitIndex]?.close ?? null
+			: null
 		trades.push({
-			id: gridKey,
-			candidateId: outcome.candidateId,
-			scenario: outcome.scenario,
-			direction: outcome.direction,
-			trigger: outcome.trigger,
-			createdAtIndex: outcome.createdAtIndex,
-			touchIndex: outcome.entryIndex,
-			level: outcome.entryPrice,
-			stop: outcome.stopPrice,
-			tp,
-			// +1: свеча касания входит в окно (тот же фикс, что в runBatch).
-			bigbar: bigbarCovered(snapshot.candles, outcome.createdAtIndex, outcome.entryIndex + 1, zoneNearPrice, zoneFarPrice),
-			gridLevels: cVariant.levels.map((l) => ({ ratio: l.ratio, price: l.price })),
-			legStart: { index: cVariant.start.index, price: cVariant.start.price },
+			id, parentId: id, candidateId: outcome.candidateId,
+			stream: scenario, scenario, shadow: false,
+			direction: outcome.direction, trigger: outcome.trigger,
+			createdAtIndex: outcome.createdAtIndex, entryIndex: replay.fillIndex,
+			exitIndex, entry, stop, take, exitPrice,
+			result: replay.status === 'done' ? replay.result : 'open',
+			netR: replay.status === 'done' ? replay.netR : null,
+			holdBars: replay.status === 'done' ? replay.exitIndex - replay.fillIndex : null,
+			riskMult: Number(riskMult.toFixed(2)), freshBars,
+			bigbarDiagnostic: bigbar,
+			gridLevels: variant.levels.map((l) => ({ ratio: l.ratio, price: l.price })),
+			legStart: { index: variant.start.index, price: variant.start.price },
 			legEnd: { index: candidate.end.index, price: candidate.end.price },
-			models,
+		})
+
+		if (scenario !== 'ote') continue
+		const mirror = BATTLE_CONFIG.reverse[0]
+		if (!mirror) continue
+		const mirrorReplay = replayTrade(snapshot.candles, outcome.entryIndex + 1, !long,
+			at(mirror.entry), at(mirror.stop), at(mirror.take), at(mirror.cancelBeyond), null)
+		if (mirrorReplay.status !== 'open' && mirrorReplay.status !== 'done') continue
+		const mirrorExit = mirrorReplay.status === 'done' ? mirrorReplay.exitIndex : null
+		const mirrorExitPrice = mirrorReplay.status === 'done'
+			? mirrorReplay.result === 'stop' ? at(mirror.stop) : at(mirror.take)
+			: null
+		trades.push({
+			id: `${id}|mirror`, parentId: id, candidateId: outcome.candidateId,
+			stream: 'mirror', scenario: 'mirror', shadow: true,
+			direction: long ? 'short' : 'long', trigger: outcome.trigger,
+			createdAtIndex: outcome.entryIndex, entryIndex: mirrorReplay.fillIndex,
+			exitIndex: mirrorExit, entry: at(mirror.entry), stop: at(mirror.stop), take: at(mirror.take),
+			exitPrice: mirrorExitPrice,
+			result: mirrorReplay.status === 'done' ? mirrorReplay.result : 'open',
+			netR: mirrorReplay.status === 'done' ? mirrorReplay.netR : null,
+			holdBars: mirrorReplay.status === 'done' ? mirrorReplay.exitIndex - mirrorReplay.fillIndex : null,
+			riskMult: 0, suggestedRiskMult: reverseRiskMultiplier(freshBars), freshBars,
+			bigbarDiagnostic: false,
+			gridLevels: variant.levels.map((l) => ({ ratio: l.ratio, price: l.price })),
+			legStart: { index: variant.start.index, price: variant.start.price },
+			legEnd: { index: candidate.end.index, price: candidate.end.price },
 		})
 	}
 	return trades
@@ -215,6 +237,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const snapshot = runAnalysis(candles)
 
 			sendJson(res, 200, {
+				strategy: {
+					version: FORWARD_VERSION,
+					benchmarks: BATTLE_CONFIG.benchmarks,
+					bigbar: 'diagnostic-only',
+					mirror: 'shadow-risk-0',
+				},
 				dataset: { symbol, timeframe, limit, candleCount: candles.length, source: useFixture ? 'fixture' : 'fresh' },
 				candles: snapshot.candles,
 				structure: snapshot.structure,

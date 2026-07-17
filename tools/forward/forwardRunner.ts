@@ -27,7 +27,7 @@ const STATE_PATH = join(DATA_DIR, 'state.json')
 const JOURNAL_PATH = join(DATA_DIR, 'signals.jsonl')
 const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
 
-export const FORWARD_VERSION = 'battle-7.45-exec-v2'
+export const FORWARD_VERSION = 'battle-7.47-canon-v3'
 const SYMBOLS = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'XRP/USDT', 'BNB/USDT', 'DOGE/USDT', 'ADA/USDT',
 	'AVAX/USDT', 'LINK/USDT', 'SUI/USDT', 'TON/USDT', 'NEAR/USDT', 'APT/USDT', 'LTC/USDT']
 const TIMEFRAMES = ['15m', '30m', '1h']
@@ -66,6 +66,10 @@ export interface SignalEvent {
 	stop: number
 	take: number
 	riskMult: number
+	/** Shadow-событие наблюдается, но не получает капитал. */
+	shadow?: boolean
+	/** Исследовательский multiplier до перевода потока в shadow. */
+	suggestedRiskMult?: number
 	/** true только если заявка и нужный размер существовали до fill. */
 	forwardEligible?: boolean
 	reason?: 'price-invalidated' | 'opposite-event' | 'bigbar-before-touch'
@@ -362,7 +366,8 @@ export function processWindow(
 			type: 'setup', id: mirrorSetupId, orderId: mirrorOrderId,
 			at: new Date(candles[entryIndex]!.timestamp + tfMs).toISOString(),
 			symbol, timeframe, stream: 'mirror', direction: long ? 'short' : 'long',
-			entry: atL(mirror.entry), stop: atL(mirror.stop), take: atL(mirror.take), riskMult: mirrorRisk,
+			entry: atL(mirror.entry), stop: atL(mirror.stop), take: atL(mirror.take), riskMult: 0,
+			shadow: true, suggestedRiskMult: mirrorRisk,
 			forwardEligible: state.orderEligible[mirrorOrderId] === true,
 		})
 		const reverseLong = !long
@@ -373,7 +378,7 @@ export function processWindow(
 				type: 'cancel', id: `cancel|${mirrorOrderId}`, orderId: mirrorOrderId,
 				at: eventTime(candles, mirrorResult.cancelIndex), symbol, timeframe, stream: 'mirror',
 				direction: reverseLong ? 'long' : 'short', entry: atL(mirror.entry), stop: atL(mirror.stop),
-				take: atL(mirror.take), riskMult: 0, reason: 'price-invalidated',
+				take: atL(mirror.take), riskMult: 0, reason: 'price-invalidated', shadow: true,
 				forwardEligible: state.orderEligible[mirrorOrderId] === true,
 			})
 			continue
@@ -385,14 +390,14 @@ export function processWindow(
 			type: 'signal', id: `signal|${mirrorOrderId}`, orderId: mirrorOrderId,
 			at: eventTime(candles, mirrorResult.fillIndex), symbol, timeframe, stream: 'mirror',
 			direction: reverseLong ? 'long' : 'short', entry: atL(mirror.entry), stop: atL(mirror.stop),
-			take: atL(mirror.take), riskMult: mirrorRisk, forwardEligible: mirrorEligible,
+			take: atL(mirror.take), riskMult: 0, shadow: true, suggestedRiskMult: mirrorRisk, forwardEligible: mirrorEligible,
 		})
 		if (mirrorResult.status === 'done') {
 			emit({
 				type: 'outcome', id: `outcome|${mirrorOrderId}`, orderId: mirrorOrderId,
 				at: eventTime(candles, mirrorResult.exitIndex), symbol, timeframe, stream: 'mirror',
 				direction: reverseLong ? 'long' : 'short', entry: atL(mirror.entry), stop: atL(mirror.stop),
-				take: atL(mirror.take), riskMult: mirrorRisk, forwardEligible: mirrorEligible,
+				take: atL(mirror.take), riskMult: 0, shadow: true, suggestedRiskMult: mirrorRisk, forwardEligible: mirrorEligible,
 				result: mirrorResult.result, netR: Number(mirrorResult.netR.toFixed(3)),
 				holdBars: mirrorResult.exitIndex - mirrorResult.fillIndex,
 			})
@@ -404,6 +409,8 @@ export function processWindow(
 export interface ForwardReport {
 	forwardOutcomes: SignalEvent[]
 	backfillOutcomes: SignalEvent[]
+	shadowOutcomes: SignalEvent[]
+	shadowBackfill: SignalEvent[]
 	pendingOrders: SignalEvent[]
 	openTrades: SignalEvent[]
 }
@@ -418,12 +425,15 @@ export function buildForwardReport(events: readonly SignalEvent[]): ForwardRepor
 		if (e.type === 'signal') signals.set(e.orderId, e)
 		if (e.type === 'outcome') outcomes.set(e.orderId, e)
 	}
+	const closed = [...outcomes.values()]
 	return {
-		forwardOutcomes: [...outcomes.values()].filter((e) => e.forwardEligible === true),
-		backfillOutcomes: [...outcomes.values()].filter((e) => e.forwardEligible !== true),
+		forwardOutcomes: closed.filter((e) => e.forwardEligible === true && e.shadow !== true),
+		backfillOutcomes: closed.filter((e) => e.forwardEligible !== true && e.shadow !== true),
+		shadowOutcomes: closed.filter((e) => e.forwardEligible === true && e.shadow === true),
+		shadowBackfill: closed.filter((e) => e.forwardEligible !== true && e.shadow === true),
 		pendingOrders: [...lastOrderEvent.values()].filter((e) =>
-			(e.type === 'setup' || e.type === 'amend') && e.forwardEligible === true && !signals.has(e.orderId)),
-		openTrades: [...signals.values()].filter((e) => e.forwardEligible === true && !outcomes.has(e.orderId)),
+			(e.type === 'setup' || e.type === 'amend') && e.shadow !== true && e.forwardEligible === true && !signals.has(e.orderId)),
+		openTrades: [...signals.values()].filter((e) => e.shadow !== true && e.forwardEligible === true && !outcomes.has(e.orderId)),
 	}
 }
 
@@ -442,15 +452,21 @@ function durationText(fromIso: string): string {
 }
 
 function printStreamStats(pool: SignalEvent[]): void {
-	const expected: Record<ForwardStream, number> = { deep: 0.358, ote: 0.244, mirror: 0.172 }
-	for (const stream of ['deep', 'ote', 'mirror'] as const) {
+	for (const stream of ['deep', 'ote'] as const) {
 		const rows = pool.filter((e) => e.stream === stream)
 		if (rows.length === 0) continue
 		const total = rows.reduce((sum, e) => sum + (e.netR ?? 0), 0)
 		const weighted = rows.reduce((sum, e) => sum + (e.netR ?? 0) * e.riskMult, 0)
 		const wins = rows.filter((e) => (e.netR ?? 0) > 0).length
-		console.log(`  ${stream.padEnd(6)} n=${String(rows.length).padStart(3)} | total=${total.toFixed(1)}R | avg=${(total / rows.length).toFixed(3)}R (старый бенч. ${expected[stream].toFixed(3)}) | WR=${(100 * wins / rows.length).toFixed(1)}% | weighted=${weighted.toFixed(1)}R`)
+		console.log(`  ${stream.padEnd(6)} n=${String(rows.length).padStart(3)} | total=${total.toFixed(1)}R | avg=${(total / rows.length).toFixed(3)}R (бенч. ${BATTLE_CONFIG.benchmarks[stream].toFixed(3)}) | WR=${(100 * wins / rows.length).toFixed(1)}% | weighted=${weighted.toFixed(1)}R`)
 	}
+}
+
+function printShadowStats(pool: SignalEvent[]): void {
+	if (pool.length === 0) { console.log('  пока нет закрытых shadow-сделок'); return }
+	const total = pool.reduce((sum, e) => sum + (e.netR ?? 0), 0)
+	const wins = pool.filter((e) => (e.netR ?? 0) > 0).length
+	console.log(`  mirror n=${pool.length} | total=${total.toFixed(1)}R | avg=${(total / pool.length).toFixed(3)}R (бенч. ${BATTLE_CONFIG.benchmarks.mirrorShadow.toFixed(3)}) | WR=${(100 * wins / pool.length).toFixed(1)}% | risk=0`)
 }
 
 function printReport(): void {
@@ -462,10 +478,12 @@ function printReport(): void {
 	console.log(`старт:  ${state.firstRunAt}`)
 	console.log(`работает: ${durationText(state.firstRunAt)}`)
 	console.log(`ожидают входа: ${report.pendingOrders.length} | открытых позиций: ${report.openTrades.length}`)
-	console.log(`честных закрытых сделок: ${report.forwardOutcomes.length} | backfill/catch-up закрытых: ${report.backfillOutcomes.length}`)
-	console.log('\n=== ЧИСТЫЙ FORWARD (только заявки, известные до fill) ===')
+	console.log(`боевых закрытых: ${report.forwardOutcomes.length} | shadow mirror: ${report.shadowOutcomes.length} | backfill: ${report.backfillOutcomes.length + report.shadowBackfill.length}`)
+	console.log('\n=== ЧИСТЫЙ БОЕВОЙ FORWARD (Deep + OTE) ===')
 	if (report.forwardOutcomes.length === 0) console.log('  пока нет закрытых сделок')
 	else printStreamStats(report.forwardOutcomes)
+	console.log('\n=== SHADOW MIRROR (наблюдение, риск 0) ===')
+	printShadowStats(report.shadowOutcomes)
 	console.log('\n=== BACKFILL / ПРОПУЩЕННЫЕ ПРИ ПРОСТОЕ (не входят в forward) ===')
 	if (report.backfillOutcomes.length === 0) console.log('  нет')
 	else printStreamStats(report.backfillOutcomes)
@@ -490,7 +508,10 @@ async function notifyTelegram(events: SignalEvent[]): Promise<void> {
 	for (const e of fresh) {
 		const arrow = e.direction === 'long' ? 'LONG' : 'SHORT'
 		let text: string
-		switch (e.type) {
+		if (e.shadow) {
+			text = `SHADOW ${e.type.toUpperCase()} MIRROR ${arrow}\n${e.symbol} ${e.timeframe}\nentry ${e.entry} / stop ${e.stop} / take ${e.take}` +
+				(e.netR != null ? `\nрезультат ${e.netR.toFixed(2)}R` : '') + '\nНЕ ТОРГОВАТЬ — риск 0'
+		} else switch (e.type) {
 			case 'setup': text = `SETUP ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nлимит ${e.entry}\nстоп ${e.stop}\nтейк ${e.take}\nриск x${e.riskMult}`; break
 			case 'amend': text = `AMEND ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nизмени размер заявки: риск x${e.riskMult}`; break
 			case 'cancel': text = `CANCEL ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nсними лимит ${e.entry}\nпричина: ${e.reason}`; break
@@ -526,7 +547,7 @@ async function cycle(state: RunnerState, fixture: boolean): Promise<void> {
 	saveState(state)
 	if (all.length > 0) {
 		console.log(`${new Date().toISOString()} новых событий: ${all.length}`)
-		for (const e of all) console.log(`  ${e.type.padEnd(7)} ${e.stream.padEnd(6)} ${e.direction.padEnd(5)} ${e.symbol} ${e.timeframe}${e.netR != null ? ` ${e.netR}R` : ''}${e.forwardEligible === false ? ' [backfill]' : ''}`)
+		for (const e of all) console.log(`  ${e.type.padEnd(7)} ${e.stream.padEnd(6)} ${e.direction.padEnd(5)} ${e.symbol} ${e.timeframe}${e.netR != null ? ` ${e.netR}R` : ''}${e.shadow ? ' [SHADOW]' : ''}${e.forwardEligible === false ? ' [backfill]' : ''}`)
 	}
 	await notifyTelegram(all)
 }

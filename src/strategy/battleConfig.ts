@@ -9,19 +9,16 @@
 // Строение системы — два потока на одной fib-сетке (уровни в ratio сетки,
 // 0 = основание ноги, 100 = точка слома, >100 = расширения):
 //
-// Поток 1 «канон» (по тренду сетки):
-//   deep: вход touch 38.2, стоп 15, тейк 61.8  (avgR +0.358, WR 45.7%)
-//   ote:  вход touch 78.6, стоп 61.8, тейк 100 (avgR +0.244, WR 58.7%)
-//   + bigbar-фильтр (SPEC 7.26), + тайм-стоп 20 баров только для ote
-//   (SPEC 7.36: deep живёт ~4 бара, резать нечего).
+// Поток 1 «канон» (по тренду сетки, executable SPEC 7.47):
+//   deep: touch 38.2, stop 15, take 61.8 (avgR +0.184, H1/H2 +0.206/+0.162)
+//   ote:  touch 78.6, stop 61.8, take 100 (avgR +0.138, H1/H2 +0.130/+0.145)
+//   + time-stop 20 баров только для ote.
+//   Bigbar — ТОЛЬКО диагностика: на touch-баре он известен после fill,
+//   поэтому старый post-hoc фильтр отключён (он завышал totalR на +660R).
 //
-// Поток 2 «реверс» (против сетки, только ote-сетки, SPEC 7.37/7.38/7.45):
-//   mirror: лимитка на 100 после канон-входа, стоп 120, тейк 78.6
-//   (avgR +0.172, H1 +0.169 / H2 +0.175 — очень стабилен).
-//   fade141 УДАЛЁН (SPEC 7.45): без look-ahead он неисполним — заявка
-//   ставится после канон-входа (от 78.6), цена не доходит до 141, не
-//   пройдя 100, mirror филлится всегда первым. Старый avgR реверса
-//   0.347 был завышен look-ahead'ом (fade с бара создания сетки).
+// Reverse mirror переведён в SHADOW (SPEC 7.47): ручная заявка доступна
+// только со следующего бара после OTE fill и даёт avgR +0.022; 7/14 монет
+// отрицательны, 15m отрицателен. Параметры оставлены для наблюдения без риска.
 //
 // Сайзинг канона (SPEC 7.33/7.35, слои независимы — перемножаются):
 //   risk = base × F(свежесть) × S(компактность) × T(сессия, опц.)
@@ -42,12 +39,14 @@ export interface CanonSetup {
 }
 
 export interface ReverseSetup {
-	stream: 'mirror' | 'fade141'
-	/** Лимитка на уровне (направление — ПРОТИВ сетки). */
+	stream: 'mirror'
+	/** Shadow не получает капитал и не входит в боевой totalR. */
+	mode: 'shadow'
+	/** Ручная заявка доступна только со следующего бара после OTE fill. */
+	activation: 'next-bar'
 	entry: GridRatio
 	stop: GridRatio
 	take: GridRatio
-	/** Отмена заявки, если цена ушла за уровень до филла. */
 	cancelBeyond: GridRatio
 }
 
@@ -58,19 +57,17 @@ export const BATTLE_CONFIG = {
 		{ scenario: 'ote', entry: 78.6, stop: 61.8, take: 100, timeStopBars: 20 },
 	] as readonly CanonSetup[],
 
-	/**
-	 * SPEC 7.37/7.38/7.45: реверс-поток на ote-сетках — только mirror.
-	 * Лимитка ставится после канон-входа ote, отменяется при уходе цены
-	 * за 0. fade141 удалён: реализуемый без look-ahead вариант (заявка
-	 * после канон-входа) неисполним — mirror на 100 всегда филлится
-	 * раньше 141 (fade-only на пофикшенном пуле: n 0).
-	 */
+	/** SPEC 7.47: mirror остаётся только shadow-наблюдением без капитала. */
 	reverse: [
-		{ stream: 'mirror', entry: 100, stop: 120, take: 78.6, cancelBeyond: 0 },
+		{ stream: 'mirror', mode: 'shadow', activation: 'next-bar', entry: 100, stop: 120, take: 78.6, cancelBeyond: 0 },
 	] as readonly ReverseSetup[],
 
-	/** SPEC 7.26: bigbar-фильтр канона (сетки от аномально больших баров — скип). */
-	bigbarFilter: true,
+	/** Post-hoc bigbar на свече touch неисполним; хранится только как diagnostic label. */
+	bigbarFilter: false,
+	bigbarDiagnostic: true,
+
+	/** Честные ориентиры полного executable-прогона SPEC 7.47. */
+	benchmarks: { deep: 0.184, ote: 0.138, mirrorShadow: 0.022 },
 
 	/** SPEC 7.35: сайзинг-стек канона. */
 	sizing: {

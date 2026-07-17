@@ -2481,31 +2481,64 @@ freshness multiplier становился известен уже после fil
 Для первого чистого запуска старую папку `tmp/forward` нужно удалить или
 заархивировать. Смешивать её с v2 запрещено.
 
-## 7.47 Пересчёт executable battle v2 (КОД ГОТОВ, ЖДЁТ ПОЛНЫЙ ПРОГОН)
+## 7.47 Пересчёт executable battle v2 (ЗАКРЫТ)
 
-После изменения execution semantics старые ожидания deep/ote/mirror
-нельзя сравнивать с forward v2 напрямую. В `--eval-entry` добавлен блок
-`Executable battle v2 audit`. CSV получает числовые колонки
-`mirrorSameBarR` / `mirrorNextR` для честных symbol/TF/H1/H2-разрезов;
-объектные `mirrorBest` / `mirrorNextBest` остаются внутренней диагностикой
-индексов fill/exit.
+Полный прогон: 6537 canon touch-сделок, 14 монет × 15m/30m/1h.
 
-Один прогон сравнивает на тех же данных:
+Canon без post-hoc bigbar:
 
-1. Canon old: текущий post-hoc bigbar удаляет touch-сделку по close
-   свечи входа.
-2. Canon executable: resting limit fill имеет приоритет, поэтому сделки
-   bigbar-свечи входят в пул. Отдельно печатается EV именно добавленного
-   `touch-bigbar subset` — цена перехода к исполнимой модели.
-3. Mirror old: заявка может заполниться на полном OHLC OTE entry-бара.
-4. Mirror executable: setup становится известен после закрытия OTE
-   entry-бара, replay начинается с `entryIndex + 1`.
-5. Сравниваются total opportunity R canon+mirror, H1/H2 и разбивка по TF.
-   Полный per-row результат (включая symbol) остаётся в evalentry CSV.
+- deep: n 2177, total +400.987R, avgR +0.184, H1/H2 +0.206/+0.162;
+- ote: n 4360, total +599.593R, avgR +0.138, H1/H2 +0.130/+0.145;
+- canon total: +1000.580R; все 14 монет и все 3 ТФ положительны.
 
-Решение принимается только после полного 14-монетного прогона. Fixture
-нужна лишь как smoke и не является статистикой (одна BTC-фикстура
-реплицируется по матрице символов/ТФ).
+Старый bigbar был сильным, но неисполнимым post-hoc отбором. Срез
+сделок, который он удалял уже после touch:
+
+- deep: n 295, avgR −0.924, H1/H2 −0.880/−0.968;
+- ote: n 311, avgR −1.246, WR 0%, H1/H2 −1.176/−1.317;
+- срез отрицателен на всех 14 монетах и всех ТФ, суммарно −660R.
+
+Вывод: bigbar — ценная диагностическая информация, но не разрешённый
+фильтр resting limit. В `BATTLE_CONFIG.bigbarFilter=false`, метка
+`bigbarDiagnostic=true`. Будущее исследование — causal detection до
+entry по младшим свечам/формирующемуся бару.
+
+Mirror с активацией со следующего бара:
+
+- n 3395, total +73.989R, avgR +0.022, H1/H2 +0.023/+0.021;
+- 15m −0.016, 30m +0.033, 1h +0.043;
+- 7 из 14 монет отрицательны.
+
+Вывод: для отдельного риска edge недостаточен. Mirror переведён в
+SHADOW с risk=0; не входит в боевой totalR. Старый same-bar mirror
+(+0.172R) требует отдельного LTF-порядка событий 78.6→100 и не может
+считаться исполнимым по одному старшему OHLC.
+
+Итоговый executable battle сейчас — только canon deep+ote, +1000.6R
+opportunity total до портфельного risk cap. Честные benchmarks:
+deep 0.184, ote 0.138; mirror shadow 0.022.
+
+## 7.48 Battle config + Visualizer v2 (СДЕЛАН)
+
+`BATTLE_CONFIG` синхронизирован с 7.47: bigbar diagnostic-only, mirror
+shadow/next-bar/risk0, benchmarks 0.184/0.138/0.022. Forward journal
+получил новую версию `battle-7.47-canon-v3`, чтобы старый state не
+смешивался с изменившейся стратегией; mirror выводится отдельным shadow
+блоком и не попадает в боевой weighted R.
+
+Визуализатор переписан с устаревших zero-stop/t100 и confirm-моделей на
+текущий executable battleConfig:
+
+- canon-клетки deep 38.2/15/61.8 и ote 78.6/61.8/100;
+- OTE time-stop 20; causal fresh×compact risk multiplier;
+- bigbar только жёлтая диагностическая метка;
+- mirror next-bar только purple shadow с risk 0;
+- карточки avgR/totalR/WR по canon/deep/ote/bigbar/mirror;
+- фильтры stream/direction/result/trigger, BOS/CHoCH и protected overlays;
+- список, навигация ↑/↓, detail-панель и подсветка fib/entry/stop/take.
+
+`/api/analyze` возвращает `strategy.version`, benchmarks и статусы
+bigbar/mirror, чтобы UI явно показывал используемую модель.
 
 ## 12. Как работа��ь в этом проекте (методология, а не только код)
 
