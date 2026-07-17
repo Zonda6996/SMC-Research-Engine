@@ -2535,7 +2535,10 @@ shadow/next-bar/risk0, benchmarks 0.184/0.138/0.022. Forward journal
 - mirror next-bar только purple shadow с risk 0;
 - карточки avgR/totalR/WR по canon/deep/ote/bigbar/mirror;
 - фильтры stream/direction/result/trigger, BOS/CHoCH и protected overlays;
-- список, навигация ↑/↓, detail-панель и подсветка fib/entry/stop/take.
+- список, навигация ↑/↓, detail-панель и подсветка fib/entry/stop/take;
+- latest canon выбирается автоматически; диагональ 0% START → 100% EVENT,
+  подписи всех ключевых Fib-уровней и ENTRY/SL/TP видны на графике;
+- линии структурных событий снова имеют явные подписи BOS↑/↓ и CHoCH↑/↓.
 
 `/api/analyze` возвращает `strategy.version`, benchmarks и статусы
 bigbar/mirror, чтобы UI явно показывал используемую модель.
