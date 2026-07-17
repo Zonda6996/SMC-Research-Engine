@@ -2574,7 +2574,7 @@ body последней свечи/ATR, net move и total range последни
 полный Binance-прогон в sandbox недоступен из-за HTTP 451 и выполняется
 локально пользователем.
 
-## 7.50 First-5 gate + lifecycle probes (КОД ГОТОВ)
+## 7.50 First-5 gate + lifecycle probes (ЗАКРЫТ)
 
 Два независимых 60k×5m окна (~208 дней каждое) подтвердили единое правило:
 не входить при touch в первой 5m-свече каждого 15m/30m/1h-бара.
@@ -2608,8 +2608,30 @@ Visualizer получает 5m-окно, показывает `FIRST5 SKIP` ка
 3. Sizing stack пересчитывается на first-5-kept пуле с causal median.
 
 Same-LTF stop→141 и mirror-TP→re-entry помечаются ambiguous и не входят в
-результат. Для решения нужны оба уже закэшированных окна: current и
-`--until 2025-12-21`.
+результат.
+
+Результаты двух окон:
+
+1. Sizing после first-5 gate СОХРАНИЛСЯ. Discovery: flat avgR 0.199,
+   sizing R/unit 0.240 (H1/H2 0.246/0.234). OOS: flat 0.227, sizing
+   0.264 (0.254/0.274). Совместный uplift качества около +18.5%; старые
+   множители fresh×compact остаются в бою.
+2. Fade141 после stop mirror ОТКЛОНЁН. Discovery n812 avg −0.038 с
+   развалом H1/H2 −0.195/+0.119; OOS n863 avg −0.260, H1/H2
+   −0.228/−0.292, все TF отрицательны. Post-hoc выбор отдельных монет
+   запрещён.
+3. Повторный OTE-cycle ОТКЛОНЁН жёстко. Discovery n739 avg −0.389,
+   OOS n786 avg −0.351; все TF и почти все symbol/H1/H2 отрицательны.
+4. Честный mirror повторно подтверждён убыточным: discovery −0.045,
+   OOS −0.093. Reverse-направление закрыто полностью.
+
+Боевой итог: только deep+ote, first-5 gate, fresh×compact sizing, OTE
+20-bar time-stop. Mirror/fade/cycle не входят даже как активные shadow-
+идеи.
+
+Forward state больше не требует ручного удаления папки при смене версии:
+`migrateRunnerState()` автоматически начинает чистый state, а старый
+JSONL остаётся на диске; отчёт фильтрует события по `version`.
 
 ## 12. Как работа��ь в этом проекте (методология, а не только код)
 

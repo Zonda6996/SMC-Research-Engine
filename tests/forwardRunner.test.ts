@@ -9,6 +9,7 @@ import {
 	buildForwardReport,
 	createRunnerState,
 	firstLtfTouch,
+	migrateRunnerState,
 	processWindow,
 	type SignalEvent,
 } from '../tools/forward/forwardRunner.js'
@@ -74,6 +75,15 @@ describe('forward runner v4', () => {
 		assert.ok(!('swingPool' in state))
 
 		assert.equal(first.some((e) => e.stream === 'mirror'), false)
+	})
+
+	it('version change starts a clean state without deleting the journal', () => {
+		const now = new Date('2026-07-17T12:00:00.000Z')
+		const result = migrateRunnerState({ version: 'old', firstRunAt: '2020-01-01T00:00:00.000Z', emitted: ['x'], orderEligible: {}, tradeEligible: {} }, now)
+		assert.equal(result.migrated, true)
+		assert.equal(result.state.version, FORWARD_VERSION)
+		assert.equal(result.state.firstRunAt, now.toISOString())
+		assert.deepEqual(result.state.emitted, [])
 	})
 
 	it('first-5 gate identifies only the first LTF touch as skipped', () => {

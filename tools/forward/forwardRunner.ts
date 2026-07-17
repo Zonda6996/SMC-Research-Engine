@@ -94,19 +94,22 @@ export function createRunnerState(now = new Date()): RunnerState {
 	}
 }
 
+export function migrateRunnerState(raw: Partial<RunnerState>, now = new Date()): { state: RunnerState; migrated: boolean } {
+	if (raw.version !== FORWARD_VERSION || !raw.firstRunAt || !raw.emitted || !raw.orderEligible || !raw.tradeEligible) {
+		return { state: createRunnerState(now), migrated: true }
+	}
+	return { state: raw as RunnerState, migrated: false }
+}
+
 function loadState(): RunnerState {
 	if (!existsSync(STATE_PATH)) return createRunnerState()
-	const state = JSON.parse(readFileSync(STATE_PATH, 'utf8')) as Partial<RunnerState>
-	if (state.version !== FORWARD_VERSION) {
-		throw new Error(
-			`Старый forward state (${state.version ?? 'без версии'}). ` +
-			`Сохраните/удалите tmp/forward и запустите заново; текущая версия: ${FORWARD_VERSION}`,
-		)
+	const raw = JSON.parse(readFileSync(STATE_PATH, 'utf8')) as Partial<RunnerState>
+	const { state, migrated } = migrateRunnerState(raw)
+	if (migrated) {
+		console.log(`forward state автоматически переключён: ${raw.version ?? 'legacy'} → ${FORWARD_VERSION}`)
+		console.log('старый signals.jsonl сохранён; отчёт разделяет события по version')
 	}
-	if (!state.firstRunAt || !state.emitted || !state.orderEligible || !state.tradeEligible) {
-		throw new Error('Повреждён tmp/forward/state.json — начните новый forward state')
-	}
-	return state as RunnerState
+	return state
 }
 
 function saveState(state: RunnerState): void {
