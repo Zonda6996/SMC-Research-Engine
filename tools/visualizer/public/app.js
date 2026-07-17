@@ -4,8 +4,9 @@ let selectedId = null
 let filtered = []
 let labMode = false
 let labIndex = 0
+let labStep = 0
 let labRevealed = false
-const LAB_KEY = 'smc-141-decisions-v1'
+const LAB_KEY = 'smc-141-decisions-v2'
 
 const C={green:'#35c59a',red:'#ff6675',amber:'#ffbd5b',blue:'#5b8cff',purple:'#a98bff',dim:'#8290a8',text:'#e5eaf2',grid:'#171f2e'}
 const $=(id)=>document.getElementById(id)
@@ -119,19 +120,25 @@ function labCandidates(){if(!data?.reactionCandidates)return[];const level=$('la
 function currentLab(){const xs=labCandidates();if(!xs.length)return null;labIndex=Math.max(0,Math.min(labIndex,xs.length-1));return xs[labIndex]}
 function restoreMainCandles(){candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})))}
 function labTags(){return [...document.querySelectorAll('[data-lab-tag]:checked')].map(x=>x.dataset.labTag)}
+function labSource(c){
+	const wanted=$('labContext').value
+	if(wanted==='5m'&&data.ltf5m?.length&&c.touchLtfIndex!=null)return{source:data.ltf5m,touchIndex:c.touchLtfIndex,context:'5m'}
+	if(wanted==='15m'&&data.ltf15m?.length&&c.touch15mIndex!=null)return{source:data.ltf15m,touchIndex:c.touch15mIndex,context:'15m'}
+	return{source:data.candles,touchIndex:c.touchHtfIndex,context:data.dataset.timeframe}
+}
 function applyLabDecision(decision){
 	const c=currentLab();if(!c)return
-	const all=labDecisions();all[c.id]={id:c.id,decision,entryStyle:$('labEntryStyle').value,targetRatio:$('labTarget').value,stopRatio:$('labStop').value,tags:labTags(),note:$('labNote').value.trim(),symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,level:c.ratio,touchAt:c.touchAt,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,recordedAt:new Date().toISOString()};saveLabDecisions(all);labRevealed=false;renderLab();
+	const view=labSource(c),decisionBar=view.source[Math.min(view.source.length-1,view.touchIndex+labStep)]
+	const all=labDecisions(),previous=all[c.id]||{};all[c.id]={...previous,id:c.id,decision,entryStyle:$('labEntryStyle').value,targetRatio:$('labTarget').value,stopRatio:$('labStop').value,tags:labTags(),note:$('labNote').value.trim(),symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,level:c.ratio,touchAt:c.touchAt,decisionAt:decisionBar?.timestamp??c.touchAt,barsWaited:labStep,decisionContext:view.context,contextMode:$('labContext').value,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,actions:[...(previous.actions||[]),{action:decision,step:labStep,at:decisionBar?.timestamp??c.touchAt,context:view.context,recordedAt:new Date().toISOString()}],recordedAt:new Date().toISOString()};saveLabDecisions(all);labRevealed=false;renderLab();
 }
-function loadLabForm(c){const d=labDecisions()[c.id];document.querySelectorAll('[data-lab-tag]').forEach(x=>x.checked=!!d?.tags?.includes(x.dataset.labTag));$('labNote').value=d?.note||'';$('labEntryStyle').value=d?.entryStyle||'reaction-close';$('labTarget').value=d?.targetRatio||(c.ratio===241?'141':c.ratio===200?'141':'100');$('labStop').value=d?.stopRatio||(c.ratio===241?'261':c.ratio===200?'241':'176');$('labTake').classList.toggle('active',d?.decision==='TAKE');$('labSkip').classList.toggle('active',d?.decision==='SKIP')}
+function loadLabForm(c){const d=labDecisions()[c.id];if(labStep===0&&d?.contextMode===$('labContext').value)labStep=d.barsWaited||d.lastObservedStep||0;document.querySelectorAll('[data-lab-tag]').forEach(x=>x.checked=!!d?.tags?.includes(x.dataset.labTag));$('labNote').value=d?.note||'';$('labEntryStyle').value=d?.entryStyle||'reaction-close';$('labTarget').value=d?.targetRatio||(c.ratio===241?'141':c.ratio===200?'141':'100');$('labStop').value=d?.stopRatio||(c.ratio===241?'261':c.ratio===200?'241':'176');$('labTake').classList.toggle('active',d?.decision==='TAKE');$('labSkip').classList.toggle('active',d?.decision==='SKIP')}
 function renderLab(){
 	if(!data||!labMode)return
 	clearOverlays();markersPlugin.setMarkers([])
 	const c=currentLab(),xs=labCandidates();if(!c){$('labStatus').textContent='Нет касаний выбранного уровня';return}
 	loadLabForm(c)
-	const use5=$('labContext').value==='5m'&&data.ltf5m?.length&&c.touchLtfIndex!=null
-	const source=use5?data.ltf5m:data.candles,touchIndex=use5?c.touchLtfIndex:c.touchHtfIndex
-	const end=labRevealed?Math.min(source.length,touchIndex+101):touchIndex+1
+	const view=labSource(c),source=view.source,touchIndex=view.touchIndex
+	const end=labRevealed?Math.min(source.length,touchIndex+101):Math.min(source.length,touchIndex+1+labStep)
 	const shown=source.slice(Math.max(0,touchIndex-220),end)
 	candlesSeries.setData(shown.map(x=>({time:time(x.timestamp),open:x.open,high:x.high,low:x.low,close:x.close})))
 	const first=shown[0],last=shown.at(-1);if(!first||!last)return
@@ -140,15 +147,23 @@ function renderLab(){
 	LightweightCharts.createSeriesMarkers(leg,[{time:Math.max(from,time(c.legStart.timestamp)),position:'inBar',color:C.amber,shape:'circle',size:1,text:'0% START'},{time:Math.max(from,time(c.legEnd.timestamp)),position:'inBar',color:C.blue,shape:'circle',size:1,text:'100% EVENT'}].sort((a,b)=>a.time-b.time))
 	for(const x of c.gridLevels.filter(x=>[0,61.8,78.6,100,141,161,200,241,261].includes(x.ratio))){const key=x.ratio===c.ratio;const s=line([{time:from,value:x.price},{time:to,value:x.price}],{color:key?C.purple:x.ratio>100?'#7059a8':'#49699d',lineWidth:key?3:1,lineStyle:key?LightweightCharts.LineStyle.Solid:LightweightCharts.LineStyle.Dotted});LightweightCharts.createSeriesMarkers(s,[{time:Math.max(from,time(c.touchAt)),position:'inBar',color:key?C.purple:C.dim,shape:'circle',size:0,text:`${x.ratio}% ${fmtP(x.price)}`}])}
 	markersPlugin.setMarkers([{time:time(c.touchAt),position:c.tradeDirection==='long'?'belowBar':'aboveBar',color:C.purple,shape:c.tradeDirection==='long'?'arrowUp':'arrowDown',size:1,text:`DECIDE ${c.ratio}`}])
-	const d=labDecisions()[c.id],done=Object.keys(labDecisions()).length
-	$('labStatus').innerHTML=`${labIndex+1}/${xs.length} · <b>${c.ratio}%</b> · ${c.tradeDirection.toUpperCase()} · ${c.trigger.toUpperCase()} · touch ${c.resolution.toUpperCase()} · ${d?.decision||'НЕ РЕШЕНО'} · всего решений ${done}${labRevealed?' · FUTURE REVEALED':''}`
+	const decisions=labDecisions(),d=decisions[c.id],done=Object.values(decisions).filter(x=>x.decision==='TAKE'||x.decision==='SKIP').length
+	$('labStatus').innerHTML=`${labIndex+1}/${xs.length} · <b>${c.ratio}%</b> · ${c.tradeDirection.toUpperCase()} · ${c.trigger.toUpperCase()} · ${view.context} · после touch +${labStep} свеч. · ${d?.decision||'НЕ РЕШЕНО'} · решений ${done}${labRevealed?' · FUTURE REVEALED':''}`
 	chart.timeScale().fitContent()
 }
-function moveLab(step){const xs=labCandidates();if(!xs.length)return;labIndex=(labIndex+step+xs.length)%xs.length;labRevealed=false;renderLab()}
-function toggleLab(){labMode=!labMode;$('labControls').style.display=labMode?'block':'none';$('labToggle').textContent=labMode?'Выключить':'Включить';$('labToggle').classList.toggle('active',labMode);if(labMode){selectedId=null;labIndex=0;labRevealed=false;renderLab()}else{restoreMainCandles();redraw();chart.timeScale().fitContent()}}
-function revealLab(){const c=currentLab();if(!c)return;if(!labDecisions()[c.id]){alert('Сначала выберите TAKE или SKIP');return}labRevealed=true;renderLab()}
+function moveLab(step){const xs=labCandidates();if(!xs.length)return;labIndex=(labIndex+step+xs.length)%xs.length;labStep=0;labRevealed=false;renderLab()}
+function advanceLab(action){
+	const c=currentLab();if(!c||labRevealed)return
+	const view=labSource(c);if(view.touchIndex+labStep+1>=view.source.length)return
+	labStep++
+	const bar=view.source[view.touchIndex+labStep],all=labDecisions(),previous=all[c.id]||{}
+	all[c.id]={...previous,id:c.id,decision:previous.decision??null,symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,level:c.ratio,touchAt:c.touchAt,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,actions:[...(previous.actions||[]),{action,step:labStep,at:bar?.timestamp??c.touchAt,context:view.context,recordedAt:new Date().toISOString()}],contextMode:$('labContext').value,lastObservedStep:labStep,lastObservedAt:bar?.timestamp??c.touchAt}
+	saveLabDecisions(all);renderLab()
+}
+function toggleLab(){labMode=!labMode;$('labControls').style.display=labMode?'block':'none';$('labToggle').textContent=labMode?'Выключить':'Включить';$('labToggle').classList.toggle('active',labMode);if(labMode){selectedId=null;labIndex=0;labStep=0;labRevealed=false;renderLab()}else{restoreMainCandles();redraw();chart.timeScale().fitContent()}}
+function revealLab(){const c=currentLab();if(!c)return;const d=labDecisions()[c.id];if(d?.decision!=='TAKE'&&d?.decision!=='SKIP'){alert('Сначала выберите TAKE или SKIP');return}labRevealed=true;renderLab()}
 function exportLab(){const blob=new Blob([JSON.stringify(Object.values(labDecisions()),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`decision-lab-${data?.dataset?.symbol?.replace('/','-')||'export'}-${Date.now()}.json`;a.click();URL.revokeObjectURL(a.href)}
-function clearLab(){const c=currentLab();if(!c)return;const all=labDecisions();delete all[c.id];saveLabDecisions(all);labRevealed=false;renderLab()}
+function clearLab(){const c=currentLab();if(!c)return;const all=labDecisions();delete all[c.id];saveLabDecisions(all);labStep=0;labRevealed=false;renderLab()}
 
 function redraw(){if(!data)return;if(labMode){renderLab();return}clearOverlays();renderList();renderEvents();renderProtected();renderMarkers();renderSelected();renderDetail();renderCards()}
 function showTooltip(p){const el=$('tooltip');if(!p.time||!p.point){el.style.display='none';return}const i=data?.candles.findIndex(c=>time(c.timestamp)===p.time);const t=filtered.find(x=>x.entryIndex===i||x.exitIndex===i);if(!t){el.style.display='none';return}el.innerHTML=`<strong>${t.stream.toUpperCase()} ${t.direction.toUpperCase()}</strong>${t.first5Skipped?' <span class="dim">FIRST5 SKIP</span>':''}<br>${t.result} · <span class="${cls(t.netR)}">${fmtR(t.netR)}</span><br><span class="muted">entry ${fmtP(t.entry)} · stop ${fmtP(t.stop)} · take ${fmtP(t.take)} · risk ${t.first5Skipped?'0':`x${t.riskMult}`}</span>${t.bigbarDiagnostic?'<br><span class="amber">BIGBAR diagnostic</span>':''}`;el.style.left=`${Math.min(p.point.x+18,$('chart').clientWidth-350)}px`;el.style.top=`${Math.max(8,p.point.y-45)}px`;el.style.display='block'}
@@ -156,12 +171,12 @@ function status(text){$('loading').style.display=text?'block':'none';$('loading'
 
 async function load(){
 	$('loadBtn').disabled=true;status('Загрузка данных…')
-	try{const symbol=$('symbol').value.trim()||'BTC/USDT',timeframe=document.querySelector('#tfGroup .active')?.dataset.tf||'30m',limit=Number($('limit').value)||5000,source=$('source').value;const q=new URLSearchParams({symbol,timeframe,limit:String(limit),source});const r=await fetch(`/api/analyze?${q}`),json=await r.json();if(json.error)throw new Error(json.error);data=json;selectedId=null;labMode=false;labRevealed=false;$('labControls').style.display='none';$('labToggle').textContent='Включить';$('labToggle').classList.remove('active');initChart();candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})));$('version').textContent=data.strategy.version;$('dataset').textContent=`${data.dataset.symbol} · ${data.dataset.timeframe} · ${data.dataset.candleCount} свечей · ${data.finalTrend}`;redraw();const latest=getFiltered().find(t=>!t.first5Skipped)||getFiltered()[0];if(latest)selectTrade(latest.id);else chart.timeScale().fitContent();status('')}catch(e){status(`Ошибка: ${e.message}`)}finally{$('loadBtn').disabled=false}}
+	try{const symbol=$('symbol').value.trim()||'BTC/USDT',timeframe=document.querySelector('#tfGroup .active')?.dataset.tf||'30m',limit=Number($('limit').value)||5000,source=$('source').value;const q=new URLSearchParams({symbol,timeframe,limit:String(limit),source});const r=await fetch(`/api/analyze?${q}`),json=await r.json();if(json.error)throw new Error(json.error);data=json;selectedId=null;labMode=false;labStep=0;labRevealed=false;$('labControls').style.display='none';$('labToggle').textContent='Включить';$('labToggle').classList.remove('active');initChart();candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})));$('version').textContent=data.strategy.version;$('dataset').textContent=`${data.dataset.symbol} · ${data.dataset.timeframe} · ${data.dataset.candleCount} свечей · ${data.finalTrend}`;redraw();const latest=getFiltered().find(t=>!t.first5Skipped)||getFiltered()[0];if(latest)selectTrade(latest.id);else chart.timeScale().fitContent();status('')}catch(e){status(`Ошибка: ${e.message}`)}finally{$('loadBtn').disabled=false}}
 async function loadSymbols(){try{const r=await fetch('/api/symbols'),x=await r.json();if(x.symbols)$('symbolsList').innerHTML=x.symbols.map(s=>`<option value="${s}">`).join('')}catch{}}
 
 $('loadBtn').onclick=load;$('symbol').onkeydown=e=>{if(e.key==='Enter')load()};document.querySelectorAll('#tfGroup button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tfGroup button').forEach(x=>x.classList.remove('active'));b.classList.add('active');load()})
 for(const id of['fStream','fDirection','fResult','fTrigger','bigbarOnly','showSkipped','showEvents','showProtected'])$(id).onchange=()=>{selectedId=null;redraw()}
 $('prevBtn').onclick=()=>navigate(-1);$('nextBtn').onclick=()=>navigate(1)
-$('labToggle').onclick=toggleLab;$('labPrev').onclick=()=>moveLab(-1);$('labNext').onclick=()=>moveLab(1);$('labTake').onclick=()=>applyLabDecision('TAKE');$('labSkip').onclick=()=>applyLabDecision('SKIP');$('labReveal').onclick=revealLab;$('labExport').onclick=exportLab;$('labClear').onclick=clearLab;$('labLevel').onchange=()=>{labIndex=0;labRevealed=false;renderLab()};$('labContext').onchange=()=>{labRevealed=false;renderLab()}
+$('labToggle').onclick=toggleLab;$('labPrev').onclick=()=>moveLab(-1);$('labNext').onclick=()=>moveLab(1);$('labStep').onclick=()=>advanceLab('STEP');$('labWait').onclick=()=>advanceLab('WAIT');$('labTake').onclick=()=>applyLabDecision('TAKE');$('labSkip').onclick=()=>applyLabDecision('SKIP');$('labReveal').onclick=revealLab;$('labExport').onclick=exportLab;$('labClear').onclick=clearLab;$('labLevel').onchange=()=>{labIndex=0;labStep=0;labRevealed=false;renderLab()};$('labContext').onchange=()=>{labStep=0;labRevealed=false;renderLab()}
 document.addEventListener('keydown',e=>{if(labMode){if(e.key==='ArrowLeft')moveLab(-1);if(e.key==='ArrowRight')moveLab(1);return}if(e.key==='ArrowUp')navigate(-1);if(e.key==='ArrowDown')navigate(1)})
 initChart();loadSymbols();load()

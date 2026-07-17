@@ -55,11 +55,11 @@
 			<section class="section" id="labPanel">
 				<div class="section-title"><span>141 / 200 / 241 Decision Lab</span><button class="labbtn" id="labToggle">Включить</button></div>
 				<div id="labControls" style="display:none">
-					<div class="filters"><select id="labLevel"><option value="all">Все уровни</option><option value="141">141</option><option value="200">200</option><option value="241">241</option></select><select id="labContext"><option value="htf">Текущий HTF</option><option value="5m">5m контекст</option></select></div>
+					<div class="filters"><select id="labLevel"><option value="all">Все уровни</option><option value="141">141</option><option value="200">200</option><option value="241">241</option></select><select id="labContext"><option value="htf">Текущий HTF</option><option value="15m">15m контекст</option><option value="5m">5m контекст</option></select></div>
 					<div class="filters" style="margin-top:7px"><select id="labEntryStyle"><option value="reaction-close">Вход: close встречной свечи</option><option value="touch">Вход: touch уровня</option><option value="manual">Вход: вручную/другое</option></select><select id="labTarget"><option value="78.6">TP 78.6</option><option value="100">TP 100</option><option value="141" selected>TP 141</option><option value="200">TP 200</option><option value="manual">TP вручную</option></select></div>
 					<div class="filters" style="margin-top:7px"><select id="labStop"><option value="161">SL 161</option><option value="176">SL 176</option><option value="200">SL 200</option><option value="241">SL 241</option><option value="261">SL 261</option><option value="300">SL 300</option><option value="manual">SL вручную</option></select><span></span></div>
 					<div class="lab-status" id="labStatus">—</div>
-					<div class="lab-actions"><button class="labbtn" id="labPrev">←</button><button class="labbtn" id="labNext">→</button><button class="labbtn take" id="labTake">TAKE</button><button class="labbtn skip" id="labSkip">SKIP</button><button class="labbtn reveal" id="labReveal">REVEAL</button></div>
+					<div class="lab-actions"><button class="labbtn" id="labPrev">←</button><button class="labbtn" id="labNext">→</button><button class="labbtn" id="labStep">STEP +1</button><button class="labbtn" id="labWait">WAIT</button><button class="labbtn take" id="labTake">TAKE</button><button class="labbtn skip" id="labSkip">SKIP</button><button class="labbtn reveal" id="labReveal">REVEAL</button></div>
 					<div class="tag-grid">
 						<label class="check"><input type="checkbox" data-lab-tag="opposite-candle">встречная свеча</label><label class="check"><input type="checkbox" data-lab-tag="stopping">остановка</label>
 						<label class="check"><input type="checkbox" data-lab-tag="liquidity-sweep">снятие ликвидности</label><label class="check"><input type="checkbox" data-lab-tag="strong-zone">сильная зона</label>
@@ -67,7 +67,7 @@
 					</div>
 					<textarea class="lab-note" id="labNote" placeholder="Что увидели до входа…"></textarea>
 					<div class="lab-actions" style="margin-top:7px"><button class="labbtn" id="labExport">Экспорт JSON</button><button class="labbtn" id="labClear">Очистить решение</button></div>
-					<div class="notice">Сначала TAKE/SKIP, потом REVEAL. Решения хранятся локально в браузере.</div>
+					<div class="notice">WAIT/STEP открывают по одной закрытой свече без показа всего исхода. TAKE/SKIP фиксируют момент решения; только потом REVEAL.</div>
 				</div>
 			</section>
 			<section class="section"><div class="section-title trade-head"><span>Сделки</span><button class="navbtn" id="prevBtn">↑</button><button class="navbtn" id="nextBtn">↓</button><span class="count" id="count"></span></div><div class="trade-list" id="tradeList"></div></section>

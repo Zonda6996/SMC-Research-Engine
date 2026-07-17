@@ -2685,13 +2685,16 @@ trigger, oppositeSweptBefore, Fib-якорями и уровнями.
 
 UI-режим Decision Lab:
 
-- будущее после touch скрыто; контекст HTF или 5m;
+- будущее после touch скрыто; контекст HTF / 15m / 5m;
+- WAIT/STEP+1 открывают ровно одну следующую закрытую свечу, не весь исход;
 - пользователь обязан сохранить TAKE/SKIP до REVEAL;
+- экспорт хранит полный action trail (WAIT/STEP/TAKE/SKIP), число свечей
+  ожидания, timestamp и ТФ фактического решения;
 - выбор entry style (touch / close встречной свечи / manual), target ratio
   и stop ratio; для 241 default TP141/SL261;
 - теги: opposite candle, stopping, liquidity sweep, strong zone,
   oversold, trend context + свободная заметка;
-- решения хранятся локально (`smc-141-decisions-v1`) и экспортируются JSON;
+- решения хранятся локально (`smc-141-decisions-v2`) и экспортируются JSON;
 - уровни 141/200/241 рассматриваются отдельно, без навязанного entry/stop.
 
 Цель — собрать минимум 100–200 решений и проверить, отделяет ли реальное

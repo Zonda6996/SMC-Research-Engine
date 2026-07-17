@@ -29,7 +29,7 @@ it('Decision Lab falls back to HTF when LTF history starts after setup', () => {
 		}] },
 	} as unknown as ReturnType<typeof runAnalysis>
 
-	const result = buildReactionCandidates(snapshot, ltfTooLate, 900_000)
+	const result = buildReactionCandidates(snapshot, ltfTooLate, [], 900_000)
 	const level141 = result.find((x) => x.ratio === 141)
 	assert.ok(level141)
 	assert.equal(level141.touchAt, 900_000)

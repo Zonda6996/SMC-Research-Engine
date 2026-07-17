@@ -24,7 +24,7 @@ import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
-import { fetchCandlesPaginated, MAX_CANDLES, TF_MS } from '../shared/candleFetcher.js'
+import { aggregateCandles, fetchCandlesPaginated, MAX_CANDLES, TF_MS } from '../shared/candleFetcher.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PUBLIC_DIR = join(__dirname, 'public')
@@ -176,6 +176,7 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>, ltf5m: import('..
 export function buildReactionCandidates(
 	snapshot: ReturnType<typeof runAnalysis>,
 	ltf5m: import('../../src/models/price/Candle.js').Candle[] | null,
+	ltf15m: import('../../src/models/price/Candle.js').Candle[],
 	htfMs: number,
 ) {
 	const result: Record<string, unknown>[] = []
@@ -205,6 +206,7 @@ export function buildReactionCandidates(
 				? snapshot.candles.findIndex((c) => touch.timestamp >= c.timestamp && touch.timestamp < c.timestamp + htfMs)
 				: touchIndex
 			if (touchHtfIndex < 0) continue
+			const touch15mIndex = ltf15m.findIndex((c) => touch.timestamp >= c.timestamp && touch.timestamp < c.timestamp + TF_MS['15m']!)
 			result.push({
 				id: `${candidate.id}|${mode}|${ratio}|${touch.timestamp}`,
 				candidateId: candidate.id, ratio, levelPrice: price,
@@ -213,6 +215,7 @@ export function buildReactionCandidates(
 				trigger: candidate.trigger, oppositeSweptBefore: candidate.oppositeSweptBefore,
 				createdAt: created.timestamp, touchAt: touch.timestamp,
 				touchHtfIndex, touchLtfIndex: ltfCoversSetup ? touchIndex : null,
+				touch15mIndex: touch15mIndex >= 0 ? touch15mIndex : null,
 				resolution: ltfCoversSetup ? '5m' : 'htf',
 				legStart: { timestamp: variant.start.timestamp, price: variant.start.price },
 				legEnd: { timestamp: candidate.end.timestamp, price: candidate.end.price },
@@ -269,6 +272,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			if (!htfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
 			const ltf5m = useFixture ? null : await fetchCandlesPaginated(symbol, '5m',
 				Math.min(MAX_CANDLES, Math.ceil(limit * htfMs / TF_MS['5m']!)), market)
+			const ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
 
 			sendJson(res, 200, {
 				strategy: {
@@ -281,7 +285,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				dataset: { symbol, timeframe, limit, candleCount: candles.length, source: useFixture ? 'fixture' : 'fresh' },
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
-				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, htfMs),
+				ltf15m,
+				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs),
 				structure: snapshot.structure,
 				trendHistory: snapshot.market.trendHistory,
 				finalTrend: snapshot.market.trend,
