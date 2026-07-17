@@ -4,9 +4,12 @@ let selectedId = null
 let filtered = []
 let labMode = false
 let labIndex = 0
-let labStep = 0
+let labCursorAt = 0
 let labRevealed = false
-const LAB_KEY = 'smc-141-decisions-v2'
+let labOrder = []
+let labStartedAt = 0
+const LAB_KEY = 'smc-141-decisions-v4'
+const LAB_TF_MS={"5m":300000,"15m":900000,"30m":1800000,"45m":2700000,"1h":3600000,"2h":7200000,"3h":10800000,"4h":14400000}
 
 const C={green:'#35c59a',red:'#ff6675',amber:'#ffbd5b',blue:'#5b8cff',purple:'#a98bff',dim:'#8290a8',text:'#e5eaf2',grid:'#171f2e'}
 const $=(id)=>document.getElementById(id)
@@ -116,67 +119,96 @@ function navigate(step){if(!filtered.length)return;let i=filtered.findIndex(x=>x
 
 function labDecisions(){try{return JSON.parse(localStorage.getItem(LAB_KEY)||'{}')}catch{return{}}}
 function saveLabDecisions(x){localStorage.setItem(LAB_KEY,JSON.stringify(x))}
-function labCandidates(){if(!data?.reactionCandidates)return[];const level=$('labLevel')?.value||'all';return data.reactionCandidates.filter(x=>level==='all'||String(x.ratio)===level)}
-function currentLab(){const xs=labCandidates();if(!xs.length)return null;labIndex=Math.max(0,Math.min(labIndex,xs.length-1));return xs[labIndex]}
-function restoreMainCandles(){candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})))}
 function labTags(){return [...document.querySelectorAll('[data-lab-tag]:checked')].map(x=>x.dataset.labTag)}
-function labSource(c){
-	const wanted=$('labContext').value
-	if(wanted==='5m'&&data.ltf5m?.length&&c.touchLtfIndex!=null)return{source:data.ltf5m,touchIndex:c.touchLtfIndex,context:'5m'}
-	if(wanted==='15m'&&data.ltf15m?.length&&c.touch15mIndex!=null)return{source:data.ltf15m,touchIndex:c.touch15mIndex,context:'15m'}
-	return{source:data.candles,touchIndex:c.touchHtfIndex,context:data.dataset.timeframe}
+function seedHash(text){let h=2166136261;for(const c of text){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function seededRandom(seed){let x=seedHash(seed);return()=>{x+=0x6D2B79F5;let t=x;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function baseLabCandidates(){
+	if(!data?.reactionCandidates)return[]
+	const level=$('labLevel')?.value||'all',exact=$('labExact')?.checked
+	return data.reactionCandidates.filter(x=>(level==='all'||String(x.ratio)===level)&&(!exact||x.resolution==='5m'))
 }
+function rebuildLabOrder(){
+	const base=baseLabCandidates(),rand=seededRandom(`${$('labSeed').value}|${data?.dataset?.symbol}|${data?.dataset?.timeframe}|${$('labLevel').value}`)
+	labOrder=base.map(x=>x.id)
+	if($('labRandom').checked)for(let i=labOrder.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[labOrder[i],labOrder[j]]=[labOrder[j],labOrder[i]]}
+	labIndex=0;setLabCursor(currentLab())
+}
+function labCandidates(){const map=new Map((data?.reactionCandidates||[]).map(x=>[x.id,x]));return labOrder.map(id=>map.get(id)).filter(Boolean)}
+function currentLab(){const xs=labCandidates();if(!xs.length)return null;labIndex=Math.max(0,Math.min(labIndex,xs.length-1));return xs[labIndex]}
+function setLabCursor(c){if(!c){labCursorAt=0;return}const d=labDecisions()[c.id];labCursorAt=d?.replayCursorAt||c.touchAt+LAB_TF_MS['5m'];labRevealed=false;labStartedAt=Date.now()}
+function aggregateKnown(base,tf,cursor){
+	const ms=LAB_TF_MS[tf],known=base.filter(c=>c.timestamp<cursor)
+	if(tf==='5m')return known
+	const groups=new Map()
+	for(const c of known){const bucket=Math.floor(c.timestamp/ms)*ms;(groups.get(bucket)||groups.set(bucket,[]).get(bucket)).push(c)}
+	return[...groups.entries()].sort((a,b)=>a[0]-b[0]).map(([timestamp,g])=>({timestamp,open:g[0].open,high:Math.max(...g.map(x=>x.high)),low:Math.min(...g.map(x=>x.low)),close:g.at(-1).close,volume:g.reduce((s,x)=>s+x.volume,0),partial:g.at(-1).timestamp+LAB_TF_MS['5m']<timestamp+ms}))
+}
+function labView(c,reveal=false){
+	const tf=$('labContext').value
+	if(c.resolution==='5m'&&data.ltf5m?.length){
+		const cursor=reveal?Math.min(data.ltf5m.at(-1).timestamp+LAB_TF_MS['5m'],c.touchAt+101*LAB_TF_MS['5m']):labCursorAt
+		const source=aggregateKnown(data.ltf5m,tf,cursor)
+		const ms=LAB_TF_MS[tf],touchIndex=source.findIndex(x=>c.touchAt>=x.timestamp&&c.touchAt<x.timestamp+ms)
+		return{source,touchIndex,context:tf,cursor}
+	}
+	const source=data.candles.slice(0,reveal?Math.min(data.candles.length,c.touchHtfIndex+101):c.touchHtfIndex+1)
+	return{source,touchIndex:c.touchHtfIndex,context:data.dataset.timeframe,cursor:c.touchAt}
+}
+function levelPrice(c,ratio){const z=c.gridLevels.find(x=>x.ratio===Number(ratio));if(z)return z.price;const p0=c.gridLevels.find(x=>x.ratio===0)?.price,p100=c.gridLevels.find(x=>x.ratio===100)?.price;return p0==null||p100==null?null:p0+(Number(ratio)/100)*(p100-p0)}
+function simulateLabOutcome(c,d){
+	if(!data.ltf5m?.length||d.entryStyle==='manual'||d.targetRatio==='manual'||d.stopRatio==='manual')return null
+	const direction=c.tradeDirection,long=direction==='long',entry=d.entryStyle==='touch'?c.levelPrice:d.decisionPrice,stop=levelPrice(c,d.stopRatio),target=levelPrice(c,d.targetRatio)
+	if(entry==null||stop==null||target==null||(long?(stop>=entry||target<=entry):(stop<=entry||target>=entry)))return{status:'invalid-geometry'}
+	const risk=Math.abs(entry-stop),startAt=d.entryStyle==='touch'?c.touchAt:d.decisionAt,start=data.ltf5m.findIndex(x=>x.timestamp>=startAt)
+	if(start<0)return{status:'no-data'}
+	for(let i=start;i<data.ltf5m.length;i++){const x=data.ltf5m[i],hitStop=long?x.low<=stop:x.high>=stop,hitTp=long?x.high>=target:x.low<=target;if(hitStop)return{status:'stop',grossR:-1,entry,stop,target,exitAt:x.timestamp,bars:i-start};if(hitTp)return{status:'tp',grossR:Math.abs(target-entry)/risk,entry,stop,target,exitAt:x.timestamp,bars:i-start}}
+	return{status:'open',entry,stop,target}
+}
+function labSource(c){return labView(c,false)}
 function applyLabDecision(decision){
-	const c=currentLab();if(!c)return
-	const view=labSource(c),decisionBar=view.source[Math.min(view.source.length-1,view.touchIndex+labStep)]
-	const all=labDecisions(),previous=all[c.id]||{};all[c.id]={...previous,id:c.id,decision,entryStyle:$('labEntryStyle').value,targetRatio:$('labTarget').value,stopRatio:$('labStop').value,tags:labTags(),note:$('labNote').value.trim(),symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,level:c.ratio,touchAt:c.touchAt,decisionAt:decisionBar?.timestamp??c.touchAt,barsWaited:labStep,decisionContext:view.context,contextMode:$('labContext').value,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,actions:[...(previous.actions||[]),{action:decision,step:labStep,at:decisionBar?.timestamp??c.touchAt,context:view.context,recordedAt:new Date().toISOString()}],recordedAt:new Date().toISOString()};saveLabDecisions(all);labRevealed=false;renderLab();
+	const c=currentLab();if(!c||labRevealed)return
+	const view=labView(c,false),decisionBar=view.source.at(-1),all=labDecisions(),previous=all[c.id]||{},now=new Date().toISOString()
+	all[c.id]={...previous,id:c.id,decision,entryStyle:$('labEntryStyle').value,targetRatio:$('labTarget').value,stopRatio:$('labStop').value,tags:labTags(),note:$('labNote').value.trim(),symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,level:c.ratio,touchAt:c.touchAt,decisionAt:view.cursor,decisionPrice:decisionBar?.close??c.levelPrice,barsWaited5m:Math.max(0,Math.round((view.cursor-(c.touchAt+LAB_TF_MS['5m']))/LAB_TF_MS['5m'])),decisionContext:view.context,contextMode:$('labContext').value,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,replayCursorAt:view.cursor,decisionDurationMs:Date.now()-labStartedAt,actions:[...(previous.actions||[]),{action:decision,cursorAt:view.cursor,context:view.context,recordedAt:now}],recordedAt:now};saveLabDecisions(all);renderLab()
 }
-function loadLabForm(c){const d=labDecisions()[c.id];if(labStep===0&&d?.contextMode===$('labContext').value)labStep=d.barsWaited||d.lastObservedStep||0;document.querySelectorAll('[data-lab-tag]').forEach(x=>x.checked=!!d?.tags?.includes(x.dataset.labTag));$('labNote').value=d?.note||'';$('labEntryStyle').value=d?.entryStyle||'reaction-close';$('labTarget').value=d?.targetRatio||(c.ratio===241?'141':c.ratio===200?'141':'100');$('labStop').value=d?.stopRatio||(c.ratio===241?'261':c.ratio===200?'241':'176');$('labTake').classList.toggle('active',d?.decision==='TAKE');$('labSkip').classList.toggle('active',d?.decision==='SKIP')}
+function loadLabForm(c){const d=labDecisions()[c.id];document.querySelectorAll('[data-lab-tag]').forEach(x=>x.checked=!!d?.tags?.includes(x.dataset.labTag));$('labNote').value=d?.note||'';$('labEntryStyle').value=d?.entryStyle||'reaction-close';$('labTarget').value=d?.targetRatio||(c.ratio===241?'141':c.ratio===200?'141':'100');$('labStop').value=d?.stopRatio||(c.ratio===241?'261':c.ratio===200?'241':'176');$('labTake').classList.toggle('active',d?.decision==='TAKE');$('labSkip').classList.toggle('active',d?.decision==='SKIP')}
+function renderLabAnalytics(){const ds=Object.values(labDecisions()),final=ds.filter(x=>x.decision==='TAKE'||x.decision==='SKIP'),takes=final.filter(x=>x.decision==='TAKE'),resolved=takes.filter(x=>x.outcome?.grossR!=null),avg=resolved.length?resolved.reduce((s,x)=>s+x.outcome.grossR,0)/resolved.length:0;$('labAnalytics').textContent=`TAKE ${takes.length} · SKIP ${final.length-takes.length} · resolved ${resolved.length} · TAKE avg ${fmtR(avg)}`}
 function renderLab(){
 	if(!data||!labMode)return
 	clearOverlays();markersPlugin.setMarkers([])
-	const c=currentLab(),xs=labCandidates();if(!c){$('labStatus').textContent='Нет касаний выбранного уровня';return}
-	loadLabForm(c)
-	const view=labSource(c),source=view.source,touchIndex=view.touchIndex
-	const end=labRevealed?Math.min(source.length,touchIndex+101):Math.min(source.length,touchIndex+1+labStep)
-	const shown=source.slice(Math.max(0,touchIndex-220),end)
+	const c=currentLab(),xs=labCandidates();if(!c){$('labStatus').textContent='Нет exact-LTF касаний по фильтру';return}
+	loadLabForm(c);document.body.classList.toggle('lab-blind',$('labBlind').checked&&!labRevealed);chart.applyOptions({timeScale:{visible:!$('labBlind').checked||labRevealed},rightPriceScale:{visible:!$('labBlind').checked||labRevealed}})
+	const view=labView(c,labRevealed),source=view.source,touchIndex=view.touchIndex,left=Number($('labHistory').value)||250
+	const shown=source.slice(Math.max(0,touchIndex-left),source.length)
 	candlesSeries.setData(shown.map(x=>({time:time(x.timestamp),open:x.open,high:x.high,low:x.low,close:x.close})))
 	const first=shown[0],last=shown.at(-1);if(!first||!last)return
-	const from=time(first.timestamp),to=time(last.timestamp)
+	const from=time(first.timestamp),to=time(last.timestamp),blind=$('labBlind').checked&&!labRevealed
 	const leg=line([{time:Math.max(from,time(c.legStart.timestamp)),value:c.legStart.price},{time:Math.max(from,time(c.legEnd.timestamp)),value:c.legEnd.price}].sort((a,b)=>a.time-b.time),{color:C.amber,lineWidth:3,lineStyle:LightweightCharts.LineStyle.Dashed})
 	LightweightCharts.createSeriesMarkers(leg,[{time:Math.max(from,time(c.legStart.timestamp)),position:'inBar',color:C.amber,shape:'circle',size:1,text:'0% START'},{time:Math.max(from,time(c.legEnd.timestamp)),position:'inBar',color:C.blue,shape:'circle',size:1,text:'100% EVENT'}].sort((a,b)=>a.time-b.time))
-	for(const x of c.gridLevels.filter(x=>[0,61.8,78.6,100,141,161,200,241,261].includes(x.ratio))){const key=x.ratio===c.ratio;const s=line([{time:from,value:x.price},{time:to,value:x.price}],{color:key?C.purple:x.ratio>100?'#7059a8':'#49699d',lineWidth:key?3:1,lineStyle:key?LightweightCharts.LineStyle.Solid:LightweightCharts.LineStyle.Dotted});LightweightCharts.createSeriesMarkers(s,[{time:Math.max(from,time(c.touchAt)),position:'inBar',color:key?C.purple:C.dim,shape:'circle',size:0,text:`${x.ratio}% ${fmtP(x.price)}`}])}
+	for(const x of c.gridLevels.filter(x=>[0,61.8,78.6,100,141,161,200,241,261].includes(x.ratio))){const key=x.ratio===c.ratio,s=line([{time:from,value:x.price},{time:to,value:x.price}],{color:key?C.purple:x.ratio>100?'#7059a8':'#49699d',lineWidth:key?3:1,lineStyle:key?LightweightCharts.LineStyle.Solid:LightweightCharts.LineStyle.Dotted});LightweightCharts.createSeriesMarkers(s,[{time:Math.max(from,time(c.touchAt)),position:'inBar',color:key?C.purple:C.dim,shape:'circle',size:0,text:blind?`${x.ratio}%`:`${x.ratio}% ${fmtP(x.price)}`}])}
 	markersPlugin.setMarkers([{time:time(c.touchAt),position:c.tradeDirection==='long'?'belowBar':'aboveBar',color:C.purple,shape:c.tradeDirection==='long'?'arrowUp':'arrowDown',size:1,text:`DECIDE ${c.ratio}`}])
-	const decisions=labDecisions(),d=decisions[c.id],done=Object.values(decisions).filter(x=>x.decision==='TAKE'||x.decision==='SKIP').length
-	$('labStatus').innerHTML=`${labIndex+1}/${xs.length} · <b>${c.ratio}%</b> · ${c.tradeDirection.toUpperCase()} · ${c.trigger.toUpperCase()} · ${view.context} · после touch +${labStep} свеч. · ${d?.decision||'НЕ РЕШЕНО'} · решений ${done}${labRevealed?' · FUTURE REVEALED':''}`
-	chart.timeScale().fitContent()
+	const decisions=labDecisions(),d=decisions[c.id],done=Object.values(decisions).filter(x=>x.decision==='TAKE'||x.decision==='SKIP').length,wait=Math.max(0,Math.round((view.cursor-(c.touchAt+LAB_TF_MS['5m']))/LAB_TF_MS['5m']))
+	$('labStatus').innerHTML=`${labIndex+1}/${xs.length} · <b>${c.ratio}%</b> · ${c.tradeDirection.toUpperCase()} · ${view.context} · +${wait}×5m · ${d?.decision||'НЕ РЕШЕНО'} · решений ${done}${labRevealed?' · REVEALED':''}`
+	renderLabAnalytics();chart.timeScale().fitContent()
 }
-function moveLab(step){const xs=labCandidates();if(!xs.length)return;labIndex=(labIndex+step+xs.length)%xs.length;labStep=0;labRevealed=false;renderLab()}
-function advanceLab(action){
-	const c=currentLab();if(!c||labRevealed)return
-	const view=labSource(c);if(view.touchIndex+labStep+1>=view.source.length)return
-	labStep++
-	const bar=view.source[view.touchIndex+labStep],all=labDecisions(),previous=all[c.id]||{}
-	all[c.id]={...previous,id:c.id,decision:previous.decision??null,symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,level:c.ratio,touchAt:c.touchAt,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,actions:[...(previous.actions||[]),{action,step:labStep,at:bar?.timestamp??c.touchAt,context:view.context,recordedAt:new Date().toISOString()}],contextMode:$('labContext').value,lastObservedStep:labStep,lastObservedAt:bar?.timestamp??c.touchAt}
-	saveLabDecisions(all);renderLab()
-}
-function toggleLab(){labMode=!labMode;$('labControls').style.display=labMode?'block':'none';$('labToggle').textContent=labMode?'Выключить':'Включить';$('labToggle').classList.toggle('active',labMode);if(labMode){selectedId=null;labIndex=0;labStep=0;labRevealed=false;renderLab()}else{restoreMainCandles();redraw();chart.timeScale().fitContent()}}
-function revealLab(){const c=currentLab();if(!c)return;const d=labDecisions()[c.id];if(d?.decision!=='TAKE'&&d?.decision!=='SKIP'){alert('Сначала выберите TAKE или SKIP');return}labRevealed=true;renderLab()}
-function exportLab(){const blob=new Blob([JSON.stringify(Object.values(labDecisions()),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`decision-lab-${data?.dataset?.symbol?.replace('/','-')||'export'}-${Date.now()}.json`;a.click();URL.revokeObjectURL(a.href)}
-function clearLab(){const c=currentLab();if(!c)return;const all=labDecisions();delete all[c.id];saveLabDecisions(all);labStep=0;labRevealed=false;renderLab()}
+function moveLab(step){const xs=labCandidates();if(!xs.length)return;labIndex=(labIndex+step+xs.length)%xs.length;setLabCursor(currentLab());renderLab()}
+function advanceLab(action){const c=currentLab();if(!c||labRevealed||c.resolution!=='5m')return;const max=data.ltf5m.at(-1).timestamp+LAB_TF_MS['5m'];if(labCursorAt+LAB_TF_MS['5m']>max)return;labCursorAt+=LAB_TF_MS['5m'];const all=labDecisions(),previous=all[c.id]||{},now=new Date().toISOString();all[c.id]={...previous,id:c.id,decision:previous.decision??null,symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,level:c.ratio,touchAt:c.touchAt,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,actions:[...(previous.actions||[]),{action,cursorAt:labCursorAt,context:$('labContext').value,recordedAt:now}],replayCursorAt:labCursorAt,lastObservedAt:labCursorAt};saveLabDecisions(all);renderLab()}
+function toggleLab(){labMode=!labMode;$('labControls').style.display=labMode?'block':'none';$('labToggle').textContent=labMode?'Выключить':'Включить';$('labToggle').classList.toggle('active',labMode);if(labMode){selectedId=null;rebuildLabOrder();setLabCursor(currentLab());renderLab()}else{document.body.classList.remove('lab-blind');chart.applyOptions({timeScale:{visible:true},rightPriceScale:{visible:true}});restoreMainCandles();redraw();chart.timeScale().fitContent()}}
+function revealLab(){const c=currentLab();if(!c)return;const all=labDecisions(),d=all[c.id];if(d?.decision!=='TAKE'&&d?.decision!=='SKIP'){alert('Сначала выберите TAKE или SKIP');return}labRevealed=true;all[c.id]={...d,outcome:simulateLabOutcome(c,d),actions:[...(d.actions||[]),{action:'REVEAL',cursorAt:labCursorAt,context:$('labContext').value,recordedAt:new Date().toISOString()}]};saveLabDecisions(all);renderLab()}
+function exportLab(){const blob=new Blob([JSON.stringify(Object.values(labDecisions()),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`decision-lab-session-${Date.now()}.json`;a.click();URL.revokeObjectURL(a.href)}
+function clearLab(){const c=currentLab();if(!c)return;const all=labDecisions();delete all[c.id];saveLabDecisions(all);setLabCursor(c);renderLab()}
 
 function redraw(){if(!data)return;if(labMode){renderLab();return}clearOverlays();renderList();renderEvents();renderProtected();renderMarkers();renderSelected();renderDetail();renderCards()}
-function showTooltip(p){const el=$('tooltip');if(!p.time||!p.point){el.style.display='none';return}const i=data?.candles.findIndex(c=>time(c.timestamp)===p.time);const t=filtered.find(x=>x.entryIndex===i||x.exitIndex===i);if(!t){el.style.display='none';return}el.innerHTML=`<strong>${t.stream.toUpperCase()} ${t.direction.toUpperCase()}</strong>${t.first5Skipped?' <span class="dim">FIRST5 SKIP</span>':''}<br>${t.result} · <span class="${cls(t.netR)}">${fmtR(t.netR)}</span><br><span class="muted">entry ${fmtP(t.entry)} · stop ${fmtP(t.stop)} · take ${fmtP(t.take)} · risk ${t.first5Skipped?'0':`x${t.riskMult}`}</span>${t.bigbarDiagnostic?'<br><span class="amber">BIGBAR diagnostic</span>':''}`;el.style.left=`${Math.min(p.point.x+18,$('chart').clientWidth-350)}px`;el.style.top=`${Math.max(8,p.point.y-45)}px`;el.style.display='block'}
+function showTooltip(p){const el=$('tooltip');if(labMode){el.style.display='none';return}if(!p.time||!p.point){el.style.display='none';return}const i=data?.candles.findIndex(c=>time(c.timestamp)===p.time);const t=filtered.find(x=>x.entryIndex===i||x.exitIndex===i);if(!t){el.style.display='none';return}el.innerHTML=`<strong>${t.stream.toUpperCase()} ${t.direction.toUpperCase()}</strong>${t.first5Skipped?' <span class="dim">FIRST5 SKIP</span>':''}<br>${t.result} · <span class="${cls(t.netR)}">${fmtR(t.netR)}</span><br><span class="muted">entry ${fmtP(t.entry)} · stop ${fmtP(t.stop)} · take ${fmtP(t.take)} · risk ${t.first5Skipped?'0':`x${t.riskMult}`}</span>${t.bigbarDiagnostic?'<br><span class="amber">BIGBAR diagnostic</span>':''}`;el.style.left=`${Math.min(p.point.x+18,$('chart').clientWidth-350)}px`;el.style.top=`${Math.max(8,p.point.y-45)}px`;el.style.display='block'}
 function status(text){$('loading').style.display=text?'block':'none';$('loading').textContent=text||''}
 
 async function load(){
 	$('loadBtn').disabled=true;status('Загрузка данных…')
-	try{const symbol=$('symbol').value.trim()||'BTC/USDT',timeframe=document.querySelector('#tfGroup .active')?.dataset.tf||'30m',limit=Number($('limit').value)||5000,source=$('source').value;const q=new URLSearchParams({symbol,timeframe,limit:String(limit),source});const r=await fetch(`/api/analyze?${q}`),json=await r.json();if(json.error)throw new Error(json.error);data=json;selectedId=null;labMode=false;labStep=0;labRevealed=false;$('labControls').style.display='none';$('labToggle').textContent='Включить';$('labToggle').classList.remove('active');initChart();candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})));$('version').textContent=data.strategy.version;$('dataset').textContent=`${data.dataset.symbol} · ${data.dataset.timeframe} · ${data.dataset.candleCount} свечей · ${data.finalTrend}`;redraw();const latest=getFiltered().find(t=>!t.first5Skipped)||getFiltered()[0];if(latest)selectTrade(latest.id);else chart.timeScale().fitContent();status('')}catch(e){status(`Ошибка: ${e.message}`)}finally{$('loadBtn').disabled=false}}
+	try{const symbol=$('symbol').value.trim()||'BTC/USDT',timeframe=document.querySelector('#tfGroup .active')?.dataset.tf||'30m',limit=Number($('limit').value)||5000,source=$('source').value;const q=new URLSearchParams({symbol,timeframe,limit:String(limit),source});const r=await fetch(`/api/analyze?${q}`),json=await r.json();if(json.error)throw new Error(json.error);data=json;selectedId=null;labMode=false;labOrder=[];labCursorAt=0;labRevealed=false;$('labControls').style.display='none';$('labToggle').textContent='Включить';$('labToggle').classList.remove('active');initChart();candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})));$('version').textContent=data.strategy.version;$('dataset').textContent=`${data.dataset.symbol} · ${data.dataset.timeframe} · ${data.dataset.candleCount} свечей · ${data.finalTrend}`;redraw();const latest=getFiltered().find(t=>!t.first5Skipped)||getFiltered()[0];if(latest)selectTrade(latest.id);else chart.timeScale().fitContent();status('')}catch(e){status(`Ошибка: ${e.message}`)}finally{$('loadBtn').disabled=false}}
 async function loadSymbols(){try{const r=await fetch('/api/symbols'),x=await r.json();if(x.symbols)$('symbolsList').innerHTML=x.symbols.map(s=>`<option value="${s}">`).join('')}catch{}}
 
 $('loadBtn').onclick=load;$('symbol').onkeydown=e=>{if(e.key==='Enter')load()};document.querySelectorAll('#tfGroup button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tfGroup button').forEach(x=>x.classList.remove('active'));b.classList.add('active');load()})
 for(const id of['fStream','fDirection','fResult','fTrigger','bigbarOnly','showSkipped','showEvents','showProtected'])$(id).onchange=()=>{selectedId=null;redraw()}
 $('prevBtn').onclick=()=>navigate(-1);$('nextBtn').onclick=()=>navigate(1)
-$('labToggle').onclick=toggleLab;$('labPrev').onclick=()=>moveLab(-1);$('labNext').onclick=()=>moveLab(1);$('labStep').onclick=()=>advanceLab('STEP');$('labWait').onclick=()=>advanceLab('WAIT');$('labTake').onclick=()=>applyLabDecision('TAKE');$('labSkip').onclick=()=>applyLabDecision('SKIP');$('labReveal').onclick=revealLab;$('labExport').onclick=exportLab;$('labClear').onclick=clearLab;$('labLevel').onchange=()=>{labIndex=0;labStep=0;labRevealed=false;renderLab()};$('labContext').onchange=()=>{labStep=0;labRevealed=false;renderLab()}
+$('labToggle').onclick=toggleLab;$('labShuffle').onclick=()=>{rebuildLabOrder();renderLab()};$('labPrev').onclick=()=>moveLab(-1);$('labNext').onclick=()=>moveLab(1);$('labStep').onclick=()=>advanceLab('STEP');$('labWait').onclick=()=>advanceLab('WAIT');$('labTake').onclick=()=>applyLabDecision('TAKE');$('labSkip').onclick=()=>applyLabDecision('SKIP');$('labReveal').onclick=revealLab;$('labExport').onclick=exportLab;$('labClear').onclick=clearLab;for(const id of['labLevel','labRandom','labExact'])$(id).onchange=()=>{rebuildLabOrder();renderLab()};$('labSeed').onchange=()=>{rebuildLabOrder();renderLab()};for(const id of['labContext','labHistory','labBlind'])$(id).onchange=renderLab
 document.addEventListener('keydown',e=>{if(labMode){if(e.key==='ArrowLeft')moveLab(-1);if(e.key==='ArrowRight')moveLab(1);return}if(e.key==='ArrowUp')navigate(-1);if(e.key==='ArrowDown')navigate(1)})
 initChart();loadSymbols();load()

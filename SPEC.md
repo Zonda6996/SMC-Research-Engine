@@ -2694,7 +2694,7 @@ UI-режим Decision Lab:
   и stop ratio; для 241 default TP141/SL261;
 - теги: opposite candle, stopping, liquidity sweep, strong zone,
   oversold, trend context + свободная заметка;
-- решения хранятся локально (`smc-141-decisions-v2`) и экспортируются JSON;
+- решения хранятся локально (`smc-141-decisions-v4`) и экспортируются JSON;
 - уровни 141/200/241 рассматриваются отдельно, без навязанного entry/stop.
 
 Цель — собрать минимум 100–200 решений и проверить, отделяет ли реальное
@@ -2709,6 +2709,36 @@ Fix после визуального smoke: 5m-история API короче 
 80k. Теперь LTF используется только если покрывает `knownAt` сетки;
 иначе first touch ищется по полной HTF-истории и помечается `resolution=htf`.
 Кандидаты сортируются от новых к старым. Regression test закрепляет кейс.
+
+Decision Lab v2 превращён в синхронный replay simulator:
+
+- exact-LTF кандидаты перемешиваются seeded random-очередью;
+- optional blind mode скрывает symbol/date/price scale до reveal;
+- история слева 100/250/500/1000 свечей;
+- любой контекст 5m/15m/30m/45m/1h/2h/3h/4h агрегируется из одного 5m
+  потока и обрезается единым `replayCursorAt` — переключение TF не
+  раскрывает будущее;
+- WAIT/STEP двигают cursor ровно на 5m и пишутся в action trail;
+- TAKE/SKIP сохраняют decision time/price/context/duration/tags;
+- REVEAL рассчитывает gross outcome по выбранным entry/SL/TP (touch или
+  reaction-close), сохраняет TP/SL/open, R и bars;
+- локальная аналитика показывает TAKE/SKIP/resolved/TAKE avgR.
+
+## 7.53 Аудит приватного Telegram signal bot (ИНСТРУМЕНТ ГОТОВ)
+
+`tools/review/analyzeTelegramSignals.ts` парсит Telegram HTML без внешних
+зависимостей и независимо разрешает каждый заявленный entry/SL/TP по
+Binance futures 5m (stop-first при конфликте). Команда:
+`npm run review-telegram -- messages.html`; `--parse-only` проверяет экспорт
+без Binance.
+
+По приложенному HTML: 230 сигналов за 2026-06-08→07-17, 167 long / 63
+short, 34 актива; confidence median 78, только 20 (8.7%) ≥85, хотя позднее
+автор рекомендует смотреть 85+; stop median 2.46%, 39 стопов >3.5%, 20
+>5%; RR практически константа 3.0. В канале опубликованы только 2 явных
+TP-закрытия и 0 явных SL, поэтому по самому Telegram невозможно честно
+посчитать WR/EV — присутствует сильный reporting/survivorship risk.
+Независимый market replay обязателен до заимствования confidence-фич.
 
 ## 12. Как работа��ь в этом проекте (методология, а не только код)
 
