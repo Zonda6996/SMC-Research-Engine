@@ -2543,6 +2543,37 @@ shadow/next-bar/risk0, benchmarks 0.184/0.138/0.022. Forward journal
 `/api/analyze` возвращает `strategy.version`, benchmarks и статусы
 bigbar/mirror, чтобы UI явно показывал используемую модель.
 
+## 7.49 LTF Execution Audit (КОД ГОТОВ, ЖДЁТ ПОЛНЫЙ ПРОГОН)
+
+`tools/batch/runExecutionAudit.ts` (`npm run execution-audit`) — отдельный
+измерительный runner для двух потерь SPEC 7.47. Загружается до 60k свечей
+5m на символ (~208 дней), а 15m/30m/1h агрегируются из одного LTF-ряда —
+временные окна совпадают по построению.
+
+Блок mirror ordering классифицирует только наблюдаемый порядок после OTE:
+
+- `same-htf-valid` — 100 коснулись в более поздней 5m-свече того же HTF-бара;
+- `next-htf` — fill 100 произошёл в следующем HTF-баре или позже;
+- `ambiguousSameLtf` — 78.6 и 100 внутри одной 5m-свечи, порядок неизвестен
+  и сделка НЕ считается доказанным mirror;
+- `mirrorPreFill100` — 100 касались до OTE fill: источник phantom mirror
+  старого полного HTF OHLC;
+- `missed/open` — заявка не вошла/не разрешилась.
+
+Mirror replay начинается строго с LTF-бара ПОСЛЕ OTE touch-LTF. CSV несёт
+класс, fill time, netR и результат; TXT — H1/H2, TF и symbol-разрезы.
+
+Bigbar-блок не вводит фильтр. Для каждой canon-сделки сохраняются только
+признаки из ЗАКРЫТЫХ LTF-свечей до touch-LTF: время touch внутри HTF-бара,
+body последней свечи/ATR, net move и total range последних трёх свечей,
+доля adverse-свечей и дистанция до entry на последнем close. TXT печатает
+квартильные бакеты с avgR/H1/H2 и долей будущих bigbar; это discovery,
+не production-rule. Любой найденный порог требует отдельного OOS-теста.
+
+Результаты: `execution-audit-*.txt/.csv`. Fixture проходит как smoke;
+полный Binance-прогон в sandbox недоступен из-за HTTP 451 и выполняется
+локально пользователем.
+
 ## 12. Как работа��ь в этом проекте (методология, а не только код)
 
 - Любое утверждение "это работает правильно" — подтверждать `tsc --noEmit` и тестом

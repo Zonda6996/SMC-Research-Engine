@@ -11,7 +11,8 @@
 		"batch": "tsx tools/batch/runBatch.ts",
 		"forward": "tsx tools/forward/forwardRunner.ts",
 		"portfolio": "tsx tools/batch/runBatch.ts --portfolio",
-		"multitf": "tsx tools/batch/runMultiTf.ts"
+		"multitf": "tsx tools/batch/runMultiTf.ts",
+		"execution-audit": "tsx tools/batch/runExecutionAudit.ts"
 	},
 	"keywords": [],
 	"author": "",
