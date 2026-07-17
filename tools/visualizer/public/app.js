@@ -141,7 +141,7 @@ function renderLab(){
 	for(const x of c.gridLevels.filter(x=>[0,61.8,78.6,100,141,161,200,241,261].includes(x.ratio))){const key=x.ratio===c.ratio;const s=line([{time:from,value:x.price},{time:to,value:x.price}],{color:key?C.purple:x.ratio>100?'#7059a8':'#49699d',lineWidth:key?3:1,lineStyle:key?LightweightCharts.LineStyle.Solid:LightweightCharts.LineStyle.Dotted});LightweightCharts.createSeriesMarkers(s,[{time:Math.max(from,time(c.touchAt)),position:'inBar',color:key?C.purple:C.dim,shape:'circle',size:0,text:`${x.ratio}% ${fmtP(x.price)}`}])}
 	markersPlugin.setMarkers([{time:time(c.touchAt),position:c.tradeDirection==='long'?'belowBar':'aboveBar',color:C.purple,shape:c.tradeDirection==='long'?'arrowUp':'arrowDown',size:1,text:`DECIDE ${c.ratio}`}])
 	const d=labDecisions()[c.id],done=Object.keys(labDecisions()).length
-	$('labStatus').innerHTML=`${labIndex+1}/${xs.length} · <b>${c.ratio}%</b> · ${c.tradeDirection.toUpperCase()} · ${c.trigger.toUpperCase()} · ${d?.decision||'НЕ РЕШЕНО'} · всего решений ${done}${labRevealed?' · FUTURE REVEALED':''}`
+	$('labStatus').innerHTML=`${labIndex+1}/${xs.length} · <b>${c.ratio}%</b> · ${c.tradeDirection.toUpperCase()} · ${c.trigger.toUpperCase()} · touch ${c.resolution.toUpperCase()} · ${d?.decision||'НЕ РЕШЕНО'} · всего решений ${done}${labRevealed?' · FUTURE REVEALED':''}`
 	chart.timeScale().fitContent()
 }
 function moveLab(step){const xs=labCandidates();if(!xs.length)return;labIndex=(labIndex+step+xs.length)%xs.length;labRevealed=false;renderLab()}

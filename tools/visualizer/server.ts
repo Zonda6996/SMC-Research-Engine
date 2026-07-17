@@ -19,7 +19,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join, extname } from 'node:path'
+import { dirname, join, extname, resolve } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
@@ -173,12 +173,11 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>, ltf5m: import('..
 }
 
 /** Кандидаты ручного Decision Lab: только факт первого касания 141/200/241. */
-function buildReactionCandidates(
+export function buildReactionCandidates(
 	snapshot: ReturnType<typeof runAnalysis>,
 	ltf5m: import('../../src/models/price/Candle.js').Candle[] | null,
 	htfMs: number,
 ) {
-	const source = ltf5m ?? snapshot.candles
 	const result: Record<string, unknown>[] = []
 	for (const candidate of snapshot.fib.candidates) {
 		const mode = candidate.variants.local ? 'local' : candidate.variants.global ? 'global' : null
@@ -190,13 +189,21 @@ function buildReactionCandidates(
 		const created = snapshot.candles[candidate.createdAtIndex]
 		if (p0 == null || p100 == null || !created) continue
 		const knownAt = created.timestamp + htfMs
+		// LTF можно использовать только если его история покрывает сам момент
+		// создания сетки. Иначе первый доступный 5m-бар ошибочно выглядел бы
+		// «первым касанием» уровня, который цена прошла задолго до LTF-окна.
+		const ltfCoversSetup = ltf5m != null && ltf5m.length > 0 &&
+			ltf5m[0]!.timestamp <= knownAt && ltf5m[ltf5m.length - 1]!.timestamp >= knownAt
+		const source = ltfCoversSetup ? ltf5m : snapshot.candles
 		for (const ratio of [141, 200, 241] as const) {
 			const price = gridLevelPrice(p0, p100, ratio)
 			const touchIndex = source.findIndex((c) => c.timestamp >= knownAt &&
 				(candidate.direction === 'long' ? c.high >= price : c.low <= price))
 			if (touchIndex < 0) continue
 			const touch = source[touchIndex]!
-			const touchHtfIndex = snapshot.candles.findIndex((c) => touch.timestamp >= c.timestamp && touch.timestamp < c.timestamp + htfMs)
+			const touchHtfIndex = ltfCoversSetup
+				? snapshot.candles.findIndex((c) => touch.timestamp >= c.timestamp && touch.timestamp < c.timestamp + htfMs)
+				: touchIndex
 			if (touchHtfIndex < 0) continue
 			result.push({
 				id: `${candidate.id}|${mode}|${ratio}|${touch.timestamp}`,
@@ -205,14 +212,15 @@ function buildReactionCandidates(
 				tradeDirection: candidate.direction === 'long' ? 'short' : 'long',
 				trigger: candidate.trigger, oppositeSweptBefore: candidate.oppositeSweptBefore,
 				createdAt: created.timestamp, touchAt: touch.timestamp,
-				touchHtfIndex, touchLtfIndex: ltf5m ? touchIndex : null,
+				touchHtfIndex, touchLtfIndex: ltfCoversSetup ? touchIndex : null,
+				resolution: ltfCoversSetup ? '5m' : 'htf',
 				legStart: { timestamp: variant.start.timestamp, price: variant.start.price },
 				legEnd: { timestamp: candidate.end.timestamp, price: candidate.end.price },
 				gridLevels: variant.levels.map((x) => ({ ratio: x.ratio, price: x.price })),
 			})
 		}
 	}
-	return result
+	return result.sort((a, b) => Number(b.touchAt) - Number(a.touchAt))
 }
 
 /** Protected-уровни: только активные из snapshot — без старых пробников. */
@@ -311,6 +319,9 @@ server.on('error', (err: NodeJS.ErrnoException) => {
 	process.exit(1)
 })
 
-server.listen(PORT, () => {
-	console.log(`\n  Fib Playbook visualizer → http://localhost:${PORT}\n`)
-})
+const isMain = process.argv[1] != null && resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+if (isMain) {
+	server.listen(PORT, () => {
+		console.log(`\n  Fib Playbook visualizer → http://localhost:${PORT}\n`)
+	})
+}
