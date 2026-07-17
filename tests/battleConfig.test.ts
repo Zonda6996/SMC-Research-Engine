@@ -6,7 +6,7 @@
 
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../src/strategy/battleConfig.js'
+import { BATTLE_CONFIG, RESEARCH_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../src/strategy/battleConfig.js'
 
 describe('BATTLE_CONFIG geometry', () => {
 	it('canon: stop below entry below take (trend direction, ratio space)', () => {
@@ -16,29 +16,19 @@ describe('BATTLE_CONFIG geometry', () => {
 		}
 	})
 
-	it('reverse: stop beyond entry, take below entry (counter-trend)', () => {
-		for (const s of BATTLE_CONFIG.reverse) {
-			assert.ok(s.stop > s.entry, `${s.stream}: stop ${s.stop} > entry ${s.entry}`)
-			assert.ok(s.take < s.entry, `${s.stream}: take ${s.take} < entry ${s.entry}`)
-			assert.equal(s.take, 78.6, `${s.stream}: take is the magnet zone 78.6`)
-		}
-	})
-
-	it('executable cells and statuses match SPEC 7.47', () => {
+	it('executable cells and first-5 gate match SPEC 7.50', () => {
 		const deep = BATTLE_CONFIG.canon.find((s) => s.scenario === 'deep')!
 		const ote = BATTLE_CONFIG.canon.find((s) => s.scenario === 'ote')!
 		assert.deepEqual([deep.entry, deep.stop, deep.take], [38.2, 15, 61.8])
 		assert.deepEqual([ote.entry, ote.stop, ote.take], [78.6, 61.8, 100])
 		assert.equal(ote.timeStopBars, 20)
 		assert.equal(deep.timeStopBars, null)
-		const mirror = BATTLE_CONFIG.reverse[0]!
-		assert.deepEqual([mirror.entry, mirror.stop, mirror.take], [100, 120, 78.6])
-		assert.equal(mirror.mode, 'shadow')
-		assert.equal(mirror.activation, 'next-bar')
-		assert.equal(BATTLE_CONFIG.reverse.length, 1)
+		assert.equal(BATTLE_CONFIG.reverse.length, 0)
+		assert.deepEqual(BATTLE_CONFIG.entryGate, { timeframe: '5m', skipFirstBars: 1, cancelOnSkippedTouch: true })
 		assert.equal(BATTLE_CONFIG.bigbarFilter, false)
 		assert.equal(BATTLE_CONFIG.bigbarDiagnostic, true)
-		assert.deepEqual(BATTLE_CONFIG.benchmarks, { deep: 0.184, ote: 0.138, mirrorShadow: 0.022 })
+		assert.deepEqual(BATTLE_CONFIG.benchmarks, { deep: 0.246, ote: 0.193 })
+		assert.deepEqual(RESEARCH_CONFIG.mirrorProbe, { entry: 100, stop: 120, take: 78.6, cancelBeyond: 0 })
 	})
 })
 

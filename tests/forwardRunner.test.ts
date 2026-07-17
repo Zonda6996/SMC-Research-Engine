@@ -8,6 +8,7 @@ import {
 	buildCausalMedianByCandidate,
 	buildForwardReport,
 	createRunnerState,
+	firstLtfTouch,
 	processWindow,
 	type SignalEvent,
 } from '../tools/forward/forwardRunner.js'
@@ -27,7 +28,7 @@ function event(partial: Partial<SignalEvent> & Pick<SignalEvent, 'type' | 'id' |
 	}
 }
 
-describe('forward runner v2', () => {
+describe('forward runner v4', () => {
 	it('causal median uses each candidate once and excludes current candidate', () => {
 		const medians = buildCausalMedianByCandidate([
 			outcome('a', 10, 4, 'ote'),
@@ -72,15 +73,16 @@ describe('forward runner v2', () => {
 		assert.equal(written.length, first.length)
 		assert.ok(!('swingPool' in state))
 
-		// Mirror нельзя заполнить на OTE entry-баре: setup создаётся после
-		// OTE fill и активен только со следующего бара.
-		const signals = new Map(first.filter((e) => e.type === 'signal').map((e) => [e.orderId, e]))
-		const mirrorSignals = first.filter((e) => e.type === 'signal' && e.stream === 'mirror')
-		assert.ok(mirrorSignals.length > 0)
-		for (const mirror of mirrorSignals) {
-			const parent = signals.get(mirror.orderId.replace(/\|mirror$/, ''))
-			assert.ok(parent)
-			assert.ok(Date.parse(mirror.at) > Date.parse(parent.at))
-		}
+		assert.equal(first.some((e) => e.stream === 'mirror'), false)
+	})
+
+	it('first-5 gate identifies only the first LTF touch as skipped', () => {
+		const ltf: Candle[] = [
+			{ timestamp: 0, open: 110, high: 111, low: 99, close: 100, volume: 1 },
+			{ timestamp: 300_000, open: 100, high: 102, low: 98, close: 101, volume: 1 },
+		]
+		assert.deepEqual(firstLtfTouch(ltf, 0, 900_000, true, 100), { offset: 0, at: 0 })
+		const later = firstLtfTouch([{ ...ltf[0]!, low: 101 }, ltf[1]!], 0, 900_000, true, 100)
+		assert.deepEqual(later, { offset: 1, at: 300_000 })
 	})
 })

@@ -2574,6 +2574,43 @@ body последней свечи/ATR, net move и total range последни
 полный Binance-прогон в sandbox недоступен из-за HTTP 451 и выполняется
 локально пользователем.
 
+## 7.50 First-5 gate + lifecycle probes (КОД ГОТОВ)
+
+Два независимых 60k×5m окна (~208 дней каждое) подтвердили единое правило:
+не входить при touch в первой 5m-свече каждого 15m/30m/1h-бара.
+
+Discovery 2025-12-21→2026-07-17: early n 2753, −410.3R, avg −0.149;
+after gate +1377.0R против baseline +966.7R (+42%).
+OOS 2025-05-27→2025-12-20: early n 2956, −554.3R, avg −0.188;
+after gate +1608.5R против +1054.2R (+52.6%).
+В OOS early-touch отрицателен на 14/14 монет, deep/ote, всех 3 ТФ и
+H1/H2. Вместе: totalR +47.7%, avgR ~x2 при −29% сделок.
+
+`BATTLE_CONFIG.entryGate = 5m / skipFirstBars=1 / cancelOnSkippedTouch`.
+Benchmarks после gate на двух окнах: deep ~0.246, ote ~0.193. Reverse
+потоков в battleConfig больше нет.
+
+Forward v4 (`battle-7.50-first5-v4`) получает последние 500 свечей 5m
+на символ, работает циклом 5m и перед fill проверяет первый LTF-touch
+внутри HTF-бара. offset=0 → `cancel:first-5-touch`, сделка не входит в
+clean forward. Без LTF-доказательства fill остаётся catch-up. Mirror
+полностью удалён из forward.
+
+Visualizer получает 5m-окно, показывает `FIRST5 SKIP` как counterfactual
+с risk=0 и исключает его из боевых карточек по умолчанию.
+
+Тем же `execution-audit` одним прогоном исследуются, но НЕ включаются в бой:
+
+1. `fadeAfterMirrorStop`: после наблюдаемого stop mirror@120, со следующего
+   LTF-бара limit141/stop176/take78.6; pending отменяется возвратом к 100.
+2. `oteCycleAfterDoubleTp`: после TP canon и TP mirror со следующего LTF-бара
+   одна попытка 78.6/61.8/100, cancel0, OTE time-stop пересчитан в LTF-бары.
+3. Sizing stack пересчитывается на first-5-kept пуле с causal median.
+
+Same-LTF stop→141 и mirror-TP→re-entry помечаются ambiguous и не входят в
+результат. Для решения нужны оба уже закэшированных окна: current и
+`--until 2025-12-21`.
+
 ## 12. Как работа��ь в этом проекте (методология, а не только код)
 
 - Любое утверждение "это работает правильно" — подтверждать `tsc --noEmit` и тестом

@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { BINGX_MAKER_RATE, BINGX_SLIP_RATE, BINGX_TAKER_RATE } from '../../src/core/analysis/entryModels.js'
 import { fillCostR } from '../../src/core/analysis/takeLadders.js'
-import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice, reverseRiskMultiplier } from '../../src/strategy/battleConfig.js'
+import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { fetchCandlesPaginated, TF_MS } from '../shared/candleFetcher.js'
 import type { FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
 import type { Candle } from '../../src/models/price/Candle.js'
@@ -27,7 +27,7 @@ const STATE_PATH = join(DATA_DIR, 'state.json')
 const JOURNAL_PATH = join(DATA_DIR, 'signals.jsonl')
 const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
 
-export const FORWARD_VERSION = 'battle-7.47-canon-v3'
+export const FORWARD_VERSION = 'battle-7.50-first5-v4'
 const SYMBOLS = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'XRP/USDT', 'BNB/USDT', 'DOGE/USDT', 'ADA/USDT',
 	'AVAX/USDT', 'LINK/USDT', 'SUI/USDT', 'TON/USDT', 'NEAR/USDT', 'APT/USDT', 'LTC/USDT']
 const TIMEFRAMES = ['15m', '30m', '1h']
@@ -72,7 +72,7 @@ export interface SignalEvent {
 	suggestedRiskMult?: number
 	/** true только если заявка и нужный размер существовали до fill. */
 	forwardEligible?: boolean
-	reason?: 'price-invalidated' | 'opposite-event' | 'bigbar-before-touch'
+	reason?: 'price-invalidated' | 'opposite-event' | 'bigbar-before-touch' | 'first-5-touch'
 	result?: 'tp' | 'stop' | 'timestop'
 	netR?: number
 	holdBars?: number
@@ -221,6 +221,23 @@ function eventTime(candles: Candle[], index: number): string {
 	return new Date(candles[index]!.timestamp).toISOString()
 }
 
+/** Первый 5m touch внутри HTF-бара. null = LTF-окно не покрывает бар. */
+export function firstLtfTouch(
+	ltf: Candle[] | null,
+	htfOpen: number,
+	htfMs: number,
+	long: boolean,
+	entry: number,
+): { offset: number; at: number } | null {
+	if (!ltf) return null
+	const bars = ltf.filter((c) => c.timestamp >= htfOpen && c.timestamp < htfOpen + htfMs)
+	for (let i = 0; i < bars.length; i++) {
+		const c = bars[i]!
+		if (long ? c.low <= entry : c.high >= entry) return { offset: i, at: c.timestamp }
+	}
+	return null
+}
+
 /**
  * Один детерминированный replay symbol|tf. writeEvent отделён для тестов.
  */
@@ -231,6 +248,7 @@ export function processWindow(
 	candles: Candle[],
 	writeEvent: (event: SignalEvent) => void = (event) => appendFileSync(JOURNAL_PATH, JSON.stringify(event) + '\n'),
 	now: () => string = () => new Date().toISOString(),
+	ltfCandles: Candle[] | null = null,
 ): SignalEvent[] {
 	const emittedBeforeCycle = new Set(state.emitted)
 	const emitted = new Set(state.emitted)
@@ -334,9 +352,21 @@ export function processWindow(
 		const freshBars = entryIndex - created
 		const riskMult = canonRiskMultiplier(freshBars, outcome.legAtrRatio, med)
 		const requiredRevision = riskRevisionId(orderId, freshBars)
-		const tradeEligible = state.orderEligible[orderId] === true && emittedBeforeCycle.has(requiredRevision)
-		state.tradeEligible[orderId] = tradeEligible
 		const entry = atL(config.entry), stop = atL(config.stop), take = atL(config.take)
+		const gateTouch = firstLtfTouch(ltfCandles, candles[entryIndex]!.timestamp, tfMs, long, entry)
+		if (gateTouch?.offset === 0) {
+			state.tradeEligible[orderId] = false
+			emit({
+				type: 'cancel', id: `cancel|${orderId}`, orderId, at: new Date(gateTouch.at).toISOString(),
+				symbol, timeframe, stream, direction: outcome.direction,
+				entry, stop, take, riskMult: 0, reason: 'first-5-touch', forwardEligible: false,
+			})
+			continue
+		}
+		// Без LTF-доказательства fill остаётся catch-up и не входит в clean forward.
+		const gatePassed = gateTouch != null && gateTouch.offset >= BATTLE_CONFIG.entryGate.skipFirstBars
+		const tradeEligible = state.orderEligible[orderId] === true && emittedBeforeCycle.has(requiredRevision) && gatePassed
+		state.tradeEligible[orderId] = tradeEligible
 		emit({
 			type: 'signal', id: `signal|${orderId}`, orderId, at: eventTime(candles, entryIndex),
 			symbol, timeframe, stream, direction: outcome.direction,
@@ -352,56 +382,6 @@ export function processWindow(
 			})
 		}
 
-		if (outcome.scenario !== 'ote') continue
-		const mirror = BATTLE_CONFIG.reverse[0]
-		if (!mirror) continue
-		const mirrorOrderId = `${orderId}|mirror`
-		const mirrorSetupId = `setup|${mirrorOrderId}`
-		const mirrorRisk = reverseRiskMultiplier(freshBars)
-		if (!(mirrorOrderId in state.orderEligible)) state.orderEligible[mirrorOrderId] = tradeEligible
-		// OTE fill узнаётся после закрытия entry-бара; mirror resting order
-		// считается активным со следующего бара. Так мы не используем high/low,
-		// случившиеся раньше OTE fill внутри той же свечи.
-		emit({
-			type: 'setup', id: mirrorSetupId, orderId: mirrorOrderId,
-			at: new Date(candles[entryIndex]!.timestamp + tfMs).toISOString(),
-			symbol, timeframe, stream: 'mirror', direction: long ? 'short' : 'long',
-			entry: atL(mirror.entry), stop: atL(mirror.stop), take: atL(mirror.take), riskMult: 0,
-			shadow: true, suggestedRiskMult: mirrorRisk,
-			forwardEligible: state.orderEligible[mirrorOrderId] === true,
-		})
-		const reverseLong = !long
-		const mirrorResult = replayTrade(candles, entryIndex + 1, reverseLong,
-			atL(mirror.entry), atL(mirror.stop), atL(mirror.take), atL(mirror.cancelBeyond), null)
-		if (mirrorResult.status === 'cancelled') {
-			if (mirrorResult.cancelIndex != null) emit({
-				type: 'cancel', id: `cancel|${mirrorOrderId}`, orderId: mirrorOrderId,
-				at: eventTime(candles, mirrorResult.cancelIndex), symbol, timeframe, stream: 'mirror',
-				direction: reverseLong ? 'long' : 'short', entry: atL(mirror.entry), stop: atL(mirror.stop),
-				take: atL(mirror.take), riskMult: 0, reason: 'price-invalidated', shadow: true,
-				forwardEligible: state.orderEligible[mirrorOrderId] === true,
-			})
-			continue
-		}
-		if (mirrorResult.status === 'pending') continue
-		const mirrorEligible = state.orderEligible[mirrorOrderId] === true && emittedBeforeCycle.has(mirrorSetupId)
-		state.tradeEligible[mirrorOrderId] = mirrorEligible
-		emit({
-			type: 'signal', id: `signal|${mirrorOrderId}`, orderId: mirrorOrderId,
-			at: eventTime(candles, mirrorResult.fillIndex), symbol, timeframe, stream: 'mirror',
-			direction: reverseLong ? 'long' : 'short', entry: atL(mirror.entry), stop: atL(mirror.stop),
-			take: atL(mirror.take), riskMult: 0, shadow: true, suggestedRiskMult: mirrorRisk, forwardEligible: mirrorEligible,
-		})
-		if (mirrorResult.status === 'done') {
-			emit({
-				type: 'outcome', id: `outcome|${mirrorOrderId}`, orderId: mirrorOrderId,
-				at: eventTime(candles, mirrorResult.exitIndex), symbol, timeframe, stream: 'mirror',
-				direction: reverseLong ? 'long' : 'short', entry: atL(mirror.entry), stop: atL(mirror.stop),
-				take: atL(mirror.take), riskMult: 0, shadow: true, suggestedRiskMult: mirrorRisk, forwardEligible: mirrorEligible,
-				result: mirrorResult.result, netR: Number(mirrorResult.netR.toFixed(3)),
-				holdBars: mirrorResult.exitIndex - mirrorResult.fillIndex,
-			})
-		}
 	}
 	return output
 }
@@ -462,13 +442,6 @@ function printStreamStats(pool: SignalEvent[]): void {
 	}
 }
 
-function printShadowStats(pool: SignalEvent[]): void {
-	if (pool.length === 0) { console.log('  пока нет закрытых shadow-сделок'); return }
-	const total = pool.reduce((sum, e) => sum + (e.netR ?? 0), 0)
-	const wins = pool.filter((e) => (e.netR ?? 0) > 0).length
-	console.log(`  mirror n=${pool.length} | total=${total.toFixed(1)}R | avg=${(total / pool.length).toFixed(3)}R (бенч. ${BATTLE_CONFIG.benchmarks.mirrorShadow.toFixed(3)}) | WR=${(100 * wins / pool.length).toFixed(1)}% | risk=0`)
-}
-
 function printReport(): void {
 	const state = loadState()
 	const events = readJournal()
@@ -478,12 +451,10 @@ function printReport(): void {
 	console.log(`старт:  ${state.firstRunAt}`)
 	console.log(`работает: ${durationText(state.firstRunAt)}`)
 	console.log(`ожидают входа: ${report.pendingOrders.length} | открытых позиций: ${report.openTrades.length}`)
-	console.log(`боевых закрытых: ${report.forwardOutcomes.length} | shadow mirror: ${report.shadowOutcomes.length} | backfill: ${report.backfillOutcomes.length + report.shadowBackfill.length}`)
+	console.log(`боевых закрытых: ${report.forwardOutcomes.length} | backfill: ${report.backfillOutcomes.length}`)
 	console.log('\n=== ЧИСТЫЙ БОЕВОЙ FORWARD (Deep + OTE) ===')
 	if (report.forwardOutcomes.length === 0) console.log('  пока нет закрытых сделок')
 	else printStreamStats(report.forwardOutcomes)
-	console.log('\n=== SHADOW MIRROR (наблюдение, риск 0) ===')
-	printShadowStats(report.shadowOutcomes)
 	console.log('\n=== BACKFILL / ПРОПУЩЕННЫЕ ПРИ ПРОСТОЕ (не входят в forward) ===')
 	if (report.backfillOutcomes.length === 0) console.log('  нет')
 	else printStreamStats(report.backfillOutcomes)
@@ -512,7 +483,7 @@ async function notifyTelegram(events: SignalEvent[]): Promise<void> {
 			text = `SHADOW ${e.type.toUpperCase()} MIRROR ${arrow}\n${e.symbol} ${e.timeframe}\nentry ${e.entry} / stop ${e.stop} / take ${e.take}` +
 				(e.netR != null ? `\nрезультат ${e.netR.toFixed(2)}R` : '') + '\nНЕ ТОРГОВАТЬ — риск 0'
 		} else switch (e.type) {
-			case 'setup': text = `SETUP ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nлимит ${e.entry}\nстоп ${e.stop}\nтейк ${e.take}\nриск x${e.riskMult}`; break
+			case 'setup': text = `SETUP ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nлимит ${e.entry}\nстоп ${e.stop}\nтейк ${e.take}\nриск x${e.riskMult}\nFIRST-5 GATE: первые 5m каждого ${e.timeframe}-бара заявка выключена`; break
 			case 'amend': text = `AMEND ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nизмени размер заявки: риск x${e.riskMult}`; break
 			case 'cancel': text = `CANCEL ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nсними лимит ${e.entry}\nпричина: ${e.reason}`; break
 			case 'signal': text = `FILL ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nвход ${e.entry}\nстоп ${e.stop}\nтейк ${e.take}\nриск x${e.riskMult}\nforward: ${e.forwardEligible ? 'да' : 'нет (catch-up)'}`; break
@@ -534,13 +505,25 @@ async function cycle(state: RunnerState, fixture: boolean): Promise<void> {
 		const candles = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8')) as Candle[]
 		all.push(...processWindow(state, 'BTC/USDT', '15m', candles))
 	} else {
-		for (const symbol of SYMBOLS) for (const timeframe of TIMEFRAMES) {
+		for (const symbol of SYMBOLS) {
+			let ltf: Candle[]
 			try {
-				const candles = await fetchCandlesPaginated(symbol, timeframe, WINDOW, 'futures')
-				const tfMs = TF_MS[timeframe]!
-				all.push(...processWindow(state, symbol, timeframe, candles.filter((c) => c.timestamp + tfMs <= Date.now())))
+				const ltfMs = TF_MS[BATTLE_CONFIG.entryGate.timeframe]!
+				ltf = (await fetchCandlesPaginated(symbol, BATTLE_CONFIG.entryGate.timeframe, 500, 'futures'))
+					.filter((c) => c.timestamp + ltfMs <= Date.now())
 			} catch (error) {
-				console.error(`[${symbol} ${timeframe}]`, (error as Error).message)
+				console.error(`[${symbol} 5m]`, (error as Error).message)
+				continue
+			}
+			for (const timeframe of TIMEFRAMES) {
+				try {
+					const candles = await fetchCandlesPaginated(symbol, timeframe, WINDOW, 'futures')
+					const tfMs = TF_MS[timeframe]!
+					all.push(...processWindow(state, symbol, timeframe,
+						candles.filter((c) => c.timestamp + tfMs <= Date.now()), undefined, undefined, ltf))
+				} catch (error) {
+					console.error(`[${symbol} ${timeframe}]`, (error as Error).message)
+				}
 			}
 		}
 	}
@@ -560,8 +543,8 @@ async function main(): Promise<void> {
 	const state = loadState()
 	await cycle(state, fixture)
 	if (argv.includes('--once') || fixture) { printReport(); return }
-	const intervalMs = TF_MS['15m']!
-	console.log(`форвард запущен: версия ${FORWARD_VERSION}, ${SYMBOLS.length} монет × ${TIMEFRAMES.join('/')}, цикл 15m`)
+	const intervalMs = TF_MS[BATTLE_CONFIG.entryGate.timeframe]!
+	console.log(`форвард запущен: версия ${FORWARD_VERSION}, ${SYMBOLS.length} монет × ${TIMEFRAMES.join('/')}, цикл 5m, first-5 gate включён`)
 	for (;;) {
 		const now = Date.now()
 		const next = Math.floor(now / intervalMs) * intervalMs + intervalMs + 10_000

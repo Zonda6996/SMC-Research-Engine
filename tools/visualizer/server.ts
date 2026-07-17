@@ -22,9 +22,9 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join, extname } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
-import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice, reverseRiskMultiplier } from '../../src/strategy/battleConfig.js'
-import { buildCausalMedianByCandidate, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
-import { fetchCandlesPaginated } from '../shared/candleFetcher.js'
+import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
+import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
+import { fetchCandlesPaginated, MAX_CANDLES, TF_MS } from '../shared/candleFetcher.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PUBLIC_DIR = join(__dirname, 'public')
@@ -109,7 +109,7 @@ const ENTRY_ZONES: Record<'ote' | 'deep', readonly [number, number]> = {
 	deep: [23.6, 38.2],
 }
 
-function buildTrades(snapshot: ReturnType<typeof runAnalysis>) {
+function buildTrades(snapshot: ReturnType<typeof runAnalysis>, ltf5m: import('../../src/models/price/Candle.js').Candle[] | null, htfMs: number) {
 	const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
 	const seen = new Set<string>()
 	const canonOutcomes = snapshot.fibLifecycle.outcomes
@@ -142,6 +142,8 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>) {
 			at(ENTRY_ZONES[scenario][0]), at(ENTRY_ZONES[scenario][1]))
 		const freshBars = outcome.entryIndex - outcome.createdAtIndex
 		const riskMult = canonRiskMultiplier(freshBars, outcome.legAtrRatio, medians.get(outcome.candidateId) ?? null)
+		const gateTouch = firstLtfTouch(ltf5m, snapshot.candles[outcome.entryIndex]!.timestamp, htfMs, long, entry)
+		const first5Skipped = gateTouch?.offset === 0
 		const id = `${scenario}|${outcome.candidateId}`
 		const exitIndex = replay.status === 'done' ? replay.exitIndex : null
 		const exitPrice = replay.status === 'done'
@@ -154,43 +156,18 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>) {
 			createdAtIndex: outcome.createdAtIndex, entryIndex: replay.fillIndex,
 			exitIndex, entry, stop, take, exitPrice,
 			entryRatio: config.entry, stopRatio: config.stop, takeRatio: config.take,
-			result: replay.status === 'done' ? replay.result : 'open',
+			result: first5Skipped ? 'first5-skip' : replay.status === 'done' ? replay.result : 'open',
+			/** netR остаётся counterfactual для анализа пропущенного среза. */
 			netR: replay.status === 'done' ? replay.netR : null,
 			holdBars: replay.status === 'done' ? replay.exitIndex - replay.fillIndex : null,
-			riskMult: Number(riskMult.toFixed(2)), freshBars,
+			riskMult: first5Skipped ? 0 : Number(riskMult.toFixed(2)), freshBars,
+			first5Skipped, first5TouchAt: gateTouch?.at ?? null,
 			bigbarDiagnostic: bigbar,
 			gridLevels: variant.levels.map((l) => ({ ratio: l.ratio, price: l.price })),
 			legStart: { index: variant.start.index, price: variant.start.price },
 			legEnd: { index: candidate.end.index, price: candidate.end.price },
 		})
 
-		if (scenario !== 'ote') continue
-		const mirror = BATTLE_CONFIG.reverse[0]
-		if (!mirror) continue
-		const mirrorReplay = replayTrade(snapshot.candles, outcome.entryIndex + 1, !long,
-			at(mirror.entry), at(mirror.stop), at(mirror.take), at(mirror.cancelBeyond), null)
-		if (mirrorReplay.status !== 'open' && mirrorReplay.status !== 'done') continue
-		const mirrorExit = mirrorReplay.status === 'done' ? mirrorReplay.exitIndex : null
-		const mirrorExitPrice = mirrorReplay.status === 'done'
-			? mirrorReplay.result === 'stop' ? at(mirror.stop) : at(mirror.take)
-			: null
-		trades.push({
-			id: `${id}|mirror`, parentId: id, candidateId: outcome.candidateId,
-			stream: 'mirror', scenario: 'mirror', shadow: true,
-			direction: long ? 'short' : 'long', trigger: outcome.trigger,
-			createdAtIndex: outcome.entryIndex, entryIndex: mirrorReplay.fillIndex,
-			exitIndex: mirrorExit, entry: at(mirror.entry), stop: at(mirror.stop), take: at(mirror.take),
-			entryRatio: mirror.entry, stopRatio: mirror.stop, takeRatio: mirror.take,
-			exitPrice: mirrorExitPrice,
-			result: mirrorReplay.status === 'done' ? mirrorReplay.result : 'open',
-			netR: mirrorReplay.status === 'done' ? mirrorReplay.netR : null,
-			holdBars: mirrorReplay.status === 'done' ? mirrorReplay.exitIndex - mirrorReplay.fillIndex : null,
-			riskMult: 0, suggestedRiskMult: reverseRiskMultiplier(freshBars), freshBars,
-			bigbarDiagnostic: false,
-			gridLevels: variant.levels.map((l) => ({ ratio: l.ratio, price: l.price })),
-			legStart: { index: variant.start.index, price: variant.start.price },
-			legEnd: { index: candidate.end.index, price: candidate.end.price },
-		})
 	}
 	return trades
 }
@@ -237,13 +214,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				? loadFixtureCandles()
 				: await fetchCandlesPaginated(symbol, timeframe, limit, market)
 			const snapshot = runAnalysis(candles)
+			const htfMs = TF_MS[timeframe]
+			if (!htfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
+			const ltf5m = useFixture ? null : await fetchCandlesPaginated(symbol, '5m',
+				Math.min(MAX_CANDLES, Math.ceil(limit * htfMs / TF_MS['5m']!)), market)
 
 			sendJson(res, 200, {
 				strategy: {
 					version: FORWARD_VERSION,
 					benchmarks: BATTLE_CONFIG.benchmarks,
 					bigbar: 'diagnostic-only',
-					mirror: 'shadow-risk-0',
+					entryGate: BATTLE_CONFIG.entryGate,
+					mirror: 'removed',
 				},
 				dataset: { symbol, timeframe, limit, candleCount: candles.length, source: useFixture ? 'fixture' : 'fresh' },
 				candles: snapshot.candles,
@@ -252,7 +234,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				finalTrend: snapshot.market.trend,
 				events: snapshot.events,
 				protectedSegments: buildProtectedSegments(snapshot),
-				trades: buildTrades(snapshot),
+				trades: buildTrades(snapshot, ltf5m, htfMs),
 			})
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err)

@@ -57,17 +57,22 @@ export const BATTLE_CONFIG = {
 		{ scenario: 'ote', entry: 78.6, stop: 61.8, take: 100, timeStopBars: 20 },
 	] as readonly CanonSetup[],
 
-	/** SPEC 7.47: mirror остаётся только shadow-наблюдением без капитала. */
-	reverse: [
-		{ stream: 'mirror', mode: 'shadow', activation: 'next-bar', entry: 100, stop: 120, take: 78.6, cancelBeyond: 0 },
-	] as readonly ReverseSetup[],
+	/** SPEC 7.49: подтверждённых reverse-потоков больше нет. */
+	reverse: [] as readonly ReverseSetup[],
+
+	/**
+	 * SPEC 7.50: не входить при touch в первой 5m-свече каждого HTF-бара.
+	 * Правило прошло discovery + непересекающийся OOS: totalR +47.7%,
+	 * avgR ~x2. Если первая 5m коснулась entry, setup отработан и отменён.
+	 */
+	entryGate: { timeframe: '5m', skipFirstBars: 1, cancelOnSkippedTouch: true },
 
 	/** Post-hoc bigbar на свече touch неисполним; хранится только как diagnostic label. */
 	bigbarFilter: false,
 	bigbarDiagnostic: true,
 
-	/** Честные ориентиры полного executable-прогона SPEC 7.47. */
-	benchmarks: { deep: 0.184, ote: 0.138, mirrorShadow: 0.022 },
+	/** Benchmarks двух независимых 208-дневных LTF-окон после first-5 gate. */
+	benchmarks: { deep: 0.246, ote: 0.193 },
 
 	/** SPEC 7.35: сайзинг-стек канона. */
 	sizing: {
@@ -95,6 +100,26 @@ export const BATTLE_CONFIG = {
 			{ maxBars: 15, mult: 1.0 },
 			{ maxBars: Number.POSITIVE_INFINITY, mult: 0.7 },
 		],
+	},
+} as const
+
+/**
+ * Исследовательские ветки SPEC 7.50. Они НЕ входят в battle totalR и
+ * не должны использоваться forward-раннером до отдельного OOS-решения.
+ */
+export const RESEARCH_CONFIG = {
+	mirrorProbe: { entry: 100, stop: 120, take: 78.6, cancelBeyond: 0 },
+	fadeAfterMirrorStop: {
+		armAfterMirrorResult: 'stop',
+		entry: 141, stop: 176, take: 78.6,
+		/** Возврат к mirror-entry до fill означает, что вынос уже погашен. */
+		cancelBeyond: 100,
+		activation: 'next-ltf-bar',
+	},
+	oteCycleAfterDoubleTp: {
+		armAfterCanonResult: 'tp', armAfterMirrorResult: 'tp',
+		entry: 78.6, stop: 61.8, take: 100, cancelBeyond: 0,
+		activation: 'next-ltf-bar', maxAttempts: 1,
 	},
 } as const
 

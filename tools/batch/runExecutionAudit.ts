@@ -23,8 +23,8 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
-import { BATTLE_CONFIG, gridLevelPrice } from '../../src/strategy/battleConfig.js'
-import { replayTrade } from '../forward/forwardRunner.js'
+import { BATTLE_CONFIG, RESEARCH_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
+import { buildCausalMedianByCandidate, replayTrade } from '../forward/forwardRunner.js'
 import {
 	aggregateCandles,
 	fetchCandlesPaginated,
@@ -74,12 +74,25 @@ interface AuditRow {
 	last3RangeAtr: number | null
 	last3AdverseShare: number | null
 	distanceBeforeTouchAtr: number | null
+	first5Skipped: boolean
+	freshBars: number
+	swingAtr: number | null
+	medianSwingAtr: number | null
+	riskMult: number
 	mirrorClass: '' | 'same-htf-valid' | 'next-htf' | 'missed' | 'open'
 	mirrorAmbiguousSameLtf: boolean
 	mirrorPreFill100: boolean
 	mirrorFillAt: number | null
 	mirrorNetR: number | null
 	mirrorResult: string
+	fadeAfterStopClass: '' | 'entered' | 'missed' | 'open'
+	fadeAfterStopAmbiguous: boolean
+	fadeAfterStopNetR: number | null
+	fadeAfterStopResult: string
+	oteCycleClass: '' | 'entered' | 'missed' | 'open'
+	oteCycleAmbiguous: boolean
+	oteCycleNetR: number | null
+	oteCycleResult: string
 }
 
 function parseArgs(argv: string[]): Args {
@@ -152,10 +165,12 @@ function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): A
 	const candles = ltfTf === htf ? ltf : aggregateCandles(ltf, ltfTf, htf)
 	const snapshot = runAnalysis(candles)
 	const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
+	const selected = selectedOutcomes(snapshot.fibLifecycle.outcomes)
+	const medians = buildCausalMedianByCandidate(selected)
 	const htfMs = TF_MS[htf]!, groups = bucketLtf(ltf, htfMs)
 	const rows: AuditRow[] = []
 
-	for (const outcome of selectedOutcomes(snapshot.fibLifecycle.outcomes)) {
+	for (const outcome of selected) {
 		if (!outcome.entered || outcome.entryIndex == null) continue
 		const scenario = outcome.scenario as 'deep' | 'ote'
 		const config = BATTLE_CONFIG.canon.find((x) => x.scenario === scenario)
@@ -179,6 +194,9 @@ function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): A
 		const pre = ltf.slice(Math.max(0, touch.index - 3), touch.index)
 		const last = pre.at(-1) ?? null, first = pre[0] ?? null
 		const norm = (x: number): number | null => atr != null && atr > 0 ? x / atr : null
+		const freshBars = outcome.entryIndex - outcome.createdAtIndex
+		const medianSwingAtr = medians.get(outcome.candidateId) ?? null
+		const riskMult = canonRiskMultiplier(freshBars, outcome.legAtrRatio, medianSwingAtr)
 		const row: AuditRow = {
 			symbol, htf, scenario, direction: outcome.direction,
 			entryAt: htfEntryCandle.timestamp, entryIndex: outcome.entryIndex, entryPrice: entry,
@@ -190,12 +208,16 @@ function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): A
 			last3RangeAtr: pre.length ? norm(pre.reduce((s, c) => s + c.high - c.low, 0)) : null,
 			last3AdverseShare: pre.length ? pre.filter((c) => adverseBody(c, long) > 0).length / pre.length : null,
 			distanceBeforeTouchAtr: last ? norm(Math.max(0, distanceToEntry(last.close, entry, long))) : null,
+			first5Skipped: touch.offset < BATTLE_CONFIG.entryGate.skipFirstBars,
+			freshBars, swingAtr: outcome.legAtrRatio, medianSwingAtr, riskMult,
 			mirrorClass: '', mirrorAmbiguousSameLtf: false, mirrorPreFill100: false,
 			mirrorFillAt: null, mirrorNetR: null, mirrorResult: '',
+			fadeAfterStopClass: '', fadeAfterStopAmbiguous: false, fadeAfterStopNetR: null, fadeAfterStopResult: '',
+			oteCycleClass: '', oteCycleAmbiguous: false, oteCycleNetR: null, oteCycleResult: '',
 		}
 
 		if (scenario === 'ote') {
-			const mirror = BATTLE_CONFIG.reverse[0]!
+			const mirror = RESEARCH_CONFIG.mirrorProbe
 			const mEntry = at(mirror.entry), reverseLong = !long
 			row.mirrorPreFill100 = items.slice(0, touch.offset).some((x) => reverseLong ? x.candle.low <= mEntry : x.candle.high >= mEntry)
 			row.mirrorAmbiguousSameLtf = reverseLong ? touch.candle.low <= mEntry : touch.candle.high >= mEntry
@@ -204,8 +226,40 @@ function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): A
 				const fill = ltf[mirrorTrade.fillIndex]!
 				row.mirrorClass = fill.timestamp < htfEntryCandle.timestamp + htfMs ? 'same-htf-valid' : 'next-htf'
 				row.mirrorFillAt = fill.timestamp
-				if (mirrorTrade.status === 'done') { row.mirrorNetR = mirrorTrade.netR; row.mirrorResult = mirrorTrade.result }
-				else row.mirrorClass = 'open'
+				if (mirrorTrade.status === 'done') {
+					row.mirrorNetR = mirrorTrade.netR
+					row.mirrorResult = mirrorTrade.result
+
+					// Fade141 — только ПОСЛЕ наблюдаемого stop mirror@120.
+					if (!row.first5Skipped && mirrorTrade.result === RESEARCH_CONFIG.fadeAfterMirrorStop.armAfterMirrorResult) {
+						const fade = RESEARCH_CONFIG.fadeAfterMirrorStop
+						const stopBar = ltf[mirrorTrade.exitIndex]!
+						const fadeEntry = at(fade.entry)
+						row.fadeAfterStopAmbiguous = reverseLong ? stopBar.low <= fadeEntry : stopBar.high >= fadeEntry
+						const fadeTrade = replayTrade(ltf, mirrorTrade.exitIndex + 1, reverseLong,
+							fadeEntry, at(fade.stop), at(fade.take), at(fade.cancelBeyond), null)
+						if (fadeTrade.status === 'done') {
+							row.fadeAfterStopClass = 'entered'; row.fadeAfterStopNetR = fadeTrade.netR; row.fadeAfterStopResult = fadeTrade.result
+						} else if (fadeTrade.status === 'open') row.fadeAfterStopClass = 'open'
+						else row.fadeAfterStopClass = 'missed'
+					}
+
+					// Один повторный OTE-cycle — только после TP canon И TP mirror.
+					if (!row.first5Skipped && trade.result === RESEARCH_CONFIG.oteCycleAfterDoubleTp.armAfterCanonResult &&
+						mirrorTrade.result === RESEARCH_CONFIG.oteCycleAfterDoubleTp.armAfterMirrorResult) {
+						const cycle = RESEARCH_CONFIG.oteCycleAfterDoubleTp
+						const exitBar = ltf[mirrorTrade.exitIndex]!
+						const cycleEntry = at(cycle.entry)
+						row.oteCycleAmbiguous = long ? exitBar.low <= cycleEntry : exitBar.high >= cycleEntry
+						const ltfTimeStop = config.timeStopBars == null ? null : config.timeStopBars * Math.round(htfMs / TF_MS[ltfTf]!)
+						const cycleTrade = replayTrade(ltf, mirrorTrade.exitIndex + 1, long,
+							cycleEntry, at(cycle.stop), at(cycle.take), at(cycle.cancelBeyond), ltfTimeStop)
+						if (cycleTrade.status === 'done') {
+							row.oteCycleClass = 'entered'; row.oteCycleNetR = cycleTrade.netR; row.oteCycleResult = cycleTrade.result
+						} else if (cycleTrade.status === 'open') row.oteCycleClass = 'open'
+						else row.oteCycleClass = 'missed'
+					}
+				} else row.mirrorClass = 'open'
 			} else row.mirrorClass = 'missed'
 		}
 		rows.push(row)
@@ -262,10 +316,27 @@ function report(rows: AuditRow[], args: Args): string {
 		'=== LTF EXECUTION AUDIT (SPEC 7.49) ===',
 		`LTF ${args.ltf}, limit ${args.limit}, symbols ${args.symbols.length}, HTF ${args.htfs.join('/')}`,
 		`range ${rangeStart} → ${rangeEnd}`,
-		'', '=== EXECUTABLE CANON ===',
+		'', '=== FIRST-5 ENTRY GATE (боевой кандидат SPEC 7.50) ===',
 	]
-	for (const sc of ['deep', 'ote'] as const) lines.push(`${sc}: ${rowStats(rows.filter((r) => r.scenario === sc))}`)
-	for (const tf of args.htfs) lines.push(`${tf}: ${rowStats(rows.filter((r) => r.htf === tf))}`)
+	const kept = rows.filter((r) => !r.first5Skipped), skipped = rows.filter((r) => r.first5Skipped)
+	lines.push(`baseline : ${rowStats(rows)}`)
+	lines.push(`skipped  : ${rowStats(skipped)}`)
+	lines.push(`after gate: ${rowStats(kept)}`)
+	for (const sc of ['deep', 'ote'] as const) {
+		lines.push(`${sc} skipped: ${rowStats(skipped.filter((r) => r.scenario === sc))}`)
+		lines.push(`${sc} kept   : ${rowStats(kept.filter((r) => r.scenario === sc))}`)
+	}
+	for (const tf of args.htfs) lines.push(`${tf} skipped: ${rowStats(skipped.filter((r) => r.htf === tf))} | kept: ${rowStats(kept.filter((r) => r.htf === tf))}`)
+	lines.push('', '=== SIZING STACK ON FIRST-5-KEPT POOL ===')
+	const sizingLine = (name: string, pool: AuditRow[]): string => {
+		const total = pool.reduce((s, r) => s + r.netR * r.riskMult, 0)
+		const units = pool.reduce((s, r) => s + r.riskMult, 0)
+		const sorted = [...pool].sort((a, b) => a.entryAt - b.entryAt), mid = sorted[Math.floor(sorted.length / 2)]?.entryAt ?? 0
+		const ru = (g: AuditRow[]) => { const t = g.reduce((s, r) => s + r.netR * r.riskMult, 0), u = g.reduce((s, r) => s + r.riskMult, 0); return u ? t / u : 0 }
+		return `${name}: weighted ${fmt(total)}, units ${units.toFixed(1)}, R/unit ${fmt(units ? total / units : 0)} | H1 ${fmt(ru(pool.filter((r) => r.entryAt < mid)))} / H2 ${fmt(ru(pool.filter((r) => r.entryAt >= mid)))}`
+	}
+	lines.push(sizingLine('all kept', kept))
+	for (const sc of ['deep', 'ote'] as const) lines.push(sizingLine(sc, kept.filter((r) => r.scenario === sc)))
 	lines.push('', '=== BIGBAR DIAGNOSTIC ===')
 	for (const sc of ['deep', 'ote'] as const) {
 		const all = rows.filter((r) => r.scenario === sc), bb = all.filter((r) => r.bigbar), normal = all.filter((r) => !r.bigbar)
@@ -287,7 +358,28 @@ function report(rows: AuditRow[], args: Args): string {
 	for (const tf of args.htfs) lines.push(`${tf}: ${rowStats(ote.filter((r) => r.htf === tf), (r) => r.mirrorNetR)}`)
 	lines.push('', '=== MIRROR BY SYMBOL ===')
 	for (const symbol of args.symbols) lines.push(`${symbol.padEnd(12)} ${rowStats(ote.filter((r) => r.symbol === symbol), (r) => r.mirrorNetR)}`)
-	lines.push('', 'Правило чтения: feature buckets — диагностика, не готовый фильтр. Same-5m ambiguous не считается доказанным mirror fill.')
+
+	lines.push('', '=== FADE141 AFTER OBSERVED MIRROR STOP (research, first-5 kept only) ===')
+	const fadeEligible = ote.filter((r) => !r.first5Skipped && r.mirrorResult === 'stop')
+	lines.push(`mirror stops eligible: ${fadeEligible.length}`)
+	for (const cls of ['entered', 'missed', 'open'] as const) lines.push(`${cls.padEnd(8)}: ${fadeEligible.filter((r) => r.fadeAfterStopClass === cls).length}`)
+	lines.push(`same-stop-LTF ambiguous (not used): ${fadeEligible.filter((r) => r.fadeAfterStopAmbiguous).length}`)
+	lines.push(`resolved fade: ${rowStats(fadeEligible, (r) => r.fadeAfterStopNetR)}`)
+	for (const tf of args.htfs) lines.push(`${tf}: ${rowStats(fadeEligible.filter((r) => r.htf === tf), (r) => r.fadeAfterStopNetR)}`)
+	lines.push('-- fade by symbol --')
+	for (const symbol of args.symbols) lines.push(`${symbol.padEnd(12)} ${rowStats(fadeEligible.filter((r) => r.symbol === symbol), (r) => r.fadeAfterStopNetR)}`)
+
+	lines.push('', '=== ONE OTE CYCLE AFTER CANON TP + MIRROR TP (research, first-5 kept only) ===')
+	const cycleEligible = ote.filter((r) => !r.first5Skipped && r.result === 'tp' && r.mirrorResult === 'tp')
+	lines.push(`double-TP parents eligible: ${cycleEligible.length}`)
+	for (const cls of ['entered', 'missed', 'open'] as const) lines.push(`${cls.padEnd(8)}: ${cycleEligible.filter((r) => r.oteCycleClass === cls).length}`)
+	lines.push(`same-mirror-exit-LTF ambiguous (not used): ${cycleEligible.filter((r) => r.oteCycleAmbiguous).length}`)
+	lines.push(`resolved cycle: ${rowStats(cycleEligible, (r) => r.oteCycleNetR)}`)
+	for (const tf of args.htfs) lines.push(`${tf}: ${rowStats(cycleEligible.filter((r) => r.htf === tf), (r) => r.oteCycleNetR)}`)
+	lines.push('-- cycle by symbol --')
+	for (const symbol of args.symbols) lines.push(`${symbol.padEnd(12)} ${rowStats(cycleEligible.filter((r) => r.symbol === symbol), (r) => r.oteCycleNetR)}`)
+
+	lines.push('', 'Правило чтения: feature buckets — диагностика, не готовый фильтр. Same-LTF ambiguous не считается доказанным fill.')
 	return lines.join('\n')
 }
 
