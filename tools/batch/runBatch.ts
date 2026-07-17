@@ -1012,6 +1012,8 @@ async function main() {
 		mirror618R: number | null; mirror786R: number | null; scale100R: number | null; scale886R: number | null;
 		honestR: number | null;
 		noSlipR: number | null;
+		mirrorSameBarR: number | null;
+		mirrorNextR: number | null;
 		mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null;
 		mirrorNextBest: { netR: number; entryIndex: number; exitIndex: number } | null;
 		fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null;
@@ -1713,8 +1715,8 @@ async function main() {
 														const labels = htfContextAt(htfCtx, entryCandle.timestamp, outcome.entryPrice!, outcome.direction)
 														return labels.trendAligned
 													})(),
-													...((): { honestR: number | null; noSlipR: number | null; deepMirrorR: number | null; mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null; mirrorNextBest: { netR: number; entryIndex: number; exitIndex: number } | null; fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null } => {
-														const empty = { honestR: null, noSlipR: null, deepMirrorR: null, mirrorBest: null, mirrorNextBest: null, fadeBest: null }
+													...((): { honestR: number | null; noSlipR: number | null; deepMirrorR: number | null; mirrorSameBarR: number | null; mirrorNextR: number | null; mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null; mirrorNextBest: { netR: number; entryIndex: number; exitIndex: number } | null; fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null } => {
+														const empty = { honestR: null, noSlipR: null, deepMirrorR: null, mirrorSameBarR: null, mirrorNextR: null, mirrorBest: null, mirrorNextBest: null, fadeBest: null }
 														const p0 = levelPrice(0)
 														if (p0 == null || outcome.entryPrice == null || outcome.entryIndex == null) return empty
 														const atL = (ratio: number): number => p0 + (ratio / 100) * (tp - p0)
@@ -1734,7 +1736,7 @@ async function main() {
 															// SPEC 7.43: зеркало deep — реверс с ретеста 61.8
 															// (тейка deep-канона), stop 78.6 × tp 38.2.
 															const dm = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDirAll, atL(61.8), atL(78.6), atL(38.2), atL(0), bingxCosts)
-															return { honestR, noSlipR, deepMirrorR: dm.status === 'entered' ? dm.netR : null, mirrorBest: null, mirrorNextBest: null, fadeBest: null }
+															return { honestR, noSlipR, deepMirrorR: dm.status === 'entered' ? dm.netR : null, mirrorSameBarR: null, mirrorNextR: null, mirrorBest: null, mirrorNextBest: null, fadeBest: null }
 														}
 														// mirror: утверждённая клетка 7.37 stop 120 × tp 78.6
 														const m = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDirAll, atL(100), atL(120), atL(78.6), atL(0), bingxCosts)
@@ -1750,6 +1752,8 @@ async function main() {
 															honestR,
 															noSlipR,
 															deepMirrorR: null,
+															mirrorSameBarR: m.status === 'entered' ? m.netR : null,
+															mirrorNextR: mNext.status === 'entered' ? mNext.netR : null,
 															mirrorBest: m.status === 'entered' && m.netR != null && m.entryIndex != null && m.exitIndex != null
 																? { netR: m.netR, entryIndex: m.entryIndex, exitIndex: m.exitIndex } : null,
 															mirrorNextBest: mNext.status === 'entered' && mNext.netR != null && mNext.entryIndex != null && mNext.exitIndex != null

@@ -2485,7 +2485,10 @@ freshness multiplier становился известен уже после fil
 
 После изменения execution semantics старые ожидания deep/ote/mirror
 нельзя сравнивать с forward v2 напрямую. В `--eval-entry` добавлен блок
-`Executable battle v2 audit` и колонка `mirrorNextBest` в CSV.
+`Executable battle v2 audit`. CSV получает числовые колонки
+`mirrorSameBarR` / `mirrorNextR` для честных symbol/TF/H1/H2-разрезов;
+объектные `mirrorBest` / `mirrorNextBest` остаются внутренней диагностикой
+индексов fill/exit.
 
 Один прогон сравнивает на тех же данных:
 
