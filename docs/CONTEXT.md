@@ -247,109 +247,43 @@ entryAt → symbol → timeframe → scenario → id
 
 ---
 
-## 7. Открытые критические вопросы после ревью коммита 864895e
+## 7. Forward runner v2 (сделано после ревью 864895e)
 
-Это не утверждённые багфиксы. Каждый пункт нужно сначала показать пользователю и проверить отдельным тестом/прогоном.
+Текущая версия журнала: `battle-7.45-exec-v2`. Детали и принятые решения — SPEC 7.46.
 
-### 7.1 Bigbar-фильтр может быть post-fill look-ahead
+Исправлено:
 
-`bigbarCovered()` в `src/core/analysis/entryModels.ts` использует тело свечи касания, включая её close. В комментарии функции прямо сказано, что для touch-limit это диагностическая метка.
+- state и события версионированы; старый state не открывается молча;
+- FORWARD определяется по заявке/размеру, известным до fill, а не по времени outcome;
+- carry-in и catch-up навсегда остаются backfill;
+- mutable `swingPool` удалён, median строится по прошлым 200 уникальным сеткам;
+- freshness исполняется через `SETUP` и заранее отправленные `AMEND` перед барами 4/16;
+- touch fill важнее bigbar свечи касания; post-close bigbar не отменяет уже исполненную лимитку;
+- mirror получает setup после OTE fill и торгуется только со следующего бара;
+- structural cancel получает реальный confirmIndex противоположного события;
+- отчёт показывает clean forward, backfill, pending orders и open trades;
+- добавлены тесты median/report/idempotency.
 
-При resting limit реальная последовательность такая:
+После изменения execution semantics старые цифры `deep 0.358`, `OTE 0.244`, `mirror 0.172` в forward-report — только старые benchmarks. Нужен отдельный batch-пересчёт с теми же исполнимыми правилами.
 
-1. order стоит заранее;
-2. свеча касается entry, order fills;
-3. только после закрытия свечи становится известно, что её body перекрыл всю зону;
-4. отменить уже заполненную заявку нельзя.
+Перед запуском v2 старую `tmp/forward` обязательно архивировать или удалить.
 
-Текущий forward runner может после закрытия entry-свечи эмитить `cancel` и исключить сделку через bigbar. Это потенциально тот же класс неисполняемого отбора, что был у fade.
+### Что ещё проверить
 
-Нужен обязательный прогон:
-
-- текущий posthoc bigbar;
-- executable bigbar только по полностью закрытым свечам до touch-свечи;
-- вообще без bigbar.
-
-Главная метрика — честные deep/OTE totalR и avgR на одном universe. До этого нельзя считать исторические `0.358/0.244` полностью подтверждёнными для resting execution.
-
-### 7.2 Предварительный и финальный riskMult несовместимы с одним resting order
-
-При setup forward runner вызывает `canonRiskMultiplier(4, ...)`, то есть условно использует normal freshness. При touch он пересчитывает multiplier по фактическому delay.
-
-Но quantity лимитного ордера уже зафиксировано до fill. Нельзя после fill задним числом изменить риск.
-
-Возможные исполнимые правила:
-
-- фиксировать risk при setup и отказаться от будущей freshness;
-- на каждом закрытом баре до fill делать amend quantity по текущему возрасту setup;
-- использовать заранее определённую child-order схему.
-
-Предпочтительный простой кандидат — amend quantity на каждом баре, но решение должен утвердить пользователь.
-
-### 7.3 Rolling median compactness в forward runner может быть не causal
-
-`swingPool` обновляется для всех исторических outcomes при каждом stateless replay, даже когда события уже были emitted. Одни и те же сетки повторно добавляются; после первого цикла pool содержит поздние observations, которые на следующем цикле могут влиять на старые setups.
-
-Нужно хранить уникальные timestamped observations по candidate id и считать median только по сеткам, существовавшим до текущего setup.
-
-Обязательные тесты:
-
-- повторный replay того же окна не меняет pool;
-- добавление будущих candles не меняет multiplier старого setup;
-- restart runner сохраняет тот же результат;
-- каждая сетка добавляется в pool один раз.
-
-### 7.4 Expired cancel получает неправильный timestamp
-
-Для не вошедшего outcome `preEnd` сейчас часто равен последней свече окна. Cancel для `state === expired` датируется концом окна, а не `confirmIndex` противоположного события.
-
-Последствия:
-
-- позднее снятие реальной заявки;
-- исторический expired setup может выглядеть как свежий cancel;
-- Telegram может прислать неактуальную отмену с текущим timestamp.
-
-`FibLifecycleEngine` уже знает `expiryIndex`, но `FibSetupOutcome` его не экспортирует. Правильнее прокинуть `cancelIndex/expiryIndex` из lifecycle, а не восстанавливать его в forward runner.
-
-### 7.5 Mirror всё ещё требует pre-touch setup
-
-Canon теперь даёт setup до touch, но mirror пока эмитит только fill-сигнал на 100. Для ручного исполнения это снова сообщение после фактического касания.
-
-Исполнимый lifecycle:
-
-- OTE canon fill → сразу `setup mirror@100`;
-- цена касается 100 → `signal/FILL`;
-- цена уходит за 0 до fill → `cancel`;
-- затем outcome.
-
-### 7.6 Новая forward state machine почти не покрыта тестами
-
-Тест изменён в основном для удаления fade из battleConfig. Нужны синтетические тесты для:
-
-- setup до touch;
-- idempotent repeated replay;
-- invalidation cancel;
-- expiry cancel на правильном индексе;
-- fill/cancel same-bar ordering;
-- bigbar на entry-свече;
-- mirror setup после OTE fill;
-- causal unique rolling median.
+1. Полный batch-сравнительный прогон старой и executable bigbar semantics.
+2. Пересчитать mirror с активацией со следующего бара после OTE fill.
+3. Добавить более прямые синтетические тесты exact cancel index и mirror next-bar.
+4. Построить единый battle-family portfolio ledger; legacy `portfolioBacktest.ts` всё ещё не равен текущему battleConfig.
 
 ---
 
 ## 8. Приоритет следующей работы
 
-Рекомендуемый порядок:
-
-1. **Executable bigbar audit.** Потенциально ещё одна поправка уровня fade141.
-2. Исправить causal rolling median и покрыть тестами.
-3. Определить исполнимую механику freshness quantity до fill.
-4. Прокинуть точный cancel/expiry index из lifecycle.
-5. Добавить pre-touch mirror setup.
-6. После стабилизации execution построить единый battle-family portfolio ledger.
-7. Только затем исследовать capital allocator, нормировку риска и расширение universe.
-
-Не начинать с новых indicators/confirmations: текущий bottleneck — execution truth и parent-family allocation.
+1. Запустить чистый forward v2 после удаления старой папки.
+2. Доделать визуализатор так, чтобы он использовал тот же battle execution layer.
+3. Пересчитать old-vs-executable bigbar и mirror next-bar.
+4. Проверить fade141 только после stop mirror.
+5. Затем family sizing/allocator и остальные новые идеи.
 
 ---
 
