@@ -270,9 +270,9 @@ entryAt → symbol → timeframe → scenario → id
 
 ### Что ещё проверить
 
-1. Полный batch-сравнительный прогон старой и executable bigbar semantics.
-2. Пересчитать mirror с активацией со следующего бара после OTE fill.
-3. Добавить более прямые синтетические тесты exact cancel index и mirror next-bar.
+1. Запустить полный `--eval-entry`: блок SPEC 7.47 уже сравнивает old/executable bigbar и old/next-bar mirror; fixture прошла, но статистикой не является.
+2. По полному TXT+CSV установить новые честные benchmarks deep/OTE/mirror.
+3. Добавить более прямой синтетический тест exact cancel index.
 4. Построить единый battle-family portfolio ledger; legacy `portfolioBacktest.ts` всё ещё не равен текущему battleConfig.
 
 ---

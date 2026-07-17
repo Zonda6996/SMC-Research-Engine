@@ -1013,6 +1013,7 @@ async function main() {
 		honestR: number | null;
 		noSlipR: number | null;
 		mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null;
+		mirrorNextBest: { netR: number; entryIndex: number; exitIndex: number } | null;
 		fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null;
 		volRatio: number | null;
 		htfAlign: boolean | null;
@@ -1712,8 +1713,8 @@ async function main() {
 														const labels = htfContextAt(htfCtx, entryCandle.timestamp, outcome.entryPrice!, outcome.direction)
 														return labels.trendAligned
 													})(),
-													...((): { honestR: number | null; noSlipR: number | null; deepMirrorR: number | null; mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null; fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null } => {
-														const empty = { honestR: null, noSlipR: null, deepMirrorR: null, mirrorBest: null, fadeBest: null }
+													...((): { honestR: number | null; noSlipR: number | null; deepMirrorR: number | null; mirrorBest: { netR: number; entryIndex: number; exitIndex: number } | null; mirrorNextBest: { netR: number; entryIndex: number; exitIndex: number } | null; fadeBest: { netR: number; entryIndex: number; exitIndex: number } | null } => {
+														const empty = { honestR: null, noSlipR: null, deepMirrorR: null, mirrorBest: null, mirrorNextBest: null, fadeBest: null }
 														const p0 = levelPrice(0)
 														if (p0 == null || outcome.entryPrice == null || outcome.entryIndex == null) return empty
 														const atL = (ratio: number): number => p0 + (ratio / 100) * (tp - p0)
@@ -1733,10 +1734,14 @@ async function main() {
 															// SPEC 7.43: зеркало deep — реверс с ретеста 61.8
 															// (тейка deep-канона), stop 78.6 × tp 38.2.
 															const dm = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDirAll, atL(61.8), atL(78.6), atL(38.2), atL(0), bingxCosts)
-															return { honestR, noSlipR, deepMirrorR: dm.status === 'entered' ? dm.netR : null, mirrorBest: null, fadeBest: null }
+															return { honestR, noSlipR, deepMirrorR: dm.status === 'entered' ? dm.netR : null, mirrorBest: null, mirrorNextBest: null, fadeBest: null }
 														}
 														// mirror: утверждённая клетка 7.37 stop 120 × tp 78.6
 														const m = replayEntryStopTake(snapshot.candles, outcome.entryIndex, revDirAll, atL(100), atL(120), atL(78.6), atL(0), bingxCosts)
+										// SPEC 7.47: исполнимый manual-forward — mirror setup узнаём
+										// после закрытия OTE entry-бара, поэтому вход разрешён
+										// только со следующего бара.
+										const mNext = replayEntryStopTake(snapshot.candles, outcome.entryIndex + 1, revDirAll, atL(100), atL(120), atL(78.6), atL(0), bingxCosts)
 														// fade141: клетка 7.37 stop 176 × tp 78.6; SPEC 7.45 —
 														// лимитка ПОСЛЕ канон-входа (с createdAtIndex был
 														// look-ahead: слепая зона -0.508 avgR)
@@ -1747,6 +1752,8 @@ async function main() {
 															deepMirrorR: null,
 															mirrorBest: m.status === 'entered' && m.netR != null && m.entryIndex != null && m.exitIndex != null
 																? { netR: m.netR, entryIndex: m.entryIndex, exitIndex: m.exitIndex } : null,
+															mirrorNextBest: mNext.status === 'entered' && mNext.netR != null && mNext.entryIndex != null && mNext.exitIndex != null
+																? { netR: mNext.netR, entryIndex: mNext.entryIndex, exitIndex: mNext.exitIndex } : null,
 															fadeBest: f.status === 'entered' && f.netR != null && f.entryIndex != null && f.exitIndex != null
 																? { netR: f.netR, entryIndex: f.entryIndex, exitIndex: f.exitIndex } : null,
 														}
@@ -2405,6 +2412,53 @@ async function main() {
 			for (const sc of scenarios) {
 				const s = ncStat(ncPool.filter((r) => r.scenario === sc))
 				lines.push(`${sc.padEnd(6)}: ${s.n} trades, totalR ${fmt(s.total)}, avgR ${fmt(s.n ? s.total / s.n : 0)}, WR ${s.wr.toFixed(1)}%`)
+			}
+
+			// SPEC 7.47: пересчёт после forward-v2. Старый канон удалял
+			// bigbar на свече touch постфактум; исполнимый resting limit уже
+			// заполнен до close этой свечи, поэтому executable pool включает
+			// такие сделки. Mirror в manual-forward ставится после закрытия
+			// OTE entry-бара и может заполниться только со следующего бара.
+			lines.push('', '=== Executable battle v2 audit (SPEC 7.47) ===')
+			{
+				const execPool = evalEntryRows.filter((r) => r.touchStatus === 'entered' && r.newCanonR != null)
+				const valueStat = <T extends Row>(g: T[], value: (r: T) => number | null): { n: number; total: number; avg: number; wr: number; h1: number; h2: number } => {
+					const usable = g.map((r) => ({ r, v: value(r) })).filter((x): x is { r: T; v: number } => x.v != null)
+					const sortedAt = usable.map((x) => x.r.entryAt).sort((a, b) => a - b)
+					const mid = sortedAt[Math.floor(sortedAt.length / 2)] ?? 0
+					const avgPart = (part: typeof usable): number => part.length ? part.reduce((s, x) => s + x.v, 0) / part.length : 0
+					const total = usable.reduce((s, x) => s + x.v, 0)
+					return { n: usable.length, total, avg: usable.length ? total / usable.length : 0,
+						wr: usable.length ? 100 * usable.filter((x) => x.v > 0).length / usable.length : 0,
+						h1: avgPart(usable.filter((x) => x.r.entryAt < mid)), h2: avgPart(usable.filter((x) => x.r.entryAt >= mid)) }
+				}
+				const show = (name: string, s: ReturnType<typeof valueStat>): void => {
+					lines.push(`${name.padEnd(28)} n ${String(s.n).padStart(5)}, totalR ${fmt(s.total)}, avgR ${fmt(s.avg)}, WR ${s.wr.toFixed(1)}% | H1 ${fmt(s.h1)} / H2 ${fmt(s.h2)}`)
+				}
+				lines.push('-- canon: old post-hoc bigbar vs executable fill-wins --')
+				for (const sc of scenarios) {
+					show(`${sc} old bigbar`, valueStat(ncPool.filter((r) => r.scenario === sc), (r) => r.newCanonR))
+					show(`${sc} executable`, valueStat(execPool.filter((r) => r.scenario === sc), (r) => r.newCanonR))
+					show(`${sc} touch-bigbar subset`, valueStat(execPool.filter((r) => r.scenario === sc && r.bigbar), (r) => r.newCanonR))
+				}
+				const oldMirrorPool = ncPool.filter((r) => r.scenario === 'ote')
+				const execMirrorPool = execPool.filter((r) => r.scenario === 'ote')
+				lines.push('-- mirror: old same-bar activation vs executable next-bar activation --')
+				show('mirror old same-bar', valueStat(oldMirrorPool, (r) => r.mirrorBest?.netR ?? null))
+				show('mirror executable next', valueStat(execMirrorPool, (r) => r.mirrorNextBest?.netR ?? null))
+				const oldCanon = valueStat(ncPool, (r) => r.newCanonR)
+				const execCanon = valueStat(execPool, (r) => r.newCanonR)
+				const oldMirror = valueStat(oldMirrorPool, (r) => r.mirrorBest?.netR ?? null)
+				const execMirror = valueStat(execMirrorPool, (r) => r.mirrorNextBest?.netR ?? null)
+				lines.push('-- total opportunity R (canon + mirror; не portfolio, risk units не нормированы) --')
+				lines.push(`old battle totalR        ${fmt(oldCanon.total + oldMirror.total)} = canon ${fmt(oldCanon.total)} + mirror ${fmt(oldMirror.total)}`)
+				lines.push(`executable battle totalR ${fmt(execCanon.total + execMirror.total)} = canon ${fmt(execCanon.total)} + mirror ${fmt(execMirror.total)}`)
+				lines.push('-- executable by timeframe (canon + mirror totalR) --')
+				for (const tf of [...new Set(execPool.map((r) => r.timeframe))].sort()) {
+					const c = valueStat(execPool.filter((r) => r.timeframe === tf), (r) => r.newCanonR)
+					const m = valueStat(execMirrorPool.filter((r) => r.timeframe === tf), (r) => r.mirrorNextBest?.netR ?? null)
+					lines.push(`  ${tf.padEnd(4)} canon ${fmt(c.total)} (n ${c.n}, avg ${fmt(c.avg)}) + mirror ${fmt(m.total)} (n ${m.n}, avg ${fmt(m.avg)}) = ${fmt(c.total + m.total)}`)
+				}
 			}
 			// Сайзинг по свежести: риск-множитель по touchDelayBars. Метрики:
 			// totalR (взвеш.) и R НА ЕДИНИЦУ РИСКА = sum(m*r)/sum(m) — главная:
