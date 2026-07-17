@@ -23,6 +23,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
+import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
 import { BATTLE_CONFIG, RESEARCH_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, replayTrade } from '../forward/forwardRunner.js'
 import {
@@ -79,6 +80,11 @@ interface AuditRow {
 	swingAtr: number | null
 	medianSwingAtr: number | null
 	riskMult: number
+	touchPhase: 'skip' | 'early' | 'middle' | 'late'
+	touchPhaseMult: number
+	atrRatio: number | null
+	chochShare: number | null
+	confluenceAtr: number | null
 	mirrorClass: '' | 'same-htf-valid' | 'next-htf' | 'missed' | 'open'
 	mirrorAmbiguousSameLtf: boolean
 	mirrorPreFill100: boolean
@@ -160,10 +166,18 @@ function firstTouch(items: { candle: Candle; index: number }[], long: boolean, p
 function adverseBody(c: Candle, long: boolean): number { return long ? c.open - c.close : c.close - c.open }
 function adverseNet(from: Candle, to: Candle, long: boolean): number { return long ? from.close - to.close : to.close - from.close }
 function distanceToEntry(close: number, entry: number, long: boolean): number { return long ? close - entry : entry - close }
+function phaseOf(offset: number, barsInHtf: number): { phase: AuditRow['touchPhase']; mult: number } {
+	if (offset === 0) return { phase: 'skip', mult: 0 }
+	const fraction = offset / barsInHtf
+	if (fraction <= 1 / 3) return { phase: 'early', mult: 0.5 }
+	if (fraction <= 2 / 3) return { phase: 'middle', mult: 1.0 }
+	return { phase: 'late', mult: 1.5 }
+}
 
 function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): AuditRow[] {
 	const candles = ltfTf === htf ? ltf : aggregateCandles(ltf, ltfTf, htf)
 	const snapshot = runAnalysis(candles)
+	const regime = computeRegimeMetrics(snapshot.candles, snapshot.atr, snapshot.events, snapshot.market.trendHistory)
 	const candidateById = new Map(snapshot.fib.candidates.map((c) => [c.id, c]))
 	const selected = selectedOutcomes(snapshot.fibLifecycle.outcomes)
 	const medians = buildCausalMedianByCandidate(selected)
@@ -197,6 +211,12 @@ function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): A
 		const freshBars = outcome.entryIndex - outcome.createdAtIndex
 		const medianSwingAtr = medians.get(outcome.candidateId) ?? null
 		const riskMult = canonRiskMultiplier(freshBars, outcome.legAtrRatio, medianSwingAtr)
+		const phase = phaseOf(touch.offset, items.length)
+		const local = candidate.variants.local, global = candidate.variants.global
+		const localEntry = local ? gridLevelPrice(local.levels.find((x) => x.ratio === 0)!.price, p100, config.entry) : null
+		const globalEntry = global ? gridLevelPrice(global.levels.find((x) => x.ratio === 0)!.price, p100, config.entry) : null
+		const confluenceAtr = atr != null && atr > 0 && localEntry != null && globalEntry != null ? Math.abs(localEntry - globalEntry) / atr : null
+		const regimeAtSetup = regime[outcome.createdAtIndex]
 		const row: AuditRow = {
 			symbol, htf, scenario, direction: outcome.direction,
 			entryAt: htfEntryCandle.timestamp, entryIndex: outcome.entryIndex, entryPrice: entry,
@@ -210,6 +230,8 @@ function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): A
 			distanceBeforeTouchAtr: last ? norm(Math.max(0, distanceToEntry(last.close, entry, long))) : null,
 			first5Skipped: touch.offset < BATTLE_CONFIG.entryGate.skipFirstBars,
 			freshBars, swingAtr: outcome.legAtrRatio, medianSwingAtr, riskMult,
+			touchPhase: phase.phase, touchPhaseMult: phase.mult,
+			atrRatio: regimeAtSetup?.atrRatio ?? null, chochShare: regimeAtSetup?.chochShare ?? null, confluenceAtr,
 			mirrorClass: '', mirrorAmbiguousSameLtf: false, mirrorPreFill100: false,
 			mirrorFillAt: null, mirrorNetR: null, mirrorResult: '',
 			fadeAfterStopClass: '', fadeAfterStopAmbiguous: false, fadeAfterStopNetR: null, fadeAfterStopResult: '',
@@ -337,6 +359,34 @@ function report(rows: AuditRow[], args: Args): string {
 	}
 	lines.push(sizingLine('all kept', kept))
 	for (const sc of ['deep', 'ote'] as const) lines.push(sizingLine(sc, kept.filter((r) => r.scenario === sc)))
+
+	lines.push('', '=== TOUCH-PHASE SIZING CANDIDATE (0 / 0.5 / 1.0 / 1.5) ===')
+	for (const phase of ['skip', 'early', 'middle', 'late'] as const) lines.push(`${phase.padEnd(7)}: ${rowStats(rows.filter((r) => r.touchPhase === phase))}`)
+	const phaseSizing = (pool: AuditRow[]): string => {
+		const total = pool.reduce((s, r) => s + r.netR * r.riskMult * r.touchPhaseMult, 0)
+		const units = pool.reduce((s, r) => s + r.riskMult * r.touchPhaseMult, 0)
+		return `weighted ${fmt(total)}, units ${units.toFixed(1)}, R/unit ${fmt(units ? total / units : 0)}`
+	}
+	lines.push(`base sizing + phase: ${phaseSizing(rows)}`)
+	for (const sc of ['deep', 'ote'] as const) lines.push(`${sc}: ${phaseSizing(rows.filter((r) => r.scenario === sc))}`)
+
+	lines.push('', '=== REGIME ON FIRST-5-KEPT POOL (diagnostic sizing only) ===')
+	for (const sc of ['deep', 'ote'] as const) {
+		const pool = kept.filter((r) => r.scenario === sc)
+		featureReport(lines, pool, 'atrRatio', `${sc} atrRatio at setup`)
+		featureReport(lines, pool, 'chochShare', `${sc} chochShare at setup`)
+	}
+	lines.push('', '=== LOCAL/GLOBAL CONFLUENCE ON KEPT POOL ===')
+	for (const sc of ['deep', 'ote'] as const) featureReport(lines, kept.filter((r) => r.scenario === sc), 'confluenceAtr', `${sc} |entryLocal-entryGlobal| / ATR (lower=closer)`)
+	const withConf = kept.filter((r) => r.confluenceAtr != null && r.swingAtr != null && r.medianSwingAtr != null)
+	if (withConf.length) {
+		const medConf = quantiles(withConf.map((r) => r.confluenceAtr!))[1]
+		lines.push(`-- confluence x compactness (confluence median ${medConf.toFixed(3)}) --`)
+		for (const close of [true, false]) for (const compact of [true, false]) {
+			const g = withConf.filter((r) => (r.confluenceAtr! <= medConf) === close && (r.swingAtr! <= r.medianSwingAtr!) === compact)
+			lines.push(`  ${close ? 'close' : 'wide '} x ${compact ? 'compact' : 'stretched'}: ${rowStats(g)}`)
+		}
+	}
 	lines.push('', '=== BIGBAR DIAGNOSTIC ===')
 	for (const sc of ['deep', 'ote'] as const) {
 		const all = rows.filter((r) => r.scenario === sc), bb = all.filter((r) => r.bigbar), normal = all.filter((r) => !r.bigbar)
