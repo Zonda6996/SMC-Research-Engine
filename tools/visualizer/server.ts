@@ -172,6 +172,49 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>, ltf5m: import('..
 	return trades
 }
 
+/** Кандидаты ручного Decision Lab: только факт первого касания 141/200/241. */
+function buildReactionCandidates(
+	snapshot: ReturnType<typeof runAnalysis>,
+	ltf5m: import('../../src/models/price/Candle.js').Candle[] | null,
+	htfMs: number,
+) {
+	const source = ltf5m ?? snapshot.candles
+	const result: Record<string, unknown>[] = []
+	for (const candidate of snapshot.fib.candidates) {
+		const mode = candidate.variants.local ? 'local' : candidate.variants.global ? 'global' : null
+		if (!mode) continue
+		const variant = candidate.variants[mode]
+		if (!variant) continue
+		const p0 = variant.levels.find((x) => x.ratio === 0)?.price
+		const p100 = variant.levels.find((x) => x.ratio === 100)?.price
+		const created = snapshot.candles[candidate.createdAtIndex]
+		if (p0 == null || p100 == null || !created) continue
+		const knownAt = created.timestamp + htfMs
+		for (const ratio of [141, 200, 241] as const) {
+			const price = gridLevelPrice(p0, p100, ratio)
+			const touchIndex = source.findIndex((c) => c.timestamp >= knownAt &&
+				(candidate.direction === 'long' ? c.high >= price : c.low <= price))
+			if (touchIndex < 0) continue
+			const touch = source[touchIndex]!
+			const touchHtfIndex = snapshot.candles.findIndex((c) => touch.timestamp >= c.timestamp && touch.timestamp < c.timestamp + htfMs)
+			if (touchHtfIndex < 0) continue
+			result.push({
+				id: `${candidate.id}|${mode}|${ratio}|${touch.timestamp}`,
+				candidateId: candidate.id, ratio, levelPrice: price,
+				gridDirection: candidate.direction,
+				tradeDirection: candidate.direction === 'long' ? 'short' : 'long',
+				trigger: candidate.trigger, oppositeSweptBefore: candidate.oppositeSweptBefore,
+				createdAt: created.timestamp, touchAt: touch.timestamp,
+				touchHtfIndex, touchLtfIndex: ltf5m ? touchIndex : null,
+				legStart: { timestamp: variant.start.timestamp, price: variant.start.price },
+				legEnd: { timestamp: candidate.end.timestamp, price: candidate.end.price },
+				gridLevels: variant.levels.map((x) => ({ ratio: x.ratio, price: x.price })),
+			})
+		}
+	}
+	return result
+}
+
 /** Protected-уровни: только активные из snapshot — без старых пробников. */
 function buildProtectedSegments(
 	snapshot: ReturnType<typeof runAnalysis>,
@@ -229,6 +272,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				},
 				dataset: { symbol, timeframe, limit, candleCount: candles.length, source: useFixture ? 'fixture' : 'fresh' },
 				candles: snapshot.candles,
+				ltf5m: ltf5m ?? [],
+				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, htfMs),
 				structure: snapshot.structure,
 				trendHistory: snapshot.market.trendHistory,
 				finalTrend: snapshot.market.trend,
