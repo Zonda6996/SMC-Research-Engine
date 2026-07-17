@@ -1,70 +1,415 @@
-# Контекст проекта — Fib Playbook (обновлено 2026-07-15, SPEC 7.26)
+# Контекст проекта SMC Research Engine для нового ИИ
 
-Этот файл — точка восстановления контекста для нового чата. Прочитай его целиком перед любой работой.
+> Обновлено: 2026-07-17. Состояние репозитория при обновлении: `864895e8c5b6cde104b30a9c436860f31df691d7`.
+>
+> Это файл быстрого восстановления контекста, **не замена `SPEC.md`**. `SPEC.md` — главный источник истории решений, результатов и отрицательного знания. Код, особенно `src/strategy/battleConfig.ts`, — источник истины о текущем боевом поведении.
 
-## Что это за проект
+## 0. Обязательный протокол нового чата
 
-Исследование edge в фибо-стратегии (SMC-стиль) на крипто-фьючерсах: импульс → BOS/CHoCH-структура → фибо-сетка на импульсной ноге → лимитный вход на откате → тейк на экстензии. Пайплайн: свечи Binance USDT-M → детекция структуры → сетки → симуляция сделок → пул-оценка (без портфеля, чтобы видеть чистый эффект каждого правила).
+Перед любыми идеями, выводами или изменениями кода:
 
-Пользователь торгует руками на **BingX** (реферал: maker 0.02%, taker 0.05%). Все расчёты костов — под BingX.
+1. Открой актуальный репозиторий и выполни `git pull`/`git fetch`.
+2. Прочитай **`SPEC.md` полностью**, от начала до конца. Не ограничивайся последними разделами: старые волны объясняют, что уже тестировалось и почему было отклонено.
+3. Прочитай этот файл полностью.
+4. Просмотри все tracked-файлы проекта как минимум через `git ls-files`; бинарные результаты можно инвентаризировать, но весь исходный код, тесты, конфиги и Markdown нужно прочитать.
+5. Особенно внимательно прочитай:
+   - `src/strategy/battleConfig.ts`;
+   - `src/core/analysis/runAnalysis.ts`;
+   - `src/core/fib/FibLifecycleEngine.ts`;
+   - `src/core/analysis/entryModels.ts`;
+   - `src/core/analysis/takeLadders.ts`;
+   - `src/core/analysis/portfolioBacktest.ts`;
+   - `src/core/analysis/regimeFilter.ts`;
+   - `src/core/analysis/dedupFilter.ts`;
+   - `tools/batch/runBatch.ts`;
+   - `tools/forward/forwardRunner.ts`;
+   - все тесты в `tests/`.
+6. Посмотри последние коммиты и diff, а не исходи из того, что этот контекст всё ещё свежий.
+7. Перед утверждением «работает» запусти:
 
-## Канонический пул
+```bash
+npm install --package-lock=false --ignore-scripts --no-audit --no-fund
+npm test
+npx tsc --noEmit
+```
 
-- 14 активов: BTC, ETH, SOL, XRP, BNB, DOGE, ADA, AVAX, LINK, SUI, TON, NEAR, APT, LTC
-- 3 ТФ: 15m / 30m / 1h; ~2.3 года данных (2024 — только Q4)
-- Сценарии: **ote** (вход 78.6, зона 61.8–78.6) и **deep** (вход 38.2, зона 23.6–38.2); breaker выкинут (SPEC 7.15, стабильный минус)
-- Стоп: zero (за 0% ноги); regime-фильтр для deep встроен в пул
-- ~6500 сделок
+На коммите `864895e` проходили 217/217 тестов и `tsc --noEmit`.
 
-## Текущий канон стратегии (подтверждён прогонами)
+8. Не исправляй найденные логические проблемы молча. Сначала покажи проблему, экономический эффект, варианты решения и тест, который отличит варианты.
+9. Не предлагай повторно уже убитые идеи без нового information set и явного объяснения, почему теперь результат может измениться.
+10. Общайся с пользователем по-русски, прямо, плотно, с цифрами. Не выдумывай результаты и параметры.
 
-1. **Вход: лимитка на уровне (touch)** — 78.6 для ote, 38.2 для deep
-2. **Bigbar-фильтр (идея пользователя): если одна свеча телом перекрыла всю входную зону — сетап пропускается.** Окно: от создания сетки до свечи касания включительно
-3. **Выход: вся позиция лимиткой на уровне 100% (t100-only).** Без частичных, без раннеров, без БУ
-4. Косты BingX: вход/тейк maker 0.02%, стоп taker 0.05% + слип 0.02%
+---
 
-**Результат канона: +788R на 5931 сделках, avgR +0.133, WR 74.8%.** deep avgR +0.227, ote +0.089. Все 14 активов в плюсе, все 3 ТФ в плюсе (15m/30m avgR +0.143, 1h +0.115). Работает каждый год.
+## 1. Что это за проект
 
-## История результата (тот же пул)
+SMC Research Engine — TypeScript/Node.js research-платформа для проверки авторской SMC/Fibonacci-логики на крипто-фьючерсах. Это не классический ICT, не готовый торговый бот и не лицензия придумывать новые правила структуры.
 
-| Этап | totalR | Что поменяли |
-|---|---|---|
-| Старые тейки (50%@141+раннер) + завышенные косты | −9R | — |
-| t100-only выходы (SPEC 7.22) | +272R | тейки |
-| Косты BingX (SPEC 7.24) | +552R | комиссии |
-| + bigbar (SPEC 7.24 fix) | **+788R** | фильтр пользователя |
+Основной pipeline:
 
-## Проверено и отклонено (не переделывать!)
+```text
+Candles
+→ PivotDetector
+→ SwingEngine
+→ StructureEngine / MarketStructureEngine
+→ BosChochEngine
+→ FibGridEngine
+→ FibLifecycleEngine
+→ batch/replay/portfolio/forward tooling
+```
 
-- **Подтверждающие входы (closeConfirm — маркет по закрытию свечи касания; candleConfirm — после доп. подтверждающей свечи): −288R и −267R.** Причина: тейк на 100 близко, подтверждение опаздывает (~2000 упущенных сделок на +700R), плюс тесные стопы от позднего входа раздувают комиссию до 1.5–3R на лосс. Логика проверена — это не баг, а геометрия близкой цели
-- **chop поверх bigbar+t100**: режет 80% объёма, денег меньше
-- **align поверх bigbar**: −630 сделок, −52R, не окупается
-- **dedup/cooldown («серия BOS в одном тренде = одна сделка»)**: повторы в тренде прибыльны, дедуп стоит −658R. Три лонга подряд в визуализаторе — фича
-- Мёртвые фильтры прошлых волн: late, extreme, chop-ote, fade/inv/combo (7.19), cooldown (7.16)
-- HTF trend/premium-discount (7.21) — только диагностика, в бою не используется; «по тренду старшего ТФ» опровергнуто
+Канонический оркестратор — `runAnalysis()` в `src/core/analysis/runAnalysis.ts`. Он чистый: считает snapshot без вывода и сетевого исполнения.
 
-## SPEC 7.26 закрыт (2026-07-15): full@100 подтверждён
+Рынок исследования: Binance USDT-M candles. Пользователь торгует/оценивает исполнение под BingX. Модель costs:
 
-Прогон `--eval-entry` на каноне (5859 сделок с резолвом всех схем): **full@100 +748.5R (avgR 0.128, WR 74.5%)** > full@141 +583.9R (WR 51.6%) > 50/50(BE) +532.1R. Deep нечувствителен к схеме (403/383/390), весь проигрыш дальних целей — ote (346 → 201 → 142: цена от 78.6 доходит до 100 и разворачивается). t100 в плюсе на всех 14 активах; 50/50 минусует 4 (APT, BNB, LTC, NEAR). Исключение 30m (там дальние лучше) — разный знак эффекта по ТФ, признано подгонкой, per-TF выбор схемы отклонён. Детали в SPEC 7.26.
+- maker: 0.02%;
+- taker: 0.05%;
+- дополнительный stop slippage allowance: 0.02%;
+- входы и тейки предполагаются maker, стоп и time-stop — taker+slippage.
 
-## Открытые вопросы (следующий шаг)
+Исторический основной universe последних исследований:
 
-Отложенные идеи фильтров: «свежесть касания» (вход только если касание зоны в первые N свечей жизни сетки), «близость тейка» (пропуск, если на входе до тейка < X от стопа).
+- 14 активов: BTC, ETH, SOL, XRP, BNB, DOGE, ADA, AVAX, LINK, SUI, TON, NEAR, APT, LTC;
+- таймфреймы: 15m, 30m, 1h;
+- Binance USDT-M futures;
+- H1/H2, asset/TF-разрезы и rolling walk-forward применяются как защита от подгонки.
 
-## Ключевые файлы
+---
 
-- `tools/batch/runBatch.ts` — батч-раннер; флаг `--eval-entry` = основной актуальный прогон (модели входа + комбо + схемы выхода); шапка файла документирует все флаги
-- `src/core/analysis/entryModels.ts` — модели входа, косты BingX (BINGX_MAKER_RATE и т.д.), bigbarCovered
-- `src/core/analysis/takeLadders.ts` — схемы выхода (TAKE_LADDERS: canon, t100-only, t141-only...), replayLadder с параметром costs
-- `src/core/analysis/setupFilters.ts` — фильтры chop/align/late/extreme (большинство мёртвые)
-- `src/core/fib/FibLifecycleEngine.ts` — движок сделок (конвенция: конфликт стоп/тейк в одном баре = стоп, worst-case)
-- `tools/visualizer/` — TV-стиль визуализатор (`npx tsx tools/visualizer/server.ts` → localhost:7788), сделки канона + модели входа + bigbar
-- `docs/SPEC.md` (если есть) — история спеков
+## 2. Текущий боевой source of truth
 
-## Рабочий процесс с пользователем
+Источник истины — `BATTLE_CONFIG` в `src/strategy/battleConfig.ts`. Не копируй его числовые параметры в другие модули.
 
-- Пользователь запускает прогоны **локально** (`git pull && npx tsx tools/batch/runBatch.ts --eval-entry`), скидывает результаты (txt/csv) в чат, агент анализирует
-- Sandbox не имеет доступа к Binance — реальные данные только у пользователя
-- Общаться по-русски, прямо, без воды и «магических слов»; признавать косяки явно; выводы сразу с цифрами; не выдумывать параметры — уточнять
-- Пользователь ждёт проактивных идей уровня bigbar-фильтра (дикий плюс любой ценой)
-- Каждое изменение: tsc + тесты (208 шт) + фикстура-смоук (`--fixture`) + коммит + пуш в main (пуш спрашивает разрешение)
+### Canon stream
+
+#### Deep
+
+- направление: по сетке;
+- touch entry: 38.2;
+- stop: 15;
+- full take: 61.8;
+- time-stop: нет;
+- историческое ожидание после costs: около `+0.358R` на сделку.
+
+#### OTE
+
+- направление: по сетке;
+- touch entry: 78.6;
+- stop: 61.8;
+- full take: 100;
+- time-stop: 20 баров;
+- историческое ожидание после costs: около `+0.244R` на сделку.
+
+Для canon включён bigbar-фильтр, но его исполнимость для resting touch-limit сейчас является открытым критическим вопросом — см. раздел 7.
+
+### Canon sizing
+
+`canonRiskMultiplier()` перемножает:
+
+- freshness: `≤3 → 2.0`, `4–15 → 1.0`, `16+ → 0.5`;
+- swing compactness относительно rolling median: compact `1.4`, wide `0.7`;
+- session 15–20 UTC `1.2`, но session layer сейчас выключен.
+
+Исторический research-результат sizing stack: около `0.280 → 0.362 R/unit`, то есть +29% к качеству аллокации. Это не означает, что production budget normalization уже корректно реализована.
+
+### Reverse stream после исправления SPEC 7.45
+
+Текущий reverse — **только mirror**:
+
+- активируется после canon OTE entry;
+- направление против сетки;
+- entry 100;
+- stop 120;
+- take 78.6;
+- cancelBeyond 0;
+- честное ожидание: `+0.172R`, WR 60.5%, H1 `+0.169`, H2 `+0.175`, n=3515.
+
+`fade141` удалён из `BATTLE_CONFIG` и новых forward-сигналов.
+
+### Reverse sizing
+
+`reverseRiskMultiplier()` использует свежесть canon-касания:
+
+- `≤3 → 1.5`;
+- `4–15 → 1.0`;
+- `16+ → 0.7`.
+
+На исправленном mirror-only пуле avgR по этим бакетам: `0.268 / 0.178 / 0.138`. Compactness для reverse не прошла и не используется.
+
+---
+
+## 3. Важнейшее исправление SPEC 7.45: fade141 был look-ahead
+
+Ранее reverse состоял из `mirror@100` и `fade141@141` с first-fill-wins и показывал `+0.347R`.
+
+Проблема: fade оценивался на OTE-сетках, где canon **впоследствии вошёл**, хотя fade-заявка стартовала при создании сетки, когда будущий canon entry ещё неизвестен. Это selection look-ahead.
+
+Unconditional проверка дала:
+
+- все OTE-сетки: n=5625, avgR `−0.130`;
+- canon вошёл: n=2983, avgR `+0.205`;
+- canon не вошёл: n=2642, avgR `−0.508`, WR 19.2%;
+- отрицательный результат устойчив на H1/H2.
+
+После переноса fade activation на момент после canon OTE entry выяснилось:
+
+- цена не может дойти от 78.6 до 141, не пройдя 100;
+- mirror на 100 всегда заполняется раньше;
+- fade-only n=0;
+- first-fill-wins вырождается в mirror-only.
+
+Поэтому fade удалён, старые `+0.347R` признаны завышенными. Новый ИИ не должен ссылаться на `0.347` как на актуальное ожидание reverse, даже если эта цифра осталась в более раннем разделе `SPEC.md` или legacy journal report.
+
+Методологическое правило, добавленное после этой находки:
+
+> Любое условие отбора universe должно быть проверяемо в момент постановки заявки. Если eligibility зависит от будущего входа/исхода другой leg, это look-ahead.
+
+---
+
+## 4. Forward runner после последних изменений
+
+Файл: `tools/forward/forwardRunner.ts`.
+
+Архитектура: stateless replay последних 3000 свечей на каждом `symbol|tf`, состояние дедупликации в `tmp/forward/state.json`, журнал в `tmp/forward/signals.jsonl`, опциональные Telegram-уведомления.
+
+Добавлены события:
+
+- `setup` — сетка создана, нужно заранее поставить canon limit;
+- `cancel` — снять незаполненную заявку;
+- `signal` — fill;
+- `outcome` — tp/stop/timestop.
+
+`--report` считает статистику только по signal/outcome, но показывает число setup/cancel. Legacy fade141-записи читаются для совместимости, новые не создаются.
+
+Это улучшило старую проблему «сигнал-некролог», когда пользователь узнавал о touch только после закрытия свечи. Но implementation ещё не полностью исполнима — см. открытые вопросы.
+
+---
+
+## 5. Что уже исследовано и закрыто
+
+Не предлагай это как новую идею:
+
+- close/candle confirmations;
+- MTF CHoCH confirmation;
+- partial exits и runners;
+- break-even management;
+- trailing по уровням;
+- re-entry после стопа;
+- scale-in/усреднение;
+- динамическая переподгонка stop/take cells;
+- per-symbol/per-TF cherry-picking;
+- HTF trend/alignment filter;
+- deep-mirror;
+- fade241;
+- подход к зоне `approachAtr` и wick fraction;
+- equity-streak sizing;
+- fixed R:R для OTE;
+- дальние цели 141/241 вместо магнитных 61.8/100.
+
+Причины подробно описаны в `SPEC.md`: подтверждения опаздывают, runners разбавляют edge после магнитного уровня, BE/trailing выбивают будущих победителей, re-entry торгует уже сломанный уровень, scale-in получает adverse selection, MTF теряет V-развороты и платит худшей ценой.
+
+### Проверенные и принятые результаты
+
+- full single take лучше partial/BE/runners;
+- оптимальные fixed cells: deep `15×61.8`, OTE `61.8×100`;
+- OTE entry 78.6 подтверждён полным entry×stop×take sweep;
+- freshness и compactness работают как sizing, не hard filters;
+- OTE time-stop 20 даёт небольшой плюс;
+- rolling walk-forward подтвердил стабильность fixed cells;
+- pessimistic intrabar почти не искажает результат для stop/take conflicts;
+- volume spike `volRatio≥2` ухудшает OTE, но эффект признан слишком слабым/немонотонным для production layer;
+- текущий reverse — только mirror, не fade.
+
+---
+
+## 6. Архитектурный разрыв, который ещё не закрыт
+
+`src/core/analysis/portfolioBacktest.ts` не является portfolio backtest текущего `BATTLE_CONFIG`.
+
+Он исторически собирает lifecycle-сценарии `ote/deep/breaker`, использует одинаковый `riskPct`, `netBeR()` старого lifecycle и tie-break:
+
+```text
+entryAt → symbol → timeframe → scenario → id
+```
+
+Он не моделирует полноценно:
+
+- новые stop/take cells battleConfig;
+- raw/normalized canon sizing;
+- mirror activation как parent-child lifecycle;
+- reverse sizing;
+- единый parent setup risk;
+- реальную приоритизацию при max concurrent risk.
+
+Поэтому его equity/DD/Monte Carlo нельзя автоматически называть портфелем текущей canon+mirror системы.
+
+Будущий правильный слой должен строить единый chronological family ledger непосредственно из `BATTLE_CONFIG` и использовать один и тот же replay в batch и forward.
+
+---
+
+## 7. Открытые критические вопросы после ревью коммита 864895e
+
+Это не утверждённые багфиксы. Каждый пункт нужно сначала показать пользователю и проверить отдельным тестом/прогоном.
+
+### 7.1 Bigbar-фильтр может быть post-fill look-ahead
+
+`bigbarCovered()` в `src/core/analysis/entryModels.ts` использует тело свечи касания, включая её close. В комментарии функции прямо сказано, что для touch-limit это диагностическая метка.
+
+При resting limit реальная последовательность такая:
+
+1. order стоит заранее;
+2. свеча касается entry, order fills;
+3. только после закрытия свечи становится известно, что её body перекрыл всю зону;
+4. отменить уже заполненную заявку нельзя.
+
+Текущий forward runner может после закрытия entry-свечи эмитить `cancel` и исключить сделку через bigbar. Это потенциально тот же класс неисполняемого отбора, что был у fade.
+
+Нужен обязательный прогон:
+
+- текущий posthoc bigbar;
+- executable bigbar только по полностью закрытым свечам до touch-свечи;
+- вообще без bigbar.
+
+Главная метрика — честные deep/OTE totalR и avgR на одном universe. До этого нельзя считать исторические `0.358/0.244` полностью подтверждёнными для resting execution.
+
+### 7.2 Предварительный и финальный riskMult несовместимы с одним resting order
+
+При setup forward runner вызывает `canonRiskMultiplier(4, ...)`, то есть условно использует normal freshness. При touch он пересчитывает multiplier по фактическому delay.
+
+Но quantity лимитного ордера уже зафиксировано до fill. Нельзя после fill задним числом изменить риск.
+
+Возможные исполнимые правила:
+
+- фиксировать risk при setup и отказаться от будущей freshness;
+- на каждом закрытом баре до fill делать amend quantity по текущему возрасту setup;
+- использовать заранее определённую child-order схему.
+
+Предпочтительный простой кандидат — amend quantity на каждом баре, но решение должен утвердить пользователь.
+
+### 7.3 Rolling median compactness в forward runner может быть не causal
+
+`swingPool` обновляется для всех исторических outcomes при каждом stateless replay, даже когда события уже были emitted. Одни и те же сетки повторно добавляются; после первого цикла pool содержит поздние observations, которые на следующем цикле могут влиять на старые setups.
+
+Нужно хранить уникальные timestamped observations по candidate id и считать median только по сеткам, существовавшим до текущего setup.
+
+Обязательные тесты:
+
+- повторный replay того же окна не меняет pool;
+- добавление будущих candles не меняет multiplier старого setup;
+- restart runner сохраняет тот же результат;
+- каждая сетка добавляется в pool один раз.
+
+### 7.4 Expired cancel получает неправильный timestamp
+
+Для не вошедшего outcome `preEnd` сейчас часто равен последней свече окна. Cancel для `state === expired` датируется концом окна, а не `confirmIndex` противоположного события.
+
+Последствия:
+
+- позднее снятие реальной заявки;
+- исторический expired setup может выглядеть как свежий cancel;
+- Telegram может прислать неактуальную отмену с текущим timestamp.
+
+`FibLifecycleEngine` уже знает `expiryIndex`, но `FibSetupOutcome` его не экспортирует. Правильнее прокинуть `cancelIndex/expiryIndex` из lifecycle, а не восстанавливать его в forward runner.
+
+### 7.5 Mirror всё ещё требует pre-touch setup
+
+Canon теперь даёт setup до touch, но mirror пока эмитит только fill-сигнал на 100. Для ручного исполнения это снова сообщение после фактического касания.
+
+Исполнимый lifecycle:
+
+- OTE canon fill → сразу `setup mirror@100`;
+- цена касается 100 → `signal/FILL`;
+- цена уходит за 0 до fill → `cancel`;
+- затем outcome.
+
+### 7.6 Новая forward state machine почти не покрыта тестами
+
+Тест изменён в основном для удаления fade из battleConfig. Нужны синтетические тесты для:
+
+- setup до touch;
+- idempotent repeated replay;
+- invalidation cancel;
+- expiry cancel на правильном индексе;
+- fill/cancel same-bar ordering;
+- bigbar на entry-свече;
+- mirror setup после OTE fill;
+- causal unique rolling median.
+
+---
+
+## 8. Приоритет следующей работы
+
+Рекомендуемый порядок:
+
+1. **Executable bigbar audit.** Потенциально ещё одна поправка уровня fade141.
+2. Исправить causal rolling median и покрыть тестами.
+3. Определить исполнимую механику freshness quantity до fill.
+4. Прокинуть точный cancel/expiry index из lifecycle.
+5. Добавить pre-touch mirror setup.
+6. После стабилизации execution построить единый battle-family portfolio ledger.
+7. Только затем исследовать capital allocator, нормировку риска и расширение universe.
+
+Не начинать с новых indicators/confirmations: текущий bottleneck — execution truth и parent-family allocation.
+
+---
+
+## 9. Важные команды и файлы результатов
+
+Основные команды:
+
+```bash
+npm test
+npx tsc --noEmit
+npm run batch -- --eval-entry
+npm run forward -- --once
+npm run forward -- --report
+npm run forward -- --fixture
+npm run portfolio -- ...
+```
+
+Перед реальным длинным прогоном изучить CLI-шапку и `parseArgs()` в `tools/batch/runBatch.ts`.
+
+Forward state/journal:
+
+```text
+tmp/forward/state.json
+tmp/forward/signals.jsonl
+```
+
+Batch results генерируются research runner; не делай вывод по одному summary без CSV-разрезов H1/H2, symbol, TF и проверок одинакового universe.
+
+---
+
+## 10. Стиль работы с пользователем
+
+- Ответы только на русском, если пользователь не попросил иначе.
+- Без мотивационной воды.
+- Сначала факт из кода/SPEC, затем интерпретация.
+- Любую оценку помечать как оценку.
+- Если результат плохой — говорить прямо. История fade141 показывает, что пользователь предпочитает честное удаление красивого edge его защите.
+- Не считать большой totalR доказательством без проверки universe eligibility на момент решения.
+- Не менять архитектурные правила без согласования.
+- После любой правки: тест, `tsc`, fixture/synthetic regression, затем описание diff.
+- Коммит/пуш — только если пользователь явно попросил или подтвердил.
+
+---
+
+## 11. Короткая формула текущего состояния
+
+```text
+Боевой кандидат:
+canon deep 38.2 → stop15 → take61.8
+canon OTE 78.6 → stop61.8 → take100, time-stop20
++ canon freshness×compact sizing
++ mirror reverse 100 → stop120 → take78.6
++ mirror freshness sizing 1.5/1.0/0.7
+− fade141 удалён как look-ahead/non-executable
+
+Но перед деньгами ещё проверить:
+bigbar executability
+risk quantity до fill
+causal rolling median
+точный cancel timestamp
+pre-touch mirror setup
+единый battle-family portfolio ledger
+```
