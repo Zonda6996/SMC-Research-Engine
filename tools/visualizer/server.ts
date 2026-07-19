@@ -172,7 +172,17 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>, ltf5m: import('..
 	return trades
 }
 
-/** Кандидаты ручного Decision Lab: только факт первого касания 141/200/241. */
+/**
+ * Кандидаты ручного Decision Lab: первое касание 141/200/241 только пока
+ * сетка относится к текущей структуре своего TF.
+ *
+ * Исторический FibGridCandidate сам по себе не означает «активную сетку»:
+ * snapshot хранит архив для бэктеста. Поэтому до touch каузально исключаем:
+ * - сетку, после которой уже подтвердилось противоположное событие;
+ * - сетку, которую заменила более новая сетка того же направления.
+ * Возраст не скрывается: UI отдельно фильтрует ageBars (по умолчанию 200
+ * HTF-баров), не меняя боевой lifecycle Deep/OTE.
+ */
 export function buildReactionCandidates(
 	snapshot: ReturnType<typeof runAnalysis>,
 	ltf5m: import('../../src/models/price/Candle.js').Candle[] | null,
@@ -180,16 +190,20 @@ export function buildReactionCandidates(
 	htfMs: number,
 ) {
 	const result: Record<string, unknown>[] = []
-	for (const candidate of snapshot.fib.candidates) {
-		const mode = candidate.variants.local ? 'local' : candidate.variants.global ? 'global' : null
-		if (!mode) continue
+	const prepared = snapshot.fib.candidates.flatMap((candidate) => {
+		const mode = candidate.variants.local ? 'local' as const : candidate.variants.global ? 'global' as const : null
+		if (!mode) return []
 		const variant = candidate.variants[mode]
-		if (!variant) continue
+		const created = snapshot.candles[candidate.createdAtIndex]
+		if (!variant || !created) return []
+		return [{ candidate, mode, variant, created, knownAt: created.timestamp + htfMs }]
+	})
+
+	for (const item of prepared) {
+		const { candidate, mode, variant, created, knownAt } = item
 		const p0 = variant.levels.find((x) => x.ratio === 0)?.price
 		const p100 = variant.levels.find((x) => x.ratio === 100)?.price
-		const created = snapshot.candles[candidate.createdAtIndex]
-		if (p0 == null || p100 == null || !created) continue
-		const knownAt = created.timestamp + htfMs
+		if (p0 == null || p100 == null) continue
 		// LTF можно использовать только если его история покрывает сам момент
 		// создания сетки. Иначе первый доступный 5m-бар ошибочно выглядел бы
 		// «первым касанием» уровня, который цена прошла задолго до LTF-окна.
@@ -206,6 +220,26 @@ export function buildReactionCandidates(
 				? snapshot.candles.findIndex((c) => touch.timestamp >= c.timestamp && touch.timestamp < c.timestamp + htfMs)
 				: touchIndex
 			if (touchHtfIndex < 0) continue
+
+			// Событие становится известным только после close confirm-свечи.
+			// Так мы не используем её будущий close против внутрисвечного 5m touch.
+			const oppositeDirection = candidate.direction === 'long' ? 'down' : 'up'
+			const expiredBeforeTouch = (snapshot.events ?? []).some((event) => {
+				const confirm = snapshot.candles[event.confirmIndex]
+				return event.confirmIndex > candidate.createdAtIndex && event.direction === oppositeDirection &&
+					confirm != null && confirm.timestamp + htfMs <= touch.timestamp
+			})
+			if (expiredBeforeTouch) continue
+
+			// На одном исходном TF новая сетка того же направления становится
+			// текущей структурой после своего close. Старая больше не предлагается
+			// как ручной 141/200/241 setup.
+			const supersededBeforeTouch = prepared.some((newer) =>
+				newer.candidate.direction === candidate.direction &&
+				newer.candidate.createdAtIndex > candidate.createdAtIndex &&
+				newer.knownAt <= touch.timestamp)
+			if (supersededBeforeTouch) continue
+
 			const touch15mIndex = ltf15m.findIndex((c) => touch.timestamp >= c.timestamp && touch.timestamp < c.timestamp + TF_MS['15m']!)
 			result.push({
 				id: `${candidate.id}|${mode}|${ratio}|${touch.timestamp}`,
@@ -213,7 +247,10 @@ export function buildReactionCandidates(
 				gridDirection: candidate.direction,
 				tradeDirection: candidate.direction === 'long' ? 'short' : 'long',
 				trigger: candidate.trigger, oppositeSweptBefore: candidate.oppositeSweptBefore,
-				createdAt: created.timestamp, touchAt: touch.timestamp,
+				createdAt: created.timestamp, knownAt, touchAt: touch.timestamp,
+				ageBars: Math.max(1, touchHtfIndex - candidate.createdAtIndex),
+				ageMs: Math.max(0, touch.timestamp - knownAt),
+				activeAtTouch: true,
 				touchHtfIndex, touchLtfIndex: ltfCoversSetup ? touchIndex : null,
 				touch15mIndex: touch15mIndex >= 0 ? touch15mIndex : null,
 				resolution: ltfCoversSetup ? '5m' : 'htf',

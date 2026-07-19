@@ -36,4 +36,60 @@ it('Decision Lab falls back to HTF when LTF history starts after setup', () => {
 	assert.equal(level141.touchHtfIndex, 1)
 	assert.equal(level141.touchLtfIndex, null)
 	assert.equal(level141.resolution, 'htf')
+	assert.equal(level141.ageBars, 1)
+})
+
+it('Decision Lab excludes a grid expired by an opposite confirmed structure before touch', () => {
+	const candles: Candle[] = [
+		{ timestamp: 0, open: 190, high: 200, low: 180, close: 195, volume: 1 },
+		{ timestamp: 900_000, open: 195, high: 210, low: 190, close: 205, volume: 1 },
+		{ timestamp: 1_800_000, open: 205, high: 250, low: 200, close: 240, volume: 1 },
+	]
+	const variant = {
+		start: { index: 0, timestamp: 0, price: 100, type: 'low', label: 'UNKNOWN', knownAtIndex: 0 },
+		levels: [{ ratio: 0, price: 100, kind: 'anchor' }, { ratio: 100, price: 200, kind: 'anchor' }],
+		legSize: 100, legAtrRatio: 5,
+	}
+	const snapshot = {
+		candles,
+		events: [{ direction: 'down', confirmIndex: 1 }],
+		fib: { candidates: [{
+			id: 'old-grid', eventId: 'event-1', trigger: 'bos', direction: 'long',
+			end: { index: 0, timestamp: 0, price: 200, type: 'high', label: 'HH', knownAtIndex: 0 },
+			variants: { local: variant, global: null }, createdAtIndex: 0,
+			oppositeSweptBefore: false, explanation: '',
+		}] },
+	} as unknown as ReturnType<typeof runAnalysis>
+
+	const result = buildReactionCandidates(snapshot, null, [], 900_000)
+	assert.equal(result.some((x) => x.candidateId === 'old-grid'), false)
+})
+
+it('Decision Lab excludes an old same-direction grid superseded before its touch', () => {
+	const candles: Candle[] = [
+		{ timestamp: 0, open: 190, high: 200, low: 180, close: 195, volume: 1 },
+		{ timestamp: 900_000, open: 195, high: 215, low: 190, close: 210, volume: 1 },
+		{ timestamp: 1_800_000, open: 210, high: 250, low: 205, close: 240, volume: 1 },
+	]
+	const makeVariant = (start: number, end: number) => ({
+		start: { index: 0, timestamp: 0, price: start, type: 'low', label: 'UNKNOWN', knownAtIndex: 0 },
+		levels: [{ ratio: 0, price: start, kind: 'anchor' }, { ratio: 100, price: end, kind: 'anchor' }],
+		legSize: end - start, legAtrRatio: 5,
+	})
+	const makeCandidate = (id: string, createdAtIndex: number, variant: ReturnType<typeof makeVariant>) => ({
+		id, eventId: `event-${id}`, trigger: 'bos', direction: 'long',
+		end: { index: createdAtIndex, timestamp: candles[createdAtIndex]!.timestamp, price: 200, type: 'high', label: 'HH', knownAtIndex: createdAtIndex },
+		variants: { local: variant, global: null }, createdAtIndex,
+		oppositeSweptBefore: false, explanation: '',
+	})
+	const snapshot = {
+		candles, events: [],
+		fib: { candidates: [
+			makeCandidate('old-grid', 0, makeVariant(100, 200)),
+			makeCandidate('new-grid', 1, makeVariant(150, 200)),
+		] },
+	} as unknown as ReturnType<typeof runAnalysis>
+
+	const result = buildReactionCandidates(snapshot, null, [], 900_000)
+	assert.equal(result.some((x) => x.candidateId === 'old-grid'), false)
 })
