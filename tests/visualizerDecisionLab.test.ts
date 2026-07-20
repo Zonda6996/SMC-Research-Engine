@@ -93,3 +93,26 @@ it('Decision Lab excludes an old same-direction grid superseded before its touch
 	const result = buildReactionCandidates(snapshot, null, [], 900_000)
 	assert.equal(result.some((x) => x.candidateId === 'old-grid'), false)
 })
+
+it('Decision Lab reaction id is stable when candle-window candidate ids change', () => {
+	const candles: Candle[] = [
+		{ timestamp: 0, open: 190, high: 200, low: 180, close: 195, volume: 1 },
+		{ timestamp: 900_000, open: 200, high: 250, low: 190, close: 240, volume: 1 },
+	]
+	const makeSnapshot = (candidateId: string) => ({
+		candles, events: [],
+		fib: { candidates: [{
+			id: candidateId, eventId: `event-${candidateId}`, trigger: 'bos', direction: 'long',
+			end: { index: 0, timestamp: 0, price: 200, type: 'high', label: 'HH', knownAtIndex: 0 },
+			variants: { local: {
+				start: { index: 0, timestamp: 0, price: 100, type: 'low', label: 'UNKNOWN', knownAtIndex: 0 },
+				levels: [{ ratio: 0, price: 100, kind: 'anchor' }, { ratio: 100, price: 200, kind: 'anchor' }],
+				legSize: 100, legAtrRatio: 5,
+			}, global: null }, createdAtIndex: 0, oppositeSweptBefore: false, explanation: '',
+		}] },
+	}) as unknown as ReturnType<typeof runAnalysis>
+
+	const first = buildReactionCandidates(makeSnapshot('window-index-10'), null, [], 900_000, 'BTC/USDT|1h')
+	const shifted = buildReactionCandidates(makeSnapshot('window-index-999'), null, [], 900_000, 'BTC/USDT|1h')
+	assert.equal(first.find((x) => x.ratio === 141)?.id, shifted.find((x) => x.ratio === 141)?.id)
+})

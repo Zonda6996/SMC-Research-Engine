@@ -8,7 +8,8 @@ let labCursorAt = 0
 let labRevealed = false
 let labOrder = []
 let labStartedAt = 0
-const LAB_KEY = 'smc-141-decisions-v5'
+let labLastContext = '5m'
+const LAB_KEY = 'smc-141-decisions-v6'
 const LAB_TF_MS={"5m":300000,"15m":900000,"30m":1800000,"45m":2700000,"1h":3600000,"2h":7200000,"3h":10800000,"4h":14400000}
 
 const C={green:'#35c59a',red:'#ff6675',amber:'#ffbd5b',blue:'#5b8cff',purple:'#a98bff',dim:'#8290a8',text:'#e5eaf2',grid:'#171f2e'}
@@ -124,8 +125,8 @@ function seedHash(text){let h=2166136261;for(const c of text){h^=c.charCodeAt(0)
 function seededRandom(seed){let x=seedHash(seed);return()=>{x+=0x6D2B79F5;let t=x;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 function baseLabCandidates(){
 	if(!data?.reactionCandidates)return[]
-	const level=$('labLevel')?.value||'all',exact=$('labExact')?.checked,age=$('labAge')?.value||'200'
-	return data.reactionCandidates.filter(x=>(level==='all'||String(x.ratio)===level)&&(!exact||x.resolution==='5m')&&(age==='all'||x.ageBars<=Number(age)))
+	const level=$('labLevel')?.value||'all',exact=$('labExact')?.checked,age=$('labAge')?.value||'200',saved=labDecisions()
+	return data.reactionCandidates.filter(x=>!saved[x.id]?.revealedAt&&(level==='all'||String(x.ratio)===level)&&(!exact||x.resolution==='5m')&&(age==='all'||x.ageBars<=Number(age)))
 }
 function rebuildLabOrder(){
 	const base=baseLabCandidates(),rand=seededRandom(`${$('labSeed').value}|${data?.dataset?.symbol}|${data?.dataset?.timeframe}|${$('labLevel').value}`)
@@ -135,7 +136,7 @@ function rebuildLabOrder(){
 }
 function labCandidates(){const map=new Map((data?.reactionCandidates||[]).map(x=>[x.id,x]));return labOrder.map(id=>map.get(id)).filter(Boolean)}
 function currentLab(){const xs=labCandidates();if(!xs.length)return null;labIndex=Math.max(0,Math.min(labIndex,xs.length-1));return xs[labIndex]}
-function setLabCursor(c){if(!c){labCursorAt=0;return}const d=labDecisions()[c.id];labCursorAt=d?.replayCursorAt||c.touchAt+LAB_TF_MS['5m'];labRevealed=false;labStartedAt=Date.now()}
+function setLabCursor(c){if(!c){labCursorAt=0;return}const d=labDecisions()[c.id];labCursorAt=d?.replayCursorAt||c.touchAt+LAB_TF_MS['5m'];labRevealed=!!d?.revealedAt;labStartedAt=Date.now();labLastContext=$('labContext').value}
 function aggregateKnown(base,tf,cursor){
 	const ms=LAB_TF_MS[tf],known=base.filter(c=>c.timestamp<cursor)
 	if(tf==='5m')return known
@@ -146,7 +147,9 @@ function aggregateKnown(base,tf,cursor){
 function labView(c,reveal=false){
 	const tf=$('labContext').value
 	if(c.resolution==='5m'&&data.ltf5m?.length){
-		const cursor=reveal?Math.min(data.ltf5m.at(-1).timestamp+LAB_TF_MS['5m'],c.touchAt+101*LAB_TF_MS['5m']):labCursorAt
+		const saved=labDecisions()[c.id],exitAt=saved?.outcome?.exitAt
+		const revealUntil=exitAt!=null?Math.max(c.touchAt+101*LAB_TF_MS['5m'],exitAt+5*LAB_TF_MS['5m']):c.touchAt+101*LAB_TF_MS['5m']
+		const cursor=reveal?Math.min(data.ltf5m.at(-1).timestamp+LAB_TF_MS['5m'],revealUntil):labCursorAt
 		const source=aggregateKnown(data.ltf5m,tf,cursor)
 		const ms=LAB_TF_MS[tf],touchIndex=source.findIndex(x=>c.touchAt>=x.timestamp&&c.touchAt<x.timestamp+ms)
 		return{source,touchIndex,context:tf,cursor}
@@ -168,14 +171,31 @@ function labSource(c){return labView(c,false)}
 function applyLabDecision(decision){
 	const c=currentLab();if(!c||labRevealed)return
 	const view=labView(c,false),decisionBar=view.source.at(-1),all=labDecisions(),previous=all[c.id]||{},now=new Date().toISOString()
-	all[c.id]={...previous,id:c.id,decision,entryStyle:$('labEntryStyle').value,targetRatio:$('labTarget').value,stopRatio:$('labStop').value,tags:labTags(),note:$('labNote').value.trim(),symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,level:c.ratio,gridCreatedAt:c.createdAt,gridKnownAt:c.knownAt,gridAgeBars:c.ageBars,touchAt:c.touchAt,decisionAt:view.cursor,decisionPrice:decisionBar?.close??c.levelPrice,barsWaited5m:Math.max(0,Math.round((view.cursor-(c.touchAt+LAB_TF_MS['5m']))/LAB_TF_MS['5m'])),decisionContext:view.context,contextMode:$('labContext').value,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,replayCursorAt:view.cursor,decisionDurationMs:Date.now()-labStartedAt,actions:[...(previous.actions||[]),{action:decision,cursorAt:view.cursor,context:view.context,recordedAt:now}],recordedAt:now};saveLabDecisions(all);renderLab()
+	if(previous.revealedAt)return
+	all[c.id]={...previous,id:c.id,decision,entryStyle:$('labEntryStyle').value,targetRatio:$('labTarget').value,stopRatio:$('labStop').value,tags:labTags(),note:$('labNote').value.trim(),symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,datasetUntil:data.dataset.until,level:c.ratio,gridCreatedAt:c.createdAt,gridKnownAt:c.knownAt,gridAgeBars:c.ageBars,touchAt:c.touchAt,decisionAt:view.cursor,decisionPrice:decisionBar?.close??c.levelPrice,barsWaited5m:Math.max(0,Math.round((view.cursor-(c.touchAt+LAB_TF_MS['5m']))/LAB_TF_MS['5m'])),decisionContext:view.context,contextMode:$('labContext').value,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,replayCursorAt:view.cursor,decisionDurationMs:Date.now()-labStartedAt,actions:[...(previous.actions||[]),{action:decision,cursorAt:view.cursor,context:view.context,recordedAt:now}],recordedAt:now};saveLabDecisions(all);renderLab()
 }
 function loadLabForm(c){const d=labDecisions()[c.id];document.querySelectorAll('[data-lab-tag]').forEach(x=>x.checked=!!d?.tags?.includes(x.dataset.labTag));$('labNote').value=d?.note||'';$('labEntryStyle').value=d?.entryStyle||'reaction-close';$('labTarget').value=d?.targetRatio||(c.ratio===241?'141':c.ratio===200?'141':'100');$('labStop').value=d?.stopRatio||(c.ratio===241?'261':c.ratio===200?'241':'176');$('labTake').classList.toggle('active',d?.decision==='TAKE');$('labSkip').classList.toggle('active',d?.decision==='SKIP')}
 function renderLabAnalytics(){const ds=Object.values(labDecisions()),final=ds.filter(x=>x.decision==='TAKE'||x.decision==='SKIP'),takes=final.filter(x=>x.decision==='TAKE'),resolved=takes.filter(x=>x.outcome?.grossR!=null),avg=resolved.length?resolved.reduce((s,x)=>s+x.outcome.grossR,0)/resolved.length:0;$('labAnalytics').textContent=`TAKE ${takes.length} · SKIP ${final.length-takes.length} · resolved ${resolved.length} · TAKE avg ${fmtR(avg)}`}
+function renderLabOutcome(d){
+	const el=$('labOutcome'),o=d?.outcome
+	if(!labRevealed){el.style.display='none';el.textContent='';return}
+	if(!o){el.className='lab-outcome neutral';el.style.display='block';el.textContent='REVEALED · автоматический исход недоступен для manual-геометрии';return}
+	const r=o.grossR,kind=r>0?'win':r<0?'loss':'neutral',label=o.status==='tp'?'TAKE PROFIT':o.status==='stop'?'STOP LOSS':o.status==='open'?'OPEN':o.status.toUpperCase()
+	el.className=`lab-outcome ${kind}`;el.style.display='block'
+	el.innerHTML=`<b>${d.decision==='SKIP'?'SKIP · counterfactual':'TAKE'}: ${label}${r!=null?` · ${fmtR(r)}`:''}</b>${o.entry!=null?`<br><span class="muted">entry ${fmtP(o.entry)} · stop ${fmtP(o.stop)} · target ${fmtP(o.target)}${o.bars!=null?` · ${o.bars}×5m`:''}</span>`:''}`
+}
+function switchLabContext(){
+	const to=$('labContext').value,c=currentLab(),from=labLastContext
+	labLastContext=to
+	if(!c||to===from||labRevealed){renderLab();return}
+	const all=labDecisions(),previous=all[c.id]||{},now=new Date().toISOString()
+	all[c.id]={...previous,id:c.id,decision:previous.decision??null,symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,datasetUntil:data.dataset.until,level:c.ratio,gridCreatedAt:c.createdAt,gridKnownAt:c.knownAt,gridAgeBars:c.ageBars,touchAt:c.touchAt,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,actions:[...(previous.actions||[]),{action:'TF_SWITCH',from,to,cursorAt:labCursorAt,recordedAt:now}],replayCursorAt:labCursorAt,lastObservedAt:labCursorAt}
+	saveLabDecisions(all);renderLab()
+}
 function renderLab(){
 	if(!data||!labMode)return
 	clearOverlays();markersPlugin.setMarkers([])
-	const c=currentLab(),xs=labCandidates();if(!c){$('labStatus').textContent='Нет structurally-active exact-LTF касаний по уровню/возрасту';return}
+	const c=currentLab(),xs=labCandidates();if(!c){$('labStatus').textContent='Нет новых structurally-active exact-LTF касаний по уровню/возрасту';$('labOutcome').style.display='none';return}
 	loadLabForm(c);document.body.classList.toggle('lab-blind',$('labBlind').checked&&!labRevealed);chart.applyOptions({timeScale:{visible:!$('labBlind').checked||labRevealed},rightPriceScale:{visible:!$('labBlind').checked||labRevealed}})
 	const view=labView(c,labRevealed),source=view.source,touchIndex=view.touchIndex,left=Number($('labHistory').value)||250
 	const shown=source.slice(Math.max(0,touchIndex-left),source.length)
@@ -186,16 +206,18 @@ function renderLab(){
 	const leg=line([{time:startTime,value:c.legStart.price},{time:endTime,value:c.legEnd.price}].sort((a,b)=>a.time-b.time),{color:C.amber,lineWidth:3,lineStyle:LightweightCharts.LineStyle.Dashed})
 	LightweightCharts.createSeriesMarkers(leg,[{time:startTime,position:'inBar',color:C.amber,shape:'circle',size:1,text:startBefore?'← 0% ДО ОКНА':'0% START'},{time:endTime,position:'inBar',color:C.blue,shape:'circle',size:1,text:endBefore?'← 100% ДО ОКНА':'100% EVENT'}].sort((a,b)=>a.time-b.time))
 	for(const x of c.gridLevels.filter(x=>[0,61.8,78.6,100,141,161,200,241,261].includes(x.ratio))){const key=x.ratio===c.ratio,s=line([{time:from,value:x.price},{time:to,value:x.price}],{color:key?C.purple:x.ratio>100?'#7059a8':'#49699d',lineWidth:key?3:1,lineStyle:key?LightweightCharts.LineStyle.Solid:LightweightCharts.LineStyle.Dotted});LightweightCharts.createSeriesMarkers(s,[{time:Math.max(from,time(c.touchAt)),position:'inBar',color:key?C.purple:C.dim,shape:'circle',size:0,text:blind?`${x.ratio}%`:`${x.ratio}% ${fmtP(x.price)}`}])}
-	markersPlugin.setMarkers([{time:time(c.touchAt),position:c.tradeDirection==='long'?'belowBar':'aboveBar',color:C.purple,shape:c.tradeDirection==='long'?'arrowUp':'arrowDown',size:1,text:`DECIDE ${c.ratio}`}])
 	const decisions=labDecisions(),d=decisions[c.id],done=Object.values(decisions).filter(x=>x.decision==='TAKE'||x.decision==='SKIP').length,wait=Math.max(0,Math.round((view.cursor-(c.touchAt+LAB_TF_MS['5m']))/LAB_TF_MS['5m']))
+	const marks=[{time:time(c.touchAt),position:c.tradeDirection==='long'?'belowBar':'aboveBar',color:C.purple,shape:c.tradeDirection==='long'?'arrowUp':'arrowDown',size:1,text:`DECIDE ${c.ratio}`}]
+	if(labRevealed&&d?.outcome?.exitAt!=null){const ms=LAB_TF_MS[view.context]||LAB_TF_MS['5m'],exitBar=source.find(x=>d.outcome.exitAt>=x.timestamp&&d.outcome.exitAt<x.timestamp+ms);if(exitBar)marks.push({time:time(exitBar.timestamp),position:d.outcome.status==='stop'?'belowBar':'aboveBar',color:d.outcome.status==='stop'?C.red:C.green,shape:'circle',size:1,text:d.outcome.status==='stop'?'STOP':`TP ${fmtR(d.outcome.grossR)}`})}
+	markersPlugin.setMarkers(marks.sort((a,b)=>a.time-b.time))
 	const origin=blind?`сетка создана ${c.ageBars} HTF-баров до касания`:`сетка известна ${new Date(c.knownAt).toLocaleString('ru-RU')} → касание ${new Date(c.touchAt).toLocaleString('ru-RU')} · возраст ${c.ageBars} ${data.dataset.timeframe}-бар.`
 	$('labStatus').innerHTML=`${labIndex+1}/${xs.length} · <b>${c.ratio}%</b> · ${c.tradeDirection.toUpperCase()} · ${view.context} · +${wait}×5m · ${d?.decision||'НЕ РЕШЕНО'} · решений ${done}${labRevealed?' · REVEALED':''}<br><span class="muted">${origin} · структура active-at-touch</span>`
-	renderLabAnalytics();chart.timeScale().fitContent()
+	renderLabOutcome(d);renderLabAnalytics();chart.timeScale().fitContent()
 }
 function moveLab(step){const xs=labCandidates();if(!xs.length)return;labIndex=(labIndex+step+xs.length)%xs.length;setLabCursor(currentLab());renderLab()}
-function advanceLab(action){const c=currentLab();if(!c||labRevealed||c.resolution!=='5m')return;const max=data.ltf5m.at(-1).timestamp+LAB_TF_MS['5m'];if(labCursorAt+LAB_TF_MS['5m']>max)return;labCursorAt+=LAB_TF_MS['5m'];const all=labDecisions(),previous=all[c.id]||{},now=new Date().toISOString();all[c.id]={...previous,id:c.id,decision:previous.decision??null,symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,level:c.ratio,gridCreatedAt:c.createdAt,gridKnownAt:c.knownAt,gridAgeBars:c.ageBars,touchAt:c.touchAt,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,actions:[...(previous.actions||[]),{action,cursorAt:labCursorAt,context:$('labContext').value,recordedAt:now}],replayCursorAt:labCursorAt,lastObservedAt:labCursorAt};saveLabDecisions(all);renderLab()}
+function advanceLab(action){const c=currentLab();if(!c||labRevealed||c.resolution!=='5m')return;const max=data.ltf5m.at(-1).timestamp+LAB_TF_MS['5m'];if(labCursorAt+LAB_TF_MS['5m']>max)return;labCursorAt+=LAB_TF_MS['5m'];const all=labDecisions(),previous=all[c.id]||{},now=new Date().toISOString();all[c.id]={...previous,id:c.id,decision:previous.decision??null,symbol:data.dataset.symbol,timeframe:data.dataset.timeframe,datasetUntil:data.dataset.until,level:c.ratio,gridCreatedAt:c.createdAt,gridKnownAt:c.knownAt,gridAgeBars:c.ageBars,touchAt:c.touchAt,tradeDirection:c.tradeDirection,trigger:c.trigger,oppositeSweptBefore:c.oppositeSweptBefore,actions:[...(previous.actions||[]),{action,cursorAt:labCursorAt,context:$('labContext').value,recordedAt:now}],replayCursorAt:labCursorAt,lastObservedAt:labCursorAt};saveLabDecisions(all);renderLab()}
 function toggleLab(){labMode=!labMode;$('labControls').style.display=labMode?'block':'none';$('labToggle').textContent=labMode?'Выключить':'Включить';$('labToggle').classList.toggle('active',labMode);if(labMode){selectedId=null;rebuildLabOrder();setLabCursor(currentLab());renderLab()}else{document.body.classList.remove('lab-blind');chart.applyOptions({timeScale:{visible:true},rightPriceScale:{visible:true}});restoreMainCandles();redraw();chart.timeScale().fitContent()}}
-function revealLab(){const c=currentLab();if(!c)return;const all=labDecisions(),d=all[c.id];if(d?.decision!=='TAKE'&&d?.decision!=='SKIP'){alert('Сначала выберите TAKE или SKIP');return}labRevealed=true;all[c.id]={...d,outcome:simulateLabOutcome(c,d),actions:[...(d.actions||[]),{action:'REVEAL',cursorAt:labCursorAt,context:$('labContext').value,recordedAt:new Date().toISOString()}]};saveLabDecisions(all);renderLab()}
+function revealLab(){const c=currentLab();if(!c||labRevealed)return;const all=labDecisions(),d=all[c.id];if(d?.decision!=='TAKE'&&d?.decision!=='SKIP'){alert('Сначала выберите TAKE или SKIP');return}const revealedAt=new Date().toISOString();labRevealed=true;all[c.id]={...d,revealedAt,outcome:simulateLabOutcome(c,d),actions:[...(d.actions||[]),{action:'REVEAL',cursorAt:labCursorAt,context:$('labContext').value,recordedAt:revealedAt}]};saveLabDecisions(all);renderLab()}
 function exportLab(){const blob=new Blob([JSON.stringify(Object.values(labDecisions()),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`decision-lab-session-${Date.now()}.json`;a.click();URL.revokeObjectURL(a.href)}
 function clearLab(){const c=currentLab();if(!c)return;const all=labDecisions();delete all[c.id];saveLabDecisions(all);setLabCursor(c);renderLab()}
 
@@ -205,12 +227,13 @@ function status(text){$('loading').style.display=text?'block':'none';$('loading'
 
 async function load(){
 	$('loadBtn').disabled=true;status('Загрузка данных…')
-	try{const symbol=$('symbol').value.trim()||'BTC/USDT',timeframe=document.querySelector('#tfGroup .active')?.dataset.tf||'30m',limit=Number($('limit').value)||5000,source=$('source').value;const q=new URLSearchParams({symbol,timeframe,limit:String(limit),source});const r=await fetch(`/api/analyze?${q}`),json=await r.json();if(json.error)throw new Error(json.error);data=json;selectedId=null;labMode=false;labOrder=[];labCursorAt=0;labRevealed=false;$('labControls').style.display='none';$('labToggle').textContent='Включить';$('labToggle').classList.remove('active');initChart();candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})));$('version').textContent=data.strategy.version;$('dataset').textContent=`${data.dataset.symbol} · ${data.dataset.timeframe} · ${data.dataset.candleCount} свечей · ${data.finalTrend}`;redraw();const latest=getFiltered().find(t=>!t.first5Skipped)||getFiltered()[0];if(latest)selectTrade(latest.id);else chart.timeScale().fitContent();status('')}catch(e){status(`Ошибка: ${e.message}`)}finally{$('loadBtn').disabled=false}}
+	try{const symbol=$('symbol').value.trim()||'BTC/USDT',timeframe=document.querySelector('#tfGroup .active')?.dataset.tf||'30m',limit=Number($('limit').value)||5000,source=$('source').value,until=$('historyUntil').value;const q=new URLSearchParams({symbol,timeframe,limit:String(limit),source});if(until)q.set('until',until);const r=await fetch(`/api/analyze?${q}`),json=await r.json();if(json.error)throw new Error(json.error);data=json;selectedId=null;labMode=false;labOrder=[];labCursorAt=0;labRevealed=false;$('labControls').style.display='none';$('labToggle').textContent='Включить';$('labToggle').classList.remove('active');initChart();candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})));$('version').textContent=data.strategy.version;$('dataset').textContent=`${data.dataset.symbol} · ${data.dataset.timeframe} · ${data.dataset.candleCount} свечей · ${data.dataset.until?`до ${data.dataset.until.slice(0,10)} · `:''}${data.finalTrend}`;redraw();const latest=getFiltered().find(t=>!t.first5Skipped)||getFiltered()[0];if(latest)selectTrade(latest.id);else chart.timeScale().fitContent();status('')}catch(e){status(`Ошибка: ${e.message}`)}finally{$('loadBtn').disabled=false}}
+function randomHistoricalPeriod(){const from=Date.UTC(2024,2,1),to=Date.now(),at=from+Math.floor(Math.random()*(to-from));$('historyUntil').value=new Date(at).toISOString().slice(0,10);load()}
 async function loadSymbols(){try{const r=await fetch('/api/symbols'),x=await r.json();if(x.symbols)$('symbolsList').innerHTML=x.symbols.map(s=>`<option value="${s}">`).join('')}catch{}}
 
-$('loadBtn').onclick=load;$('symbol').onkeydown=e=>{if(e.key==='Enter')load()};document.querySelectorAll('#tfGroup button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tfGroup button').forEach(x=>x.classList.remove('active'));b.classList.add('active');load()})
+$('loadBtn').onclick=load;$('randomPeriod').onclick=randomHistoricalPeriod;$('symbol').onkeydown=e=>{if(e.key==='Enter')load()};document.querySelectorAll('#tfGroup button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tfGroup button').forEach(x=>x.classList.remove('active'));b.classList.add('active');load()})
 for(const id of['fStream','fDirection','fResult','fTrigger','bigbarOnly','showSkipped','showEvents','showProtected'])$(id).onchange=()=>{selectedId=null;redraw()}
 $('prevBtn').onclick=()=>navigate(-1);$('nextBtn').onclick=()=>navigate(1)
-$('labToggle').onclick=toggleLab;$('labShuffle').onclick=()=>{rebuildLabOrder();renderLab()};$('labPrev').onclick=()=>moveLab(-1);$('labNext').onclick=()=>moveLab(1);$('labStep').onclick=()=>advanceLab('STEP');$('labWait').onclick=()=>advanceLab('WAIT');$('labTake').onclick=()=>applyLabDecision('TAKE');$('labSkip').onclick=()=>applyLabDecision('SKIP');$('labReveal').onclick=revealLab;$('labExport').onclick=exportLab;$('labClear').onclick=clearLab;for(const id of['labLevel','labAge','labRandom','labExact'])$(id).onchange=()=>{rebuildLabOrder();renderLab()};$('labSeed').onchange=()=>{rebuildLabOrder();renderLab()};for(const id of['labContext','labHistory','labBlind'])$(id).onchange=renderLab
+$('labToggle').onclick=toggleLab;$('labShuffle').onclick=()=>{rebuildLabOrder();renderLab()};$('labPrev').onclick=()=>moveLab(-1);$('labNext').onclick=()=>moveLab(1);$('labStep').onclick=()=>advanceLab('STEP');$('labWait').onclick=()=>advanceLab('WAIT');$('labTake').onclick=()=>applyLabDecision('TAKE');$('labSkip').onclick=()=>applyLabDecision('SKIP');$('labReveal').onclick=revealLab;$('labExport').onclick=exportLab;$('labClear').onclick=clearLab;for(const id of['labLevel','labAge','labRandom','labExact'])$(id).onchange=()=>{rebuildLabOrder();renderLab()};$('labSeed').onchange=()=>{rebuildLabOrder();renderLab()};$('labContext').onchange=switchLabContext;for(const id of['labHistory','labBlind'])$(id).onchange=renderLab
 document.addEventListener('keydown',e=>{if(labMode){if(e.key==='ArrowLeft')moveLab(-1);if(e.key==='ArrowRight')moveLab(1);return}if(e.key==='ArrowUp')navigate(-1);if(e.key==='ArrowDown')navigate(1)})
 initChart();loadSymbols();load()

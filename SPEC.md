@@ -2697,8 +2697,9 @@ UI-режим Decision Lab:
   и stop ratio; для 241 default TP141/SL261;
 - теги: opposite candle, stopping, liquidity sweep, strong zone,
   oversold, trend context + свободная заметка;
-- решения хранятся локально (`smc-141-decisions-v5`) и экспортируются JSON;
-  v5 начинает чистую сессию после удаления архивных/superseded сеток;
+- решения хранятся локально (`smc-141-decisions-v6`) и экспортируются JSON;
+  v6 начинает чистую сессию со стабильными timestamp-based reaction id: один
+  рыночный сетап не дублируется после загрузки другого размера окна;
 - уровни 141/200/241 рассматриваются отдельно, без навязанного entry/stop.
 
 Цель — собрать минимум 100–200 решений и проверить, отделяет ли реальное
@@ -2727,9 +2728,13 @@ Decision Lab v2 превращён в синхронный replay simulator:
   потока и обрезается единым `replayCursorAt` — переключение TF не
   раскрывает будущее;
 - WAIT/STEP двигают cursor ровно на 5m и пишутся в action trail;
+- каждое переключение контекста пишется как `TF_SWITCH` без движения cursor;
 - TAKE/SKIP сохраняют decision time/price/context/duration/tags;
-- REVEAL рассчитывает gross outcome по выбранным entry/SL/TP (touch или
-  reaction-close), сохраняет TP/SL/open, R и bars;
+- REVEAL однократен, рассчитывает gross outcome по выбранным entry/SL/TP
+  (touch или reaction-close), явно показывает TP/SL/open, R, bars и exit-marker;
+  reveal-график продолжается до фактического exit, а не обрывается на 100 барах;
+- date/until и random historical period загружают синхронное историческое окно
+  (от 01.03.2024 до текущей даты) без попытки держать миллионы 5m-свечей;
 - локальная аналитика показывает TAKE/SKIP/resolved/TAKE avgR.
 
 ## 7.53 Аудит приватного Telegram signal bot (ИНСТРУМЕНТ ГОТОВ)

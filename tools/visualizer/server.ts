@@ -24,7 +24,7 @@ import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
-import { aggregateCandles, fetchCandlesPaginated, MAX_CANDLES, TF_MS } from '../shared/candleFetcher.js'
+import { aggregateCandles, fetchCandlesPaginated, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PUBLIC_DIR = join(__dirname, 'public')
@@ -44,6 +44,7 @@ interface AnalyzeQuery {
 	limit?: string | undefined
 	source?: string | undefined
 	market?: string | undefined
+	until?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -54,6 +55,7 @@ function parseQuery(qs: string): AnalyzeQuery {
 		limit: params.get('limit') ?? undefined,
 		source: params.get('source') ?? undefined,
 		market: params.get('market') ?? undefined,
+		until: params.get('until') ?? undefined,
 	}
 }
 
@@ -188,6 +190,7 @@ export function buildReactionCandidates(
 	ltf5m: import('../../src/models/price/Candle.js').Candle[] | null,
 	ltf15m: import('../../src/models/price/Candle.js').Candle[],
 	htfMs: number,
+	scope = '',
 ) {
 	const result: Record<string, unknown>[] = []
 	const prepared = snapshot.fib.candidates.flatMap((candidate) => {
@@ -241,8 +244,10 @@ export function buildReactionCandidates(
 			if (supersededBeforeTouch) continue
 
 			const touch15mIndex = ltf15m.findIndex((c) => touch.timestamp >= c.timestamp && touch.timestamp < c.timestamp + TF_MS['15m']!)
+			const stableId = [scope, candidate.direction, mode, variant.start.timestamp, p0,
+				candidate.end.timestamp, p100, created.timestamp, ratio, touch.timestamp].join('|')
 			result.push({
-				id: `${candidate.id}|${mode}|${ratio}|${touch.timestamp}`,
+				id: stableId,
 				candidateId: candidate.id, ratio, levelPrice: price,
 				gridDirection: candidate.direction,
 				tradeDirection: candidate.direction === 'long' ? 'short' : 'long',
@@ -299,16 +304,22 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const timeframe = q.timeframe ?? '30m'
 			const limit = Number(q.limit ?? 2000)
 			const market = q.market === 'spot' ? 'spot' : 'futures'
+			const parsedUntil = q.until ? Date.parse(`${q.until}T23:59:59.999Z`) : null
+			if (q.until && !Number.isFinite(parsedUntil)) throw new Error(`Invalid until date: ${q.until}`)
+			const untilMs = parsedUntil == null ? null : Math.min(parsedUntil, Date.now())
 
 			const useFixture = q.source !== 'fresh'
 			const candles = useFixture
 				? loadFixtureCandles()
-				: await fetchCandlesPaginated(symbol, timeframe, limit, market)
+				: await fetchCandlesPaginated(symbol, timeframe, limit, market, untilMs)
 			const snapshot = runAnalysis(candles)
 			const htfMs = TF_MS[timeframe]
 			if (!htfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
+			// Default Lab horizon = 250 bars left + max age 200 HTF bars.
+			// Это даёт exact 5m без загрузки сотен тысяч свечей всей HTF-истории.
+			const ltfNeed = Math.max(5_000, Math.ceil(450 * htfMs / TF_MS['5m']!))
 			const ltf5m = useFixture ? null : await fetchCandlesPaginated(symbol, '5m',
-				Math.min(MAX_CANDLES, Math.ceil(limit * htfMs / TF_MS['5m']!)), market)
+				Math.min(MAX_CANDLES_LTF, ltfNeed), market, untilMs, MAX_CANDLES_LTF)
 			const ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
 
 			sendJson(res, 200, {
@@ -319,11 +330,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					entryGate: BATTLE_CONFIG.entryGate,
 					mirror: 'removed',
 				},
-				dataset: { symbol, timeframe, limit, candleCount: candles.length, source: useFixture ? 'fixture' : 'fresh' },
+				dataset: { symbol, timeframe, limit, candleCount: candles.length, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
 				ltf15m,
-				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs),
+				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs, `${symbol}|${timeframe}`),
 				structure: snapshot.structure,
 				trendHistory: snapshot.market.trendHistory,
 				finalTrend: snapshot.market.trend,
