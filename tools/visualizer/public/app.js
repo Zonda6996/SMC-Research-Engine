@@ -9,7 +9,7 @@ let labRevealed = false
 let labOrder = []
 let labStartedAt = 0
 let labLastContext = '5m'
-const LAB_KEY = 'smc-141-decisions-v7'
+const LAB_KEY = 'smc-141-decisions-v8'
 const LAB_TF_MS={"5m":300000,"15m":900000,"30m":1800000,"45m":2700000,"1h":3600000,"2h":7200000,"3h":10800000,"4h":14400000}
 
 const C={green:'#35c59a',red:'#ff6675',amber:'#ffbd5b',blue:'#5b8cff',purple:'#a98bff',dim:'#8290a8',text:'#e5eaf2',grid:'#171f2e'}

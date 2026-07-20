@@ -13,7 +13,8 @@
 		"portfolio": "tsx tools/batch/runBatch.ts --portfolio",
 		"multitf": "tsx tools/batch/runMultiTf.ts",
 		"execution-audit": "tsx tools/batch/runExecutionAudit.ts",
-		"review-telegram": "tsx tools/review/analyzeTelegramSignals.ts"
+		"review-telegram": "tsx tools/review/analyzeTelegramSignals.ts",
+		"reaction-audit": "tsx tools/review/runReactionAudit.ts"
 	},
 	"keywords": [],
 	"author": "",

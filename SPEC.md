@@ -2697,8 +2697,8 @@ UI-режим Decision Lab:
   и stop ratio; для 241 default TP141/SL261;
 - теги: opposite candle, stopping, liquidity sweep, strong zone,
   oversold, trend context + свободная заметка;
-- решения хранятся локально (`smc-141-decisions-v7`) и экспортируются JSON;
-  v7 начинает чистую сессию после гарантии полного левого контекста;
+- решения хранятся локально (`smc-141-decisions-v8`) и экспортируются JSON;
+  v8 начинает чистую сессию после исключения уровней, достигнутых до knownAt;
   timestamp-based reaction id стабилен: один рыночный сетап не дублируется
   после загрузки другого размера окна;
 - уровни 141/200/241 рассматриваются отдельно, без навязанного entry/stop.
@@ -2739,6 +2739,21 @@ Decision Lab v2 превращён в синхронный replay simulator:
 - date/until и random historical period загружают синхронное историческое окно
   (от 01.03.2024 до текущей даты) без попытки держать миллионы 5m-свечей;
 - локальная аналитика показывает TAKE/SKIP/resolved/TAKE avgR.
+
+BTC manual pilot v7 дал 21 решение, но формат признан слишком трудоёмким:
+TAKE 13 (12 closed) = -4.00R, avg -0.333R; 141 TAKE closed 7 =
++1.00R, avg +0.143R; 241 TAKE 5/5 stop = -5R. Три исполнимых SKIP
+все спасли stop, ещё пять были entry-expired/invalid-geometry. Это пилот,
+не финальная статистика: часть STEP прокликана в усталости.
+
+`npm run reaction-audit` переносит только заранее зафиксированные признаки
+в автоматический research, не в battle/forward: 141/241 отдельно,
+30m/1h/4h, окна 2024/2025/2026, first opposite 5m candle close,
+wait 1/3/6/12, min actual RR 0/0.5/1, optional full-body-through skip,
+BingX costs и требование положительности в каждом временном окне. Сетки,
+чей extension уже был достигнут до `knownAt`, исключаются: последующий
+возврат не считается первым касанием. Oversold/overbought не добавляются:
+без отдельной формальной индикаторной гипотезы это новая логика.
 
 ## 7.53 Аудит приватного Telegram signal bot (ИНСТРУМЕНТ ГОТОВ)
 

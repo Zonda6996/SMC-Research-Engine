@@ -220,6 +220,11 @@ export function buildReactionCandidates(
 		const source = ltfCoversSetup ? ltf5m : snapshot.candles
 		for (const ratio of [141, 200, 241] as const) {
 			const price = gridLevelPrice(p0, p100, ratio)
+			// Если extension уже был достигнут до close, на котором сетка стала
+			// известна, последующий возврат не является «первым касанием».
+			const touchedBeforeKnown = snapshot.candles.slice(Math.max(0, variant.start.index), candidate.createdAtIndex + 1)
+				.some((c) => candidate.direction === 'long' ? c.high >= price : c.low <= price)
+			if (touchedBeforeKnown) continue
 			const touchIndex = source.findIndex((c) => c.timestamp >= knownAt &&
 				(candidate.direction === 'long' ? c.high >= price : c.low <= price))
 			if (touchIndex < 0) continue

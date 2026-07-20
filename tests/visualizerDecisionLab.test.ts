@@ -145,3 +145,24 @@ it('Decision Lab exact candidate requires the requested left replay history', ()
 	assert.ok(enough.some((x) => x.ratio === 141))
 	assert.equal(tooClose.some((x) => x.ratio === 141), false)
 })
+
+it('Decision Lab excludes a level already touched before the grid became known', () => {
+	const candles: Candle[] = [
+		{ timestamp: 0, open: 190, high: 250, low: 180, close: 220, volume: 1 },
+		{ timestamp: 900_000, open: 220, high: 250, low: 210, close: 240, volume: 1 },
+	]
+	const snapshot = {
+		candles, events: [],
+		fib: { candidates: [{
+			id: 'late-grid', eventId: 'event', trigger: 'bos', direction: 'long',
+			end: { index: 0, timestamp: 0, price: 200, type: 'high', label: 'HH', knownAtIndex: 0 },
+			variants: { local: {
+				start: { index: 0, timestamp: 0, price: 100, type: 'low', label: 'UNKNOWN', knownAtIndex: 0 },
+				levels: [{ ratio: 0, price: 100, kind: 'anchor' }, { ratio: 100, price: 200, kind: 'anchor' }],
+				legSize: 100, legAtrRatio: 5,
+			}, global: null }, createdAtIndex: 0, oppositeSweptBefore: false, explanation: '',
+		}] },
+	} as unknown as ReturnType<typeof runAnalysis>
+	const result = buildReactionCandidates(snapshot, null, [], 900_000)
+	assert.equal(result.some((x) => x.ratio === 141), false)
+})
