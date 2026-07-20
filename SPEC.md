@@ -2808,3 +2808,30 @@ TP-закрытия и 0 явных SL, поэтому по самому Telegra
   вернулось — см. баг №6 в реестре).
 
 P.S. ��десь опи��аны не все возмож��ости, а только что нужно сделать в ближайшем будущем.
+
+## 7.54 Refined POI confirmation research v0.1 (НЕ BATTLE)
+
+Версия: `refined-poi-0.1.1-ltf-aligned`. Это первая визуально проверяемая
+механическая версия, не точная копия discretionary/heatmap стратегии и не
+часть Deep/OTE forward.
+
+POI v0.1: 4h structural Order Block ∩ FVG одного displacement около
+подтверждённого BOS/CHoCH; full-candle OB, классический 3-candle FVG.
+Подтверждение: 15m POI touch → stopping volume (max20 ИЛИ >=1.5×SMA20) →
+3 свечи без нового экстремума + rebound >=0.5 ATR → повторный sweep → close
+обратно на sweep-свече или следующей → 1–2 opposite test candles с volume
+ниже последней impulse-свечи → первая close-свеча по направлению = entry.
+Stop за sweep-extreme +0.05 ATR; diagnostic outcomes: full 2R. Отказы:
+`poi-invalidated/no-stopping/no-rebound/no-second-sweep/failed-protection/
+high-volume-test/no-low-volume-test/second-extreme-break/no-resumption`.
+
+Visualizer обязан показывать OB, FVG, overlap POI и полный state trace:
+POI_KNOWN/TOUCH, STOPPING, REBOUND, SECOND_SWEEP, PROTECTED,
+LOW_VOLUME_TEST, ENTRY, STOP/TP2, включая rejected/pending случаи. Сначала
+проверяются последние BTC 4h→15m детекции; batch/OOS запрещён до визуальной
+валидации. Следующая независимая версия после этого — 1h→5m.
+
+v0.1.1 alignment fix: HTF POI не попадает в визуальный список, если 15m
+history не покрывает `poiKnownAt`; default список содержит только POI с
+фактическим touch (entered + rejected), newest first. Старые pending-зоны
+вне LTF-окна больше не могут показываться поверх современных свечей.

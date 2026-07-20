@@ -54,6 +54,7 @@
 					<label class="check"><input type="checkbox" id="showProtected">protected</label>
 				</div>
 			</section>
+			<section class="section" id="refinedPanel"><div class="section-title"><span>Refined POI 0.1 · 4h→15m</span><button class="labbtn" id="refinedToggle">Открыть</button></div><div id="refinedControls" style="display:none"><div class="filters"><select id="refinedStatus"><option value="touched" selected>Touched: entered + rejected</option><option value="entered">Entered</option><option value="rejected">Rejected</option><option value="pending">Pending без касания</option><option value="all">Все состояния</option></select><select id="refinedReason"><option value="all">Все причины</option></select></div><div class="lab-status" id="refinedStatusText">—</div><div class="lab-actions"><button class="labbtn" id="refinedPrev">←</button><button class="labbtn" id="refinedNext">→</button><button class="labbtn" id="refinedBack">Вернуть обычный график</button><button class="labbtn" id="refinedExport">Экспорт POI JSON</button></div><div class="detail" id="refinedTrace"></div><div class="notice">Сначала проверяем только детектор: POI, stopping, sweep, protection, low-volume test и entry. Статистика пока не является результатом стратегии.</div></div></section>
 			<section class="section" id="labPanel">
 				<div class="section-title"><span>141 / 200 / 241 Decision Lab</span><button class="labbtn" id="labToggle">Включить</button></div>
 				<div id="labControls" style="display:none">
