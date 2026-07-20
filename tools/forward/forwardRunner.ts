@@ -234,6 +234,9 @@ export function firstLtfTouch(
 ): { offset: number; at: number } | null {
 	if (!ltf) return null
 	const bars = ltf.filter((c) => c.timestamp >= htfOpen && c.timestamp < htfOpen + htfMs)
+	// Если начало HTF-бара выпало из rolling LTF-окна, первая доступная
+	// свеча не имеет права считаться offset=0 (иначе ложный first-5 cancel).
+	if (bars[0]?.timestamp !== htfOpen) return null
 	for (let i = 0; i < bars.length; i++) {
 		const c = bars[i]!
 		if (long ? c.low <= entry : c.high >= entry) return { offset: i, at: c.timestamp }

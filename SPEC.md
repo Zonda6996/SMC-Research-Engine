@@ -2746,6 +2746,17 @@ TAKE 13 (12 closed) = -4.00R, avg -0.333R; 141 TAKE closed 7 =
 все спасли stop, ещё пять были entry-expired/invalid-geometry. Это пилот,
 не финальная статистика: часть STEP прокликана в усталости.
 
+Execution-cost gate исследуется отдельно до изменения battle: для resting
+limit заранее вычисляется `fullStopNetR = -1 - maker entry cost - taker+slip
+stop cost`. Пороговый sweep −1.25/−1.5/−1.75/−2/−2.5/−3R добавлен в
+`execution-audit`; он обязан пройти discovery и OOS. BTC-пример entry
+63989.09 / stop 63968.83 даёт stop 0.0317% и плановый −3.842R, поэтому
+является математически неторгуемым при разумном cost cap.
+
+LTF first-touch теперь требует наличия 5m-свечи ровно с начала HTF-бара.
+Обрезанное rolling-окно не может назвать первую доступную свечу offset=0
+и создать ложный `first-5-touch` cancel.
+
 `npm run reaction-audit` переносит только заранее зафиксированные признаки
 в автоматический research, не в battle/forward: 141/241 отдельно,
 30m/1h/4h, окна 2024/2025/2026, first opposite 5m candle close,

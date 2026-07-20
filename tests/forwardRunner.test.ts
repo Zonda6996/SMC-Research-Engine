@@ -94,5 +94,6 @@ describe('forward runner v4', () => {
 		assert.deepEqual(firstLtfTouch(ltf, 0, 900_000, true, 100), { offset: 0, at: 0 })
 		const later = firstLtfTouch([{ ...ltf[0]!, low: 101 }, ltf[1]!], 0, 900_000, true, 100)
 		assert.deepEqual(later, { offset: 1, at: 300_000 })
+		assert.equal(firstLtfTouch([ltf[1]!], 0, 900_000, true, 100), null)
 	})
 })

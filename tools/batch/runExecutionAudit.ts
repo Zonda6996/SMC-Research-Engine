@@ -35,6 +35,7 @@ import {
 } from '../shared/candleFetcher.js'
 import type { Candle } from '../../src/models/price/Candle.js'
 import type { FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
+import { plannedFullStop } from '../shared/executionCostGate.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const CACHE_DIR = join(__dirname, 'cache', 'execution-audit')
@@ -63,6 +64,12 @@ interface AuditRow {
 	entryAt: number
 	entryIndex: number
 	entryPrice: number
+	stopPrice: number
+	takePrice: number
+	stopPct: number
+	/** Плановый полный убыток при stop с entry/exit costs; известен до fill. */
+	fullStopNetR: number
+	costRAtStop: number
 	netR: number
 	result: string
 	bigbar: boolean
@@ -217,9 +224,12 @@ function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): A
 		const globalEntry = global ? gridLevelPrice(global.levels.find((x) => x.ratio === 0)!.price, p100, config.entry) : null
 		const confluenceAtr = atr != null && atr > 0 && localEntry != null && globalEntry != null ? Math.abs(localEntry - globalEntry) / atr : null
 		const regimeAtSetup = regime[outcome.createdAtIndex]
+		const plannedStop = plannedFullStop(entry, stop)
 		const row: AuditRow = {
 			symbol, htf, scenario, direction: outcome.direction,
 			entryAt: htfEntryCandle.timestamp, entryIndex: outcome.entryIndex, entryPrice: entry,
+			stopPrice: stop, takePrice: take, stopPct: plannedStop.stopPct,
+			fullStopNetR: plannedStop.netR, costRAtStop: plannedStop.costR,
 			netR: trade.netR, result: trade.result, bigbar: bigbarCovered(candles, outcome.createdAtIndex, outcome.entryIndex + 1,
 				at(scenario === 'ote' ? 61.8 : 23.6), at(scenario === 'ote' ? 78.6 : 38.2)),
 			atr, touchLtfAt: touch.candle.timestamp, touchOffset: touch.offset, touchOffsetFrac: touch.offset / items.length,
@@ -349,6 +359,19 @@ function report(rows: AuditRow[], args: Args): string {
 		lines.push(`${sc} kept   : ${rowStats(kept.filter((r) => r.scenario === sc))}`)
 	}
 	for (const tf of args.htfs) lines.push(`${tf} skipped: ${rowStats(skipped.filter((r) => r.htf === tf))} | kept: ${rowStats(kept.filter((r) => r.htf === tf))}`)
+
+	lines.push('', '=== EXECUTION COST GATE (известен до выставления лимитки) ===')
+	lines.push('fullStopNetR = -1R price loss - entry maker fee - stop taker fee/slippage')
+	for (const cap of [1.25, 1.5, 1.75, 2, 2.5, 3]) {
+		const allowed = kept.filter((r) => r.fullStopNetR >= -cap)
+		const rejected = kept.filter((r) => r.fullStopNetR < -cap)
+		lines.push(`max loss -${cap.toFixed(2)}R | KEEP ${rowStats(allowed)} | SKIP cf ${rowStats(rejected)}`)
+		for (const sc of ['deep', 'ote'] as const) lines.push(`  ${sc}: ${rowStats(allowed.filter((r) => r.scenario === sc))}`)
+		for (const tf of args.htfs) lines.push(`  ${tf}: ${rowStats(allowed.filter((r) => r.htf === tf))}`)
+	}
+	featureReport(lines, kept, 'fullStopNetR', 'planned full stop netR (closer to -1 = cheaper execution)')
+	featureReport(lines, kept, 'stopPct', 'entry-stop distance %')
+
 	lines.push('', '=== SIZING STACK ON FIRST-5-KEPT POOL ===')
 	const sizingLine = (name: string, pool: AuditRow[]): string => {
 		const total = pool.reduce((s, r) => s + r.netR * r.riskMult, 0)

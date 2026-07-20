@@ -25,6 +25,7 @@ import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
 import { aggregateCandles, fetchCandlesPaginated, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
+import { plannedFullStop } from '../shared/executionCostGate.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PUBLIC_DIR = join(__dirname, 'public')
@@ -151,6 +152,7 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>, ltf5m: import('..
 		const gateTouch = firstLtfTouch(ltf5m, snapshot.candles[outcome.entryIndex]!.timestamp, htfMs, long, entry)
 		const first5Skipped = gateTouch?.offset === 0
 		const id = `${scenario}|${outcome.candidateId}`
+		const plannedStop = plannedFullStop(entry, stop)
 		const exitIndex = replay.status === 'done' ? replay.exitIndex : null
 		const exitPrice = replay.status === 'done'
 			? replay.result === 'stop' ? stop : replay.result === 'tp' ? take : snapshot.candles[replay.exitIndex]?.close ?? null
@@ -162,6 +164,7 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>, ltf5m: import('..
 			createdAtIndex: outcome.createdAtIndex, entryIndex: replay.fillIndex,
 			exitIndex, entry, stop, take, exitPrice,
 			entryRatio: config.entry, stopRatio: config.stop, takeRatio: config.take,
+			stopPct: plannedStop.stopPct, fullStopNetR: plannedStop.netR, costRAtStop: plannedStop.costR,
 			result: first5Skipped ? 'first5-skip' : replay.status === 'done' ? replay.result : 'open',
 			/** netR остаётся counterfactual для анализа пропущенного среза. */
 			netR: replay.status === 'done' ? replay.netR : null,
