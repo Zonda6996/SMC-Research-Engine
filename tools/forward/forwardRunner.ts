@@ -18,6 +18,7 @@ import { BINGX_MAKER_RATE, BINGX_SLIP_RATE, BINGX_TAKER_RATE } from '../../src/c
 import { fillCostR } from '../../src/core/analysis/takeLadders.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { fetchCandlesPaginated, TF_MS } from '../shared/candleFetcher.js'
+import { plannedFullStop } from '../shared/executionCostGate.js'
 import type { FibSetupOutcome } from '../../src/models/fib/FibLifecycle.js'
 import type { Candle } from '../../src/models/price/Candle.js'
 
@@ -27,7 +28,7 @@ const STATE_PATH = join(DATA_DIR, 'state.json')
 const JOURNAL_PATH = join(DATA_DIR, 'signals.jsonl')
 const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
 
-export const FORWARD_VERSION = 'battle-7.50-first5-v4'
+export const FORWARD_VERSION = 'battle-7.53-cost175-v5'
 const SYMBOLS = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'XRP/USDT', 'BNB/USDT', 'DOGE/USDT', 'ADA/USDT',
 	'AVAX/USDT', 'LINK/USDT', 'SUI/USDT', 'TON/USDT', 'NEAR/USDT', 'APT/USDT', 'LTC/USDT']
 const TIMEFRAMES = ['15m', '30m', '1h']
@@ -72,7 +73,10 @@ export interface SignalEvent {
 	suggestedRiskMult?: number
 	/** true только если заявка и нужный размер существовали до fill. */
 	forwardEligible?: boolean
-	reason?: 'price-invalidated' | 'opposite-event' | 'bigbar-before-touch' | 'first-5-touch'
+	reason?: 'price-invalidated' | 'opposite-event' | 'bigbar-before-touch' | 'first-5-touch' | 'execution-cost'
+	/** Pre-entry execution diagnostic; present for cost-gate skips. */
+	fullStopNetR?: number
+	stopPct?: number
 	result?: 'tp' | 'stop' | 'timestop'
 	netR?: number
 	holdBars?: number
@@ -297,11 +301,24 @@ export function processWindow(
 		const med = medians.get(outcome.candidateId) ?? null
 		const setupRisk = canonRiskMultiplier(1, outcome.legAtrRatio, med)
 		const setupKnownAt = createdBar.timestamp + tfMs
+		const entry = atL(config.entry), stop = atL(config.stop), take = atL(config.take)
+		const plannedStop = plannedFullStop(entry, stop)
+		if (BATTLE_CONFIG.executionCostGate.enabled && plannedStop.netR < -BATTLE_CONFIG.executionCostGate.maxFullStopLossR) {
+			state.orderEligible[orderId] = false
+			state.tradeEligible[orderId] = false
+			emit({
+				type: 'cancel', id: `cancel|${orderId}`, orderId, at: new Date(setupKnownAt).toISOString(),
+				symbol, timeframe, stream, direction: outcome.direction,
+				entry, stop, take, riskMult: 0, reason: 'execution-cost', forwardEligible: false,
+				fullStopNetR: Number(plannedStop.netR.toFixed(3)), stopPct: Number(plannedStop.stopPct.toFixed(4)),
+			})
+			continue
+		}
 		if (!(orderId in state.orderEligible)) state.orderEligible[orderId] = setupKnownAt >= firstRunMs
 		emit({
 			type: 'setup', id: setupId, orderId, at: new Date(setupKnownAt).toISOString(),
 			symbol, timeframe, stream, direction: outcome.direction,
-			entry: atL(config.entry), stop: atL(config.stop), take: atL(config.take), riskMult: Number(setupRisk.toFixed(2)),
+			entry, stop, take, riskMult: Number(setupRisk.toFixed(2)),
 			forwardEligible: state.orderEligible[orderId] === true,
 		})
 
@@ -358,7 +375,6 @@ export function processWindow(
 		const freshBars = entryIndex - created
 		const riskMult = canonRiskMultiplier(freshBars, outcome.legAtrRatio, med)
 		const requiredRevision = riskRevisionId(orderId, freshBars)
-		const entry = atL(config.entry), stop = atL(config.stop), take = atL(config.take)
 		const gateTouch = firstLtfTouch(ltfCandles, candles[entryIndex]!.timestamp, tfMs, long, entry)
 		if (gateTouch?.offset === 0) {
 			state.tradeEligible[orderId] = false
@@ -399,6 +415,7 @@ export interface ForwardReport {
 	shadowBackfill: SignalEvent[]
 	pendingOrders: SignalEvent[]
 	openTrades: SignalEvent[]
+	costSkips: SignalEvent[]
 }
 
 export function buildForwardReport(events: readonly SignalEvent[]): ForwardReport {
@@ -420,6 +437,7 @@ export function buildForwardReport(events: readonly SignalEvent[]): ForwardRepor
 		pendingOrders: [...lastOrderEvent.values()].filter((e) =>
 			(e.type === 'setup' || e.type === 'amend') && e.shadow !== true && e.forwardEligible === true && !signals.has(e.orderId)),
 		openTrades: [...signals.values()].filter((e) => e.shadow !== true && e.forwardEligible === true && !outcomes.has(e.orderId)),
+		costSkips: current.filter((e) => e.type === 'cancel' && e.reason === 'execution-cost'),
 	}
 }
 
@@ -457,7 +475,7 @@ function printReport(): void {
 	console.log(`старт:  ${state.firstRunAt}`)
 	console.log(`с первого запуска прошло: ${durationText(state.firstRunAt)} (это не гарантия непрерывного uptime)`)
 	console.log(`ЛИМИТКИ ЖДУТ ЦЕНУ: ${report.pendingOrders.length} | ПОЗИЦИИ ОТКРЫТЫ: ${report.openTrades.length}`)
-	console.log(`ПОЗИЦИИ ЗАКРЫТЫ: ${report.forwardOutcomes.length} | исторический catch-up: ${report.backfillOutcomes.length}`)
+	console.log(`ПОЗИЦИИ ЗАКРЫТЫ: ${report.forwardOutcomes.length} | COST-SKIP: ${report.costSkips.length} | исторический catch-up: ${report.backfillOutcomes.length}`)
 	console.log('\n=== ЧИСТЫЙ БОЕВОЙ FORWARD (Deep + OTE) ===')
 	if (report.forwardOutcomes.length === 0) console.log('  пока нет закрытых сделок')
 	else printStreamStats(report.forwardOutcomes)
@@ -470,6 +488,10 @@ function printReport(): void {
 	console.log('\n=== BACKFILL / ПРОПУЩЕННЫЕ ПРИ ПРОСТОЕ (не входят в forward) ===')
 	if (report.backfillOutcomes.length === 0) console.log('  нет')
 	else printStreamStats(report.backfillOutcomes)
+	if (report.costSkips.length > 0) {
+		console.log('\n=== EXECUTION COST SKIP: ЛИМИТКА НЕ ВЫСТАВЛЯЛАСЬ ===')
+		for (const e of report.costSkips.slice(-10)) console.log(`  SKIP ${e.stream.toUpperCase()} ${e.direction.toUpperCase()} ${e.symbol} ${e.timeframe} | full stop ${e.fullStopNetR?.toFixed(3)}R | distance ${e.stopPct?.toFixed(4)}%`)
+	}
 	if (report.openTrades.length > 0) {
 		console.log('\n=== СЕЙЧАС В ПОЗИЦИИ (FILL УЖЕ БЫЛ) ===')
 		for (const e of report.openTrades) console.log(`  OPEN ${e.stream.toUpperCase()} ${e.direction.toUpperCase()} ${e.symbol} ${e.timeframe} | entry ${e.entry} | stop ${e.stop} | take ${e.take} | risk x${e.riskMult} | fill ${e.at}`)
@@ -487,7 +509,7 @@ function printReport(): void {
 	console.log('  AMEND   = изменён размер ожидающей лимитки; позиции ещё НЕТ')
 	console.log('  SIGNAL  = цена коснулась лимитки, произошёл FILL; позиция ОТКРЫТА')
 	console.log('  OUTCOME = открытая позиция ЗАКРЫТА по TP / STOP / TIME-STOP')
-	console.log('  CANCEL  = лимитка отменена до входа; сделки НЕ БЫЛО')
+	console.log('  CANCEL  = лимитка отменена до входа; execution-cost означает, что она вообще не выставлялась')
 	console.log('\nПримечание: weighted R использует raw riskMult и пока не является портфельным PnL.')
 }
 
@@ -506,7 +528,9 @@ async function notifyTelegram(events: SignalEvent[]): Promise<void> {
 		} else switch (e.type) {
 			case 'setup': text = `SETUP ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nлимит ${e.entry}\nстоп ${e.stop}\nтейк ${e.take}\nриск x${e.riskMult}\nFIRST-5 GATE: первые 5m каждого ${e.timeframe}-бара заявка выключена`; break
 			case 'amend': text = `AMEND ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nизмени размер заявки: риск x${e.riskMult}`; break
-			case 'cancel': text = `CANCEL ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nсними лимит ${e.entry}\nпричина: ${e.reason}`; break
+			case 'cancel': text = e.reason === 'execution-cost'
+				? `SKIP COST ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nлимит НЕ выставлять ${e.entry}\nплановый stop ${e.fullStopNetR?.toFixed(2)}R / distance ${e.stopPct?.toFixed(4)}%`
+				: `CANCEL ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nсними лимит ${e.entry}\nпричина: ${e.reason}`; break
 			case 'signal': text = `FILL ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\nвход ${e.entry}\nстоп ${e.stop}\nтейк ${e.take}\nриск x${e.riskMult}\nforward: ${e.forwardEligible ? 'да' : 'нет (catch-up)'}`; break
 			default: text = `RESULT ${e.stream} ${arrow}\n${e.symbol} ${e.timeframe}\n${e.result} ${e.netR!.toFixed(2)}R (${e.holdBars} bars)\nforward: ${e.forwardEligible ? 'да' : 'нет'}`
 		}

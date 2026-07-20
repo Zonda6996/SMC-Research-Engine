@@ -153,6 +153,7 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>, ltf5m: import('..
 		const first5Skipped = gateTouch?.offset === 0
 		const id = `${scenario}|${outcome.candidateId}`
 		const plannedStop = plannedFullStop(entry, stop)
+		const executionCostSkipped = BATTLE_CONFIG.executionCostGate.enabled && plannedStop.netR < -BATTLE_CONFIG.executionCostGate.maxFullStopLossR
 		const exitIndex = replay.status === 'done' ? replay.exitIndex : null
 		const exitPrice = replay.status === 'done'
 			? replay.result === 'stop' ? stop : replay.result === 'tp' ? take : snapshot.candles[replay.exitIndex]?.close ?? null
@@ -165,12 +166,12 @@ function buildTrades(snapshot: ReturnType<typeof runAnalysis>, ltf5m: import('..
 			exitIndex, entry, stop, take, exitPrice,
 			entryRatio: config.entry, stopRatio: config.stop, takeRatio: config.take,
 			stopPct: plannedStop.stopPct, fullStopNetR: plannedStop.netR, costRAtStop: plannedStop.costR,
-			result: first5Skipped ? 'first5-skip' : replay.status === 'done' ? replay.result : 'open',
+			result: first5Skipped ? 'first5-skip' : executionCostSkipped ? 'cost-skip' : replay.status === 'done' ? replay.result : 'open',
 			/** netR остаётся counterfactual для анализа пропущенного среза. */
 			netR: replay.status === 'done' ? replay.netR : null,
 			holdBars: replay.status === 'done' ? replay.exitIndex - replay.fillIndex : null,
-			riskMult: first5Skipped ? 0 : Number(riskMult.toFixed(2)), freshBars,
-			first5Skipped, first5TouchAt: gateTouch?.at ?? null,
+			riskMult: first5Skipped || executionCostSkipped ? 0 : Number(riskMult.toFixed(2)), freshBars,
+			first5Skipped, executionCostSkipped, first5TouchAt: gateTouch?.at ?? null,
 			bigbarDiagnostic: bigbar,
 			gridLevels: variant.levels.map((l) => ({ ratio: l.ratio, price: l.price })),
 			legStart: { index: variant.start.index, price: variant.start.price },
@@ -352,6 +353,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					benchmarks: BATTLE_CONFIG.benchmarks,
 					bigbar: 'diagnostic-only',
 					entryGate: BATTLE_CONFIG.entryGate,
+					executionCostGate: BATTLE_CONFIG.executionCostGate,
 					mirror: 'removed',
 				},
 				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },

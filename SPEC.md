@@ -2590,7 +2590,7 @@ H1/H2. Вместе: totalR +47.7%, avgR ~x2 при −29% сделок.
 Benchmarks после gate на двух окнах: deep ~0.246, ote ~0.193. Reverse
 потоков в battleConfig больше нет.
 
-Forward v4 (`battle-7.50-first5-v4`) получает последние 500 свечей 5m
+Forward v5 (`battle-7.53-cost175-v5`) получает последние 500 свечей 5m
 на символ, работает циклом 5m и перед fill проверяет первый LTF-touch
 внутри HTF-бара. offset=0 → `cancel:first-5-touch`, сделка не входит в
 clean forward. Без LTF-доказательства fill остаётся catch-up. Mirror
@@ -2746,17 +2746,14 @@ TAKE 13 (12 closed) = -4.00R, avg -0.333R; 141 TAKE closed 7 =
 все спасли stop, ещё пять были entry-expired/invalid-geometry. Это пилот,
 не финальная статистика: часть STEP прокликана в усталости.
 
-Четыре executable entry-модели исследуются отдельно до изменения battle:
-A) текущий resting limit; B) resting + pre-entry cost gate; C) после touch
-ждём close первой 5m-свечи, требуем close обратно за entry и отсутствие
-intrabar stop-pierce, затем market entry по open следующей 5m; D) C + cost
-gate по фактическому next-open. Для resting заранее вычисляется
-`fullStopNetR = -1 - maker entry cost - taker+slip stop cost`, для reaction
-entry используется taker+slip на входе. Пороговый sweep
-−1.25/−1.5/−1.75/−2/−2.5/−3R добавлен в `execution-audit`; A/B/C/D обязаны
-пройти discovery и OOS. BTC-пример entry
-63989.09 / stop 63968.83 даёт stop 0.0317% и плановый −3.842R, поэтому
-является математически неторгуемым при разумном cost cap.
+Execution-cost gate принят в battle после трёх временных окон: для resting
+limit заранее вычисляется `fullStopNetR = -1 - maker entry cost - taker+slip
+stop cost`; если значение хуже −1.75R, лимитка не выставляется. Вместе:
+21 298 → 20 976 сделок, +5069.354R → +5165.835R, avg 0.238 → 0.246;
+удалено 322 сделки и −96.483R. Удалённая группа отрицательна на каждом
+окне (−59.434/−34.901/−2.148R). Benchmarks original two windows после gate:
+Deep 0.253, OTE 0.209. BTC entry 63989.09 / stop 63968.83 имеет stop
+0.0317% и плановый −3.842R, поэтому теперь получает `execution-cost` SKIP.
 
 LTF first-touch теперь требует наличия 5m-свечи ровно с начала HTF-бара.
 Обрезанное rolling-окно не может назвать первую доступную свечу offset=0

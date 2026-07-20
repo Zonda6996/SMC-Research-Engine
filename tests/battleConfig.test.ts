@@ -16,7 +16,7 @@ describe('BATTLE_CONFIG geometry', () => {
 		}
 	})
 
-	it('executable cells and first-5 gate match SPEC 7.50', () => {
+	it('executable cells, first-5 and cost gate match SPEC 7.53', () => {
 		const deep = BATTLE_CONFIG.canon.find((s) => s.scenario === 'deep')!
 		const ote = BATTLE_CONFIG.canon.find((s) => s.scenario === 'ote')!
 		assert.deepEqual([deep.entry, deep.stop, deep.take], [38.2, 15, 61.8])
@@ -27,7 +27,8 @@ describe('BATTLE_CONFIG geometry', () => {
 		assert.deepEqual(BATTLE_CONFIG.entryGate, { timeframe: '5m', skipFirstBars: 1, cancelOnSkippedTouch: true })
 		assert.equal(BATTLE_CONFIG.bigbarFilter, false)
 		assert.equal(BATTLE_CONFIG.bigbarDiagnostic, true)
-		assert.deepEqual(BATTLE_CONFIG.benchmarks, { deep: 0.246, ote: 0.193 })
+		assert.deepEqual(BATTLE_CONFIG.executionCostGate, { enabled: true, maxFullStopLossR: 1.75 })
+		assert.deepEqual(BATTLE_CONFIG.benchmarks, { deep: 0.253, ote: 0.209 })
 		assert.deepEqual(RESEARCH_CONFIG.mirrorProbe, { entry: 100, stop: 120, take: 78.6, cancelBeyond: 0 })
 	})
 })

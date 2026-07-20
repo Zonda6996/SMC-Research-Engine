@@ -67,12 +67,20 @@ export const BATTLE_CONFIG = {
 	 */
 	entryGate: { timeframe: '5m', skipFirstBars: 1, cancelOnSkippedTouch: true },
 
+	/**
+	 * SPEC 7.53: лимитка не выставляется, если полный плановый stop с
+	 * entry maker + stop taker/slippage хуже -1.75R. Правило известно до
+	 * fill и подтверждено на трёх временных окнах: удалено 322 сделки и
+	 * -96.483R, totalR +1.9%, avgR +3.5%.
+	 */
+	executionCostGate: { enabled: true, maxFullStopLossR: 1.75 },
+
 	/** Post-hoc bigbar на свече touch неисполним; хранится только как diagnostic label. */
 	bigbarFilter: false,
 	bigbarDiagnostic: true,
 
 	/** Benchmarks двух независимых 208-дневных LTF-окон после first-5 gate. */
-	benchmarks: { deep: 0.246, ote: 0.193 },
+	benchmarks: { deep: 0.253, ote: 0.209 },
 
 	/** SPEC 7.35: сайзинг-стек канона. */
 	sizing: {
