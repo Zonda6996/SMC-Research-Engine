@@ -343,7 +343,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const minLtfLeftBars = Math.ceil(historyBars * contextMs / TF_MS['5m']!)
 			// Ещё 5000×5m оставляем справа от минимального контекста, чтобы в
 			// окне было достаточно candidate touches и будущего для outcome.
-			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(10_000, minLtfLeftBars + 5_000))
+			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(timeframe === '4h' ? 30_000 : 10_000, minLtfLeftBars + 5_000))
 			const ltf5m = useFixture ? null : await fetchCandlesPaginated(symbol, '5m',
 				ltfNeed, market, untilMs, MAX_CANDLES_LTF)
 			const ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []

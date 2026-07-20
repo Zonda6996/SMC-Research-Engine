@@ -1,10 +1,10 @@
 import type { Candle } from '../../models/price/Candle.js'
 import type { StructureEvent } from '../../models/events/StructureEvent.js'
 
-export const REFINED_POI_VERSION = 'refined-poi-0.1.1-ltf-aligned'
+export const REFINED_POI_VERSION = 'refined-poi-0.2-ob-confirmed-fvg'
 export interface RefinedTrace { state:string; at:number; price?:number; note?:string; volume?:number; volumeRatio?:number }
 export interface RefinedPoiCandidate {
- id:string; version:string; direction:'long'|'short'; poiTop:number; poiBottom:number; poiKnownAt:number; poiTouchAt:number|null
+ id:string; version:string; poiType:'ob-confirmed-by-fvg'; direction:'long'|'short'; poiTop:number; poiBottom:number; poiKnownAt:number; poiTouchAt:number|null
  obTop:number; obBottom:number; fvgTop:number; fvgBottom:number; eventType:string; eventAt:number
  status:'entered'|'rejected'|'pending'; rejectionReason:string|null; entryAt:number|null; entry:number|null; stop:number|null; tp2:number|null; outcome:'tp'|'stop'|'open'|null; grossR:number|null; trace:RefinedTrace[]
 }
@@ -26,12 +26,15 @@ export function detectRefinedPoi(htf:Candle[],events:StructureEvent[],ltf:Candle
   let ob:Candle|null=null
   for(let k=i-1;k>=Math.max(0,i-10);k--){const c=htf[k]!;if(long?c.close<c.open:c.close>c.open){ob=c;break}}
   if(!ob)continue
-  const lo=Math.max(ob.low,fvg.lo),hi=Math.min(ob.high,fvg.hi)
+  // FVG подтверждает displacement, но POI v0.2 = сама full-candle OB.
+  // Требование буквального OB∩FVG давало почти ноль зон: эти области часто
+  // соседствуют и касаются границей, а не перекрываются площадью.
+  const lo=ob.low,hi=ob.high
   if(!(hi>lo))continue
   const tfMs=htf.length>1?htf[1]!.timestamp-htf[0]!.timestamp:14_400_000
   const knownAt=Math.max(htf[e.confirmIndex]?.timestamp??e.confirmTimestamp,fvg.known)+tfMs
   const id=`${REFINED_POI_VERSION}|${long?'long':'short'}|${knownAt}|${lo}|${hi}`
-  const r:RefinedPoiCandidate={id,version:REFINED_POI_VERSION,direction:long?'long':'short',poiTop:hi,poiBottom:lo,poiKnownAt:knownAt,poiTouchAt:null,obTop:ob.high,obBottom:ob.low,fvgTop:fvg.hi,fvgBottom:fvg.lo,eventType:e.type,eventAt:e.confirmTimestamp,status:'pending',rejectionReason:null,entryAt:null,entry:null,stop:null,tp2:null,outcome:null,grossR:null,trace:[{state:'POI_KNOWN',at:knownAt,note:`${e.type} OB∩FVG`} ]}
+  const r:RefinedPoiCandidate={id,version:REFINED_POI_VERSION,poiType:'ob-confirmed-by-fvg',direction:long?'long':'short',poiTop:hi,poiBottom:lo,poiKnownAt:knownAt,poiTouchAt:null,obTop:ob.high,obBottom:ob.low,fvgTop:fvg.hi,fvgBottom:fvg.lo,eventType:e.type,eventAt:e.confirmTimestamp,status:'pending',rejectionReason:null,entryAt:null,entry:null,stop:null,tp2:null,outcome:null,grossR:null,trace:[{state:'POI_KNOWN',at:knownAt,note:`${e.type} OB confirmed by FVG`} ]}
   // Для визуальной валидации нужен непрерывный confirmation-TF ряд уже с
   // момента известности POI. Старый HTF POI вне LTF-окна не показываем:
   // иначе график прыгает к современным свечам и выглядит случайным.
