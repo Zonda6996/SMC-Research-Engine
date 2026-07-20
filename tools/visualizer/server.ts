@@ -45,6 +45,8 @@ interface AnalyzeQuery {
 	source?: string | undefined
 	market?: string | undefined
 	until?: string | undefined
+	contextTf?: string | undefined
+	historyBars?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -56,6 +58,8 @@ function parseQuery(qs: string): AnalyzeQuery {
 		source: params.get('source') ?? undefined,
 		market: params.get('market') ?? undefined,
 		until: params.get('until') ?? undefined,
+		contextTf: params.get('contextTf') ?? undefined,
+		historyBars: params.get('historyBars') ?? undefined,
 	}
 }
 
@@ -191,6 +195,7 @@ export function buildReactionCandidates(
 	ltf15m: import('../../src/models/price/Candle.js').Candle[],
 	htfMs: number,
 	scope = '',
+	minLtfLeftBars = 0,
 ) {
 	const result: Record<string, unknown>[] = []
 	const prepared = snapshot.fib.candidates.flatMap((candidate) => {
@@ -218,6 +223,9 @@ export function buildReactionCandidates(
 			const touchIndex = source.findIndex((c) => c.timestamp >= knownAt &&
 				(candidate.direction === 'long' ? c.high >= price : c.low <= price))
 			if (touchIndex < 0) continue
+			// Не предлагаем exact-5m кейс у самого левого края загруженного окна:
+			// пользователь должен видеть запрошенную историю ДО появления зоны.
+			if (ltfCoversSetup && touchIndex < minLtfLeftBars) continue
 			const touch = source[touchIndex]!
 			const touchHtfIndex = ltfCoversSetup
 				? snapshot.candles.findIndex((c) => touch.timestamp >= c.timestamp && touch.timestamp < c.timestamp + htfMs)
@@ -315,11 +323,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const snapshot = runAnalysis(candles)
 			const htfMs = TF_MS[timeframe]
 			if (!htfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
-			// Default Lab horizon = 250 bars left + max age 200 HTF bars.
-			// Это даёт exact 5m без загрузки сотен тысяч свечей всей HTF-истории.
-			const ltfNeed = Math.max(5_000, Math.ceil(450 * htfMs / TF_MS['5m']!))
+			// Загружаем не просто replay-хвост, а запрошенный левый контекст.
+			// Иначе первый exact-кандидат мог оказаться через 5 свечей от края.
+			// Replay разрешает переключение до 4h без новой загрузки, поэтому
+			// левую глубину гарантируем сразу для самого старшего контекста.
+			const contextTf = '4h'
+			const contextMs = TF_MS[contextTf]!
+			const historyBars = Math.max(100, Math.min(1_000, Number(q.historyBars ?? 250) || 250))
+			const minLtfLeftBars = Math.ceil(historyBars * contextMs / TF_MS['5m']!)
+			// Ещё 5000×5m оставляем справа от минимального контекста, чтобы в
+			// окне было достаточно candidate touches и будущего для outcome.
+			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(10_000, minLtfLeftBars + 5_000))
 			const ltf5m = useFixture ? null : await fetchCandlesPaginated(symbol, '5m',
-				Math.min(MAX_CANDLES_LTF, ltfNeed), market, untilMs, MAX_CANDLES_LTF)
+				ltfNeed, market, untilMs, MAX_CANDLES_LTF)
 			const ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
 
 			sendJson(res, 200, {
@@ -330,11 +346,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					entryGate: BATTLE_CONFIG.entryGate,
 					mirror: 'removed',
 				},
-				dataset: { symbol, timeframe, limit, candleCount: candles.length, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
+				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
 				ltf15m,
-				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs, `${symbol}|${timeframe}`),
+				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),
 				structure: snapshot.structure,
 				trendHistory: snapshot.market.trendHistory,
 				finalTrend: snapshot.market.trend,

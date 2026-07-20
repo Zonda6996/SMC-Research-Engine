@@ -116,3 +116,32 @@ it('Decision Lab reaction id is stable when candle-window candidate ids change',
 	const shifted = buildReactionCandidates(makeSnapshot('window-index-999'), null, [], 900_000, 'BTC/USDT|1h')
 	assert.equal(first.find((x) => x.ratio === 141)?.id, shifted.find((x) => x.ratio === 141)?.id)
 })
+
+it('Decision Lab exact candidate requires the requested left replay history', () => {
+	const candles: Candle[] = [
+		{ timestamp: 0, open: 190, high: 200, low: 180, close: 195, volume: 1 },
+		{ timestamp: 900_000, open: 195, high: 250, low: 190, close: 240, volume: 1 },
+	]
+	const ltf: Candle[] = [
+		{ timestamp: 0, open: 190, high: 200, low: 180, close: 195, volume: 1 },
+		{ timestamp: 900_000, open: 195, high: 220, low: 190, close: 210, volume: 1 },
+		{ timestamp: 1_200_000, open: 210, high: 250, low: 205, close: 240, volume: 1 },
+	]
+	const snapshot = {
+		candles, events: [],
+		fib: { candidates: [{
+			id: 'grid', eventId: 'event', trigger: 'bos', direction: 'long',
+			end: { index: 0, timestamp: 0, price: 200, type: 'high', label: 'HH', knownAtIndex: 0 },
+			variants: { local: {
+				start: { index: 0, timestamp: 0, price: 100, type: 'low', label: 'UNKNOWN', knownAtIndex: 0 },
+				levels: [{ ratio: 0, price: 100, kind: 'anchor' }, { ratio: 100, price: 200, kind: 'anchor' }],
+				legSize: 100, legAtrRatio: 5,
+			}, global: null }, createdAtIndex: 0, oppositeSweptBefore: false, explanation: '',
+		}] },
+	} as unknown as ReturnType<typeof runAnalysis>
+
+	const enough = buildReactionCandidates(snapshot, ltf, [], 900_000, 'BTC/USDT|1h', 2)
+	const tooClose = buildReactionCandidates(snapshot, ltf, [], 900_000, 'BTC/USDT|1h', 3)
+	assert.ok(enough.some((x) => x.ratio === 141))
+	assert.equal(tooClose.some((x) => x.ratio === 141), false)
+})

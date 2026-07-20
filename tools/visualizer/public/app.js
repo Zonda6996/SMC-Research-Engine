@@ -9,7 +9,7 @@ let labRevealed = false
 let labOrder = []
 let labStartedAt = 0
 let labLastContext = '5m'
-const LAB_KEY = 'smc-141-decisions-v6'
+const LAB_KEY = 'smc-141-decisions-v7'
 const LAB_TF_MS={"5m":300000,"15m":900000,"30m":1800000,"45m":2700000,"1h":3600000,"2h":7200000,"3h":10800000,"4h":14400000}
 
 const C={green:'#35c59a',red:'#ff6675',amber:'#ffbd5b',blue:'#5b8cff',purple:'#a98bff',dim:'#8290a8',text:'#e5eaf2',grid:'#171f2e'}
@@ -227,7 +227,7 @@ function status(text){$('loading').style.display=text?'block':'none';$('loading'
 
 async function load(){
 	$('loadBtn').disabled=true;status('Загрузка данных…')
-	try{const symbol=$('symbol').value.trim()||'BTC/USDT',timeframe=document.querySelector('#tfGroup .active')?.dataset.tf||'30m',limit=Number($('limit').value)||5000,source=$('source').value,until=$('historyUntil').value;const q=new URLSearchParams({symbol,timeframe,limit:String(limit),source});if(until)q.set('until',until);const r=await fetch(`/api/analyze?${q}`),json=await r.json();if(json.error)throw new Error(json.error);data=json;selectedId=null;labMode=false;labOrder=[];labCursorAt=0;labRevealed=false;$('labControls').style.display='none';$('labToggle').textContent='Включить';$('labToggle').classList.remove('active');initChart();candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})));$('version').textContent=data.strategy.version;$('dataset').textContent=`${data.dataset.symbol} · ${data.dataset.timeframe} · ${data.dataset.candleCount} свечей · ${data.dataset.until?`до ${data.dataset.until.slice(0,10)} · `:''}${data.finalTrend}`;redraw();const latest=getFiltered().find(t=>!t.first5Skipped)||getFiltered()[0];if(latest)selectTrade(latest.id);else chart.timeScale().fitContent();status('')}catch(e){status(`Ошибка: ${e.message}`)}finally{$('loadBtn').disabled=false}}
+	try{const symbol=$('symbol').value.trim()||'BTC/USDT',timeframe=document.querySelector('#tfGroup .active')?.dataset.tf||'30m',limit=Number($('limit').value)||5000,source=$('source').value,until=$('historyUntil').value;const q=new URLSearchParams({symbol,timeframe,limit:String(limit),source,contextTf:$('labContext').value,historyBars:$('labHistory').value});if(until)q.set('until',until);const r=await fetch(`/api/analyze?${q}`),json=await r.json();if(json.error)throw new Error(json.error);data=json;selectedId=null;labMode=false;labOrder=[];labCursorAt=0;labRevealed=false;$('labControls').style.display='none';$('labToggle').textContent='Включить';$('labToggle').classList.remove('active');initChart();candlesSeries.setData(data.candles.map(c=>({time:time(c.timestamp),open:c.open,high:c.high,low:c.low,close:c.close})));$('version').textContent=data.strategy.version;$('dataset').textContent=`${data.dataset.symbol} · ${data.dataset.timeframe} · ${data.dataset.candleCount} свечей · ${data.dataset.until?`до ${data.dataset.until.slice(0,10)} · `:''}${data.finalTrend}`;redraw();const latest=getFiltered().find(t=>!t.first5Skipped)||getFiltered()[0];if(latest)selectTrade(latest.id);else chart.timeScale().fitContent();status('')}catch(e){status(`Ошибка: ${e.message}`)}finally{$('loadBtn').disabled=false}}
 function randomHistoricalPeriod(){const from=Date.UTC(2024,2,1),to=Date.now(),at=from+Math.floor(Math.random()*(to-from));$('historyUntil').value=new Date(at).toISOString().slice(0,10);load()}
 async function loadSymbols(){try{const r=await fetch('/api/symbols'),x=await r.json();if(x.symbols)$('symbolsList').innerHTML=x.symbols.map(s=>`<option value="${s}">`).join('')}catch{}}
 
