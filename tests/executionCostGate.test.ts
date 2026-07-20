@@ -9,6 +9,12 @@ it('execution cost gate reproduces the BTC $20 stop catastrophe', () => {
 	assert.ok(x.costR > 2.8)
 })
 
+it('reaction market entry has higher planned cost than resting maker entry', () => {
+	const maker = plannedFullStop(100, 99.8)
+	const market = plannedFullStop(100, 99.8, 0.0007)
+	assert.ok(market.netR < maker.netR)
+})
+
 it('execution cost gate is scale-invariant for equal percentage stops', () => {
 	const a = plannedFullStop(100, 99.8)
 	const b = plannedFullStop(10_000, 9_980)

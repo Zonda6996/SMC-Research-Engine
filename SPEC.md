@@ -2746,10 +2746,15 @@ TAKE 13 (12 closed) = -4.00R, avg -0.333R; 141 TAKE closed 7 =
 все спасли stop, ещё пять были entry-expired/invalid-geometry. Это пилот,
 не финальная статистика: часть STEP прокликана в усталости.
 
-Execution-cost gate исследуется отдельно до изменения battle: для resting
-limit заранее вычисляется `fullStopNetR = -1 - maker entry cost - taker+slip
-stop cost`. Пороговый sweep −1.25/−1.5/−1.75/−2/−2.5/−3R добавлен в
-`execution-audit`; он обязан пройти discovery и OOS. BTC-пример entry
+Четыре executable entry-модели исследуются отдельно до изменения battle:
+A) текущий resting limit; B) resting + pre-entry cost gate; C) после touch
+ждём close первой 5m-свечи, требуем close обратно за entry и отсутствие
+intrabar stop-pierce, затем market entry по open следующей 5m; D) C + cost
+gate по фактическому next-open. Для resting заранее вычисляется
+`fullStopNetR = -1 - maker entry cost - taker+slip stop cost`, для reaction
+entry используется taker+slip на входе. Пороговый sweep
+−1.25/−1.5/−1.75/−2/−2.5/−3R добавлен в `execution-audit`; A/B/C/D обязаны
+пройти discovery и OOS. BTC-пример entry
 63989.09 / stop 63968.83 даёт stop 0.0317% и плановый −3.842R, поэтому
 является математически неторгуемым при разумном cost cap.
 

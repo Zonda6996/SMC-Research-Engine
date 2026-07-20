@@ -22,8 +22,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
-import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
+import { BINGX_MAKER_RATE, BINGX_SLIP_RATE, BINGX_TAKER_RATE, bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { computeRegimeMetrics } from '../../src/core/analysis/regimeMetrics.js'
+import { fillCostR } from '../../src/core/analysis/takeLadders.js'
 import { BATTLE_CONFIG, RESEARCH_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, replayTrade } from '../forward/forwardRunner.js'
 import {
@@ -70,6 +71,13 @@ interface AuditRow {
 	/** Плановый полный убыток при stop с entry/exit costs; известен до fill. */
 	fullStopNetR: number
 	costRAtStop: number
+	reactionClass: 'entered' | 'pierced-stop' | 'no-reclaim' | 'gap-invalid' | 'open'
+	reactionEntryAt: number | null
+	reactionEntryPrice: number | null
+	reactionStopPct: number | null
+	reactionFullStopNetR: number | null
+	reactionNetR: number | null
+	reactionResult: string
 	netR: number
 	result: string
 	bigbar: boolean
@@ -181,6 +189,35 @@ function phaseOf(offset: number, barsInHtf: number): { phase: AuditRow['touchPha
 	return { phase: 'late', mult: 1.5 }
 }
 
+function replayReactionClose(
+	ltf: Candle[], touchIndex: number, long: boolean, level: number, stop: number, take: number, timeStopBars: number | null,
+): Pick<AuditRow, 'reactionClass' | 'reactionEntryAt' | 'reactionEntryPrice' | 'reactionStopPct' | 'reactionFullStopNetR' | 'reactionNetR' | 'reactionResult'> {
+	const empty = (reactionClass: AuditRow['reactionClass']) => ({ reactionClass, reactionEntryAt: null, reactionEntryPrice: null, reactionStopPct: null, reactionFullStopNetR: null, reactionNetR: null, reactionResult: '' })
+	const touch = ltf[touchIndex]
+	if (!touch) return empty('open')
+	// Решение только после close touch-5m. Любой intrabar прокол планового stop
+	// означает «зону прошили» и запрещает последующий market entry.
+	if (long ? touch.low <= stop : touch.high >= stop) return empty('pierced-stop')
+	if (!(long ? touch.close >= level : touch.close <= level)) return empty('no-reclaim')
+	const entryIndex = touchIndex + 1, next = ltf[entryIndex]
+	if (!next) return empty('open')
+	const entry = next.open
+	if (long ? (entry <= stop || entry >= take) : (entry >= stop || entry <= take)) return empty('gap-invalid')
+	const planned = plannedFullStop(entry, stop, BINGX_TAKER_RATE + BINGX_SLIP_RATE)
+	const risk = Math.abs(entry - stop)
+	const entryCost = fillCostR(entry, BINGX_TAKER_RATE + BINGX_SLIP_RATE, 1, risk)
+	for (let i = entryIndex; i < ltf.length; i++) {
+		const c = ltf[i]!, hitStop = long ? c.low <= stop : c.high >= stop, hitTp = long ? c.high >= take : c.low <= take
+		if (hitStop) return { reactionClass: 'entered', reactionEntryAt: next.timestamp, reactionEntryPrice: entry, reactionStopPct: planned.stopPct, reactionFullStopNetR: planned.netR, reactionNetR: -1 - entryCost - fillCostR(stop, BINGX_TAKER_RATE + BINGX_SLIP_RATE, 1, risk), reactionResult: 'stop' }
+		if (hitTp) return { reactionClass: 'entered', reactionEntryAt: next.timestamp, reactionEntryPrice: entry, reactionStopPct: planned.stopPct, reactionFullStopNetR: planned.netR, reactionNetR: Math.abs(take - entry) / risk - entryCost - fillCostR(take, BINGX_MAKER_RATE, 1, risk), reactionResult: 'tp' }
+		if (timeStopBars != null && i - entryIndex >= timeStopBars) {
+			const gross = (long ? c.close - entry : entry - c.close) / risk
+			return { reactionClass: 'entered', reactionEntryAt: next.timestamp, reactionEntryPrice: entry, reactionStopPct: planned.stopPct, reactionFullStopNetR: planned.netR, reactionNetR: gross - entryCost - fillCostR(c.close, BINGX_TAKER_RATE + BINGX_SLIP_RATE, 1, risk), reactionResult: 'timestop' }
+		}
+	}
+	return { reactionClass: 'open', reactionEntryAt: next.timestamp, reactionEntryPrice: entry, reactionStopPct: planned.stopPct, reactionFullStopNetR: planned.netR, reactionNetR: null, reactionResult: 'open' }
+}
+
 function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): AuditRow[] {
 	const candles = ltfTf === htf ? ltf : aggregateCandles(ltf, ltfTf, htf)
 	const snapshot = runAnalysis(candles)
@@ -225,11 +262,14 @@ function buildRows(symbol: string, htf: string, ltfTf: string, ltf: Candle[]): A
 		const confluenceAtr = atr != null && atr > 0 && localEntry != null && globalEntry != null ? Math.abs(localEntry - globalEntry) / atr : null
 		const regimeAtSetup = regime[outcome.createdAtIndex]
 		const plannedStop = plannedFullStop(entry, stop)
+		const ltfTimeStop = config.timeStopBars == null ? null : config.timeStopBars * Math.round(htfMs / TF_MS[ltfTf]!)
+		const reaction = replayReactionClose(ltf, touch.index, long, entry, stop, take, ltfTimeStop)
 		const row: AuditRow = {
 			symbol, htf, scenario, direction: outcome.direction,
 			entryAt: htfEntryCandle.timestamp, entryIndex: outcome.entryIndex, entryPrice: entry,
 			stopPrice: stop, takePrice: take, stopPct: plannedStop.stopPct,
 			fullStopNetR: plannedStop.netR, costRAtStop: plannedStop.costR,
+			...reaction,
 			netR: trade.netR, result: trade.result, bigbar: bigbarCovered(candles, outcome.createdAtIndex, outcome.entryIndex + 1,
 				at(scenario === 'ote' ? 61.8 : 23.6), at(scenario === 'ote' ? 78.6 : 38.2)),
 			atr, touchLtfAt: touch.candle.timestamp, touchOffset: touch.offset, touchOffsetFrac: touch.offset / items.length,
@@ -346,6 +386,7 @@ function report(rows: AuditRow[], args: Args): string {
 	const rangeEnd = rows.length ? new Date(Math.max(...rows.map((r) => r.entryAt))).toISOString() : '-'
 	const lines = [
 		'=== LTF EXECUTION AUDIT (SPEC 7.49) ===',
+		'build: entry-models-A-B-C-D-v1',
 		`LTF ${args.ltf}, limit ${args.limit}, symbols ${args.symbols.length}, HTF ${args.htfs.join('/')}`,
 		`range ${rangeStart} → ${rangeEnd}`,
 		'', '=== FIRST-5 ENTRY GATE (боевой кандидат SPEC 7.50) ===',
@@ -360,14 +401,19 @@ function report(rows: AuditRow[], args: Args): string {
 	}
 	for (const tf of args.htfs) lines.push(`${tf} skipped: ${rowStats(skipped.filter((r) => r.htf === tf))} | kept: ${rowStats(kept.filter((r) => r.htf === tf))}`)
 
-	lines.push('', '=== EXECUTION COST GATE (известен до выставления лимитки) ===')
-	lines.push('fullStopNetR = -1R price loss - entry maker fee - stop taker fee/slippage')
+	lines.push('', '=== FOUR EXECUTABLE ENTRY MODELS ===')
+	lines.push(`A resting limit: ${rowStats(kept)}`)
+	lines.push(`C 5m close reclaim → next 5m open: ${rowStats(kept, (r) => r.reactionNetR)}`)
+	for (const cls of ['entered', 'pierced-stop', 'no-reclaim', 'gap-invalid', 'open'] as const) lines.push(`  reaction ${cls.padEnd(13)}: ${kept.filter((r) => r.reactionClass === cls).length}`)
+	lines.push('fullStopNetR = -1R price loss - entry cost - stop taker fee/slippage')
 	for (const cap of [1.25, 1.5, 1.75, 2, 2.5, 3]) {
-		const allowed = kept.filter((r) => r.fullStopNetR >= -cap)
-		const rejected = kept.filter((r) => r.fullStopNetR < -cap)
-		lines.push(`max loss -${cap.toFixed(2)}R | KEEP ${rowStats(allowed)} | SKIP cf ${rowStats(rejected)}`)
-		for (const sc of ['deep', 'ote'] as const) lines.push(`  ${sc}: ${rowStats(allowed.filter((r) => r.scenario === sc))}`)
-		for (const tf of args.htfs) lines.push(`  ${tf}: ${rowStats(allowed.filter((r) => r.htf === tf))}`)
+		const restingAllowed = kept.filter((r) => r.fullStopNetR >= -cap)
+		const restingRejected = kept.filter((r) => r.fullStopNetR < -cap)
+		const reactionAllowed = kept.filter((r) => r.reactionNetR != null && r.reactionFullStopNetR != null && r.reactionFullStopNetR >= -cap)
+		lines.push(`B resting + cap -${cap.toFixed(2)}R | KEEP ${rowStats(restingAllowed)} | SKIP cf ${rowStats(restingRejected)}`)
+		lines.push(`D 5m close + cap -${cap.toFixed(2)}R | ${rowStats(reactionAllowed, (r) => r.reactionNetR)}`)
+		for (const sc of ['deep', 'ote'] as const) lines.push(`  B ${sc}: ${rowStats(restingAllowed.filter((r) => r.scenario === sc))} | D ${sc}: ${rowStats(reactionAllowed.filter((r) => r.scenario === sc), (r) => r.reactionNetR)}`)
+		for (const tf of args.htfs) lines.push(`  B ${tf}: ${rowStats(restingAllowed.filter((r) => r.htf === tf))} | D ${tf}: ${rowStats(reactionAllowed.filter((r) => r.htf === tf), (r) => r.reactionNetR)}`)
 	}
 	featureReport(lines, kept, 'fullStopNetR', 'planned full stop netR (closer to -1 = cheaper execution)')
 	featureReport(lines, kept, 'stopPct', 'entry-stop distance %')
