@@ -99,11 +99,14 @@ async function main(){
 	for(const s of map.values()){s.avgR=s.entered?s.totalR/s.entered:0;s.winRate=s.entered?s.tp/s.entered:0}
 	mkdirSync(RESULTS,{recursive:true});const stamp=new Date().toISOString().replaceAll(':','-'),base=join(RESULTS,`reaction-audit-${stamp}`),rows=[...map.values()]
 	const cols=['period','timeframe','level','wait','minRR','bodyFilter','candidates','entered','tp','stop','open','skipped','totalR','avgR','winRate','statuses'] as const
-	writeFileSync(`${base}.csv`,[cols.join(','),...rows.map(r=>cols.map(k=>JSON.stringify(k==='statuses'?r.statuses:r[k])).join(','))].join('\n'))
+	const csvCell=(value:unknown)=>`"${(typeof value==='object'?JSON.stringify(value):String(value)).replaceAll('"','""')}"`
+	writeFileSync(`${base}.csv`,[cols.join(','),...rows.map(r=>cols.map(k=>csvCell(k==='statuses'?r.statuses:r[k])).join(','))].join('\n'))
 	const consistent=[] as {tf:string;level:number;wait:number;rr:number;body:boolean;minAvg:number;meanAvg:number;totalN:number}[]
 	for(const tf of TFS)for(const level of [141,241])for(const wait of WAITS)for(const rr of MIN_RRS)for(const body of BODY_FILTERS){const x=rows.filter(r=>r.timeframe===tf&&r.level===level&&r.wait===wait&&r.minRR===rr&&r.bodyFilter===body);if(x.length===3&&x.every(r=>r.entered>=10&&r.avgR>0))consistent.push({tf,level,wait,rr,body,minAvg:Math.min(...x.map(r=>r.avgR)),meanAvg:x.reduce((a,r)=>a+r.avgR,0)/3,totalN:x.reduce((a,r)=>a+r.entered,0)})}
 	consistent.sort((a,b)=>b.minAvg-a.minAvg)
-	const text=['=== REACTION 141/241 AUDIT ===',`symbols ${symbols.length}; periods 2024/2025/2026; TF ${TFS.join('/')}`,'entry: first opposite 5m candle close; costs: BingX taker+slip entry/stop, maker TP','No oversold/RSI layer. Prior-touched and structurally superseded grids excluded.','',`consistent positive variants (each period n>=10): ${consistent.length}`,...consistent.slice(0,30).map(x=>`${x.tf} L${x.level} wait${x.wait} minRR${x.rr} body=${x.body} n=${x.totalN} mean=${x.meanAvg.toFixed(3)} minPeriod=${x.minAvg.toFixed(3)}`),'',`CSV: ${base}.csv`].join('\n')
+	const baseline=rows.filter(r=>r.wait===3&&r.minRR===0&&r.bodyFilter===false)
+		.sort((a,b)=>a.timeframe.localeCompare(b.timeframe)||a.level-b.level||a.period.localeCompare(b.period))
+	const text=['=== REACTION 141/241 AUDIT ===',`symbols ${symbols.length}; periods 2024/2025/2026; TF ${TFS.join('/')}`,'entry: first opposite 5m candle close; costs: BingX taker+slip entry/stop, maker TP','No oversold/RSI layer. Prior-touched and structurally superseded grids excluded.','','BASELINE wait=3 / minRR=0 / body=false:',...baseline.map(r=>`${r.period} ${r.timeframe} L${r.level}: candidates=${r.candidates} entered=${r.entered} TP/SL=${r.tp}/${r.stop} total=${r.totalR.toFixed(2)}R avg=${r.avgR.toFixed(3)}R`),'',`consistent positive variants (each period n>=10): ${consistent.length}`,...consistent.slice(0,30).map(x=>`${x.tf} L${x.level} wait${x.wait} minRR${x.rr} body=${x.body} n=${x.totalN} mean=${x.meanAvg.toFixed(3)} minPeriod=${x.minAvg.toFixed(3)}`),'',`CSV: ${base}.csv`].join('\n')
 	writeFileSync(`${base}.txt`,text+'\n');console.log('\n'+text+`\nTXT: ${base}.txt`)
 }
 const isMain=process.argv[1]!=null&&resolve(process.argv[1])===fileURLToPath(import.meta.url)
