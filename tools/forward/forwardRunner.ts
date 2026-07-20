@@ -452,24 +452,39 @@ function printReport(): void {
 	console.log('=== FORWARD STATUS ===')
 	console.log(`версия: ${FORWARD_VERSION}`)
 	console.log(`старт:  ${state.firstRunAt}`)
-	console.log(`работает: ${durationText(state.firstRunAt)}`)
-	console.log(`ожидают входа: ${report.pendingOrders.length} | открытых позиций: ${report.openTrades.length}`)
-	console.log(`боевых закрытых: ${report.forwardOutcomes.length} | backfill: ${report.backfillOutcomes.length}`)
+	console.log(`с первого запуска прошло: ${durationText(state.firstRunAt)} (это не гарантия непрерывного uptime)`)
+	console.log(`ЛИМИТКИ ЖДУТ ЦЕНУ: ${report.pendingOrders.length} | ПОЗИЦИИ ОТКРЫТЫ: ${report.openTrades.length}`)
+	console.log(`ПОЗИЦИИ ЗАКРЫТЫ: ${report.forwardOutcomes.length} | исторический catch-up: ${report.backfillOutcomes.length}`)
 	console.log('\n=== ЧИСТЫЙ БОЕВОЙ FORWARD (Deep + OTE) ===')
 	if (report.forwardOutcomes.length === 0) console.log('  пока нет закрытых сделок')
 	else printStreamStats(report.forwardOutcomes)
+	if (report.forwardOutcomes.length > 0) {
+		console.log('\n=== ПОСЛЕДНИЕ ЗАКРЫТЫЕ ПОЗИЦИИ ===')
+		for (const e of [...report.forwardOutcomes].sort((a, b) => Date.parse(b.observedAt) - Date.parse(a.observedAt)).slice(0, 15)) {
+			console.log(`  CLOSED ${e.result?.toUpperCase()} ${e.stream.toUpperCase()} ${e.direction.toUpperCase()} ${e.symbol} ${e.timeframe} | ${e.netR?.toFixed(3)}R | risk x${e.riskMult} | exit ${e.at}`)
+		}
+	}
 	console.log('\n=== BACKFILL / ПРОПУЩЕННЫЕ ПРИ ПРОСТОЕ (не входят в forward) ===')
 	if (report.backfillOutcomes.length === 0) console.log('  нет')
 	else printStreamStats(report.backfillOutcomes)
 	if (report.openTrades.length > 0) {
-		console.log('\n=== ОТКРЫТЫЕ ПОЗИЦИИ ===')
-		for (const e of report.openTrades) console.log(`  ${e.stream} ${e.direction} ${e.symbol} ${e.timeframe} @ ${e.entry} risk x${e.riskMult}`)
-	}
+		console.log('\n=== СЕЙЧАС В ПОЗИЦИИ (FILL УЖЕ БЫЛ) ===')
+		for (const e of report.openTrades) console.log(`  OPEN ${e.stream.toUpperCase()} ${e.direction.toUpperCase()} ${e.symbol} ${e.timeframe} | entry ${e.entry} | stop ${e.stop} | take ${e.take} | risk x${e.riskMult} | fill ${e.at}`)
+	} else console.log('\n=== СЕЙЧАС В ПОЗИЦИИ: нет ===')
 	if (report.pendingOrders.length > 0) {
-		console.log('\n=== ОЖИДАЮТ ВХОДА ===')
-		for (const e of report.pendingOrders.slice(-30)) console.log(`  ${e.stream} ${e.direction} ${e.symbol} ${e.timeframe} @ ${e.entry} risk x${e.riskMult}`)
+		console.log('\n=== ЛИМИТНЫЕ ЗАЯВКИ: ВХОДА ЕЩЁ НЕ БЫЛО ===')
+		for (const e of report.pendingOrders.slice(-30)) {
+			const stage = e.type === 'amend' ? 'WAIT / размер обновлён' : 'NEW / заявка создана'
+			console.log(`  ${stage} | ${e.stream.toUpperCase()} ${e.direction.toUpperCase()} ${e.symbol} ${e.timeframe} | limit ${e.entry} | stop ${e.stop} | take ${e.take} | risk x${e.riskMult}`)
+		}
 		if (report.pendingOrders.length > 30) console.log(`  ... ещё ${report.pendingOrders.length - 30}`)
 	}
+	console.log('\n=== СЛОВАРЬ СОБЫТИЙ ===')
+	console.log('  SETUP   = создана лимитная заявка; позиции ещё НЕТ')
+	console.log('  AMEND   = изменён размер ожидающей лимитки; позиции ещё НЕТ')
+	console.log('  SIGNAL  = цена коснулась лимитки, произошёл FILL; позиция ОТКРЫТА')
+	console.log('  OUTCOME = открытая позиция ЗАКРЫТА по TP / STOP / TIME-STOP')
+	console.log('  CANCEL  = лимитка отменена до входа; сделки НЕ БЫЛО')
 	console.log('\nПримечание: weighted R использует raw riskMult и пока не является портфельным PnL.')
 }
 
