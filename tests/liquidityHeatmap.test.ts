@@ -12,6 +12,7 @@ const cfg: LiquidityHeatmapConfig = {
 	leverageTiers: [{ leverage: 10, share: 1 }],
 	binPct: 0.005,
 	minRelVolume: 0,
+	minLifetimeBars: 0,
 	minWeight: 0,
 	gamma: 1,
 }
@@ -63,4 +64,27 @@ it('insignificant volume is ignored', () => {
 	c[30] = { timestamp: 30 * H, open: 119.5, high: 120, low: 119, close: 119.6, volume: 5 }
 	const pools = detectLiquidityHeatmap(c, { ...cfg, minRelVolume: 0.5 })
 	assert.ok(pools.every(p => p.extremePrice < 125))
+})
+
+it('short-lived swept segments are filtered as noise near price', () => {
+	const highs = [...Array(8).fill(100), 112, ...Array(31).fill(100)]
+	const c = series(highs)
+	const entry = (100 + 99 + 99.6) / 3
+	const target = entry * 1.1
+	const hits = detectLiquidityHeatmap(c, { ...cfg, minLifetimeBars: 12 })
+		.filter(p => p.side === 'sell-side' && p.bandLow <= target && target <= p.bandHigh)
+	assert.equal(hits.length, 1)
+	assert.equal(hits[0]!.status, 'active')
+	assert.equal(hits[0]!.startIndex, 9)
+})
+
+it('adjacent bins alive together merge into one cluster band', () => {
+	const highs = Array.from({ length: 40 }, (_, i) => (i % 2 === 0 ? 100 : 100.6))
+	const pools = detectLiquidityHeatmap(series(highs), cfg)
+	const above = pools.filter(p => p.side === 'sell-side')
+	const below = pools.filter(p => p.side === 'buy-side')
+	assert.equal(above.length, 1)
+	assert.equal(below.length, 1)
+	assert.ok(above[0]!.spanBins >= 2)
+	assert.ok(above[0]!.bandHigh > above[0]!.bandLow * 1.008)
 })

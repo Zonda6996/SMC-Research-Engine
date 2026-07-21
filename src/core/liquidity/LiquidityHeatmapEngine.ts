@@ -1,23 +1,22 @@
 // LiquidityHeatmapEngine.ts
 //
-// Диагностический heatmap ликвидности v0.2: модель потенциальных
-// ликвидаций (coinglass-style), аппроксимированная из OHLCV без OI/funding:
-// каждая свеча «открывает позиции» пропорционально объёму, уровни
-// ликвидаций плеч 5x..100x ложатся выше/ниже входа и копятся в
-// логарифмических ценовых бинах. Объём — главный драйвер яркости.
+// Диагностический heatmap ликвидности v0.3: модель потенциальных
+// ликвидаций (coinglass-style) из OHLCV без OI/funding.
+// v0.3: только свечи со значимым объёмом рождают ликвидность,
+// соседние бины сливаются в единые кластерные полосы,
+// короткоживущий снесённый шум у цены отфильтрован.
 // Отдельный слой: НЕ участвует в battle/PnL/confirmation и пока не
-// является источником POI-зон. Все коэффициенты — display-настройки
-// интенсивности в LIQUIDITY_HEATMAP_CONFIG (см. SPEC 16.5).
+// является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.2-liquidation-bins'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.3-clustered-density'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
 
 export interface LeverageTier {
 	leverage: number
-	/** Доля условного объёма позиций, открываемых с этим плечом. */
+	/** Доля условного объёма позиций с этим плечом. */
 	share: number
 }
 
@@ -28,18 +27,24 @@ export interface LiquidityHeatmapConfig {
 	leverageTiers: LeverageTier[]
 	/** Окно SMA объёма для относительной значимости свечи. */
 	volumeLookback: number
-	/** Свечи с relVolume ниже порога игнорируются («незначительные ликвидации»). */
+	/** Ликвидность рождают только свечи с relVolume выше порога («незначительные ликвидации» игнорируются). */
 	minRelVolume: number
-	/** Сегменты слабее этого веса отбрасываются. */
+	/** Снесённые сегменты, прожившие меньше этого числа баров, отбрасываются как шум у цены. */
+	minLifetimeBars: number
+	/** Минимальное число вкладов в сегмент. */
+	minContributions: number
+	/** Максимальная высота одного кластера в бинах. */
+	maxClusterBins: number
+	/** Кластеры слабее этого веса отбрасываются. */
 	minWeight: number
 	/** Кривая яркости: weight = (notional/max)^gamma. */
 	gamma: number
-	/** Жёсткий потолок числа сегментов в выдаче (топ по весу). */
+	/** Потолок числа кластеров в выдаче (топ по весу). */
 	maxPools: number
 }
 
 export const LIQUIDITY_HEATMAP_CONFIG: LiquidityHeatmapConfig = {
-	binPct: 0.0025,
+	binPct: 0.004,
 	leverageTiers: [
 		{ leverage: 5, share: 0.1 },
 		{ leverage: 10, share: 0.275 },
@@ -48,10 +53,13 @@ export const LIQUIDITY_HEATMAP_CONFIG: LiquidityHeatmapConfig = {
 		{ leverage: 100, share: 0.125 },
 	],
 	volumeLookback: 20,
-	minRelVolume: 0.5,
-	minWeight: 0.05,
-	gamma: 0.35,
-	maxPools: 2500,
+	minRelVolume: 1.25,
+	minLifetimeBars: 12,
+	minContributions: 1,
+	maxClusterBins: 3,
+	minWeight: 0.18,
+	gamma: 0.5,
+	maxPools: 600,
 }
 
 export interface LiquidityPool {
@@ -59,15 +67,16 @@ export interface LiquidityPool {
 	version: string
 	/** sell-side = плотность ликвидаций шортов ВЫШЕ цены (красные), buy-side = лонгов НИЖЕ (зелёные). */
 	side: LiquiditySide
-	/** Середина бина — уровень отрисовки. */
+	/** Notional-взвешенная середина кластера — уровень отрисовки. */
 	extremePrice: number
 	bandLow: number
 	bandHigh: number
+	/** Высота кластера в бинах (для толщины отрисовки). */
+	spanBins: number
 	startIndex: number
 	startAt: number
 	sweptIndex: number | null
 	sweptAt: number | null
-	/** Сколько вкладов (свеча x плечо) накоплено в бине. */
 	contributions: number
 	volumeAccumulated: number
 	/** Накопленный условный объём (volume x price x share) — основа яркости. */
@@ -87,9 +96,21 @@ interface Segment {
 	notional: number
 }
 
-export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConfig = LIQUIDITY_HEATMAP_CONFIG): LiquidityPool[] {
-	if (c.length === 0) return []
-	const logStep = Math.log(1 + config.binPct)
+interface Cluster {
+	side: LiquiditySide
+	minK: number
+	maxK: number
+	startIndex: number
+	endIndex: number
+	allSwept: boolean
+	maxSweptIndex: number
+	contributions: number
+	volume: number
+	notional: number
+	midNum: number
+}
+
+function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: number): Segment[] {
 	const binOf = (price: number): number => Math.floor(Math.log(price) / logStep)
 	const binLow = (k: number): number => Math.exp(k * logStep)
 	const binHigh = (k: number): number => Math.exp((k + 1) * logStep)
@@ -99,8 +120,7 @@ export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConf
 	let volSum = 0
 	for (let i = 0; i < c.length; i++) {
 		const bar = c[i]!
-		// 1) Потребление: цена зашла в бин — ликвидность снята. Новый объём
-		// позже копит новый сегмент в том же бине (без воскрешения).
+		// 1) Потребление: цена зашла в бин — ликвидность снята; новый объём позже копит новый сегмент (без воскрешения).
 		for (const [key, seg] of alive) {
 			if (i <= seg.startIndex) continue
 			const hit = seg.side === 'sell-side' ? bar.high >= binLow(seg.k) : bar.low <= binHigh(seg.k)
@@ -110,7 +130,7 @@ export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConf
 				alive.delete(key)
 			}
 		}
-		// 2) Новые уровни ликвидаций от позиций этой свечи (известны сразу, look-ahead нет).
+		// 2) Новые уровни ликвидаций — только от свечей со значимым объёмом (look-ahead нет).
 		const avg = volWindow.length ? volSum / volWindow.length : 0
 		const relVolume = avg > 0 ? bar.volume / avg : 1
 		volWindow.push(bar.volume)
@@ -134,31 +154,87 @@ export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConf
 			}
 		}
 	}
-	const all = [...done, ...alive.values()]
-	const maxNotional = all.reduce((m, s) => Math.max(m, s.notional), 0)
+	return [...done, ...alive.values()]
+}
+
+/** Слияние соседних бинов, живущих одновременно, в единые кластерные полосы (реальные плотности вместо параллельных полос). */
+function clusterSegments(segments: Segment[], lastIndex: number, config: LiquidityHeatmapConfig, logStep: number): Cluster[] {
+	const binMid = (k: number): number => Math.exp((k + 0.5) * logStep)
+	const clusters: Cluster[] = []
+	const sorted = [...segments].sort((a, b) => (a.k - b.k) || (a.startIndex - b.startIndex))
+	for (const seg of sorted) {
+		const segEnd = seg.sweptIndex ?? lastIndex
+		let target: Cluster | null = null
+		for (const cl of clusters) {
+			if (cl.side !== seg.side) continue
+			const newSpan = Math.max(cl.maxK, seg.k) - Math.min(cl.minK, seg.k) + 1
+			if (newSpan > config.maxClusterBins) continue
+			if (seg.k < cl.minK - 1 || seg.k > cl.maxK + 1) continue
+			const overlap = Math.min(cl.endIndex, segEnd) - Math.max(cl.startIndex, seg.startIndex)
+			const minLen = Math.max(1, Math.min(cl.endIndex - cl.startIndex, segEnd - seg.startIndex))
+			if (overlap >= 0.5 * minLen) { target = cl; break }
+		}
+		if (target) {
+			target.minK = Math.min(target.minK, seg.k)
+			target.maxK = Math.max(target.maxK, seg.k)
+			target.startIndex = Math.min(target.startIndex, seg.startIndex)
+			target.endIndex = Math.max(target.endIndex, segEnd)
+			target.allSwept = target.allSwept && seg.sweptIndex != null
+			target.maxSweptIndex = Math.max(target.maxSweptIndex, seg.sweptIndex ?? -1)
+			target.contributions += seg.contributions
+			target.volume += seg.volume
+			target.notional += seg.notional
+			target.midNum += seg.notional * binMid(seg.k)
+		} else {
+			clusters.push({
+				side: seg.side, minK: seg.k, maxK: seg.k,
+				startIndex: seg.startIndex, endIndex: segEnd,
+				allSwept: seg.sweptIndex != null, maxSweptIndex: seg.sweptIndex ?? -1,
+				contributions: seg.contributions, volume: seg.volume, notional: seg.notional,
+				midNum: seg.notional * binMid(seg.k),
+			})
+		}
+	}
+	return clusters
+}
+
+export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConfig = LIQUIDITY_HEATMAP_CONFIG): LiquidityPool[] {
+	if (c.length === 0) return []
+	const logStep = Math.log(1 + config.binPct)
+	const lastIndex = c.length - 1
+	const lastTs = c[lastIndex]!.timestamp
+	const segments = collectSegments(c, config, logStep).filter(seg => {
+		if (seg.contributions < config.minContributions) return false
+		// Короткоживущий снесённый шум у цены не показываем; активные свежие остаются.
+		if (seg.sweptIndex != null && seg.sweptIndex - seg.startIndex < config.minLifetimeBars) return false
+		return true
+	})
+	const clusters = clusterSegments(segments, lastIndex, config, logStep)
+	const maxNotional = clusters.reduce((m, cl) => Math.max(m, cl.notional), 0)
 	if (maxNotional <= 0) return []
-	const lastTs = c.at(-1)!.timestamp
 	const pools: LiquidityPool[] = []
-	for (const seg of all) {
-		const weight = Math.pow(seg.notional / maxNotional, config.gamma)
+	for (const cl of clusters) {
+		const weight = Math.pow(cl.notional / maxNotional, config.gamma)
 		if (weight < config.minWeight) continue
+		const sweptIndex = cl.allSwept ? cl.maxSweptIndex : null
 		pools.push({
-			id: `${LIQUIDITY_HEATMAP_VERSION}|${seg.side}|${seg.k}|${seg.startIndex}`,
+			id: `${LIQUIDITY_HEATMAP_VERSION}|${cl.side}|${cl.minK}:${cl.maxK}|${cl.startIndex}`,
 			version: LIQUIDITY_HEATMAP_VERSION,
-			side: seg.side,
-			extremePrice: Math.exp((seg.k + 0.5) * logStep),
-			bandLow: binLow(seg.k),
-			bandHigh: binHigh(seg.k),
-			startIndex: seg.startIndex,
-			startAt: c[seg.startIndex]!.timestamp,
-			sweptIndex: seg.sweptIndex,
-			sweptAt: seg.sweptIndex == null ? null : c[seg.sweptIndex]!.timestamp,
-			contributions: seg.contributions,
-			volumeAccumulated: seg.volume,
-			notional: seg.notional,
+			side: cl.side,
+			extremePrice: cl.midNum / cl.notional,
+			bandLow: Math.exp(cl.minK * logStep),
+			bandHigh: Math.exp((cl.maxK + 1) * logStep),
+			spanBins: cl.maxK - cl.minK + 1,
+			startIndex: cl.startIndex,
+			startAt: c[cl.startIndex]!.timestamp,
+			sweptIndex,
+			sweptAt: sweptIndex == null ? null : c[sweptIndex]!.timestamp,
+			contributions: cl.contributions,
+			volumeAccumulated: cl.volume,
+			notional: cl.notional,
 			weight,
-			status: seg.sweptIndex == null ? 'active' : 'swept',
-			endAt: seg.sweptIndex == null ? lastTs : c[seg.sweptIndex]!.timestamp,
+			status: sweptIndex == null ? 'active' : 'swept',
+			endAt: sweptIndex == null ? lastTs : c[sweptIndex]!.timestamp,
 		})
 	}
 	pools.sort((a, b) => b.weight - a.weight)
