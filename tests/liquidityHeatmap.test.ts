@@ -88,3 +88,12 @@ it('adjacent bins alive together merge into one cluster band', () => {
 	assert.ok(above[0]!.spanBins >= 2)
 	assert.ok(above[0]!.bandHigh > above[0]!.bandLow * 1.008)
 })
+
+it('small fresh clusters stay visible next to giant accumulations', () => {
+	const highs = [...Array(80).fill(100), ...Array(5).fill(90), ...Array(35).fill(100)]
+	const c = series(highs)
+	const pools = detectLiquidityHeatmap(c, { ...cfg, gamma: 0.5, minWeight: 0.18 })
+	const entry = (90 + 89 + 89.6) / 3
+	const target = entry * 0.9
+	assert.ok(pools.some(p => p.side === 'buy-side' && p.status === 'active' && p.bandLow <= target && target <= p.bandHigh))
+})

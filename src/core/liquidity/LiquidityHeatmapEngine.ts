@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.3-clustered-density'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.4-balanced-brightness'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -210,11 +210,22 @@ export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConf
 		return true
 	})
 	const clusters = clusterSegments(segments, lastIndex, config, logStep)
-	const maxNotional = clusters.reduce((m, cl) => Math.max(m, cl.notional), 0)
-	if (maxNotional <= 0) return []
+	// Нормировка яркости по каждой стороне отдельно и по p90, а не по глобальному
+	// максимуму: один гигантский многомесячный кластер не должен гасить
+	// свежую ликвидность под локальными лоями/над хаями.
+	const refBySide = new Map<LiquiditySide, number>()
+	for (const side of ['sell-side', 'buy-side'] as const) {
+		const notionals = clusters.filter(cl => cl.side === side).map(cl => cl.notional).sort((a, b) => a - b)
+		if (notionals.length === 0) continue
+		const ref = notionals.length >= 10 ? notionals[Math.floor(0.9 * (notionals.length - 1))]! : notionals[notionals.length - 1]!
+		if (ref > 0) refBySide.set(side, ref)
+	}
+	if (refBySide.size === 0) return []
 	const pools: LiquidityPool[] = []
 	for (const cl of clusters) {
-		const weight = Math.pow(cl.notional / maxNotional, config.gamma)
+		const ref = refBySide.get(cl.side)
+		if (ref == null) continue
+		const weight = Math.min(1, Math.pow(cl.notional / ref, config.gamma))
 		if (weight < config.minWeight) continue
 		const sweptIndex = cl.allSwept ? cl.maxSweptIndex : null
 		pools.push({
