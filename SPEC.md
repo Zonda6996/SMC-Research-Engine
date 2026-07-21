@@ -3103,3 +3103,13 @@ shows active zones only; historical mode shows finite expired zones. Width is
 unchanged from BTC calibration: LONG 1 ATR, SHORT 0.5 ATR. Still no PnL or
 confirmation batch until BTC/ETH visual QA verifies protected internal lows,
 merged EQ zones and removal of intermediate swing duplicates.
+
+### v0.5.1 approved structural lifecycle
+
+User explicitly selected structural lifecycle; no arbitrary age/N-bar expiry.
+`local-eq` is consumed at first post-knownAt sweep of its near wick.
+`protected-structure` ends on 4h close beyond the protected near-extreme or is
+superseded when the next same-direction BOS creates a newer protected level.
+`outer-swing` ends on opposite CHoCH, a later more-extreme same-side outer
+swing, or 4h close beyond its far boundary. Default UI remains active-only;
+historical mode shows finite `knownAt -> endAt` lines.
