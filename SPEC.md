@@ -577,6 +577,17 @@ Approved correction after v0.8 visual QA:
 
 Version: `liquidity-poi-0.9-freshness-consumption`. Research-only; confirmation and PnL remain frozen.
 
+## 16.5 Liquidity heatmap indicator v0.1 (diagnostic layer)
+
+Standalone module `src/core/liquidity/LiquidityHeatmapEngine.ts`, version `liquidity-heatmap-0.1-eq-pools`. Reconstruction of the user's private TradingView liquidity heatmap from OHLCV only.
+
+- confirmed pivot highs/lows with windows 5/10/20 (left strict, right non-strict); a level becomes causally visible at pivot + 5 bars;
+- same-side pivots within max(0.1 x ATR14, 0.15% price) merge into an EQH/EQL pool; a pierce inside the tolerance is an equal-extreme update / touch, not a sweep (fixes the naive engine where a 0.05$ higher equal high instantly sweeps the pool);
+- sweep = trade beyond pool extreme + tolerance; the band stops at the sweep bar and is never resurrected; later liquidity near the same price forms a new pool (re-accumulation);
+- pool weight = 1 - exp(-rawScore/4); rawScore = sum over pivots of (log2(span) + 0.5 x min(relVolume, 2)) + 0.3 x min(touches, 5). Display-only intensity calibration exposed in `LIQUIDITY_HEATMAP_CONFIG`; explicitly NOT battle logic;
+- visualizer overlay: sell-side pools red, buy-side green, opacity and thickness by weight, band drawn from pivot bar to sweep bar (matching the TradingView reference screenshot);
+- the layer does not feed battle/PnL/confirmation and is intentionally not yet a POI source; POI integration requires separate user approval after visual QA.
+
 # Часть IV. Подтверждённые расширения, ещё не включённые в forward
 
 ## 17. Новые таймфреймы
