@@ -2998,3 +2998,52 @@ symbol, near/far prices and ATR. Goal: 8–15 manually reviewed good zones plus
 4–6 wrong zones, exported as `liquidity-poi-reviews-*.json`. Freeze boundary
 rule by visual error, validate on new symbols/screenshots, only then reconnect
 Refined confirmation state machine.
+
+### Liquidity POI v0.3 BTC calibration result (19 labels, 21.07.2026)
+
+User reviewed 19 BTC 4h candidates against TradingView heatmap/manual zones:
+13 `wrong-zone`, 4 LONG zones chose `1.00 ATR`, 2 SHORT zones chose
+`0.50 ATR`; density20/30/40 were chosen 0 times. Split: lows 4/8 accepted,
+highs 2/11 accepted. Therefore the current Gaussian density boundary proxy is
+rejected; it adds UI complexity without matching manual heatmap boundaries.
+BTC-calibrated boundary candidates for independent validation only:
+LONG far boundary = 1.0 ATR below exact low wick; SHORT = 0.5 ATR above exact
+high wick. This asymmetry is not battle logic and must be checked on unseen
+ETH/SOL examples before freezing.
+
+Zone-selection findings are stronger than boundary findings:
+
+- most raw 2+2 pivots near ongoing/current price are noise, even if liquidity
+  technically exists; do not treat every impulse pivot as a POI;
+- a higher LONG low is rejected when a clearly stronger structural low/zone
+  exists below; analogous dominance for SHORT;
+- accepted LONG lows are structural: a 4h body-close below would imply CHoCH
+  or meaningful structure loss;
+- accepted SHORT examples were nearby EQH/pivot clusters (e.g. P7+P8), often
+  local zones; older outer swing highs/lows remain separate stronger zones;
+- manual heatmap map contains both local zones and outer swing zones. Detector
+  must preserve nearest valid structural zone plus strongest outer zone, while
+  suppressing intermediate pivots dominated by either;
+- FVG overlap is optional confluence, not sufficient for acceptance.
+
+Planned v0.4 visual-only candidate rule: remove density choices; generate zones
+only from (A) protected/structure-changing 4h pivot or (B) EQH/EQL cluster,
+require causal displacement away after pivot confirmation, merge nearby pivots,
+and apply same-direction dominance. Show local vs swing class explicitly.
+Calibrate on BTC labels, freeze, then validate without retuning on ETH/SOL.
+
+## 7.56 Liquidity POI v0.4 structural hierarchy (visual-only)
+
+Frozen from BTC calibration, then validate without retuning on ETH/SOL.
+Candidates are no longer every 2+2 pivot. Keep only: (A) 40-bar outer swing
+pivot or (B) local EQH/EQL cluster of >=2 pivots within 0.25 ATR. Require
+causal post-confirmation displacement >=1.25 ATR within 12×4h bars. Apply
+same-direction dominance: a weaker inner local pivot within 2 ATR is removed
+when a stronger outer swing exists. UI labels `SWING` vs `LOCAL-EQ` and count
+of suppressed nearby weak candidates.
+
+Gaussian density boundaries are removed (0/19 manual selections). One frozen
+zone per candidate: LONG exact low wick to 1.0 ATR below; SHORT exact high wick
+to 0.5 ATR above. Review buttons only `correct/too-narrow/too-wide/wrong-zone`.
+No outcomes or confirmation statistics until BTC preservation/noise-removal is
+verified and ETH/SOL visual OOS passes.
