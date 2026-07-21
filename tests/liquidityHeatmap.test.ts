@@ -106,3 +106,19 @@ it('freshness tracks last accumulation, not cluster birth', () => {
 	assert.equal(above.lastContributionIndex, 39)
 	assert.equal(above.lastContributionAt, 39 * H)
 })
+
+it('a long gap in accumulation opens a new band instead of stretching the old one', () => {
+	const highs = [...Array(6).fill(100), ...Array(30).fill(104), ...Array(10).fill(100)]
+	const c = series(highs)
+	const entry = (100 + 99 + 99.6) / 3
+	const target = entry * 1.1
+	const hits = detectLiquidityHeatmap(c, cfg)
+		.filter(p => p.side === 'sell-side' && p.bandLow <= target && target <= p.bandHigh)
+		.sort((a, b) => a.startIndex - b.startIndex)
+	assert.equal(hits.length, 2)
+	assert.equal(hits[0]!.startIndex, 0)
+	assert.equal(hits[0]!.lastContributionIndex, 5)
+	assert.equal(hits[0]!.status, 'active')
+	assert.equal(hits[1]!.startIndex, 36)
+	assert.equal(hits[1]!.status, 'active')
+})

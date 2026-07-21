@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.5-fresh-filter'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.6-event-windows'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -35,6 +35,8 @@ export interface LiquidityHeatmapConfig {
 	minContributions: number
 	/** Максимальная высота одного кластера в бинах. */
 	maxClusterBins: number
+	/** Вклад позже чем через столько баров после предыдущего открывает НОВУЮ полосу в том же бине (событийные окна накопления). */
+	maxGapBars: number
 	/** Кластеры слабее этого веса отбрасываются. */
 	minWeight: number
 	/** Кривая яркости: weight = (notional/max)^gamma. */
@@ -57,6 +59,7 @@ export const LIQUIDITY_HEATMAP_CONFIG: LiquidityHeatmapConfig = {
 	minLifetimeBars: 12,
 	minContributions: 1,
 	maxClusterBins: 3,
+	maxGapBars: 24,
 	minWeight: 0.18,
 	gamma: 0.5,
 	maxPools: 600,
@@ -120,6 +123,8 @@ function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: n
 	const binLow = (k: number): number => Math.exp(k * logStep)
 	const binHigh = (k: number): number => Math.exp((k + 1) * logStep)
 	const alive = new Map<string, Segment>()
+	// Закрытые по гэпу окна накопления: всё ещё живая ликвидность, снимается вместе с бином.
+	const dormant = new Map<string, Segment[]>()
 	const done: Segment[] = []
 	const volWindow: number[] = []
 	let volSum = 0
@@ -132,6 +137,11 @@ function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: n
 			if (hit) {
 				seg.sweptIndex = i
 				done.push(seg)
+				for (const d of dormant.get(key) ?? []) {
+					d.sweptIndex = i
+					done.push(d)
+				}
+				dormant.delete(key)
 				alive.delete(key)
 			}
 		}
@@ -149,6 +159,14 @@ function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: n
 				const k = binOf(level)
 				const key = `${side}|${k}`
 				let seg = alive.get(key)
+				if (seg && i - seg.lastIndex > config.maxGapBars) {
+					// Гэп без вкладов: старое окно остаётся жить отдельной полосой, новый объём — новая полоса.
+					const dor = dormant.get(key) ?? []
+					dor.push(seg)
+					dormant.set(key, dor)
+					alive.delete(key)
+					seg = undefined
+				}
 				if (!seg) {
 					seg = { side, k, startIndex: i, lastIndex: i, sweptIndex: null, contributions: 0, volume: 0, notional: 0 }
 					alive.set(key, seg)
@@ -160,16 +178,17 @@ function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: n
 			}
 		}
 	}
-	return [...done, ...alive.values()]
+	return [...done, ...[...dormant.values()].flat(), ...alive.values()]
 }
 
 /** Слияние соседних бинов, живущих одновременно, в единые кластерные полосы (реальные плотности вместо параллельных полос). */
-function clusterSegments(segments: Segment[], lastIndex: number, config: LiquidityHeatmapConfig, logStep: number): Cluster[] {
+function clusterSegments(segments: Segment[], config: LiquidityHeatmapConfig, logStep: number): Cluster[] {
 	const binMid = (k: number): number => Math.exp((k + 0.5) * logStep)
 	const clusters: Cluster[] = []
 	const sorted = [...segments].sort((a, b) => (a.k - b.k) || (a.startIndex - b.startIndex))
 	for (const seg of sorted) {
-		const segEnd = seg.sweptIndex ?? lastIndex
+		// Для слияния сравниваем ОКНА НАКОПЛЕНИЯ, а не время жизни: разные эпохи одного бина не сливаются.
+		const segEnd = seg.lastIndex
 		let target: Cluster | null = null
 		for (const cl of clusters) {
 			if (cl.side !== seg.side) continue
@@ -217,7 +236,7 @@ export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConf
 		if (seg.sweptIndex != null && seg.sweptIndex - seg.startIndex < config.minLifetimeBars) return false
 		return true
 	})
-	const clusters = clusterSegments(segments, lastIndex, config, logStep)
+	const clusters = clusterSegments(segments, config, logStep)
 	// Нормировка яркости по каждой стороне отдельно и по p90, а не по глобальному
 	// максимуму: один гигантский многомесячный кластер не должен гасить
 	// свежую ликвидность под локальными лоями/над хаями.

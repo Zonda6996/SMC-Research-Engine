@@ -577,17 +577,18 @@ Approved correction after v0.8 visual QA:
 
 Version: `liquidity-poi-0.9-freshness-consumption`. Research-only; confirmation and PnL remain frozen.
 
-## 16.5 Liquidity heatmap indicator v0.5 (diagnostic layer)
+## 16.5 Liquidity heatmap indicator v0.6 (diagnostic layer)
 
-Standalone module `src/core/liquidity/LiquidityHeatmapEngine.ts`, version `liquidity-heatmap-0.5-fresh-filter`. Coinglass-style potential-liquidation heatmap approximated from OHLCV only (no open interest / funding data). Reconstruction of the reference private TradingView "GGI Liquidity Heatmap" ("denser cluster = more liquidations", volume-prioritized).
+Standalone module `src/core/liquidity/LiquidityHeatmapEngine.ts`, version `liquidity-heatmap-0.6-event-windows`. Coinglass-style potential-liquidation heatmap approximated from OHLCV only (no open interest / funding data). Reconstruction of the reference private TradingView "GGI Liquidity Heatmap" ("denser cluster = more liquidations", volume-prioritized).
 
 - ONLY candles with significant relative volume (>= 1.25 x SMA20) open positions (entry = hlc3, sized by volume x price); this makes bands discrete events instead of a continuous wall of stripes;
 - liquidation levels at entry x (1 +/- 1/L) for leverage tiers 5x/10x/25x/50x/100x with configurable shares; volume is the primary intensity driver;
-- levels accumulate in logarithmic price bins (0.4%); adjacent bins alive at overlapping times merge into single cluster bands (max 3 bins tall) -> real densities instead of parallel duplicated stripes;
+- levels accumulate in logarithmic price bins (0.4%); adjacent bins alive at overlapping times merge into single cluster bands (max 3 bins tall) -> real densities instead of parallel duplicated stripes; cluster merging compares ACCUMULATION WINDOWS, not alive spans, so different eras of the same bin never merge;
+- accumulation event windows: a contribution arriving more than 24 bars after the previous one opens a NEW band in the same bin (the old band stays alive and is swept together with the bin); bands therefore start where liquidity was actually accumulated instead of stretching from the bin birth across the whole chart;
 - consumption: when price trades into a bin after formation, its liquidity is taken at that bar; later volume re-accumulates a NEW segment (no resurrection); swept segments that lived < 12 bars are dropped as near-price noise (active fresh ones are kept);
 - brightness: per-side robust normalization, weight = min(1, (notional / ref)^0.5) where ref is the 90th percentile of that side cluster notionals (max when < 10 clusters); prevents one giant accumulation cluster from dimming the rest of the map (e.g. fresh liquidity under local lows); clusters below weight 0.18 dropped, output capped at top-600; renderer draws bands 2-8 px thick by cluster height + weight; all coefficients live in `LIQUIDITY_HEATMAP_CONFIG` and are display-only, NOT battle logic;
 - visualizer: red = short-liquidation density above price, green = long-liquidation density below; band drawn from formation to consumption; age filter (500/1000/2000 bars / full history, default 500) hides stale liquidity by FRESHNESS: last accumulation time for active clusters (`lastContributionAt`) and sweep time for swept ones -- a bin born long ago but re-fed recently (e.g. 10x levels under fresh lows fed by entries at prices the market also visited months earlier) stays visible;
-- v0.4 replaced; the layer does not feed battle/PnL/confirmation and is intentionally not yet a POI source (POI integration requires separate approval after visual QA).
+- v0.5 replaced; the layer does not feed battle/PnL/confirmation and is intentionally not yet a POI source (POI integration requires separate approval after visual QA).
 
 # Часть IV. Подтверждённые расширения, ещё не включённые в forward
 
