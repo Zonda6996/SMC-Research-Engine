@@ -97,3 +97,12 @@ it('small fresh clusters stay visible next to giant accumulations', () => {
 	const target = entry * 0.9
 	assert.ok(pools.some(p => p.side === 'buy-side' && p.status === 'active' && p.bandLow <= target && target <= p.bandHigh))
 })
+
+it('freshness tracks last accumulation, not cluster birth', () => {
+	const c = series(Array(40).fill(100))
+	const pools = detectLiquidityHeatmap(c, cfg)
+	const above = pools.find(p => p.side === 'sell-side')!
+	assert.equal(above.startIndex, 0)
+	assert.equal(above.lastContributionIndex, 39)
+	assert.equal(above.lastContributionAt, 39 * H)
+})

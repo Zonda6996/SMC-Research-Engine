@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.4-balanced-brightness'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.5-fresh-filter'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -75,6 +75,9 @@ export interface LiquidityPool {
 	spanBins: number
 	startIndex: number
 	startAt: number
+	/** Индекс/время ПОСЛЕДНЕГО пополнения кластера — основа фильтра свежести (бин мог родиться давно, но кормиться недавно). */
+	lastContributionIndex: number
+	lastContributionAt: number
 	sweptIndex: number | null
 	sweptAt: number | null
 	contributions: number
@@ -90,6 +93,7 @@ interface Segment {
 	side: LiquiditySide
 	k: number
 	startIndex: number
+	lastIndex: number
 	sweptIndex: number | null
 	contributions: number
 	volume: number
@@ -102,6 +106,7 @@ interface Cluster {
 	maxK: number
 	startIndex: number
 	endIndex: number
+	lastContributionIndex: number
 	allSwept: boolean
 	maxSweptIndex: number
 	contributions: number
@@ -145,9 +150,10 @@ function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: n
 				const key = `${side}|${k}`
 				let seg = alive.get(key)
 				if (!seg) {
-					seg = { side, k, startIndex: i, sweptIndex: null, contributions: 0, volume: 0, notional: 0 }
+					seg = { side, k, startIndex: i, lastIndex: i, sweptIndex: null, contributions: 0, volume: 0, notional: 0 }
 					alive.set(key, seg)
 				}
+				seg.lastIndex = i
 				seg.contributions++
 				seg.volume += bar.volume * tier.share
 				seg.notional += bar.volume * entry * tier.share
@@ -179,6 +185,7 @@ function clusterSegments(segments: Segment[], lastIndex: number, config: Liquidi
 			target.maxK = Math.max(target.maxK, seg.k)
 			target.startIndex = Math.min(target.startIndex, seg.startIndex)
 			target.endIndex = Math.max(target.endIndex, segEnd)
+			target.lastContributionIndex = Math.max(target.lastContributionIndex, seg.lastIndex)
 			target.allSwept = target.allSwept && seg.sweptIndex != null
 			target.maxSweptIndex = Math.max(target.maxSweptIndex, seg.sweptIndex ?? -1)
 			target.contributions += seg.contributions
@@ -189,6 +196,7 @@ function clusterSegments(segments: Segment[], lastIndex: number, config: Liquidi
 			clusters.push({
 				side: seg.side, minK: seg.k, maxK: seg.k,
 				startIndex: seg.startIndex, endIndex: segEnd,
+				lastContributionIndex: seg.lastIndex,
 				allSwept: seg.sweptIndex != null, maxSweptIndex: seg.sweptIndex ?? -1,
 				contributions: seg.contributions, volume: seg.volume, notional: seg.notional,
 				midNum: seg.notional * binMid(seg.k),
@@ -238,6 +246,8 @@ export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConf
 			spanBins: cl.maxK - cl.minK + 1,
 			startIndex: cl.startIndex,
 			startAt: c[cl.startIndex]!.timestamp,
+			lastContributionIndex: cl.lastContributionIndex,
+			lastContributionAt: c[cl.lastContributionIndex]!.timestamp,
 			sweptIndex,
 			sweptAt: sweptIndex == null ? null : c[sweptIndex]!.timestamp,
 			contributions: cl.contributions,
