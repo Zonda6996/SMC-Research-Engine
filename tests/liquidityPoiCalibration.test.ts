@@ -10,7 +10,7 @@ const candles = (n=40): Candle[] => Array.from({length:n},(_,i)=>({
 }))
 
 it('liquidity POI has a frozen non-trading structural-area version',()=>{
- assert.equal(LIQUIDITY_POI_VERSION,'liquidity-poi-0.8-validity-priority')
+ assert.equal(LIQUIDITY_POI_VERSION,'liquidity-poi-0.9-freshness-consumption')
  assert.deepEqual(detectLiquidityPoi([]),[])
 })
 
@@ -71,16 +71,18 @@ it('keeps local EQ only in aligned P/D when the causal range is known',()=>{
 })
 
 
-it('wick through far does not kill an area; 4h close beyond far does',()=>{
+it('first post-arm sweep consumes freshness; close beyond far is a separate failure',()=>{
  const c=candles();c[5]={...c[5]!,low:90}
  const life:ProtectedLevelLifecycle={id:'p1',direction:'long',point:{type:'low',label:'HL',index:5,price:90} as never,originAt:c[5]!.timestamp,knownAt:c[10]!.timestamp,supersededAt:null,breachedAt:null,endAt:null,active:true}
- c[12]={...c[12]!,low:70,close:91}
+ c[12]={...c[12]!,low:89,close:91}
  let out=detectLiquidityPoi(c,[],{protectedHistory:[life]})[0]!
- assert.equal(out.valid,true)
- c[13]={...c[13]!,low:70,close:70}
+ assert.equal(out.lifecycleState,'consumed')
+ assert.equal(out.consumedAt,c[12]!.timestamp)
+ assert.equal(out.failedAt,null)
+ c[12]={...c[12]!,low:70,close:70}
  out=detectLiquidityPoi(c,[],{protectedHistory:[life]})[0]!
- assert.equal(out.valid,false)
- assert.equal(out.invalidatedAt,c[13]!.timestamp)
+ assert.equal(out.lifecycleState,'failed')
+ assert.equal(out.failedAt,c[12]!.timestamp)
 })
 
 it('lineage supersession does not invalidate an unswept protected area',()=>{
@@ -89,4 +91,34 @@ it('lineage supersession does not invalidate an unswept protected area',()=>{
  const out=detectLiquidityPoi(c,[],{protectedHistory:[life]})[0]!
  assert.equal(out.valid,true)
  assert.equal(out.lineageSupersededAt,c[12]!.timestamp)
+})
+
+
+it('generates one local-swing extreme per side of a structural segment',()=>{
+ const c=candles(24)
+ const event={direction:'up',type:'bos',confirmIndex:2,confirmTimestamp:c[2]!.timestamp,breachIndex:2} as StructureEvent
+ c[5]={...c[5]!,low:95};c[7]={...c[7]!,high:108};c[9]={...c[9]!,low:90};c[11]={...c[11]!,high:105}
+ const structure=[
+  {index:5,timestamp:c[5]!.timestamp,price:95,type:'low',label:'HL'},
+  {index:7,timestamp:c[7]!.timestamp,price:108,type:'high',label:'HH'},
+  {index:9,timestamp:c[9]!.timestamp,price:90,type:'low',label:'LL'},
+  {index:11,timestamp:c[11]!.timestamp,price:105,type:'high',label:'LH'},
+ ] as never
+ const out=detectLiquidityPoi(c,[event],{structure})
+ const locals=out.filter(x=>x.componentClasses.includes('local-swing'))
+ assert.ok(locals.some(x=>x.direction==='long'&&x.near===90))
+ assert.ok(locals.some(x=>x.direction==='short'&&x.near===108))
+})
+
+it('retires a 4h outer area on opposite CHoCH instead of carrying it indefinitely',()=>{
+ const c=candles(30);c[5]={...c[5]!,low:90}
+ const up={direction:'up',type:'choch',confirmIndex:10,confirmTimestamp:c[10]!.timestamp,breachIndex:9} as StructureEvent
+ const down={direction:'down',type:'choch',confirmIndex:20,confirmTimestamp:c[20]!.timestamp,breachIndex:19} as StructureEvent
+ const structure=[{index:5,timestamp:c[5]!.timestamp,price:90,type:'low',label:'LL'}] as never
+ const out=detectLiquidityPoi(c,[up,down],{structure})
+ const outer=out.find(x=>x.zoneClass==='outer-swing'&&x.direction==='long')
+ assert.ok(outer)
+ assert.equal(outer.lifecycleState,'retired')
+ assert.equal(outer.retiredAt,c[21]!.timestamp)
+ assert.equal(outer.active,false)
 })
