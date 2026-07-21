@@ -1,64 +1,66 @@
 import assert from 'node:assert/strict'
 import { it } from 'node:test'
-import { detectLiquidityHeatmap, LIQUIDITY_HEATMAP_VERSION } from '../src/core/liquidity/LiquidityHeatmapEngine.js'
+import { detectLiquidityHeatmap, LIQUIDITY_HEATMAP_CONFIG, type LiquidityHeatmapConfig } from '../src/core/liquidity/LiquidityHeatmapEngine.js'
 import type { Candle } from '../src/models/price/Candle.js'
 
 const H = 14_400_000
-function series(highs: number[]): Candle[] {
-	return highs.map((h, i) => ({ timestamp: i * H, open: h - 0.5, high: h, low: h - 1, close: h - 0.4, volume: 100 }))
+function series(highs: number[], volume = 100): Candle[] {
+	return highs.map((h, i) => ({ timestamp: i * H, open: h - 0.5, high: h, low: h - 1, close: h - 0.4, volume }))
+}
+const cfg: LiquidityHeatmapConfig = {
+	...LIQUIDITY_HEATMAP_CONFIG,
+	leverageTiers: [{ leverage: 10, share: 1 }],
+	binPct: 0.005,
+	minRelVolume: 0,
+	minWeight: 0,
+	gamma: 1,
 }
 
-it('confirms pivot pools causally and tracks both sides', () => {
-	const highs = Array(30).fill(100)
-	highs[10] = 105
-	const c = series(highs)
-	c[12] = { ...c[12]!, high: 96, low: 95, open: 95.5, close: 95.6 }
-	const pools = detectLiquidityHeatmap(c)
-	const sell = pools.find(p => p.side === 'sell-side')!
-	const buy = pools.find(p => p.side === 'buy-side')!
-	assert.equal(sell.version, LIQUIDITY_HEATMAP_VERSION)
-	assert.equal(sell.extremePrice, 105)
-	assert.equal(sell.startIndex, 10)
-	assert.equal(sell.confirmedIndex, 15)
-	assert.equal(sell.status, 'active')
-	assert.equal(buy.extremePrice, 95)
-	assert.equal(buy.status, 'active')
+it('places liquidation density on both sides of entries, causally', () => {
+	const c = series(Array(40).fill(100))
+	const pools = detectLiquidityHeatmap(c, cfg)
+	const above = pools.find(p => p.side === 'sell-side')!
+	const below = pools.find(p => p.side === 'buy-side')!
+	const entry = (100 + 99 + 99.6) / 3
+	assert.ok(above.bandLow <= entry * 1.1 && entry * 1.1 <= above.bandHigh)
+	assert.ok(below.bandLow <= entry * 0.9 && entry * 0.9 <= below.bandHigh)
+	assert.equal(above.status, 'active')
+	assert.equal(above.startIndex, 0)
+	const prefix = detectLiquidityHeatmap(c.slice(0, 25), cfg)
+	assert.ok(prefix.some(p => p.side === 'sell-side' && p.startIndex === 0))
 })
 
-it('does not reveal a pool before its pivot confirmation bar', () => {
-	const highs = Array(30).fill(100)
-	highs[10] = 105
+it('volume drives brightness (coinglass-style density)', () => {
+	const highs = [...Array(20).fill(100), ...Array(20).fill(104)]
 	const c = series(highs)
-	assert.equal(detectLiquidityHeatmap(c.slice(0, 15)).length, 0)
-	assert.ok(detectLiquidityHeatmap(c.slice(0, 16)).some(p => p.side === 'sell-side' && p.extremePrice === 105))
-})
-
-it('merges equal highs into one stronger pool instead of sweeping them', () => {
-	const highs = Array(40).fill(100)
-	highs[10] = 105
-	highs[20] = 105.05
-	highs[32] = 103
-	const pools = detectLiquidityHeatmap(series(highs)).filter(p => p.side === 'sell-side')
+	c[25] = { ...c[25]!, volume: 5000 }
+	const pools = detectLiquidityHeatmap(c, cfg)
+		.filter(p => p.side === 'sell-side')
+		.sort((a, b) => a.extremePrice - b.extremePrice)
 	assert.equal(pools.length, 2)
-	const merged = pools.find(p => p.pivotCount === 2)!
-	const single = pools.find(p => p.pivotCount === 1)!
-	assert.equal(merged.status, 'active')
-	assert.equal(merged.extremePrice, 105.05)
-	assert.ok(merged.touchCount >= 1)
-	assert.ok(merged.weight > single.weight)
+	assert.ok(pools[1]!.weight > pools[0]!.weight)
+	assert.equal(pools[1]!.weight, 1)
 })
 
-it('sweeps a pool beyond tolerance and re-accumulates as a new pool', () => {
-	const highs = Array(30).fill(100)
-	highs[10] = 105
-	highs[20] = 106
-	const pools = detectLiquidityHeatmap(series(highs)).filter(p => p.side === 'sell-side')
+it('price sweeping a bin consumes it and re-accumulates later', () => {
+	const highs = [...Array(10).fill(100), ...Array(10).fill(112), ...Array(20).fill(100)]
+	const c = series(highs)
+	const entry = (100 + 99 + 99.6) / 3
+	const target = entry * 1.1
+	const hits = detectLiquidityHeatmap(c, cfg)
+		.filter(p => p.side === 'sell-side' && p.bandLow <= target && target <= p.bandHigh)
 		.sort((a, b) => a.startIndex - b.startIndex)
-	assert.equal(pools.length, 2)
-	assert.equal(pools[0]!.status, 'swept')
-	assert.equal(pools[0]!.sweptIndex, 20)
-	assert.equal(pools[0]!.endAt, 20 * H)
-	assert.equal(pools[1]!.status, 'active')
-	assert.equal(pools[1]!.startIndex, 20)
-	assert.equal(pools[1]!.extremePrice, 106)
+	assert.equal(hits.length, 2)
+	assert.equal(hits[0]!.status, 'swept')
+	assert.equal(hits[0]!.sweptIndex, 10)
+	assert.equal(hits[0]!.endAt, 10 * H)
+	assert.equal(hits[1]!.status, 'active')
+	assert.equal(hits[1]!.startIndex, 20)
+})
+
+it('insignificant volume is ignored', () => {
+	const c = series(Array(40).fill(100))
+	c[30] = { timestamp: 30 * H, open: 119.5, high: 120, low: 119, close: 119.6, volume: 5 }
+	const pools = detectLiquidityHeatmap(c, { ...cfg, minRelVolume: 0.5 })
+	assert.ok(pools.every(p => p.extremePrice < 125))
 })

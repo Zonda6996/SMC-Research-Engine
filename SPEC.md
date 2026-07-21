@@ -577,16 +577,17 @@ Approved correction after v0.8 visual QA:
 
 Version: `liquidity-poi-0.9-freshness-consumption`. Research-only; confirmation and PnL remain frozen.
 
-## 16.5 Liquidity heatmap indicator v0.1 (diagnostic layer)
+## 16.5 Liquidity heatmap indicator v0.2 (diagnostic layer)
 
-Standalone module `src/core/liquidity/LiquidityHeatmapEngine.ts`, version `liquidity-heatmap-0.1-eq-pools`. Reconstruction of the user's private TradingView liquidity heatmap from OHLCV only.
+Standalone module `src/core/liquidity/LiquidityHeatmapEngine.ts`, version `liquidity-heatmap-0.2-liquidation-bins`. Coinglass-style potential-liquidation heatmap approximated from OHLCV only (no open interest / funding data). Reconstruction of the reference private TradingView "GGI Liquidity Heatmap" ("denser cluster = more liquidations", volume-prioritized).
 
-- confirmed pivot highs/lows with windows 5/10/20 (left strict, right non-strict); a level becomes causally visible at pivot + 5 bars;
-- same-side pivots within max(0.1 x ATR14, 0.15% price) merge into an EQH/EQL pool; a pierce inside the tolerance is an equal-extreme update / touch, not a sweep (fixes the naive engine where a 0.05$ higher equal high instantly sweeps the pool);
-- sweep = trade beyond pool extreme + tolerance; the band stops at the sweep bar and is never resurrected; later liquidity near the same price forms a new pool (re-accumulation);
-- pool weight = 1 - exp(-rawScore/4); rawScore = sum over pivots of (log2(span) + 0.5 x min(relVolume, 2)) + 0.3 x min(touches, 5). Display-only intensity calibration exposed in `LIQUIDITY_HEATMAP_CONFIG`; explicitly NOT battle logic;
-- visualizer overlay: sell-side pools red, buy-side green, opacity and thickness by weight, band drawn from pivot bar to sweep bar (matching the TradingView reference screenshot);
-- the layer does not feed battle/PnL/confirmation and is intentionally not yet a POI source; POI integration requires separate user approval after visual QA.
+- each candle with sufficient relative volume (>= 0.5 x SMA20; "insignificant liquidations are ignored") opens positions at entry = hlc3 sized by volume x price (notional);
+- liquidation levels at entry x (1 +/- 1/L) for leverage tiers 5x/10x/25x/50x/100x with configurable shares; volume is the primary intensity driver, leverage shares are the secondary distribution;
+- levels accumulate in logarithmic price bins (0.25%): simultaneous contributions to one bin merge into a single density segment (real clusters, no duplicated parallel stripes);
+- consumption: when price trades into a bin after formation, its liquidity is taken at that bar; later volume re-accumulates a NEW segment in the same bin (no resurrection of consumed liquidity);
+- brightness: weight = (notional / maxNotional)^0.35; segments below weight 0.05 are dropped; output capped at top-2500 by weight; all coefficients live in `LIQUIDITY_HEATMAP_CONFIG` and are display-only, NOT battle logic;
+- visualizer: red = short-liquidation density above price, green = long-liquidation density below; band drawn from formation to consumption; age filter (500/1000/2000 bars / full history, default 500) hides stale liquidity;
+- v0.1 (EQH/EQL pivot pools) is replaced entirely; the layer does not feed battle/PnL/confirmation and is intentionally not yet a POI source (POI integration requires separate approval after visual QA).
 
 # Часть IV. Подтверждённые расширения, ещё не включённые в forward
 
