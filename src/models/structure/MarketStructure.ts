@@ -4,10 +4,13 @@ import type { BreachedLevel } from '@/models/structure/BreachedLevel.js'
 import type { TrendHistoryEntry } from '@/models/structure/TrendHistoryEntry.js'
 import type { ProtectedState } from '@/models/structure/ProtectedState.js'
 import type { StructurePoint } from '@/models/structure/StructurePoint.js'
+import type { ProtectedLevelLifecycle } from '@/models/structure/ProtectedLevelLifecycle.js'
 
 export type Trend = 'bullish' | 'bearish' | 'range'
 
 export interface MarketStructure extends ProtectedState {
+	/** Full causal assignment/replacement/breach history of protected HL/LH levels. */
+	protectedHistory: ProtectedLevelLifecycle[]
 	lastPoint?: StructurePoint
 	/**
 	 * Protected-уровни, пробитые ценой (закрытием свечи) до того,
