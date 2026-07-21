@@ -3047,3 +3047,59 @@ zone per candidate: LONG exact low wick to 1.0 ATR below; SHORT exact high wick
 to 0.5 ATR above. Review buttons only `correct/too-narrow/too-wide/wrong-zone`.
 No outcomes or confirmation statistics until BTC preservation/noise-removal is
 verified and ETH/SOL visual OOS passes.
+
+### Liquidity POI v0.4 visual OOS result — BTC + ETH (73 labels)
+
+Reviewed v0.4 only: 73 zones; 29 correct, 4 too-narrow, 40 wrong.
+Accepted including too-narrow = 45.2%. BTC 31: 13 correct, 3 narrow, 15 wrong
+(51.6% accepted). ETH 42: 16 correct, 1 narrow, 25 wrong (40.5%). Thus v0.4
+improves v0.3 but remains below usable precision.
+
+Class split: `local-eq` 15 total, 9 accepted (60%); `swing` 58 total, 24
+accepted including narrow (41%). Therefore local liquidity zones must NOT be
+removed; the dominant error is duplicate/intermediate swing pivots.
+Boundaries are provisionally adequate: 0 `too-wide`, only 4 `too-narrow`;
+selection/lifecycle is still the blocking problem.
+
+Critical lifecycle correction for v0.5:
+
+- a high/low may be valid point-in-time when created, then a later more extreme
+  same-side pivot supersedes it. Do not label the earlier P7 permanently wrong
+  using future knowledge; store `knownAt -> supersededAt` and stop its box at
+  the new higher high (SHORT) / lower low (LONG);
+- equal/nearby pivots in one swing must merge into one EQH/EQL zone, not create
+  one zone per fractal;
+- default current-map view shows active zones only; historical view may show
+  expired/superseded zones with finite lifespan;
+- within one structural leg choose the outer extreme (highest high for SHORT,
+  lowest low for LONG), suppress intermediate pivots;
+- retain important internal local zones as `protected-structure`: higher low
+  that caused bullish BOS / lower high that caused bearish BOS. These are the
+  user-marked green zones whose body break would imply continuation/CHoCH;
+- v0.5 classes: `outer-swing`, `protected-structure`, `local-eq`; candidate
+  generation should use causal BOS/CHoCH events from the structure engine.
+
+No more manual labels are required on v0.4. Confirmation and PnL remain blocked
+until active/superseded lifecycle and protected internal pivots are visual-QA'd.
+
+## 7.57 Liquidity POI v0.5 structure-events lifecycle (visual-only)
+
+Process correction: v0.4 `40-bar outer extreme` was an assistant-invented
+parameter introduced without prior user approval. It is removed. Future
+structural assumptions must be proposed before implementation; frozen SPEC is
+source of truth.
+
+v0.5 uses existing causal BOS/CHoCH events instead of rolling windows. For each
+up event, choose the lowest low of the leg since the previous opposite event;
+for each down event choose the highest high. CHoCH-origin = `outer-swing`,
+BOS-origin = `protected-structure`. Local EQH/EQL remains: >=2 confirmed 2+2
+pivots within 0.25 ATR merge into ONE `local-eq` candidate.
+
+Lifecycle fields: `knownAt`, `supersededAt`, `invalidatedAt`, `endAt`, `active`.
+A later more-extreme outer swing supersedes the prior same-side outer zone;
+4h close beyond far boundary invalidates. Zone lines end at supersede/
+invalidation instead of extending across the full chart. Default visual filter
+shows active zones only; historical mode shows finite expired zones. Width is
+unchanged from BTC calibration: LONG 1 ATR, SHORT 0.5 ATR. Still no PnL or
+confirmation batch until BTC/ETH visual QA verifies protected internal lows,
+merged EQ zones and removal of intermediate swing duplicates.
