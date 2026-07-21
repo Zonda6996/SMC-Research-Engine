@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.7-strength-gradient'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.8-visible-strength'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -55,14 +55,14 @@ export const LIQUIDITY_HEATMAP_CONFIG: LiquidityHeatmapConfig = {
 		{ leverage: 100, share: 0.125 },
 	],
 	volumeLookback: 20,
-	minRelVolume: 1.25,
+	minRelVolume: 0.75,
 	minLifetimeBars: 12,
 	minContributions: 1,
 	maxClusterBins: 3,
 	maxGapBars: 24,
 	minWeight: 0.05,
 	gamma: 1.5,
-	maxPools: 600,
+	maxPools: 2000,
 }
 
 export interface LiquidityPool {

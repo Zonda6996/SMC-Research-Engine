@@ -577,18 +577,18 @@ Approved correction after v0.8 visual QA:
 
 Version: `liquidity-poi-0.9-freshness-consumption`. Research-only; confirmation and PnL remain frozen.
 
-## 16.5 Liquidity heatmap indicator v0.7 (diagnostic layer)
+## 16.5 Liquidity heatmap indicator v0.8 (diagnostic layer)
 
-Standalone module `src/core/liquidity/LiquidityHeatmapEngine.ts`, version `liquidity-heatmap-0.7-strength-gradient`. Coinglass-style potential-liquidation heatmap approximated from OHLCV only (no open interest / funding data). Reconstruction of the reference private TradingView "GGI Liquidity Heatmap" ("denser cluster = more liquidations", volume-prioritized).
+Standalone module `src/core/liquidity/LiquidityHeatmapEngine.ts`, version `liquidity-heatmap-0.8-visible-strength`. Coinglass-style potential-liquidation heatmap approximated from OHLCV only (no open interest / funding data). Reconstruction of the reference private TradingView "GGI Liquidity Heatmap" ("denser cluster = more liquidations", volume-prioritized).
 
-- ONLY candles with significant relative volume (>= 1.25 x SMA20) open positions (entry = hlc3, sized by volume x price); this makes bands discrete events instead of a continuous wall of stripes;
+- candles with relative volume >= 0.75 x SMA20 open positions (only truly dead bars are skipped: the 1.25x gate erased liquidity accumulated by the calm recent range, e.g. bands right above/below current price; walls are prevented by event windows + freshness filter instead) (entry = hlc3, sized by volume x price); this makes bands discrete events instead of a continuous wall of stripes;
 - liquidation levels at entry x (1 +/- 1/L) for leverage tiers 5x/10x/25x/50x/100x with configurable shares; volume is the primary intensity driver;
 - levels accumulate in logarithmic price bins (0.4%); adjacent bins alive at overlapping times merge into single cluster bands (max 3 bins tall) -> real densities instead of parallel duplicated stripes; cluster merging compares ACCUMULATION WINDOWS, not alive spans, so different eras of the same bin never merge;
 - accumulation event windows: a contribution arriving more than 24 bars after the previous one opens a NEW band in the same bin (the old band stays alive and is swept together with the bin); bands therefore start where liquidity was actually accumulated instead of stretching from the bin birth across the whole chart;
 - consumption: when price trades into a bin after formation, its liquidity is taken at that bar; later volume re-accumulates a NEW segment (no resurrection); swept segments that lived < 12 bars are dropped as near-price noise (active fresh ones are kept);
-- brightness: rank-based per side, weight = (rank / count)^1.5 over clusters sorted by notional; guarantees a visible strength gradient (top clusters dark and thick, weak ones pale and thin) regardless of the notional distribution shape; clusters below weight 0.05 dropped, output capped at top-600; renderer maps weight to alpha 0.12-0.90 and thickness 1-8 px (plus cluster height); all coefficients live in `LIQUIDITY_HEATMAP_CONFIG` and are display-only, NOT battle logic;
+- brightness: rank-based per side, weight = (rank / count)^1.5 over clusters sorted by notional; guarantees a visible strength gradient (top clusters dark and thick, weak ones pale and thin) regardless of the notional distribution shape; clusters below weight 0.05 dropped, output capped at top-2000 (the old top-600 cap silently discarded fresh small clusters near price); renderer maps weight to COLOR saturation (pale -> intense), alpha 0.3-0.9 and thickness 1-9 px, so strength is perceptible on a dark background; all coefficients live in `LIQUIDITY_HEATMAP_CONFIG` and are display-only, NOT battle logic;
 - visualizer: red = short-liquidation density above price, green = long-liquidation density below; band drawn from formation to consumption; age filter (500/1000/2000 bars / full history, default 500) hides stale liquidity by FRESHNESS: last accumulation time for active clusters (`lastContributionAt`) and sweep time for swept ones -- a bin born long ago but re-fed recently (e.g. 10x levels under fresh lows fed by entries at prices the market also visited months earlier) stays visible;
-- v0.6 replaced; the layer does not feed battle/PnL/confirmation and is intentionally not yet a POI source (POI integration requires separate approval after visual QA).
+- v0.7 replaced; the layer does not feed battle/PnL/confirmation and is intentionally not yet a POI source (POI integration requires separate approval after visual QA).
 
 # Часть IV. Подтверждённые расширения, ещё не включённые в forward
 
