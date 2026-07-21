@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.6-event-windows'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-0.7-strength-gradient'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -39,7 +39,7 @@ export interface LiquidityHeatmapConfig {
 	maxGapBars: number
 	/** Кластеры слабее этого веса отбрасываются. */
 	minWeight: number
-	/** Кривая яркости: weight = (notional/max)^gamma. */
+	/** Кривая яркости: weight = (rank/count)^gamma внутри стороны; gamma > 1 делает большинство полос бледными, а топ — насыщенным. */
 	gamma: number
 	/** Потолок числа кластеров в выдаче (топ по весу). */
 	maxPools: number
@@ -60,8 +60,8 @@ export const LIQUIDITY_HEATMAP_CONFIG: LiquidityHeatmapConfig = {
 	minContributions: 1,
 	maxClusterBins: 3,
 	maxGapBars: 24,
-	minWeight: 0.18,
-	gamma: 0.5,
+	minWeight: 0.05,
+	gamma: 1.5,
 	maxPools: 600,
 }
 
@@ -237,22 +237,18 @@ export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConf
 		return true
 	})
 	const clusters = clusterSegments(segments, config, logStep)
-	// Нормировка яркости по каждой стороне отдельно и по p90, а не по глобальному
-	// максимуму: один гигантский многомесячный кластер не должен гасить
-	// свежую ликвидность под локальными лоями/над хаями.
-	const refBySide = new Map<LiquiditySide, number>()
+	// Сила кластера — ранговая внутри стороны: гарантированный градиент яркости
+	// (топ — насыщенный, середина — умеренная, слабые — бледные) без прижатия к потолку
+	// и без гашения всей карты одним выбросом.
+	const weightOf = new Map<Cluster, number>()
 	for (const side of ['sell-side', 'buy-side'] as const) {
-		const notionals = clusters.filter(cl => cl.side === side).map(cl => cl.notional).sort((a, b) => a - b)
-		if (notionals.length === 0) continue
-		const ref = notionals.length >= 10 ? notionals[Math.floor(0.9 * (notionals.length - 1))]! : notionals[notionals.length - 1]!
-		if (ref > 0) refBySide.set(side, ref)
+		const sorted = clusters.filter(cl => cl.side === side).sort((a, b) => a.notional - b.notional)
+		sorted.forEach((cl, i) => weightOf.set(cl, Math.pow((i + 1) / sorted.length, config.gamma)))
 	}
-	if (refBySide.size === 0) return []
+	if (weightOf.size === 0) return []
 	const pools: LiquidityPool[] = []
 	for (const cl of clusters) {
-		const ref = refBySide.get(cl.side)
-		if (ref == null) continue
-		const weight = Math.min(1, Math.pow(cl.notional / ref, config.gamma))
+		const weight = weightOf.get(cl) ?? 0
 		if (weight < config.minWeight) continue
 		const sweptIndex = cl.allSwept ? cl.maxSweptIndex : null
 		pools.push({

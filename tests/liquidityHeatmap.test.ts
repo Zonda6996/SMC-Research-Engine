@@ -122,3 +122,15 @@ it('a long gap in accumulation opens a new band instead of stretching the old on
 	assert.equal(hits[1]!.startIndex, 36)
 	assert.equal(hits[1]!.status, 'active')
 })
+
+it('weights form a strength gradient instead of clamping to the ceiling', () => {
+	const highs = [...Array(10).fill(100), ...Array(15).fill(104), ...Array(15).fill(108)]
+	const c = highs.map((h, i) => ({ timestamp: i * H, open: h - 0.5, high: h, low: h - 1, close: h - 0.4, volume: h === 100 ? 100 : h === 104 ? 300 : 900 }))
+	const pools = detectLiquidityHeatmap(c, cfg)
+		.filter(p => p.side === 'sell-side')
+		.sort((a, b) => a.extremePrice - b.extremePrice)
+	assert.equal(pools.length, 3)
+	assert.ok(pools[0]!.weight < pools[1]!.weight && pools[1]!.weight < pools[2]!.weight)
+	assert.equal(pools[2]!.weight, 1)
+	assert.ok(Math.abs(pools[0]!.weight - 1 / 3) < 1e-9)
+})
