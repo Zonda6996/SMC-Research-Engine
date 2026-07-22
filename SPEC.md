@@ -676,3 +676,9 @@ docs/archive/SPEC-legacy-2026-07-21.md
 ```
 
 Архив не является источником текущих правил и не должен использоваться для реализации без повторной проверки актуальности.
+
+## 16.6 Visualizer QoL (22.07.2026)
+
+- timeframes 1d and 1w added to the TF switch (TF_MS extended with `1w`); heatmap and analysis params are bar-based and apply unchanged;
+- no auto-load on page open: the user picks symbol/TF/limit and presses Load (BTC/USDT stays the default symbol);
+- candle fetching is parallel: page windows are precomputed from the fixed since..end range and fetched in batches of 6 with timestamp dedup (short histories return the same left edge on early pages), replacing strictly sequential pagination — main win on the 10k-30k 5m context fetch.
