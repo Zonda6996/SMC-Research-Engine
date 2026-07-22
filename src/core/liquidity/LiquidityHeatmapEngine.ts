@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-1.3-grouping-profiles'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-1.4-shelf-grouping'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -67,6 +67,7 @@ export const LIQUIDITY_HEATMAP_CONFIG: LiquidityHeatmapConfig = {
 
 const HOUR_4_MS = 14_400_000
 const DAY_MS = 86_400_000
+const WEEK_MS = 604_800_000
 
 /** Медианный шаг между свечами — определение ТФ без внешнего параметра. */
 export function inferTfMs(c: Candle[]): number {
@@ -85,6 +86,7 @@ export function inferTfMs(c: Candle[]): number {
  */
 export function heatmapConfigForTf(tfMs: number): LiquidityHeatmapConfig {
 	if (tfMs < HOUR_4_MS) return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.0, binPct: 0.005, maxClusterBins: 6 }
+	if (tfMs >= WEEK_MS) return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.25, binPct: 0.009, maxClusterBins: 5 }
 	if (tfMs >= DAY_MS) return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.25, binPct: 0.01, maxClusterBins: 6 }
 	return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.0, binPct: 0.006, maxClusterBins: 6 }
 }
@@ -134,8 +136,7 @@ interface Cluster {
 	startIndex: number
 	endIndex: number
 	lastContributionIndex: number
-	allSwept: boolean
-	maxSweptIndex: number
+	sweeps: Array<{ index: number; notional: number }>
 	contributions: number
 	volume: number
 	notional: number
@@ -229,8 +230,7 @@ function clusterSegments(segments: Segment[], config: LiquidityHeatmapConfig, lo
 			target.startIndex = Math.min(target.startIndex, seg.startIndex)
 			target.endIndex = Math.max(target.endIndex, segEnd)
 			target.lastContributionIndex = Math.max(target.lastContributionIndex, seg.lastIndex)
-			target.allSwept = target.allSwept && seg.sweptIndex != null
-			target.maxSweptIndex = Math.max(target.maxSweptIndex, seg.sweptIndex ?? -1)
+			if (seg.sweptIndex != null) target.sweeps.push({ index: seg.sweptIndex, notional: seg.notional })
 			target.contributions += seg.contributions
 			target.volume += seg.volume
 			target.notional += seg.notional
@@ -240,13 +240,31 @@ function clusterSegments(segments: Segment[], config: LiquidityHeatmapConfig, lo
 				side: seg.side, minK: seg.k, maxK: seg.k,
 				startIndex: seg.startIndex, endIndex: segEnd,
 				lastContributionIndex: seg.lastIndex,
-				allSwept: seg.sweptIndex != null, maxSweptIndex: seg.sweptIndex ?? -1,
+				sweeps: seg.sweptIndex != null ? [{ index: seg.sweptIndex, notional: seg.notional }] : [],
 				contributions: seg.contributions, volume: seg.volume, notional: seg.notional,
 				midNum: seg.notional * binMid(seg.k),
 			})
 		}
 	}
 	return clusters
+}
+
+/**
+ * Полоса считается снятой, когда цена сняла БОЛЬШИНСТВО (>= 50% notional) её бинов:
+ * высокая полоса, в нижние бины которой цена уже зашла, не должна лежать
+ * поперёк графика как «активная» (раньше требовалось снятие ВСЕХ бинов).
+ */
+function resolveSweptIndex(cl: Cluster): number | null {
+	let swept = 0
+	for (const sw of cl.sweeps) swept += sw.notional
+	if (swept < 0.5 * cl.notional) return null
+	const ordered = [...cl.sweeps].sort((a, b) => a.index - b.index)
+	let acc = 0
+	for (const sw of ordered) {
+		acc += sw.notional
+		if (acc >= 0.5 * cl.notional) return sw.index
+	}
+	return ordered[ordered.length - 1]!.index
 }
 
 export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmapConfig): LiquidityPool[] {
@@ -275,7 +293,7 @@ export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmap
 	for (const cl of clusters) {
 		const weight = weightOf.get(cl) ?? 0
 		if (weight < config.minWeight) continue
-		const sweptIndex = cl.allSwept ? cl.maxSweptIndex : null
+		const sweptIndex = resolveSweptIndex(cl)
 		pools.push({
 			id: `${LIQUIDITY_HEATMAP_VERSION}|${cl.side}|${cl.minK}:${cl.maxK}|${cl.startIndex}`,
 			version: LIQUIDITY_HEATMAP_VERSION,

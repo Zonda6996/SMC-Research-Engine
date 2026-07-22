@@ -148,5 +148,7 @@ it('tf profiles: all tfs group into wide bands, daily+ widest', () => {
 	assert.equal(d1.minRelVolume, 1.25)
 	assert.equal(d1.binPct, 0.01)
 	assert.equal(d1.maxClusterBins, 6)
-	assert.equal(heatmapConfigForTf(604_800_000).binPct, 0.01)
+	const w1 = heatmapConfigForTf(604_800_000)
+	assert.equal(w1.binPct, 0.009)
+	assert.equal(w1.maxClusterBins, 5)
 })
