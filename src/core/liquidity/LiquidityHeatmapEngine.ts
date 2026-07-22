@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-1.4-shelf-grouping'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-1.5-honest-shelves'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -136,7 +136,7 @@ interface Cluster {
 	startIndex: number
 	endIndex: number
 	lastContributionIndex: number
-	sweeps: Array<{ index: number; notional: number }>
+	sweeps: Array<{ index: number; notional: number; k: number }>
 	contributions: number
 	volume: number
 	notional: number
@@ -230,7 +230,7 @@ function clusterSegments(segments: Segment[], config: LiquidityHeatmapConfig, lo
 			target.startIndex = Math.min(target.startIndex, seg.startIndex)
 			target.endIndex = Math.max(target.endIndex, segEnd)
 			target.lastContributionIndex = Math.max(target.lastContributionIndex, seg.lastIndex)
-			if (seg.sweptIndex != null) target.sweeps.push({ index: seg.sweptIndex, notional: seg.notional })
+			if (seg.sweptIndex != null) target.sweeps.push({ index: seg.sweptIndex, notional: seg.notional, k: seg.k })
 			target.contributions += seg.contributions
 			target.volume += seg.volume
 			target.notional += seg.notional
@@ -240,7 +240,7 @@ function clusterSegments(segments: Segment[], config: LiquidityHeatmapConfig, lo
 				side: seg.side, minK: seg.k, maxK: seg.k,
 				startIndex: seg.startIndex, endIndex: segEnd,
 				lastContributionIndex: seg.lastIndex,
-				sweeps: seg.sweptIndex != null ? [{ index: seg.sweptIndex, notional: seg.notional }] : [],
+				sweeps: seg.sweptIndex != null ? [{ index: seg.sweptIndex, notional: seg.notional, k: seg.k }] : [],
 				contributions: seg.contributions, volume: seg.volume, notional: seg.notional,
 				midNum: seg.notional * binMid(seg.k),
 			})
@@ -254,17 +254,25 @@ function clusterSegments(segments: Segment[], config: LiquidityHeatmapConfig, lo
  * высокая полоса, в нижние бины которой цена уже зашла, не должна лежать
  * поперёк графика как «активная» (раньше требовалось снятие ВСЕХ бинов).
  */
-function resolveSweptIndex(cl: Cluster): number | null {
-	let swept = 0
-	for (const sw of cl.sweeps) swept += sw.notional
-	if (swept < 0.5 * cl.notional) return null
+function resolveSweptIndex(cl: Cluster, kMid: number): number | null {
 	const ordered = [...cl.sweeps].sort((a, b) => a.index - b.index)
-	let acc = 0
-	for (const sw of ordered) {
-		acc += sw.notional
-		if (acc >= 0.5 * cl.notional) return sw.index
+	// Касание бина, в котором лежит уровень отрисовки (среднее != медиана:
+	// по 50% массы линия могла остаться лежать на свечах) — гасим по раннему из двух событий.
+	let byLevel: number | null = null
+	for (const sw of ordered) if (sw.k === kMid) { byLevel = sw.index; break }
+	let byMass: number | null = null
+	let total = 0
+	for (const sw of cl.sweeps) total += sw.notional
+	if (total >= 0.5 * cl.notional) {
+		let acc = 0
+		for (const sw of ordered) {
+			acc += sw.notional
+			if (acc >= 0.5 * cl.notional) { byMass = sw.index; break }
+		}
 	}
-	return ordered[ordered.length - 1]!.index
+	if (byLevel == null) return byMass
+	if (byMass == null) return byLevel
+	return Math.min(byLevel, byMass)
 }
 
 export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmapConfig): LiquidityPool[] {
@@ -293,12 +301,13 @@ export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmap
 	for (const cl of clusters) {
 		const weight = weightOf.get(cl) ?? 0
 		if (weight < config.minWeight) continue
-		const sweptIndex = resolveSweptIndex(cl)
+		const extremePrice = cl.midNum / cl.notional
+		const sweptIndex = resolveSweptIndex(cl, Math.floor(Math.log(extremePrice) / logStep))
 		pools.push({
 			id: `${LIQUIDITY_HEATMAP_VERSION}|${cl.side}|${cl.minK}:${cl.maxK}|${cl.startIndex}`,
 			version: LIQUIDITY_HEATMAP_VERSION,
 			side: cl.side,
-			extremePrice: cl.midNum / cl.notional,
+			extremePrice,
 			bandLow: Math.exp(cl.minK * logStep),
 			bandHigh: Math.exp((cl.maxK + 1) * logStep),
 			spanBins: cl.maxK - cl.minK + 1,
