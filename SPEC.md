@@ -266,7 +266,7 @@ batch и PnL запрещены до визуальной валидации д�
 Текущая версия POI-детектора:
 
 ```text
-liquidity-poi-0.5.2-history-boundary
+liquidity-poi-0.9-freshness-consumption
 ```
 
 Текущая версия раннего confirmation-прототипа:
@@ -517,6 +517,84 @@ poi-invalidated
 
 ---
 
+## 16.1 POI anchor/profile v0.6
+
+Текущая реализация разделяет structural anchor и дальнюю границу. PROTECTED-STRUCTURE строится из causal history фактически назначенных protected levels. При отсутствии данных приватной TradingView heatmap дальняя граница является только OHLCV proxy по устойчивым wick/pivot bands; она не выдаётся за восстановленную ликвидационную карту. В visualizer добавлена ручная ground-truth разметка near/far, класса, источника, confidence и полностью пропущенных зон. Confirmation остаётся замороженным до visual OOS anchor detector.
+
+Версия:
+
+```text
+liquidity-poi-0.9-freshness-consumption
+```
+
+## 16.2 POI structural areas v0.7
+
+User review of 10 current-v0.6 BTC candidates: 1 correct, 3 too narrow, 6 wrong-zone. The OHLCV scoring boundary is rejected as an active rule; it often operated but did not repair wrong anchor selection.
+
+Approved clarification from manual boxes:
+
+- a POI is a significant structural area, not every protected/pivot record;
+- important local zones may survive without a structure change when they represent a causal pullback in the aligned premium/discount half;
+- nearby same-side anchors that describe the same liquidity area should be consolidated rather than displayed as duplicate zones;
+- consolidation is causal: the old area exists until the newer component is known;
+- no BTC-dollar distance is hardcoded. Connectivity uses overlap of the already approved diagnostic ATR boxes inside the same confirmed structural segment;
+- the more external low (LONG) / high (SHORT) is the dominant near anchor; component ids/classes remain auditable;
+- v0.6 wick/pivot scoring constants and the 240-candidate cap are removed;
+- width remains the earlier diagnostic calibration (LONG 1.0 ATR, SHORT 0.5 ATR) until enough manual boxes freeze another boundary rule.
+
+Version: `liquidity-poi-0.9-freshness-consumption`. Research-only; confirmation and PnL remain frozen.
+
+## 16.3 POI validity/priority v0.8
+
+Approved lifecycle correction after v0.7 visual QA:
+
+- final invalidation for every POI class is one closed 4h candle beyond the far boundary; a wick does not invalidate;
+- LOCAL-EQ remains valid after its first sweep and is invalidated only by the same far-close rule;
+- assignment of a newer protected level is lineage supersession, not zone invalidation;
+- validity, priority and interaction are independent fields;
+- current map shows the nearest valid LONG, nearest valid SHORT and all valid OUTER areas; other unswept areas remain secondary/dormant and can become nearest again when price returns;
+- matching overlapping areas may consolidate across an event-segment boundary while their validity windows overlap;
+- canonical areas are emitted once. Historical geometry changes remain component metadata rather than hundreds of separate candidates;
+- local areas become armed only after price closes away on the reaction side. Touch/retest is diagnostic and does not kill the area;
+- no arbitrary time expiry is introduced. Old outer areas remain visible as outer context.
+
+Version: `liquidity-poi-0.9-freshness-consumption`. Research-only; confirmation and PnL remain frozen.
+
+## 16.4 POI freshness/consumption v0.9
+
+Approved correction after v0.8 visual QA:
+
+- structural failure and liquidity consumption are separate;
+- after a zone is armed by a close away on the reaction side, the first later wick through near marks `CONSUMED`; it is no longer a fresh trading POI even without a far close;
+- one closed 4h candle beyond far marks `FAILED`;
+- `FORMING`, `FRESH`, `IN_PLAY`, `CONSUMED`, `FAILED`, `RETIRED` are explicit states;
+- merged areas preserve component interaction history instead of restarting at the latest geometryKnownAt;
+- a 4h OUTER is `RETIRED` on opposite CHoCH or a newer more-extreme same-side outer, preventing multi-year 4h boxes;
+- new candidate class `LOCAL-SWING`: one confirmed outer high and low of each internal structural leg. It restores meaningful standalone local pivots without emitting every raw 2+2 fractal;
+- consolidation is limited to simultaneously open areas; consumed/failed/retired history cannot contaminate a fresh zone;
+- current map contains nearest fresh LONG, nearest fresh SHORT and current fresh OUTER;
+- visual QA has current, captured-visible-history and full-audit modes. No N-bar expiry or absolute BTC distance is introduced.
+
+Version: `liquidity-poi-0.9-freshness-consumption`. Research-only; confirmation and PnL remain frozen.
+
+## 16.5 Liquidity heatmap indicator v1.0 (diagnostic layer)
+
+Standalone module `src/core/liquidity/LiquidityHeatmapEngine.ts`, version `liquidity-heatmap-1.0-staggered-starts`. Coinglass-style potential-liquidation heatmap approximated from OHLCV only (no open interest / funding data). Reconstruction of the reference private TradingView "GGI Liquidity Heatmap" ("denser cluster = more liquidations", volume-prioritized).
+
+- candles with relative volume >= 0.75 x SMA20 open positions (only truly dead bars are skipped: the 1.25x gate erased liquidity accumulated by the calm recent range, e.g. bands right above/below current price; walls are prevented by event windows + freshness filter instead) (entry = hlc3, sized by volume x price); this makes bands discrete events instead of a continuous wall of stripes;
+- liquidation levels at entry x (1 +/- 1/L) for leverage tiers 5x/10x/25x/50x/100x with configurable shares; volume is the primary intensity driver;
+- levels accumulate in logarithmic price bins (0.4%); adjacent bins alive at overlapping times merge into single cluster bands (max 3 bins tall) -> real densities instead of parallel duplicated stripes; cluster merging compares ACCUMULATION WINDOWS, not alive spans, so different eras of the same bin never merge;
+- accumulation event windows: a contribution arriving more than 12 bars after the previous one opens a NEW band in the same bin (the old band stays alive and is swept together with the bin); bands therefore start where liquidity was actually accumulated instead of stretching from the bin birth across the whole chart;
+- consumption: when price trades into a bin after formation, its liquidity is taken at that bar; later volume re-accumulates a NEW segment (no resurrection); swept segments that lived < 12 bars are dropped as near-price noise (active fresh ones are kept);
+- brightness: rank-based per side, weight = (rank / count)^1.5 over clusters sorted by notional; guarantees a visible strength gradient (top clusters dark and thick, weak ones pale and thin) regardless of the notional distribution shape; clusters below weight 0.05 dropped, output capped at top-2000 (the old top-600 cap silently discarded fresh small clusters near price); renderer recomputes strength CLIENT-SIDE as a rank inside the currently visible window (side/age/swept filters): weight = rank/count per side, so the min-weight filter removes exactly that share of visible bands at any threshold (engine-global weights made the visible subset cluster above 0.55 and the filter felt dead until 0.75), and changing the age window never silently drops densities via a weight-sorted cap; bands are drawn from their TRUE accumulation start, so starts stagger naturally along price history like on TV (clamping old bands to the age-window edge produced an artificial vertical fence of aligned starts); together with the tighter 12-bar event-window gap, re-accumulation after an absence opens a NEW band at its own birth point instead of extending a months-old one; flat TV-like colors, one hue per side, strength expressed only by opacity 0.1-0.85 (quadratic) and thickness 2-8 px; default UI min-weight 0.35; all coefficients live in `LIQUIDITY_HEATMAP_CONFIG` and are display-only, NOT battle logic;
+- visualizer: red = short-liquidation density above price, green = long-liquidation density below; band drawn from formation to consumption; age filter (500/1000/2000 bars / full history, default 500) hides stale liquidity by band BIRTH (`startAt >= cutoff`), matching the TV limited-lookback look: with 12-bar event windows any fresh re-accumulation births a NEW band, so filtering by birth cannot hide current liquidity, while continuously-fed multi-month bands from the deep past leave the default view; swept bands are hidden by default and available via the "show swept" toggle (their aligned right edges at a single sweep candle formed a fence of stale info);
+- TF profiles (engine default when no explicit config is passed; timeframe inferred from median candle spacing): sub-4h -> minRelVolume 1.0, binPct 0.005, maxClusterBins 6; 4h -> minRelVolume 1.0, binPct 0.006, maxClusterBins 6; 1d and above -> minRelVolume 1.25, binPct 0.01, maxClusterBins 6 (v1.3: full-depth output exposed thousands of weak pools the old whole-history trim used to hide, so every tf now groups them into wide bands instead of a picket fence). weekly (>= 1w) -> minRelVolume 1.25, binPct 0.009, maxClusterBins 5 (half a step back per user feedback). Version `liquidity-heatmap-1.4-shelf-grouping`;
+- v1.4 shelf view: a cluster counts as swept once price has consumed the MAJORITY (>= 50% of notional) of its bins, so tall bands no longer lie across the chart as active while price already trades inside them (previously ALL bins had to be swept); the visualizer gains a display-side grouping knob (off / 0.1% / 0.25% default / 0.5% / 1.2% price-gap merge of adjacent visible bands into shelves, no refetch needed), and display weight blends per-window rank with notional share (rank * (0.5 + 0.5*sqrt(notional/max))) so fat shelves are visibly fatter at any threshold;
+- v1.5 honest shelves (bugfix of v1.4): display merge now requires TIME OVERLAP and same status (price-only chaining collapsed whole sides into one mega-shelf across epochs) and caps shelf height at 5x the merge gap; a pool is also swept as soon as price touches the bin of its DRAWN level (weighted mean != median: the 50%-mass rule could leave the line lying across candles). Version `liquidity-heatmap-1.5-honest-shelves`;
+- v1.6 user-calibrated per-timeframe viewer defaults (viewer-only, engine untouched): switching the timeframe button presets the heatmap min-weight and merge knobs from user-tested combinations — sub-4h and 1w: all pools + normal merge; 4h: weight >= 0.55 + weak merge; 1d: weight >= 0.35 + weak merge. Values remain user-overridable after load;
+- full-depth output: the engine no longer trims pools by whole-history rank (minWeight default 0.05 -> 0, maxPools 2000 -> 10000 as a pure payload safety cap). Ranking by the entire loaded history starved the recent window: with 15k 1h candles the top-2000 slots went to fat 2024 pools and the fresh window drew ~3x fewer bands than with a 5k load. The only visual cuts are renderer-side: per-window rank threshold and the top-400 draw cap; when the payload safety cap binds, the engine keeps the NEWEST pools (by lastContributionAt), not the heaviest, so loaded history depth never changes what the fresh window shows;
+- v0.7 replaced; the layer does not feed battle/PnL/confirmation and is intentionally not yet a POI source (POI integration requires separate approval after visual QA).
+
 # Часть IV. Подтверждённые расширения, ещё не включённые в forward
 
 ## 17. Новые таймфреймы
@@ -603,3 +681,9 @@ docs/archive/SPEC-legacy-2026-07-21.md
 ```
 
 Архив не является источником текущих правил и не должен использоваться для реализации без повторной проверки актуальности.
+
+## 16.6 Visualizer QoL (22.07.2026)
+
+- timeframes 1d and 1w added to the TF switch (TF_MS extended with `1w`); heatmap and analysis params are bar-based and apply unchanged;
+- no auto-load on page open: the user picks symbol/TF/limit and presses Load (BTC/USDT stays the default symbol);
+- candle fetching is parallel: page windows are precomputed from the fixed since..end range and fetched in batches of 6 with timestamp dedup (short histories return the same left edge on early pages), replacing strictly sequential pagination — main win on the 10k-30k 5m context fetch.

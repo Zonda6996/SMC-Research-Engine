@@ -2,6 +2,7 @@ import type { Candle } from '@/models/price/Candle.js'
 import type { BreachedLevel } from '@/models/structure/BreachedLevel.js'
 import type { MarketStructure, Trend } from '@/models/structure/MarketStructure.js'
 import type { StructurePoint } from '@/models/structure/StructurePoint.js'
+import type { ProtectedLevelLifecycle } from '@/models/structure/ProtectedLevelLifecycle.js'
 
 /**
  * Автомат подтверждения пробоя protected-уровня.
@@ -63,6 +64,7 @@ export class MarketStructureEngine {
 	private readonly window: number
 	private readonly state: MarketStructure = {
 		breached: [],
+		protectedHistory: [],
 		trend: 'range',
 		trendHistory: [],
 	}
@@ -100,6 +102,7 @@ export class MarketStructureEngine {
 			point.label === 'HH' &&
 			previous.type === 'low'
 		) {
+			this.assignProtected('long', previous, point, candles)
 			this.state.protectedLow = previous
 			this.pendingLow = none()
 		}
@@ -110,6 +113,7 @@ export class MarketStructureEngine {
 			point.label === 'LL' &&
 			previous.type === 'high'
 		) {
+			this.assignProtected('short', previous, point, candles)
 			this.state.protectedHigh = previous
 			this.pendingHigh = none()
 		}
@@ -232,6 +236,36 @@ export class MarketStructureEngine {
 		}
 	}
 
+	private assignProtected(
+		direction: 'long' | 'short',
+		level: StructurePoint,
+		trigger: StructurePoint,
+		candles: Candle[],
+	): void {
+		const knownIndex = Math.min(candles.length - 1, trigger.index + this.window)
+		const knownAt = candles[knownIndex]?.timestamp ?? candles[trigger.index]?.timestamp ?? 0
+		for (const old of this.state.protectedHistory) {
+			if (old.active && old.direction === direction) {
+				old.active = false
+				old.supersededAt = knownAt
+				old.endAt = knownAt
+			}
+		}
+		const originAt = candles[level.index]?.timestamp ?? 0
+		const item: ProtectedLevelLifecycle = {
+			id: `protected|${direction}|${level.index}|${knownAt}`,
+			direction,
+			point: level,
+			originAt,
+			knownAt,
+			supersededAt: null,
+			breachedAt: null,
+			endAt: null,
+			active: true,
+		}
+		this.state.protectedHistory.push(item)
+	}
+
 	private commitBreach(
 		level: StructurePoint,
 		pending: PendingBreach,
@@ -246,12 +280,22 @@ export class MarketStructureEngine {
 			confirmTimestamp,
 		}
 		this.state.breached.push(entry)
+		const direction = level.type === 'low' ? 'long' : 'short'
+		const life = [...this.state.protectedHistory]
+			.reverse()
+			.find((x) => x.active && x.direction === direction && x.point.index === level.index)
+		if (life) {
+			life.active = false
+			life.breachedAt = confirmTimestamp
+			life.endAt = confirmTimestamp
+		}
 	}
 
 	public getState(): Readonly<MarketStructure> {
 		return {
 			...this.state,
 			breached: [...this.state.breached],
+			protectedHistory: this.state.protectedHistory.map((x) => ({ ...x })),
 			trendHistory: [...this.state.trendHistory],
 		}
 	}

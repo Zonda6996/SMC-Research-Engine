@@ -27,6 +27,7 @@ export const TF_MS: Record<string, number> = {
 	'3h': 10_800_000,
 	'4h': 14_400_000,
 	'1d': 86_400_000,
+	'1w': 604_800_000,
 }
 
 export type MarketKind = 'spot' | 'futures'
@@ -58,20 +59,21 @@ export async function fetchCandlesPaginated(
 	const { default: ccxt } = await import('ccxt')
 	const exchange = market === 'futures' ? new ccxt.binanceusdm() : new ccxt.binance()
 	const end = untilMs ?? Date.now()
-	const since = end - capped * tfMs
+	const since = Math.max(0, end - capped * tfMs)
 
-	const all: number[][] = []
-	let cursor = since
-	while (all.length < capped) {
-		const page = await exchange.fetchOHLCV(symbol, timeframe, cursor, BINANCE_PAGE_LIMIT)
-		if (page.length === 0) break
-		all.push(...(page as number[][]))
-		const lastTs = Number(page[page.length - 1]![0])
-		const nextCursor = lastTs + tfMs
-		if (nextCursor <= cursor) break // защита от зацикливания
-		if (nextCursor >= end) break // правая граница окна достигнута
-		cursor = nextCursor
+	// Страницы известны заранее (окно since..end фиксировано), поэтому качаем
+	// их параллельными пачками и дедуплицируем по timestamp: у коротких
+	// историй ранние страницы возвращают один и тот же левый край данных.
+	const pageStarts: number[] = []
+	for (let cursor = since; cursor < end; cursor += BINANCE_PAGE_LIMIT * tfMs) pageStarts.push(cursor)
+	const byTs = new Map<number, number[]>()
+	const PARALLEL_PAGES = 6
+	for (let i = 0; i < pageStarts.length; i += PARALLEL_PAGES) {
+		const pages = await Promise.all(pageStarts.slice(i, i + PARALLEL_PAGES).map((start) =>
+			exchange.fetchOHLCV(symbol, timeframe, start, BINANCE_PAGE_LIMIT)))
+		for (const page of pages) for (const row of page as number[][]) byTs.set(Number(row[0]), row as number[])
 	}
+	const all = [...byTs.values()].sort((a, b) => Number(a[0]!) - Number(b[0]!))
 
 	const bounded = all.filter((row) => Number(row[0]) < end)
 	return bounded.slice(-capped).map(([timestamp, open, high, low, close, volume]) => ({
