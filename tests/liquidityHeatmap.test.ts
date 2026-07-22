@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { it } from 'node:test'
-import { detectLiquidityHeatmap, LIQUIDITY_HEATMAP_CONFIG, type LiquidityHeatmapConfig } from '../src/core/liquidity/LiquidityHeatmapEngine.js'
+import { detectLiquidityHeatmap, heatmapConfigForTf, LIQUIDITY_HEATMAP_CONFIG, type LiquidityHeatmapConfig } from '../src/core/liquidity/LiquidityHeatmapEngine.js'
 import type { Candle } from '../src/models/price/Candle.js'
 
 const H = 14_400_000
@@ -133,4 +133,17 @@ it('weights form a strength gradient instead of clamping to the ceiling', () => 
 	assert.ok(pools[0]!.weight < pools[1]!.weight && pools[1]!.weight < pools[2]!.weight)
 	assert.equal(pools[2]!.weight, 1)
 	assert.ok(Math.abs(pools[0]!.weight - 1 / 3) < 1e-9)
+})
+
+it('tf profiles: sub-4h groups harder, daily+ widens bins, 4h stays base', () => {
+	const h1 = heatmapConfigForTf(3_600_000)
+	assert.equal(h1.minRelVolume, 1.0)
+	assert.equal(h1.maxClusterBins, 5)
+	assert.equal(h1.binPct, LIQUIDITY_HEATMAP_CONFIG.binPct)
+	assert.deepEqual(heatmapConfigForTf(14_400_000), LIQUIDITY_HEATMAP_CONFIG)
+	const d1 = heatmapConfigForTf(86_400_000)
+	assert.equal(d1.minRelVolume, 1.25)
+	assert.equal(d1.binPct, 0.008)
+	assert.equal(d1.maxClusterBins, 5)
+	assert.equal(heatmapConfigForTf(604_800_000).binPct, 0.008)
 })

@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-1.0-staggered-starts'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-1.2-tf-profiles-full-depth'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -37,11 +37,11 @@ export interface LiquidityHeatmapConfig {
 	maxClusterBins: number
 	/** Вклад позже чем через столько баров после предыдущего открывает НОВУЮ полосу в том же бине (событийные окна накопления). */
 	maxGapBars: number
-	/** Кластеры слабее этого веса отбрасываются. */
+	/** Кластеры слабее этого веса отбрасываются. 0 = без отсева: ранг считается по ВСЕЙ истории и при длинной загрузке голодил бы свежее окно; видимый отсев делает рендерер по окну. */
 	minWeight: number
 	/** Кривая яркости: weight = (rank/count)^gamma внутри стороны; gamma > 1 делает большинство полос бледными, а топ — насыщенным. */
 	gamma: number
-	/** Потолок числа кластеров в выдаче (топ по весу). */
+	/** Аварийный потолок размера выдачи (топ по весу) — защита payload, а НЕ визуальный фильтр: обрезка по историческому рангу делала 15k-загрузку пустее 5k. */
 	maxPools: number
 }
 
@@ -60,9 +60,33 @@ export const LIQUIDITY_HEATMAP_CONFIG: LiquidityHeatmapConfig = {
 	minContributions: 1,
 	maxClusterBins: 3,
 	maxGapBars: 12,
-	minWeight: 0.05,
+	minWeight: 0,
 	gamma: 1.5,
-	maxPools: 2000,
+	maxPools: 10_000,
+}
+
+const HOUR_4_MS = 14_400_000
+const DAY_MS = 86_400_000
+
+/** Медианный шаг между свечами — определение ТФ без внешнего параметра. */
+export function inferTfMs(c: Candle[]): number {
+	if (c.length < 2) return HOUR_4_MS
+	const deltas: number[] = []
+	for (let i = 1; i < c.length; i++) deltas.push(c[i]!.timestamp - c[i - 1]!.timestamp)
+	deltas.sort((a, b) => a - b)
+	return deltas[Math.floor(deltas.length / 2)]!
+}
+
+/**
+ * ТФ-профили (дефолт при отсутствии явного конфига): младшие ТФ (< 4h)
+ * группируются жёстче (крупнее кластеры, строже порог объёма), дневка/неделька
+ * дополнительно укрупняют бины — иначе узкие 0.4%-полосы на макро-диапазоне выглядят
+ * стеной шума. 4h — базовый профиль без изменений.
+ */
+export function heatmapConfigForTf(tfMs: number): LiquidityHeatmapConfig {
+	if (tfMs < HOUR_4_MS) return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.0, maxClusterBins: 5 }
+	if (tfMs >= DAY_MS) return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.25, binPct: 0.008, maxClusterBins: 5 }
+	return LIQUIDITY_HEATMAP_CONFIG
 }
 
 export interface LiquidityPool {
@@ -225,8 +249,9 @@ function clusterSegments(segments: Segment[], config: LiquidityHeatmapConfig, lo
 	return clusters
 }
 
-export function detectLiquidityHeatmap(c: Candle[], config: LiquidityHeatmapConfig = LIQUIDITY_HEATMAP_CONFIG): LiquidityPool[] {
+export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmapConfig): LiquidityPool[] {
 	if (c.length === 0) return []
+	const config = configArg ?? heatmapConfigForTf(inferTfMs(c))
 	const logStep = Math.log(1 + config.binPct)
 	const lastIndex = c.length - 1
 	const lastTs = c[lastIndex]!.timestamp
