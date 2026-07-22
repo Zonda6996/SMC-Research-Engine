@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-1.2-tf-profiles-full-depth'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-1.3-grouping-profiles'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -84,9 +84,9 @@ export function inferTfMs(c: Candle[]): number {
  * стеной шума. 4h — базовый профиль без изменений.
  */
 export function heatmapConfigForTf(tfMs: number): LiquidityHeatmapConfig {
-	if (tfMs < HOUR_4_MS) return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.0, maxClusterBins: 5 }
-	if (tfMs >= DAY_MS) return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.25, binPct: 0.008, maxClusterBins: 5 }
-	return LIQUIDITY_HEATMAP_CONFIG
+	if (tfMs < HOUR_4_MS) return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.0, binPct: 0.005, maxClusterBins: 6 }
+	if (tfMs >= DAY_MS) return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.25, binPct: 0.01, maxClusterBins: 6 }
+	return { ...LIQUIDITY_HEATMAP_CONFIG, minRelVolume: 1.0, binPct: 0.006, maxClusterBins: 6 }
 }
 
 export interface LiquidityPool {
@@ -299,5 +299,10 @@ export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmap
 		})
 	}
 	pools.sort((a, b) => b.weight - a.weight)
-	return pools.slice(0, config.maxPools)
+	if (pools.length <= config.maxPools) return pools
+	// Потолок — только защита payload: при переполнении оставляем САМЫЕ СВЕЖИЕ пулы,
+	// а не самые тяжёлые: обрезка по историческому весу голодила свежее окно при длинной загрузке.
+	const kept = [...pools].sort((a, b) => b.lastContributionAt - a.lastContributionAt).slice(0, config.maxPools)
+	kept.sort((a, b) => b.weight - a.weight)
+	return kept
 }
