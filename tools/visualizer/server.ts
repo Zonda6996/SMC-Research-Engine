@@ -27,7 +27,7 @@ import { detectLiquidityHeatmap, LIQUIDITY_HEATMAP_VERSION } from '../../src/cor
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
-import { aggregateCandles, fetchCandlesPaginated, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
+import { aggregateCandles, fetchCandlesPaginated, fetchHeatmapAux, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
 import { plannedFullStop } from '../shared/executionCostGate.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -346,8 +346,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			// Ещё 5000×5m оставляем справа от минимального контекста, чтобы в
 			// окне было достаточно candidate touches и будущего для outcome.
 			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(timeframe === '4h' ? 30_000 : 10_000, minLtfLeftBars + 5_000))
-			const ltf5m = useFixture ? null : await fetchCandlesPaginated(symbol, '5m',
-				ltfNeed, market, untilMs, MAX_CANDLES_LTF)
+			// v2.0: OI + taker-ряды качаются параллельно с LTF (fail-soft: ошибка = null-ряды, объём-прокси).
+			const [ltf5m, heatmapAux] = useFixture ? [null, null] as [null, null] : await Promise.all([
+				fetchCandlesPaginated(symbol, '5m', ltfNeed, market, untilMs, MAX_CANDLES_LTF),
+				fetchHeatmapAux(symbol, timeframe, snapshot.candles, market),
+			])
 			const ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
 
 			sendJson(res, 200, {
@@ -363,7 +366,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
 				ltf15m,
-				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: detectLiquidityHeatmap(snapshot.candles) },
+				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: detectLiquidityHeatmap(snapshot.candles, undefined, heatmapAux ?? undefined), oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: timeframe === '4h' ? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory }) : [] },
 				refinedPoi: { version: REFINED_POI_VERSION, candidates: timeframe === '4h' ? detectRefinedPoi(snapshot.candles, snapshot.events, ltf15m) : [] },
 				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),

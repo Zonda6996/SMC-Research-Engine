@@ -135,3 +135,97 @@ export function aggregateCandles(ltf: Candle[], ltfTf: string, htfTf: string): C
 	}
 	return result
 }
+
+/** Выравнивание внешнего ряда к свечам: carry-forward после первой точки, null до неё. */
+export function alignSeriesToCandles(
+	points: Array<{ timestamp: number; value: number }>,
+	candles: Candle[],
+): Array<number | null> {
+	const sorted = [...points].sort((a, b) => a.timestamp - b.timestamp)
+	const out: Array<number | null> = []
+	let j = 0
+	let last: number | null = null
+	for (const candle of candles) {
+		while (j < sorted.length && sorted[j]!.timestamp <= candle.timestamp) { last = sorted[j]!.value; j++ }
+		out.push(last)
+	}
+	return out
+}
+
+export interface HeatmapAuxSeries {
+	oi: Array<number | null>
+	takerBuyRatio: Array<number | null>
+	oiBars: number
+	takerBars: number
+}
+
+const OI_PERIODS = new Set(['5m', '15m', '30m', '1h', '2h', '4h', '6h', '12h', '1d'])
+
+function oiPeriodFor(timeframe: string): string {
+	if (OI_PERIODS.has(timeframe)) return timeframe
+	const tfMs = TF_MS[timeframe] ?? 0
+	return tfMs >= TF_MS['1d']! ? '1d' : '1h'
+}
+
+/**
+ * v2.0: ряды точности для heatmap (OI + taker buy/sell). Полностью fail-soft:
+ * любая ошибка сети/биржи даёт null-ряды и движок падает на объём-прокси и 50/50.
+ * OI: Binance хранит ~30 дней истории — старый хвост остаётся объёмным прокси (гибрид).
+ * Taker split: сырые klines (поле 9 = taker buy base volume) на всю историю окна.
+ */
+export async function fetchHeatmapAux(
+	symbol: string,
+	timeframe: string,
+	candles: Candle[],
+	market: MarketKind = 'futures',
+): Promise<HeatmapAuxSeries> {
+	const nulls = (): Array<number | null> => candles.map(() => null)
+	let oi = nulls()
+	let taker = nulls()
+	const tfMs = TF_MS[timeframe]
+	if (!candles.length || !tfMs) return { oi, takerBuyRatio: taker, oiBars: 0, takerBars: 0 }
+	const start = candles[0]!.timestamp
+	const end = candles[candles.length - 1]!.timestamp + tfMs
+	const { default: ccxt } = await import('ccxt')
+	try {
+		const raw = market === 'futures' ? new ccxt.binanceusdm() : new ccxt.binance()
+		const id = symbol.replace('/', '').replace(':USDT', '')
+		const call = (params: Record<string, unknown>): Promise<unknown> =>
+			market === 'futures'
+				? (raw as unknown as { fapiPublicGetKlines: (p: unknown) => Promise<unknown> }).fapiPublicGetKlines(params)
+				: (raw as unknown as { publicGetKlines: (p: unknown) => Promise<unknown> }).publicGetKlines(params)
+		const pageStarts: number[] = []
+		for (let cursor = start; cursor < end; cursor += BINANCE_PAGE_LIMIT * tfMs) pageStarts.push(cursor)
+		const byTs = new Map<number, number>()
+		const PARALLEL_PAGES = 6
+		for (let i = 0; i < pageStarts.length; i += PARALLEL_PAGES) {
+			const pages = await Promise.all(pageStarts.slice(i, i + PARALLEL_PAGES).map((s) =>
+				call({ symbol: id, interval: timeframe, startTime: s, limit: BINANCE_PAGE_LIMIT })))
+			for (const page of pages) for (const row of page as Array<Array<string | number>>) {
+				const vol = Number(row[5])
+				const tb = Number(row[9])
+				if (vol > 0 && Number.isFinite(tb)) byTs.set(Number(row[0]), Math.min(1, Math.max(0, tb / vol)))
+			}
+		}
+		taker = candles.map((cd) => byTs.get(cd.timestamp) ?? null)
+	} catch { taker = nulls() }
+	try {
+		const fut = new ccxt.binanceusdm() as unknown as {
+			fetchOpenInterestHistory: (s: string, tf: string, since: number, limit: number) => Promise<Array<{ timestamp?: number; openInterestAmount?: number; openInterestValue?: number }>>
+		}
+		const period = oiPeriodFor(timeframe)
+		const periodMs = TF_MS[period]!
+		const points: Array<{ timestamp: number; value: number }> = []
+		let cursor = Math.max(start, Date.now() - 29 * 86_400_000)
+		for (let guard = 0; cursor < end && guard < 80; guard++) {
+			const page = await fut.fetchOpenInterestHistory(symbol, period, cursor, 500)
+			if (!page.length) break
+			for (const p of page) if (p.timestamp != null) points.push({ timestamp: p.timestamp, value: Number(p.openInterestAmount ?? p.openInterestValue ?? 0) })
+			const lastTs = page[page.length - 1]!.timestamp ?? cursor
+			if (lastTs + periodMs <= cursor) break
+			cursor = lastTs + periodMs
+		}
+		if (points.length) oi = alignSeriesToCandles(points, candles)
+	} catch { oi = nulls() }
+	return { oi, takerBuyRatio: taker, oiBars: oi.filter((x) => x != null).length, takerBars: taker.filter((x) => x != null).length }
+}
