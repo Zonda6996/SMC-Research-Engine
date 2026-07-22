@@ -2,10 +2,11 @@ import type { Candle } from '../../models/price/Candle.js'
 import type { StructureEvent } from '../../models/events/StructureEvent.js'
 import type { StructurePoint } from '../../models/structure/StructurePoint.js'
 import type { ProtectedLevelLifecycle } from '../../models/structure/ProtectedLevelLifecycle.js'
+import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-0.9-freshness-consumption'
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.0-liquidity-bound'
 export type LiquidityZoneClass = 'outer-swing' | 'protected-structure' | 'local-eq' | 'local-swing'
-export type BoundarySource = 'atr-calibration'
+export type BoundarySource = 'atr-calibration' | 'liquidity-cluster'
 export type PdZone = 'premium' | 'discount' | 'none'
 export type ZonePriority = 'nearest' | 'outer' | 'secondary'
 export type InteractionState = 'untouched' | 'touched' | 'retested'
@@ -15,6 +16,8 @@ export interface LiquidityBand { price: number; score: number; touches: number }
 export interface LiquidityPoiContext {
 	structure?: StructurePoint[]
 	protectedHistory?: ProtectedLevelLifecycle[]
+	/** v1.0: heatmap-пулы (тот же TF, что и POI) для границы far по реальной ликвидности; без них — fallback на ATR. */
+	heatmapPools?: LiquidityPool[]
 }
 export interface LiquidityPoiCandidate {
 	id: string
@@ -107,6 +110,28 @@ function pivots(c: Candle[], events: StructureEvent[]): Pivot[] {
 /** Existing BTC visual-calibration geometry. No new boundary coefficient. */
 function calibratedFar(direction: 'long' | 'short', near: number, a: number): number {
 	return direction === 'long' ? near - a : near + 0.5 * a
+}
+
+const LIQ_FAR_LOOKBACK_ATR = 2.0
+const LIQ_FAR_MIN_WEIGHT = 0.4
+
+/** v1.0: граница far по реальным heatmap-пулам (каузально: только пулы, существовавшие и ещё не снятые на knownAt). Fallback — старая ATR-геометрия. */
+function liquidityFar(
+	direction: 'long' | 'short', near: number, a: number, knownAt: number, pools: LiquidityPool[] | undefined,
+): { far: number; boundarySource: BoundarySource; liquidityBands: LiquidityBand[] } {
+	const fallback = calibratedFar(direction, near, a)
+	if (!pools?.length) return { far: fallback, boundarySource: 'atr-calibration', liquidityBands: [] }
+	const lookback = a * LIQ_FAR_LOOKBACK_ATR
+	const side = direction === 'long' ? 'buy-side' : 'sell-side'
+	const alive = (p: LiquidityPool) => p.startAt <= knownAt && (p.sweptAt == null || p.sweptAt > knownAt)
+	const candidates = pools.filter(p => p.side === side && p.weight >= LIQ_FAR_MIN_WEIGHT && alive(p)
+		&& (direction === 'long'
+			? p.bandLow <= near && p.bandLow >= near - lookback
+			: p.bandHigh >= near && p.bandHigh <= near + lookback))
+	if (!candidates.length) return { far: fallback, boundarySource: 'atr-calibration', liquidityBands: [] }
+	const far = direction === 'long' ? Math.min(...candidates.map(p => p.bandLow)) : Math.max(...candidates.map(p => p.bandHigh))
+	const liquidityBands: LiquidityBand[] = candidates.map(p => ({ price: p.extremePrice, score: p.weight, touches: p.contributions }))
+	return { far, boundarySource: 'liquidity-cluster', liquidityBands }
 }
 
 function pdAt(c: Candle[], structure: StructurePoint[], knownAt: number, price: number, direction: 'long' | 'short'): { pdZone: PdZone; pdAligned: boolean | null } {
@@ -221,7 +246,6 @@ function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
 	const dominant = a.direction === 'long' ? (a.near <= b.near ? a : b) : (a.near >= b.near ? a : b)
 	const zoneClass = classes.reduce((best, x) => classRank(x) > classRank(best) ? x : best, dominant.zoneClass)
 	const lineageTimes = [a.lineageSupersededAt, b.lineageSupersededAt].filter((x): x is number => x != null)
-	const allOuter = classes.every(x => x === 'outer-swing')
 	const retireTimes = [a.retiredAt, b.retiredAt].filter((x): x is number => x != null)
 	const touchTimes = [a.firstTouchAt, b.firstTouchAt].filter((x): x is number => x != null)
 	const armedTimes = [a.armedAt, b.armedAt].filter((x): x is number => x != null)
@@ -240,7 +264,7 @@ function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
 		armedAt: armedTimes.length ? Math.min(...armedTimes) : null,
 		firstTouchAt: touchTimes.length ? Math.min(...touchTimes) : null,
 		consumedAt: null, failedAt: null, invalidatedAt: null,
-		retiredAt: allOuter && retireTimes.length ? Math.min(...retireTimes) : null,
+		retiredAt: retireTimes.length ? Math.min(...retireTimes) : null,
 		supersededAt: null, endAt: Math.max(a.endAt, b.endAt), mergedCount: components.length - 1,
 		suppressedCount: components.length - 1, segment: dominant.segment,
 	}
@@ -269,7 +293,12 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 			firstTouchAt ??= bar.timestamp
 		}
 		inside = overlapsZone
-		const sweptNear = area.direction === 'long' ? bar.low < area.near : bar.high > area.near
+		const isLocalClass = area.zoneClass === 'local-eq' || area.zoneClass === 'local-swing'
+		const sweptNear = isLocalClass
+			? (area.direction === 'long' ? bar.low < area.near : bar.high > area.near)
+			: area.zoneClass === 'outer-swing'
+				? false
+				: (area.direction === 'long' ? bar.close < area.near : bar.close > area.near)
 		if (sweptNear) {
 			consumedAt = bar.timestamp
 			break
@@ -316,7 +345,7 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
 		let area = evaluateArea(source, c)
 		if (isOpen(area)) {
 			for (;;) {
-				const index = areas.findIndex(x => isOpen(x) && x.direction === area.direction && overlaps(x, area))
+				const index = areas.findIndex(x => isOpen(x) && x.direction === area.direction && x.zoneClass === area.zoneClass && overlaps(x, area))
 				if (index < 0) break
 				area = evaluateArea(mergeArea(areas.splice(index, 1)[0]!, area), c)
 			}
@@ -354,11 +383,11 @@ export function detectLiquidityPoi(c: Candle[], events: StructureEvent[] = [], c
 		const near = x.direction === 'long' ? candle.low : candle.high
 		const pd = pdAt(c, structure, x.knownAt, near, x.direction)
 		if ((x.zoneClass === 'local-eq' || x.zoneClass === 'local-swing') && pd.pdAligned === false) continue
-		const far = calibratedFar(x.direction, near, a)
+		const { far, boundarySource, liquidityBands } = liquidityFar(x.direction, near, a, x.knownAt, context.heatmapPools)
 		raw.push({ id: `${LIQUIDITY_POI_VERSION}|${x.id}`, version: LIQUIDITY_POI_VERSION,
 			direction: x.direction, zoneClass: x.zoneClass, anchorId: x.id, componentAnchorIds: [x.id], componentClasses: [x.zoneClass],
 			originAt: candle.timestamp, knownAt: x.knownAt, geometryKnownAt: x.knownAt, near, far, atr: a,
-			boundarySource: 'atr-calibration', liquidityBands: [], pivotCount: x.pivots.length || 1,
+			boundarySource, liquidityBands, pivotCount: x.pivots.length || 1,
 			pivotPrices: x.pivots.length ? x.pivots.map(v => v.price) : [near],
 			pivotTimes: x.pivots.length ? x.pivots.map(v => c[v.i]!.timestamp) : [candle.timestamp], eventType: x.eventType,
 			pdZone: pd.pdZone, pdAligned: pd.pdAligned, lifecycleState: 'forming', valid: false, active: false,

@@ -24,6 +24,7 @@ import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { detectRefinedPoi, REFINED_POI_VERSION } from '../../src/core/confirmation/RefinedPoiEngine.js'
 import { detectLiquidityPoi, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
 import { detectLiquidityHeatmap, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
+import { detectPoiConfirmation, POI_CONFIRMATION_VERSION } from '../../src/core/confirmation/PoiConfirmationEngine.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
@@ -353,6 +354,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			])
 			const ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
 
+			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, undefined, heatmapAux ?? undefined)
+			const poiCandidates = timeframe === '4h'
+				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools })
+				: []
+			const poiConfirmations = timeframe === '4h' ? detectPoiConfirmation(poiCandidates, ltf15m) : []
+
 			sendJson(res, 200, {
 				strategy: {
 					version: FORWARD_VERSION,
@@ -366,8 +373,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
 				ltf15m,
-				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: detectLiquidityHeatmap(snapshot.candles, undefined, heatmapAux ?? undefined), oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
-				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: timeframe === '4h' ? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory }) : [] },
+				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
+				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
+				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
 				refinedPoi: { version: REFINED_POI_VERSION, candidates: timeframe === '4h' ? detectRefinedPoi(snapshot.candles, snapshot.events, ltf15m) : [] },
 				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),
 				structure: snapshot.structure,
