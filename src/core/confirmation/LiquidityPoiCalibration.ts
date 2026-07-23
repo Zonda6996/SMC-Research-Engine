@@ -4,7 +4,7 @@ import type { StructurePoint } from '../../models/structure/StructurePoint.js'
 import type { ProtectedLevelLifecycle } from '../../models/structure/ProtectedLevelLifecycle.js'
 import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.1-causal-liquidity'
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.2-deduped'
 
 /**
  * Все константы POI-движка (§16.8). Значения согласованы 23.07.2026; менять только по итогам
@@ -26,9 +26,12 @@ export const LIQUIDITY_POI_CONFIG = {
 	/** ATR-fallback ширина (только карта; подтверждение такие зоны не торгует — решение №6): лонг/шорт. */
 	fallbackLongAtr: 1.0,
 	fallbackShortAtr: 0.5,
+	/** §16.9: near-дубль — зона той же стороны с near в пределах этой доли ATR и пересекающимся окном. */
+	dupNearAtr: 0.25,
 } as const
 
-export type LiquidityZoneClass = 'outer-swing' | 'protected-structure' | 'local-eq' | 'local-swing'
+/** §16.9: local-swing удалён (мелкие зоны без ликвидности от каждого внутреннего колена). */
+export type LiquidityZoneClass = 'outer-swing' | 'protected-structure' | 'local-eq'
 export type BoundarySource = 'atr-calibration' | 'liquidity-cluster'
 export type PdZone = 'premium' | 'discount' | 'none'
 export type ZonePriority = 'nearest' | 'outer' | 'secondary'
@@ -83,6 +86,8 @@ export interface LiquidityPoiCandidate {
 	/** «Зона отработала»: цена ушла от near в сторону реакции на spentDistanceAtr×ATR по 4h close после касания. */
 	spentAt: number | null
 	spentReason: 'ran-away' | null
+	/** §16.9: near-дубль старшей зоны — подавлена, не торгуется и не показывается; геометрия не мутирует. */
+	duplicateOf: string | null
 	geometryKnownAt: number
 	lineageSupersededAt: number | null
 	supersededAt: number | null
@@ -247,33 +252,6 @@ function localEqAnchors(ps: Pivot[]): Anchor[] {
 }
 
 
-function localSwingAnchors(c: Candle[], events: StructureEvent[], structure: StructurePoint[]): Anchor[] {
-	const grouped = new Map<number, StructurePoint[]>()
-	// §16.8: как и у pivots(), точка известна по ЗАКРЫТИЮ подтверждающего бара i+2, не по его open.
-	const tfMs = c.length > 1 ? c[1]!.timestamp - c[0]!.timestamp : 0
-	for (const point of structure) {
-		const segment = eventSegment(events, point.index)
-		if (segment < 0 || !c[point.index + 2]) continue
-		const group = grouped.get(segment) ?? []
-		group.push(point)
-		grouped.set(segment, group)
-	}
-	const out: Anchor[] = []
-	for (const [segment, points] of grouped) {
-		for (const type of ['low', 'high'] as const) {
-			const side = points.filter(x => x.type === type)
-			if (!side.length) continue
-			const point = type === 'low'
-				? side.reduce((a, b) => a.price < b.price ? a : b)
-				: side.reduce((a, b) => a.price > b.price ? a : b)
-			const knownAt = c[point.index + 2]!.timestamp + tfMs
-			out.push({ id: `local-swing|${type}|${segment}|${point.index}`, direction: type === 'low' ? 'long' : 'short',
-				zoneClass: 'local-swing', i: point.index, knownAt, eventType: 'local-swing', pivots: [], segment,
-				supersededAt: null, invalidatedAt: null, active: true, retiredAt: null })
-		}
-	}
-	return out
-}
 
 function overlaps(a: AreaCandidate, b: AreaCandidate): boolean {
 	const aLow = Math.min(a.near, a.far), aHigh = Math.max(a.near, a.far)
@@ -282,7 +260,7 @@ function overlaps(a: AreaCandidate, b: AreaCandidate): boolean {
 }
 
 function classRank(x: LiquidityZoneClass): number {
-	return x === 'outer-swing' ? 4 : x === 'protected-structure' ? 3 : x === 'local-eq' ? 2 : 1
+	return x === 'outer-swing' ? 3 : x === 'protected-structure' ? 2 : 1
 }
 
 function isOpen(x: AreaCandidate): boolean {
@@ -314,10 +292,10 @@ function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
 		armedAt: armedTimes.length ? Math.min(...armedTimes) : null,
 		firstTouchAt: touchTimes.length ? Math.min(...touchTimes) : null,
 		consumedAt: consumedTimes.length ? Math.min(...consumedTimes) : null,
-		failedAt: null, invalidatedAt: null, spentAt: null, spentReason: null,
+		failedAt: null, invalidatedAt: null, spentAt: null, spentReason: null, duplicateOf: null,
 		retiredAt: retireTimes.length ? Math.min(...retireTimes) : null,
 		supersededAt: null, endAt: Math.max(a.endAt, b.endAt), mergedCount: components.length - 1,
-		suppressedCount: components.length - 1, segment: dominant.segment,
+		suppressedCount: 0, segment: dominant.segment,
 	}
 }
 
@@ -415,8 +393,27 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
 		}
 		areas.push(area)
 	}
+	// §16.9 (решение №20): подавление near-дублей. Зоны одной стороны с near в пределах
+	// dupNearAtr×ATR и пересекающимися окнами — одна и та же область: остаётся старшая
+	// (класс, затем возраст), младшая помечается duplicateOf и не торгуется/не показывается.
+	// Геометрия НЕ мутирует — окна подтверждения стабильны (в отличие от отклонённой
+	// склейки по времени жизни). Было 45% дублей — «листаешь одно и то же».
+	const bySeniority = [...areas].sort((a, b) =>
+		Number(b.boundarySource === 'liquidity-cluster') - Number(a.boundarySource === 'liquidity-cluster')
+		|| classRank(b.zoneClass) - classRank(a.zoneClass) || a.knownAt - b.knownAt || a.originAt - b.originAt)
+	for (const senior of bySeniority) {
+		if (senior.duplicateOf != null) continue
+		for (const junior of bySeniority) {
+			if (junior === senior || junior.duplicateOf != null) continue
+			if (junior.direction !== senior.direction) continue
+			if (Math.abs(junior.near - senior.near) > LIQUIDITY_POI_CONFIG.dupNearAtr * senior.atr) continue
+			if (!(senior.knownAt < junior.endAt && junior.knownAt < senior.endAt)) continue
+			junior.duplicateOf = senior.id
+			senior.suppressedCount += 1
+		}
+	}
 	const current = c.at(-1)!.close
-	const fresh = areas.filter(x => x.valid)
+	const fresh = areas.filter(x => x.valid && x.duplicateOf == null)
 	const distance = (x: AreaCandidate) => {
 		const lower = Math.min(x.near, x.far), upper = Math.max(x.near, x.far)
 		return current < lower ? lower - current : current > upper ? current - upper : 0
@@ -430,19 +427,19 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
 	const nearestLong = fresh.filter(x => x.direction === 'long').sort(nearestPick)[0]
 	const nearestShort = fresh.filter(x => x.direction === 'short').sort(nearestPick)[0]
 	return areas.map(x => {
-		const priority: ZonePriority = x.zoneClass === 'outer-swing' && x.valid ? 'outer'
+		const priority: ZonePriority = x.zoneClass === 'outer-swing' && x.valid && x.duplicateOf == null ? 'outer'
 			: x === nearestLong || x === nearestShort ? 'nearest' : 'secondary'
-		return { ...x, priority, active: x.valid && priority !== 'secondary' }
+		return { ...x, priority, active: x.valid && priority !== 'secondary' && x.duplicateOf == null }
 	})
 }
 
 export function detectLiquidityPoi(c: Candle[], events: StructureEvent[] = [], context: LiquidityPoiContext = {}): LiquidityPoiCandidate[] {
 	if (!c.length) return []
 	const structure = context.structure ?? []
+	// §16.9: local-swing удалён — экстремум каждого внутреннего колена плодил зоны без ликвидности.
 	const anchors = [
 		...structuralAnchors(c, events, context),
 		...localEqAnchors(pivots(c, events)),
-		...localSwingAnchors(c, events, structure),
 	]
 	assignOuterRetirement(anchors, events, c)
 	const raw: AreaCandidate[] = []
@@ -451,7 +448,7 @@ export function detectLiquidityPoi(c: Candle[], events: StructureEvent[] = [], c
 		if (!candle || !a || x.knownAt < candle.timestamp) continue
 		const near = x.direction === 'long' ? candle.low : candle.high
 		const pd = pdAt(c, structure, x.knownAt, near, x.direction)
-		if ((x.zoneClass === 'local-eq' || x.zoneClass === 'local-swing') && pd.pdAligned === false) continue
+		if (x.zoneClass === 'local-eq' && pd.pdAligned === false) continue
 		const { far, boundarySource, liquidityBands } = liquidityFar(x.direction, near, a, x.knownAt, context.heatmapPools)
 		raw.push({ id: `${LIQUIDITY_POI_VERSION}|${x.id}`, version: LIQUIDITY_POI_VERSION,
 			direction: x.direction, zoneClass: x.zoneClass, anchorId: x.id, componentAnchorIds: [x.id], componentClasses: [x.zoneClass],
@@ -461,7 +458,7 @@ export function detectLiquidityPoi(c: Candle[], events: StructureEvent[] = [], c
 			pivotTimes: x.pivots.length ? x.pivots.map(v => c[v.i]!.timestamp) : [candle.timestamp], eventType: x.eventType,
 			pdZone: pd.pdZone, pdAligned: pd.pdAligned, lifecycleState: 'forming', valid: false, active: false,
 			priority: 'secondary', interaction: 'untouched', touchCount: 0, armedAt: null, firstTouchAt: null,
-			consumedAt: null, failedAt: null, spentAt: null, spentReason: null, retiredAt: x.retiredAt, lineageSupersededAt: x.supersededAt,
+			consumedAt: null, failedAt: null, spentAt: null, spentReason: null, duplicateOf: null, retiredAt: x.retiredAt, lineageSupersededAt: x.supersededAt,
 			supersededAt: null, invalidatedAt: null, endAt: c.at(-1)!.timestamp, mergedCount: 0, suppressedCount: 0,
 			segment: x.segment })
 	}

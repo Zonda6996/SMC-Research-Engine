@@ -10,7 +10,7 @@ const candles = (n=40): Candle[] => Array.from({length:n},(_,i)=>({
 }))
 
 it('liquidity POI has a frozen non-trading structural-area version',()=>{
- assert.equal(LIQUIDITY_POI_VERSION,'liquidity-poi-1.1-causal-liquidity')
+ assert.equal(LIQUIDITY_POI_VERSION,'liquidity-poi-1.2-deduped')
  assert.deepEqual(detectLiquidityPoi([]),[])
 })
 
@@ -143,7 +143,7 @@ it('lineage supersession does not invalidate an unswept protected area',()=>{
 })
 
 
-it('generates one local-swing extreme per side of a structural segment',()=>{
+it('§16.9 (решение №19): local-swing зоны больше не создаются',()=>{
  const c=candles(24)
  const event={direction:'up',type:'bos',confirmIndex:2,confirmTimestamp:c[2]!.timestamp,breachIndex:2} as StructureEvent
  c[5]={...c[5]!,low:95};c[7]={...c[7]!,high:108};c[9]={...c[9]!,low:90};c[11]={...c[11]!,high:105}
@@ -154,9 +154,26 @@ it('generates one local-swing extreme per side of a structural segment',()=>{
   {index:11,timestamp:c[11]!.timestamp,price:105,type:'high',label:'LH'},
  ] as never
  const out=detectLiquidityPoi(c,[event],{structure})
- const locals=out.filter(x=>x.componentClasses.includes('local-swing'))
- assert.ok(locals.some(x=>x.direction==='long'&&x.near===90))
- assert.ok(locals.some(x=>x.direction==='short'&&x.near===108))
+ assert.ok(out.every(x=>!(x.componentClasses as string[]).includes('local-swing')))
+})
+
+it('§16.9 (решение №20): near-дубль подавляется (duplicateOf), геометрия не мутирует',()=>{
+ // Обе protected-зоны у 90 умирают по far-close на c14 → склейка открытых их не берёт,
+ // подавление дублей помечает младшую; старшая остаётся единственной торгуемой.
+ const c=Array.from({length:20},(_,i):Candle=>({timestamp:i*14_400_000,open:93,high:94,low:92,close:93.5,volume:1}))
+ c[5]={...c[5]!,low:90};c[7]={...c[7]!,low:90.05}
+ c[14]={...c[14]!,low:85,close:85}
+ const mk=(id:string,index:number,known:number):ProtectedLevelLifecycle=>({id,direction:'long',point:{type:'low',label:'HL',index,price:c[index]!.low} as never,originAt:c[index]!.timestamp,knownAt:c[known]!.timestamp,supersededAt:null,breachedAt:null,endAt:null,active:true})
+ const out=detectLiquidityPoi(c,[],{protectedHistory:[mk('p1',5,10),mk('p2',7,12)]})
+ const primaries=out.filter(x=>x.duplicateOf==null)
+ assert.equal(primaries.length,1)
+ const senior=primaries[0]!
+ assert.equal(senior.anchorId,'p1')
+ assert.ok(senior.suppressedCount>=1)
+ for(const dup of out.filter(x=>x.duplicateOf!=null)){
+  assert.equal(dup.duplicateOf,senior.id)
+  assert.equal(dup.active,false)
+ }
 })
 
 it('§16.8: far по КАУЗАЛЬНОМУ весу — ранг по notional среди живых на момент рождения зоны; глобальный вес игнорируется',()=>{
@@ -205,9 +222,9 @@ it('SPEC §13: слом без предыдущего противоположн
 it('§16.8: knownAt локального пивота = закрытие подтверждающего бара i+2, не его open',()=>{
  const c=Array.from({length:20},(_,i):Candle=>({timestamp:i*14_400_000,open:93,high:94,low:92,close:93.5,volume:1}))
  const event={direction:'up',type:'bos',confirmIndex:0,confirmTimestamp:c[0]!.timestamp,breachIndex:0} as StructureEvent
- const structure=[{index:6,timestamp:c[6]!.timestamp,price:90,type:'low',label:'LL'}] as never
- c[6]={...c[6]!,low:90}
- const out=detectLiquidityPoi(c,[event],{structure}).find(x=>x.componentClasses.includes('local-swing'))!
+ c[6]={...c[6]!,low:90};c[9]={...c[9]!,low:90.05}
+ const out=detectLiquidityPoi(c,[event],{}).find(x=>x.componentClasses.includes('local-eq'))!
  assert.ok(out)
- assert.equal(out.knownAt,c[8]!.timestamp+14_400_000)
+ // Поздний член кластера (c9) подтверждается закрытием c11 → knownAt = open(c11) + tfMs.
+ assert.equal(out.knownAt,c[11]!.timestamp+14_400_000)
 })
