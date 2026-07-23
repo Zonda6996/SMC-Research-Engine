@@ -4,57 +4,69 @@ import type { StructurePoint } from '../../models/structure/StructurePoint.js'
 import type { ProtectedLevelLifecycle } from '../../models/structure/ProtectedLevelLifecycle.js'
 import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.4-overlap-dedup'
+// SPEC §16.12 (v2.0, утверждено 23.07.2026): ЗОНЫ РОЖДАЮТСЯ ОТ ЛИКВИДНОСТИ, структура — пометка.
+// Три раунда визуального QA показали: генерация от структурных записей (protected/EQ/outer) даёт карту,
+// расходящуюся с ручной картой пользователя, у которого каждая зона = жирная СВЕЖАЯ полка heatmap +
+// ближайший невыметенный экстремум. v2.0: полка (стек живых свежих пулов) значима по силе×свежести →
+// зона [near=wick экстремума перед полкой или край полки, far=конец стека]; жизнь зоны = жизнь её стека.
+// Правило ran-away («3 ATR от near») ОТМЕНЕНО; отставка по CHoCH не применяется. Подтверждение (1.6)
+// работает без изменений — интерфейс LiquidityPoiCandidate сохранён.
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-2.0-liquidity-first'
 
 /**
- * Все константы POI-движка (§16.8). Значения согласованы 23.07.2026; менять только по итогам
- * визуального QA с явного согласия пользователя.
+ * Все константы POI-движка (§16.12). Значения стартовые, калибруются по визуальному QA;
+ * менять только с явного согласия пользователя.
  */
 export const LIQUIDITY_POI_CONFIG = {
 	/** Период ATR (стандартная детекторная константа). */
 	atrPeriod: 14,
-	/** Глубина поиска реальной ликвидности за near, в ATR ТФ зоны. */
-	farLookbackAtr: 2.0,
-	/** Порог КАУЗАЛЬНОГО веса пула: ранг среди пулов, живых на момент рождения зоны (не по всей истории). */
-	farMinWeight: 0.4,
-	/** Гамма кривой веса — та же, что в LIQUIDITY_HEATMAP_CONFIG.gamma. */
-	weightGamma: 1.5,
-	/** Кластеризация равных экстремумов (local-eq): разброс ≤ этой доли ATR. */
-	eqClusterAtr: 0.25,
-	/** «Зона отработала» (ran-away): после касания цена ушла от near в сторону реакции на столько ATR по close. */
-	spentDistanceAtr: 3.0,
-	/** ATR-fallback ширина (только карта; подтверждение такие зоны не торгует — решение №6): лонг/шорт. */
-	fallbackLongAtr: 1.0,
-	fallbackShortAtr: 0.5,
+	/** Стек: соседний пул присоединяется к полке при перекрытии или разрыве ≤ этой доли ATR (§16.10). */
+	stackGapAtr: 0.5,
+	/** Потолок высоты полки/зоны, в ATR — лестница ликвидаций почти непрерывна (§16.10). */
+	stackMaxAtr: 6.0,
+	/** Значимость: полка рождает зону, только если входит в топ-N по notional на свою сторону. */
+	shelfTopN: 5,
+	/** Свежесть: пул участвует в полке, пока прошло ≤ этого числа баров ТФ зоны от его последнего
+	 * пополнения (согласовано с age-фильтром heatmap-вьюера — пользователь смотрит 500). */
+	shelfFreshBars: 500,
+	/** Near = точный wick невыметенного 4h-экстремума, если он в пределах этой доли ATR от ближнего
+	 * края полки (§12.1); иначе near = край полки. */
+	nearTolAtr: 0.5,
+	/** «Стек снят»: зона отработана, когда снято ≥ этой доли суммарного notional её полки. */
+	stackConsumedShare: 0.5,
 	/** §16.9: near-дубль — зона той же стороны с near в пределах этой доли ATR и пересекающимся окном. */
 	dupNearAtr: 0.25,
-	/** §16.10: расширение far по стеку — следующий пул присоединяется, если разрыв до него ≤ этой доли ATR. */
-	stackGapAtr: 0.5,
 	/** §16.11: дубль и по перекрытию — диапазоны одной стороны пересекаются на эту долю меньшей зоны. */
 	dupOverlapShare: 0.6,
-	/** §16.10: потолок ширины зоны при стековом расширении, в ATR — лестница ликвидаций непрерывна
-	 * почти всегда (без потолка far одной зоны утаскивало на +128% от цены). */
-	stackMaxAtr: 6.0,
+	/** Идентичность полки между барами при сканировании (анти-спам эмиссии): перекрытие ≥ этой доли. */
+	shelfIdentityShare: 0.6,
+	/** Значимость-пол: полка рождает зону, только если её notional ≥ этой доли суммы свежих пулов стороны
+	 * (отсекает одинокие тонкие пулы лестницы ликвидаций, пролезающие в топ-N в тонкие периоды). */
+	shelfMinShare: 0.05,
+	/** Перерождение полки: если ≥ этой доли notional текущей полки — из пулов, которых не было в прошлых
+	 * эмиссиях этого места, полка считается НОВЫМ поколением и рождает зону заново (re-accumulation). */
+	shelfNoveltyShare: 0.5,
 } as const
 
-/** §16.9: local-swing удалён (мелкие зоны без ликвидности от каждого внутреннего колена). */
-export type LiquidityZoneClass = 'outer-swing' | 'protected-structure' | 'local-eq'
+/** §16.12: структурные классы зон больше не рождаются; значение оставлено одно + легаси для типов. */
+export type LiquidityZoneClass = 'liquidity-shelf' | 'outer-swing' | 'protected-structure' | 'local-eq'
 export type BoundarySource = 'atr-calibration' | 'liquidity-cluster'
 export type PdZone = 'premium' | 'discount' | 'none'
 export type ZonePriority = 'nearest' | 'outer' | 'secondary'
 export type InteractionState = 'untouched' | 'touched' | 'retested'
 /**
- * §16.8: использованность (consumed) больше НЕ состояние жизненного цикла, а информационная пометка
- * consumedAt. Терминальные состояния: failed (4h close телом за far), retired (отставка внешнего
- * экстремума), spent (зона отработала: цена ушла от неё в сторону реакции).
+ * Терминальные состояния: failed (4h close телом за far), spent (стек снят насквозь/по объёму или
+ * взяли тейк — confirmation), retired (легаси, v2-зоны не ретирятся). Использованность (consumed) —
+ * информационная пометка consumedAt, окно торговли не закрывает (§16.8).
  */
 export type PoiLifecycleState = 'forming' | 'fresh' | 'in-play' | 'spent' | 'failed' | 'retired'
 
 export interface LiquidityBand { price: number; score: number; touches: number }
 export interface LiquidityPoiContext {
 	structure?: StructurePoint[]
+	/** Легаси-вход: v2.0 protected-историю не использует (структура зоны не рождает). */
 	protectedHistory?: ProtectedLevelLifecycle[]
-	/** v1.0: heatmap-пулы (тот же TF, что и POI) для границы far по реальной ликвидности; без них — fallback на ATR. */
+	/** Пулы heatmap того же TF — единственный источник зон в v2.0. Без них зон нет. */
 	heatmapPools?: LiquidityPool[]
 }
 export interface LiquidityPoiCandidate {
@@ -75,6 +87,7 @@ export interface LiquidityPoiCandidate {
 	pivotCount: number
 	pivotPrices: number[]
 	pivotTimes: number[]
+	/** 'shelf+extremum' — near на невыметенном wick'е перед полкой (§12.1); 'shelf-edge' — near по краю полки. */
 	eventType: string | null
 	pdZone: PdZone
 	pdAligned: boolean | null
@@ -86,13 +99,13 @@ export interface LiquidityPoiCandidate {
 	touchCount: number
 	armedAt: number | null
 	firstTouchAt: number | null
-	/** Информационная пометка «использована»: первый фитиль сквозь near после взведения (все классы одинаково). */
+	/** Информационная пометка «использована»: первый фитиль сквозь near после взведения. */
 	consumedAt: number | null
 	failedAt: number | null
 	retiredAt: number | null
-	/** «Зона отработала»: цена ушла от near в сторону реакции на spentDistanceAtr×ATR по 4h close после касания. */
+	/** «Зона отработала»: стек снят (насквозь или по объёму). */
 	spentAt: number | null
-	spentReason: 'ran-away' | 'swept-through' | null
+	spentReason: 'swept-through' | 'stack-consumed' | null
 	/** §16.9: near-дубль старшей зоны — подавлена, не торгуется и не показывается; геометрия не мутирует. */
 	duplicateOf: string | null
 	geometryKnownAt: number
@@ -104,24 +117,9 @@ export interface LiquidityPoiCandidate {
 	suppressedCount: number
 }
 
-interface Pivot { type: 'low' | 'high'; i: number; price: number; known: number; atr: number; segment: number }
-interface Anchor {
-	id: string
-	direction: 'long' | 'short'
-	zoneClass: LiquidityZoneClass
-	i: number
-	knownAt: number
-	eventType: string | null
-	pivots: Pivot[]
-	segment: number
-	supersededAt: number | null
-	invalidatedAt: number | null
-	active: boolean
-	retiredAt: number | null
-	/** §16.10: противоположный CHoCH — условная отставка (только для уже тронутой зоны). */
-	oppositeChochAt?: number | null
-}
-interface AreaCandidate extends LiquidityPoiCandidate { segment: number; oppositeChochAt: number | null }
+interface ShelfPoolSnap { notional: number; sweptAt: number | null; lastContributionAt: number }
+interface AreaCandidate extends LiquidityPoiCandidate { shelfPools: ShelfPoolSnap[] }
+interface Shelf { lo: number; hi: number; notional: number; pools: LiquidityPool[] }
 
 function atr(c: Candle[], i: number, n = LIQUIDITY_POI_CONFIG.atrPeriod): number {
 	let sum = 0, count = 0
@@ -134,87 +132,28 @@ function atr(c: Candle[], i: number, n = LIQUIDITY_POI_CONFIG.atrPeriod): number
 	return count ? sum / count : 0
 }
 
-function eventSegment(events: StructureEvent[], index: number): number {
-	return events.findLastIndex(e => e.confirmIndex <= index)
-}
+interface Fractal { type: 'low' | 'high'; i: number; price: number; known: number; sweptAt: number | null }
 
-function pivots(c: Candle[], events: StructureEvent[]): Pivot[] {
-	const out: Pivot[] = []
-	// §16.8: фрактал 2+2 подтверждается ЗАКРЫТИЕМ бара i+2 — knownAt = его open + tfMs (раньше брали
-	// open, что делало локальные зоны известными на один бар раньше возможного — look-ahead).
+/** 4h-фракталы 2+2 с моментом подтверждения (close бара i+2) и моментом снятия wick'а. */
+function fractals(c: Candle[]): Fractal[] {
+	const out: Fractal[] = []
 	const tfMs = c.length > 1 ? c[1]!.timestamp - c[0]!.timestamp : 0
 	for (let i = 2; i < c.length - 2; i++) {
-		const x = c[i]!, a = atr(c, i)
-		if (!a) continue
+		const x = c[i]!
 		const left = c.slice(i - 2, i), right = c.slice(i + 1, i + 3)
 		const known = c[i + 2]!.timestamp + tfMs
-		const segment = eventSegment(events, i)
-		if (segment < 0) continue
-		if (left.every(v => x.low < v.low) && right.every(v => x.low < v.low)) out.push({ type: 'low', i, price: x.low, known, atr: a, segment })
-		if (left.every(v => x.high > v.high) && right.every(v => x.high > v.high)) out.push({ type: 'high', i, price: x.high, known, atr: a, segment })
+		if (left.every(v => x.low < v.low) && right.every(v => x.low < v.low)) {
+			let sweptAt: number | null = null
+			for (let k = i + 1; k < c.length; k++) if (c[k]!.low < x.low) { sweptAt = c[k]!.timestamp; break }
+			out.push({ type: 'low', i, price: x.low, known, sweptAt })
+		}
+		if (left.every(v => x.high > v.high) && right.every(v => x.high > v.high)) {
+			let sweptAt: number | null = null
+			for (let k = i + 1; k < c.length; k++) if (c[k]!.high > x.high) { sweptAt = c[k]!.timestamp; break }
+			out.push({ type: 'high', i, price: x.high, known, sweptAt })
+		}
 	}
 	return out
-}
-
-/** Existing BTC visual-calibration geometry. No new boundary coefficient. */
-function calibratedFar(direction: 'long' | 'short', near: number, a: number): number {
-	return direction === 'long' ? near - LIQUIDITY_POI_CONFIG.fallbackLongAtr * a : near + LIQUIDITY_POI_CONFIG.fallbackShortAtr * a
-}
-
-/**
- * v1.1: граница far по реальным heatmap-пулам с КАУЗАЛЬНЫМ весом — ранг по notional среди пулов,
- * живых на момент рождения зоны (та же кривая (rank/count)^gamma, что в heatmap). Глобальный вес
- * из движка heatmap ранжируется по всей загруженной истории, включая будущие пулы: от него геометрия
- * зон менялась в зависимости от limit (36% зон, в среднем 0.87 ATR). Fallback — старая ATR-геометрия.
- */
-function liquidityFar(
-	direction: 'long' | 'short', near: number, a: number, knownAt: number, pools: LiquidityPool[] | undefined,
-): { far: number; boundarySource: BoundarySource; liquidityBands: LiquidityBand[] } {
-	const cfg = LIQUIDITY_POI_CONFIG
-	const fallback = calibratedFar(direction, near, a)
-	const side = direction === 'long' ? 'buy-side' : 'sell-side'
-	const lookback = a * cfg.farLookbackAtr
-	// Каузально живые пулы В ПОЛОСЕ ПОИСКА [near − lookback, near] (для шорта зеркально): ранг считается
-	// по локальной популяции, чтобы пулы из далёкой истории/других цен не сдвигали веса — иначе граница
-	// far менялась от того, сколько истории загружено.
-	const band = (pools ?? []).filter(p => p.side === side
-		&& p.startAt <= knownAt && (p.sweptAt == null || p.sweptAt > knownAt)
-		&& (direction === 'long'
-			? p.bandLow <= near && p.bandLow >= near - lookback
-			: p.bandHigh >= near && p.bandHigh <= near + lookback))
-	if (!band.length) return { far: fallback, boundarySource: 'atr-calibration', liquidityBands: [] }
-	const sorted = [...band].sort((x, y) => x.notional - y.notional)
-	const causalWeight = new Map(sorted.map((p, i) => [p, Math.pow((i + 1) / sorted.length, cfg.weightGamma)]))
-	const candidates = band.filter(p => causalWeight.get(p)! >= cfg.farMinWeight)
-	if (!candidates.length) return { far: fallback, boundarySource: 'atr-calibration', liquidityBands: [] }
-	let far = direction === 'long' ? Math.min(...candidates.map(p => p.bandLow)) : Math.max(...candidates.map(p => p.bandHigh))
-	// §16.10: far тянется по СТЕКУ — пока живые пулы продолжаются (перекрытие или разрыв ≤ stackGapAtr),
-	// граница углубляется за пределы стартовой полосы поиска. «Конец кластеров ликвидности» из §12.1
-	// буквально: жёсткое окно 2 ATR обрезало жирные полки (кейс 67255: стек до 70022 резался на 68366).
-	const aliveAll = (pools ?? []).filter(p => p.side === side
-		&& p.startAt <= knownAt && (p.sweptAt == null || p.sweptAt > knownAt))
-	const stack = new Set(candidates)
-	const farLimit = direction === 'long' ? near - cfg.stackMaxAtr * a : near + cfg.stackMaxAtr * a
-	// §16.10: расширение тянется только к пулам НЕ СЛАБЕЕ медианы базовых — стек идёт к жирным
-	// полкам за стартовой полосой, а не ползёт по шумовой лестнице ликвидаций до потолка.
-	const sortedBase = candidates.map(p => p.notional).sort((x, y) => x - y)
-	const baseMedian = sortedBase[Math.floor(sortedBase.length / 2)]!
-	for (;;) {
-		const next = aliveAll.filter(p => !stack.has(p) && p.notional >= baseMedian
-			&& (direction === 'long'
-				? p.bandHigh >= far - cfg.stackGapAtr * a && p.bandLow < far && p.bandLow >= farLimit
-				: p.bandLow <= far + cfg.stackGapAtr * a && p.bandHigh > far && p.bandHigh <= farLimit))
-		if (!next.length) break
-		for (const p of next) stack.add(p)
-		far = direction === 'long'
-			? Math.min(far, ...next.map(p => p.bandLow))
-			: Math.max(far, ...next.map(p => p.bandHigh))
-	}
-	// Вес для отображения — каузальный ранг внутри итогового стека.
-	const stackSorted = [...stack].sort((x, y) => x.notional - y.notional)
-	const stackWeight = new Map(stackSorted.map((p, i) => [p, Math.pow((i + 1) / stackSorted.length, cfg.weightGamma)]))
-	const liquidityBands: LiquidityBand[] = [...stack].map(p => ({ price: p.extremePrice, score: stackWeight.get(p)!, touches: p.contributions }))
-	return { far, boundarySource: 'liquidity-cluster', liquidityBands }
 }
 
 function pdAt(c: Candle[], structure: StructurePoint[], knownAt: number, price: number, direction: 'long' | 'short'): { pdZone: PdZone; pdAligned: boolean | null } {
@@ -233,108 +172,44 @@ function pdAt(c: Candle[], structure: StructurePoint[], knownAt: number, price: 
 	return { pdZone, pdAligned: direction === 'long' ? pdZone === 'discount' : pdZone === 'premium' }
 }
 
-function structuralAnchors(c: Candle[], events: StructureEvent[], context: LiquidityPoiContext): Anchor[] {
-	const out: Anchor[] = []
-	for (const p of context.protectedHistory ?? []) {
-		out.push({ id: p.id, direction: p.direction, zoneClass: 'protected-structure', i: p.point.index,
-			knownAt: p.knownAt, eventType: 'protected', pivots: [], segment: eventSegment(events, p.point.index),
-			supersededAt: p.supersededAt, invalidatedAt: p.breachedAt, active: p.active, retiredAt: null })
-	}
-	const structure = context.structure ?? []
-	for (const e of events.filter(x => x.type === 'choch')) {
-		const candidates = structure.filter(p => p.index < e.breachIndex && p.type === (e.direction === 'up' ? 'low' : 'high'))
-		const prevOpposite = [...events].reverse().find(x => x.confirmIndex < e.confirmIndex && x.direction !== e.direction)
-		// SPEC §13: без подтверждённого предыдущего противоположного события начало leg неизвестно —
-		// кандидат ПРОПУСКАЕТСЯ (подставлять начало датасета запрещено, это баг v0.5.1).
-		if (!prevOpposite) continue
-		const scoped = candidates.filter(p => p.index > prevOpposite.confirmIndex)
-		if (!scoped.length) continue
-		const point = e.direction === 'up'
-			? scoped.reduce((a, b) => a.price < b.price ? a : b)
-			: scoped.reduce((a, b) => a.price > b.price ? a : b)
-		const knownAt = c[Math.min(c.length - 1, e.confirmIndex + 1)]?.timestamp ?? e.confirmTimestamp
-		out.push({ id: `outer|${e.direction}|${point.index}|${knownAt}`, direction: e.direction === 'up' ? 'long' : 'short',
-			zoneClass: 'outer-swing', i: point.index, knownAt, eventType: e.type, pivots: [], segment: eventSegment(events, point.index),
-			supersededAt: null, invalidatedAt: null, active: true, retiredAt: null })
-	}
-	return out
-}
-
-function localEqAnchors(ps: Pivot[]): Anchor[] {
-	const out: Anchor[] = [], used = new Set<number>()
-	for (let i = 0; i < ps.length; i++) {
-		if (used.has(i)) continue
-		const p = ps[i]!, group: Array<{ p: Pivot; j: number }> = []
-		for (let j = i; j < ps.length; j++) {
-			const q = ps[j]!
-			if (used.has(j) || q.type !== p.type || q.segment !== p.segment) continue
-			const current = [...group.map(x => x.p.price), q.price]
-			if (Math.max(...current) - Math.min(...current) <= LIQUIDITY_POI_CONFIG.eqClusterAtr * Math.max(p.atr, q.atr)) group.push({ p: q, j })
+/** Кластеризация живых свежих пулов стороны в полки: перекрытие или разрыв ≤ stackGapAtr×ATR. */
+function buildShelves(pools: LiquidityPool[], a: number): Shelf[] {
+	const cfg = LIQUIDITY_POI_CONFIG
+	const sorted = [...pools].sort((x, y) => x.bandLow - y.bandLow)
+	const shelves: Shelf[] = []
+	for (const p of sorted) {
+		const last = shelves.at(-1)
+		if (last && p.bandLow <= last.hi + cfg.stackGapAtr * a) {
+			last.hi = Math.max(last.hi, p.bandHigh)
+			last.lo = Math.min(last.lo, p.bandLow)
+			last.notional += p.notional
+			last.pools.push(p)
+		} else {
+			shelves.push({ lo: p.bandLow, hi: p.bandHigh, notional: p.notional, pools: [p] })
 		}
-		if (group.length < 2) continue
-		group.forEach(x => used.add(x.j))
-		const members = group.map(x => x.p)
-		const ext = p.type === 'low'
-			? members.reduce((a, b) => a.price < b.price ? a : b)
-			: members.reduce((a, b) => a.price > b.price ? a : b)
-		out.push({ id: `eq|${p.type}|${p.segment}|${members.map(x => x.i).join('-')}`,
-			direction: p.type === 'low' ? 'long' : 'short', zoneClass: 'local-eq', i: ext.i,
-			knownAt: Math.max(...members.map(x => x.known)), eventType: null, pivots: members, segment: p.segment,
-			supersededAt: null, invalidatedAt: null, active: true, retiredAt: null })
 	}
-	return out
+	return shelves
 }
 
-
-
-function overlaps(a: AreaCandidate, b: AreaCandidate): boolean {
-	const aLow = Math.min(a.near, a.far), aHigh = Math.max(a.near, a.far)
-	const bLow = Math.min(b.near, b.far), bHigh = Math.max(b.near, b.far)
-	return aLow <= bHigh && bLow <= aHigh
+const overlapShare = (aLo: number, aHi: number, bLo: number, bHi: number): number => {
+	const ov = Math.min(aHi, bHi) - Math.max(aLo, bLo)
+	if (ov <= 0) return 0
+	return ov / Math.max(1e-9, Math.min(aHi - aLo, bHi - bLo))
 }
 
-function classRank(x: LiquidityZoneClass): number {
-	return x === 'outer-swing' ? 3 : x === 'protected-structure' ? 2 : 1
+function classRank(_x: LiquidityZoneClass): number {
+	return 1
 }
 
 function isOpen(x: AreaCandidate): boolean {
 	return x.lifecycleState === 'forming' || x.lifecycleState === 'fresh' || x.lifecycleState === 'in-play'
 }
 
-function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
-	const components = [...new Set([...a.componentAnchorIds, ...b.componentAnchorIds])]
-	const classes = [...new Set([...a.componentClasses, ...b.componentClasses])]
-	const dominant = a.direction === 'long' ? (a.near <= b.near ? a : b) : (a.near >= b.near ? a : b)
-	const zoneClass = classes.reduce((best, x) => classRank(x) > classRank(best) ? x : best, dominant.zoneClass)
-	const lineageTimes = [a.lineageSupersededAt, b.lineageSupersededAt].filter((x): x is number => x != null)
-	const retireTimes = [a.retiredAt, b.retiredAt].filter((x): x is number => x != null)
-	const touchTimes = [a.firstTouchAt, b.firstTouchAt].filter((x): x is number => x != null)
-	const armedTimes = [a.armedAt, b.armedAt].filter((x): x is number => x != null)
-	const consumedTimes = [a.consumedAt, b.consumedAt].filter((x): x is number => x != null)
-	const chochTimes = [a.oppositeChochAt, b.oppositeChochAt].filter((x): x is number => x != null)
-	return {
-		...dominant,
-		id: `${LIQUIDITY_POI_VERSION}|area|${components.sort().join('+')}`,
-		zoneClass, anchorId: dominant.anchorId, componentAnchorIds: components, componentClasses: classes,
-		originAt: Math.min(a.originAt, b.originAt), knownAt: Math.min(a.knownAt, b.knownAt),
-		geometryKnownAt: Math.max(a.geometryKnownAt, b.geometryKnownAt),
-		near: dominant.near, far: a.direction === 'long' ? Math.min(a.far, b.far) : Math.max(a.far, b.far),
-		atr: Math.max(a.atr, b.atr), pivotCount: a.pivotCount + b.pivotCount,
-		pivotPrices: [...a.pivotPrices, ...b.pivotPrices], pivotTimes: [...a.pivotTimes, ...b.pivotTimes],
-		lineageSupersededAt: lineageTimes.length ? Math.max(...lineageTimes) : null,
-		lifecycleState: 'forming', valid: false, active: false, priority: 'secondary',
-		interaction: touchTimes.length ? 'touched' : 'untouched', touchCount: a.touchCount + b.touchCount,
-		armedAt: armedTimes.length ? Math.min(...armedTimes) : null,
-		firstTouchAt: touchTimes.length ? Math.min(...touchTimes) : null,
-		consumedAt: consumedTimes.length ? Math.min(...consumedTimes) : null,
-		failedAt: null, invalidatedAt: null, spentAt: null, spentReason: null, duplicateOf: null,
-		retiredAt: retireTimes.length ? Math.min(...retireTimes) : null,
-		oppositeChochAt: chochTimes.length ? Math.min(...chochTimes) : null,
-		supersededAt: null, endAt: Math.max(a.endAt, b.endAt), mergedCount: components.length - 1,
-		suppressedCount: 0, segment: dominant.segment,
-	}
-}
-
+/**
+ * §16.12: жизнь зоны = жизнь её стека. Терминалы: провал (4h close телом за far), проход насквозь
+ * (фитиль за far, момент = закрытие бара прохода), снятие стека по объёму (≥ stackConsumedShare
+ * суммарного notional полки — по sweptAt пулов). Ran-away и CHoCH-отставка отменены.
+ */
 function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 	const cfg = LIQUIDITY_POI_CONFIG
 	const long = area.direction === 'long'
@@ -342,27 +217,17 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 	const start = c.findIndex(x => x.timestamp >= area.geometryKnownAt)
 	const lower = Math.min(area.near, area.far), upper = Math.max(area.near, area.far)
 	let armedAt = area.armedAt, firstTouchAt = area.firstTouchAt, touchCount = area.touchCount
-	let consumedAt: number | null = area.consumedAt, failedAt: number | null = null, spentAt: number | null = null
-	let spentKind: 'ran-away' | 'swept-through' | null = null
-	let chochRetiredAt: number | null = null
+	let consumedAt: number | null = area.consumedAt, failedAt: number | null = null
+	let spentAt: number | null = null, spentKind: 'swept-through' | 'stack-consumed' | null = null
 	let inside = false
 	for (let i = Math.max(0, start); i < c.length; i++) {
 		const bar = c[i]!
-		if (area.retiredAt != null && bar.timestamp >= area.retiredAt) break
-		// §16.10: противоположный CHoCH ретирит только УЖЕ ТРОНУТУЮ зону. Нетронутый экстремум
-		// с живыми стопами структурный флип не хоронит — зона ждёт цену.
-		if (area.oppositeChochAt != null && bar.timestamp >= area.oppositeChochAt
-			&& firstTouchAt != null && firstTouchAt <= area.oppositeChochAt) {
-			chochRetiredAt = area.oppositeChochAt
-			break
-		}
 		// §14.6/§16.8: провал = close телом за дальней границей.
 		if (long ? bar.close < lower : bar.close > upper) {
 			failedAt = bar.timestamp
 			break
 		}
-		// §16.10: проход НАСКВОЗЬ — фитиль за far — весь стек снят, зона отработана (swept-through).
-		// Момент известен на закрытии бара прохода (+tfMs): подтверждение доигрывает сам бар прохода.
+		// §16.10: проход НАСКВОЗЬ — фитиль за far — весь стек снят; момент известен на закрытии бара.
 		if (long ? bar.low < lower : bar.high > upper) {
 			spentAt = bar.timestamp + tfMs
 			spentKind = 'swept-through'
@@ -378,25 +243,34 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 			firstTouchAt ??= bar.timestamp
 		}
 		inside = overlapsZone
-		// §16.8: использованность — информационная пометка для карты (первый фитиль сквозь near
-		// после взведения, одинаково для всех классов), окно торговли она НЕ закрывает.
+		// §16.8: использованность — информационная пометка (первый фитиль сквозь near после взведения).
 		if (consumedAt == null && (long ? bar.low < area.near : bar.high > area.near)) consumedAt = bar.timestamp
-		// §16.8 «зона отработала» (ran-away): после касания цена ушла от near в сторону реакции
-		// на spentDistanceAtr×ATR по close — дальше её не торгуем («поезд уехал, ждём ниже»).
-		if (touchCount > 0 && !overlapsZone
-			&& (long ? bar.close >= area.near + cfg.spentDistanceAtr * area.atr : bar.close <= area.near - cfg.spentDistanceAtr * area.atr)) {
-			spentAt = bar.timestamp
-			spentKind = 'ran-away'
-			break
-		}
 	}
-	const terminal = [
-		failedAt == null ? null : { state: 'failed' as const, at: failedAt },
-		spentAt == null ? null : { state: 'spent' as const, at: spentAt },
-		area.retiredAt == null ? null : { state: 'retired' as const, at: area.retiredAt },
-		chochRetiredAt == null ? null : { state: 'retired' as const, at: chochRetiredAt },
-	].filter((x): x is { state: 'failed' | 'spent' | 'retired'; at: number } => x != null)
-		.sort((a, b) => a.at - b.at)[0]
+	// §16.12: снятие стека по объёму — момент, когда снято ≥ stackConsumedShare суммарного notional полки.
+	let stackConsumedAt: number | null = null
+	const total = area.shelfPools.reduce((s, p) => s + p.notional, 0)
+	if (total > 0) {
+		const sweeps = area.shelfPools.filter(p => p.sweptAt != null).sort((a, b) => a.sweptAt! - b.sweptAt!)
+		let cum = 0
+		for (const p of sweeps) {
+			cum += p.notional
+			if (cum >= cfg.stackConsumedShare * total) { stackConsumedAt = p.sweptAt!; break }
+		}
+		if (stackConsumedAt != null && stackConsumedAt < area.geometryKnownAt) stackConsumedAt = area.geometryKnownAt
+	}
+	// §16.12: стек перестал кормиться (все пулы старше shelfFreshBars) → зона устарела (retired).
+	// Именно это выключает древние вершины: пулы не сняты, но ликвидность там давно не копится —
+	// пользователь такие полки в heatmap-вьюере тоже не видит (age-фильтр).
+	const lastFeed = area.shelfPools.reduce((m, p) => Math.max(m, p.lastContributionAt), 0)
+	const staleAt = lastFeed + cfg.shelfFreshBars * tfMs
+	const dataEnd = c.at(-1)!.timestamp
+	type Terminal = { state: 'failed' | 'spent' | 'retired'; at: number; kind: 'swept-through' | 'stack-consumed' | null }
+	const terminals: Terminal[] = []
+	if (failedAt != null) terminals.push({ state: 'failed', at: failedAt, kind: null })
+	if (spentAt != null) terminals.push({ state: 'spent', at: spentAt, kind: spentKind })
+	if (stackConsumedAt != null) terminals.push({ state: 'spent', at: stackConsumedAt, kind: 'stack-consumed' })
+	if (staleAt <= dataEnd) terminals.push({ state: 'retired', at: Math.max(staleAt, area.geometryKnownAt), kind: null })
+	const terminal = terminals.sort((x, y) => x.at - y.at)[0]
 	const current = c.at(-1)!
 	const inPlay = armedAt != null && (current.low <= upper && current.high >= lower)
 	let lifecycleState: PoiLifecycleState
@@ -409,69 +283,30 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 		...area, lifecycleState, valid, armedAt, firstTouchAt, touchCount, interaction,
 		consumedAt,
 		failedAt: terminal?.state === 'failed' ? terminal.at : null,
+		retiredAt: terminal?.state === 'retired' ? terminal.at : null,
 		spentAt: terminal?.state === 'spent' ? terminal.at : null,
-		spentReason: terminal?.state === 'spent' ? spentKind : null,
-		retiredAt: terminal?.state === 'retired' ? terminal.at : area.retiredAt,
+		spentReason: terminal?.state === 'spent' ? terminal.kind : null,
 		invalidatedAt: terminal?.state === 'failed' ? terminal.at : null,
 		endAt: terminal?.at ?? current.timestamp,
 	}
 }
 
-function assignOuterRetirement(anchors: Anchor[], events: StructureEvent[], c: Candle[]): void {
-	const outers = anchors.filter(x => x.zoneClass === 'outer-swing')
-	for (const x of outers) {
-		const opposite = events.find(e => e.type === 'choch' && e.confirmTimestamp > x.knownAt
-			&& e.direction === (x.direction === 'long' ? 'down' : 'up'))
-		// §16.10: противоположный CHoCH — УСЛОВНАЯ отставка (применится в evaluateArea только к уже
-		// тронутой зоне). Нетронутый экстремум с живыми стопами структурный флип не хоронит
-		// (кейс 67255-68366: ретирнут при 0 касаний, над ним 11.5B живой ликвидности).
-		x.oppositeChochAt = opposite ? (c[opposite.confirmIndex + 1]?.timestamp ?? opposite.confirmTimestamp) : null
-		const nextExtreme = outers.find(y => y !== x && y.direction === x.direction && y.knownAt > x.knownAt
-			&& (x.direction === 'long' ? c[y.i]!.low < c[x.i]!.low : c[y.i]!.high > c[x.i]!.high))
-		x.retiredAt = nextExtreme?.knownAt ?? null
-	}
-}
-
+/** §16.9/§16.11: подавление дублей (near ≤ dupNearAtr×ATR или перекрытие ≥ dupOverlapShare меньшей). */
 function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
-	const areas: AreaCandidate[] = []
-	for (const source of [...raw].sort((a, b) => a.knownAt - b.knownAt || a.originAt - b.originAt)) {
-		let area = evaluateArea(source, c)
-		if (isOpen(area)) {
-			for (;;) {
-				// §16.8 (решение №7): склейка перекрывающихся ОТКРЫТЫХ зон одной стороны независимо
-				// от класса — торгово это одна зона/одна позиция; классы компонентов сохраняются в
-				// componentClasses. Склейка по пересечению времени жизни (а не «обе ещё открыты»)
-				// проверена и ОТКЛОНЕНА: цепочки поглощений строят мега-зоны через месяцы, а каждое
-				// поглощение сдвигает geometryKnownAt вперёд и съедает торговое окно подтверждения.
-				// Историческая дедупликация умерших дублей — отдельное открытое решение (§16.8).
-				const index = areas.findIndex(x => isOpen(x) && x.direction === area.direction && overlaps(x, area))
-				if (index < 0) break
-				area = evaluateArea(mergeArea(areas.splice(index, 1)[0]!, area), c)
-			}
-		}
-		areas.push(area)
-	}
-	// §16.9 (решение №20): подавление near-дублей. Зоны одной стороны с near в пределах
-	// dupNearAtr×ATR и пересекающимися окнами — одна и та же область: остаётся старшая
-	// (класс, затем возраст), младшая помечается duplicateOf и не торгуется/не показывается.
-	// Геометрия НЕ мутирует — окна подтверждения стабильны (в отличие от отклонённой
-	// склейки по времени жизни). Было 45% дублей — «листаешь одно и то же».
-	const bySeniority = [...areas].sort((a, b) =>
-		Number(b.boundarySource === 'liquidity-cluster') - Number(a.boundarySource === 'liquidity-cluster')
-		|| classRank(b.zoneClass) - classRank(a.zoneClass) || a.knownAt - b.knownAt || a.originAt - b.originAt)
+	const cfg = LIQUIDITY_POI_CONFIG
+	const areas = [...raw].sort((a, b) => a.knownAt - b.knownAt || a.originAt - b.originAt).map(x => evaluateArea(x, c))
+	const bySeniority = [...areas].sort((a, b) => a.knownAt - b.knownAt || a.originAt - b.originAt)
 	for (const senior of bySeniority) {
 		if (senior.duplicateOf != null) continue
 		for (const junior of bySeniority) {
 			if (junior === senior || junior.duplicateOf != null) continue
 			if (junior.direction !== senior.direction) continue
+			if (junior.knownAt < senior.knownAt) continue
 			if (!(senior.knownAt < junior.endAt && junior.knownAt < senior.endAt)) continue
-			// §16.11: дубль по близости near ИЛИ по перекрытию диапазонов (двум зонам с near чуть
-			// выше/чуть ниже нечего делать порознь — QA: «два стопа по факту в одной зоне»).
-			const nearDup = Math.abs(junior.near - senior.near) <= LIQUIDITY_POI_CONFIG.dupNearAtr * senior.atr
+			const nearDup = Math.abs(junior.near - senior.near) <= cfg.dupNearAtr * senior.atr
 			const sLo = Math.min(senior.near, senior.far), sHi = Math.max(senior.near, senior.far)
 			const jLo = Math.min(junior.near, junior.far), jHi = Math.max(junior.near, junior.far)
-			const overlap = Math.min(sHi, jHi) - Math.max(sLo, jLo)
-			const overlapDup = overlap > 0 && overlap >= LIQUIDITY_POI_CONFIG.dupOverlapShare * Math.min(sHi - sLo, jHi - jLo)
+			const overlapDup = overlapShare(sLo, sHi, jLo, jHi) >= cfg.dupOverlapShare
 			if (!nearDup && !overlapDup) continue
 			junior.duplicateOf = senior.id
 			senior.suppressedCount += 1
@@ -483,51 +318,110 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
 		const lower = Math.min(x.near, x.far), upper = Math.max(x.near, x.far)
 		return current < lower ? lower - current : current > upper ? current - upper : 0
 	}
-	// При равной дистанции (перекрывающиеся зоны с общей near-границей) nearest получает
-	// зона с реальной ликвидностью на far-границе, затем более старший класс зоны.
+	// При равной дистанции nearest получает более СИЛЬНАЯ полка (notional стека).
 	const nearestPick = (a: AreaCandidate, b: AreaCandidate) =>
 		distance(a) - distance(b)
-		|| Number(b.boundarySource === 'liquidity-cluster') - Number(a.boundarySource === 'liquidity-cluster')
-		|| classRank(b.zoneClass) - classRank(a.zoneClass)
+		|| b.shelfPools.reduce((s, p) => s + p.notional, 0) - a.shelfPools.reduce((s, p) => s + p.notional, 0)
 	const nearestLong = fresh.filter(x => x.direction === 'long').sort(nearestPick)[0]
 	const nearestShort = fresh.filter(x => x.direction === 'short').sort(nearestPick)[0]
 	return areas.map(x => {
-		const priority: ZonePriority = x.zoneClass === 'outer-swing' && x.valid && x.duplicateOf == null ? 'outer'
-			: x === nearestLong || x === nearestShort ? 'nearest' : 'secondary'
-		return { ...x, priority, active: x.valid && priority !== 'secondary' && x.duplicateOf == null }
+		const priority: ZonePriority = x === nearestLong || x === nearestShort ? 'nearest' : 'secondary'
+		// §16.12: «важные» = ближайшая пара + все свежие непод авленные зоны значимых полок.
+		return { ...x, priority, active: x.valid && x.duplicateOf == null }
 	})
 }
 
-export function detectLiquidityPoi(c: Candle[], events: StructureEvent[] = [], context: LiquidityPoiContext = {}): LiquidityPoiCandidate[] {
+/**
+ * §16.12: сканирование полок по времени. На каждом 4h-баре собираются живые СВЕЖИЕ пулы стороны,
+ * кластеризуются в полки, берётся топ-N по notional; полка, впервые вошедшая в топ (нет полки с
+ * перекрытием ≥ shelfIdentityShare среди значимых на предыдущем баре), рождает зону-кандидата.
+ * Геометрия замораживается на knownAt (= закрытие бара); рост стека позже даёт нового кандидата,
+ * которого дедуп подавляет, пока старшая зона жива.
+ */
+export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], context: LiquidityPoiContext = {}): LiquidityPoiCandidate[] {
 	if (!c.length) return []
+	const cfg = LIQUIDITY_POI_CONFIG
+	const pools = context.heatmapPools ?? []
+	if (!pools.length) return []
 	const structure = context.structure ?? []
-	// §16.9: local-swing удалён — экстремум каждого внутреннего колена плодил зоны без ликвидности.
-	const anchors = [
-		...structuralAnchors(c, events, context),
-		...localEqAnchors(pivots(c, events)),
-	]
-	assignOuterRetirement(anchors, events, c)
+	const tfMs = c.length > 1 ? c[1]!.timestamp - c[0]!.timestamp : 0
+	const fr = fractals(c)
+	const bySide: Record<'buy-side' | 'sell-side', LiquidityPool[]> = {
+		'buy-side': pools.filter(p => p.side === 'buy-side').sort((a, b) => a.startAt - b.startAt),
+		'sell-side': pools.filter(p => p.side === 'sell-side').sort((a, b) => a.startAt - b.startAt),
+	}
 	const raw: AreaCandidate[] = []
-	for (const x of anchors) {
-		const candle = c[x.i], a = atr(c, x.i)
-		if (!candle || !a || x.knownAt < candle.timestamp) continue
-		const near = x.direction === 'long' ? candle.low : candle.high
-		const pd = pdAt(c, structure, x.knownAt, near, x.direction)
-		if (x.zoneClass === 'local-eq' && pd.pdAligned === false) continue
-		const { far, boundarySource, liquidityBands } = liquidityFar(x.direction, near, a, x.knownAt, context.heatmapPools)
-		raw.push({ id: `${LIQUIDITY_POI_VERSION}|${x.id}`, version: LIQUIDITY_POI_VERSION,
-			direction: x.direction, zoneClass: x.zoneClass, anchorId: x.id, componentAnchorIds: [x.id], componentClasses: [x.zoneClass],
-			originAt: candle.timestamp, knownAt: x.knownAt, geometryKnownAt: x.knownAt, near, far, atr: a,
-			boundarySource, liquidityBands, pivotCount: x.pivots.length || 1,
-			pivotPrices: x.pivots.length ? x.pivots.map(v => v.price) : [near],
-			pivotTimes: x.pivots.length ? x.pivots.map(v => c[v.i]!.timestamp) : [candle.timestamp], eventType: x.eventType,
-			pdZone: pd.pdZone, pdAligned: pd.pdAligned, lifecycleState: 'forming', valid: false, active: false,
-			priority: 'secondary', interaction: 'untouched', touchCount: 0, armedAt: null, firstTouchAt: null,
-			consumedAt: null, failedAt: null, spentAt: null, spentReason: null, duplicateOf: null, retiredAt: x.retiredAt, lineageSupersededAt: x.supersededAt,
-			supersededAt: null, invalidatedAt: null, endAt: c.at(-1)!.timestamp, mergedCount: 0, suppressedCount: 0,
-			segment: x.segment, oppositeChochAt: x.oppositeChochAt ?? null })
+	// Реестр эмиссий: полка перерождает зону, только когда её пулы существенно ОБНОВИЛИСЬ
+	// (re-accumulation): доля notional новых пулов ≥ shelfNoveltyShare. Непрерывно значимая полка
+	// эмитится один раз; её умершая зона (стек снят) перерождается на новых пулах.
+	const emissions: Record<'buy-side' | 'sell-side', Array<{ lo: number; hi: number; poolIds: Set<string> }>> = { 'buy-side': [], 'sell-side': [] }
+	for (let i = 0; i < c.length; i++) {
+		const bar = c[i]!
+		const t = bar.timestamp + tfMs // состояние пулов известно на ЗАКРЫТИИ бара
+		const a = atr(c, i)
+		if (!a) continue
+		for (const side of ['buy-side', 'sell-side'] as const) {
+			const direction = side === 'buy-side' ? 'long' : 'short'
+			// Живые и свежие пулы: родился к t, не снят к t, кормился не дальше shelfFreshBars назад.
+			// Строгие границы: пул рождается ВНУТРИ бара startAt (на закрытии предыдущего его ещё нет),
+			// снятый на баре sweptAt пул жив ещё на закрытии этого бара.
+			const freshPools = bySide[side].filter(p => p.startAt < t
+				&& (p.sweptAt == null || p.sweptAt >= t)
+				&& t <= p.lastContributionAt + cfg.shelfFreshBars * tfMs)
+			if (!freshPools.length) continue
+			const sideTotal = freshPools.reduce((sm, p) => sm + p.notional, 0)
+			const shelves = buildShelves(freshPools, a)
+			const significant = [...shelves].sort((x, y) => y.notional - x.notional).slice(0, cfg.shelfTopN)
+				.filter(sh => sh.notional >= cfg.shelfMinShare * sideTotal)
+			for (const shelf of significant) {
+				const knownIds = new Set<string>()
+				for (const e of emissions[side]) {
+					if (overlapShare(e.lo, e.hi, shelf.lo, shelf.hi) >= cfg.shelfIdentityShare) for (const id of e.poolIds) knownIds.add(id)
+				}
+				const novelNotional = shelf.pools.filter(p => !knownIds.has(p.id)).reduce((sm, p) => sm + p.notional, 0)
+				if (knownIds.size > 0 && novelNotional < cfg.shelfNoveltyShare * shelf.notional) continue
+				emissions[side].push({ lo: shelf.lo, hi: shelf.hi, poolIds: new Set(shelf.pools.map(p => p.id)) })
+				// Потолок высоты зоны: стек режется от БЛИЖНЕГО края (для лонга — сверху вниз).
+				const edge = direction === 'long' ? shelf.hi : shelf.lo
+				const farLimit = direction === 'long' ? edge - cfg.stackMaxAtr * a : edge + cfg.stackMaxAtr * a
+				const far = direction === 'long' ? Math.max(shelf.lo, farLimit) : Math.min(shelf.hi, farLimit)
+				// Near: точный wick невыметенного экстремума перед полкой (±nearTolAtr от края), иначе край.
+				const tol = cfg.nearTolAtr * a
+				const candidates = fr.filter(f => f.type === (direction === 'long' ? 'low' : 'high')
+					&& f.known <= t && (f.sweptAt == null || f.sweptAt > t)
+					&& Math.abs(f.price - edge) <= tol)
+				const anchor = candidates.length
+					? candidates.reduce((best, f) => Math.abs(f.price - edge) < Math.abs(best.price - edge) ? f : best)
+					: null
+				const near = anchor ? anchor.price : edge
+				const pd = pdAt(c, structure, t, near, direction)
+				const sorted = [...shelf.pools].sort((x, y) => x.notional - y.notional)
+				const weight = new Map(sorted.map((p, k) => [p, Math.pow((k + 1) / sorted.length, 1.5)]))
+				raw.push({
+					id: `${LIQUIDITY_POI_VERSION}|shelf|${side}|${i}|${Math.round(shelf.lo)}-${Math.round(shelf.hi)}`,
+					version: LIQUIDITY_POI_VERSION,
+					direction, zoneClass: 'liquidity-shelf',
+					anchorId: `shelf|${side}|${i}|${Math.round(near)}`,
+					componentAnchorIds: shelf.pools.map(p => p.id), componentClasses: ['liquidity-shelf'],
+					originAt: Math.min(...shelf.pools.map(p => p.startAt)), knownAt: t, geometryKnownAt: t,
+					near, far, atr: a, boundarySource: 'liquidity-cluster',
+					liquidityBands: shelf.pools.map(p => ({ price: p.extremePrice, score: weight.get(p)!, touches: p.contributions })),
+					pivotCount: shelf.pools.length,
+					pivotPrices: shelf.pools.map(p => p.extremePrice),
+					pivotTimes: shelf.pools.map(p => p.startAt),
+					eventType: anchor ? 'shelf+extremum' : 'shelf-edge',
+					pdZone: pd.pdZone, pdAligned: pd.pdAligned,
+					lifecycleState: 'forming', valid: false, active: false, priority: 'secondary',
+					interaction: 'untouched', touchCount: 0, armedAt: null, firstTouchAt: null,
+					consumedAt: null, failedAt: null, retiredAt: null, spentAt: null, spentReason: null,
+					duplicateOf: null, lineageSupersededAt: null, supersededAt: null, invalidatedAt: null,
+					endAt: c.at(-1)!.timestamp, mergedCount: 0, suppressedCount: 0,
+					shelfPools: shelf.pools.map(p => ({ notional: p.notional, sweptAt: p.sweptAt, lastContributionAt: p.lastContributionAt })),
+				})
+			}
+		}
 	}
 	return consolidate(raw, c)
 		.sort((a, b) => Number(b.active) - Number(a.active) || Number(b.valid) - Number(a.valid) || b.geometryKnownAt - a.geometryKnownAt)
-		.map(({ segment: _segment, oppositeChochAt: _choch, ...candidate }) => candidate)
+		.map(({ shelfPools: _shelfPools, ...candidate }) => candidate)
 }
