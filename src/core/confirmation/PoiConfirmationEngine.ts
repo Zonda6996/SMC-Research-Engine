@@ -4,7 +4,7 @@ import type { LiquidityPoiCandidate } from './LiquidityPoiCalibration.js'
 // SPEC §14: уточнённое подтверждение, ведомое от уже откалиброванных v1.0 POI-зон (near/far), а не от самостоятельно
 // найденных OB/FVG как в RefinedPoiEngine в 0.2. Окно активности зоны — [knownAt, endAt) из самого POI-движка:
 // far-close invalidation (§14.6) уже зашито в endAt/failedAt той зоны, повторно здесь её не пересчитываем.
-export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.0-zone-driven'
+export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.1-zone-extreme'
 
 export interface ConfirmationTrace {
 	state: string
@@ -63,6 +63,7 @@ function runAttempt(
 	touch: number,
 	long: boolean,
 	attemptIndex: number,
+	initExtreme: number,
 ): { attempt: ConfirmationAttempt; nextCursor: number } {
 	const attempt: ConfirmationAttempt = {
 		attemptIndex,
@@ -80,7 +81,9 @@ function runAttempt(
 	}
 	// §14.2 шаги 1-5, §14.3: экстремум остаётся динамическим (углубляется) до первой close по стороне сделки.
 	let stopping = -1
-	let dynamicExtreme = long ? ltf[touch]!.low : ltf[touch]!.high
+	// Экстремум наследуется от зоны (initExtreme): повторный заход с более мелким локальным экстремумом
+	// строит подтверждение вокруг исходного экстремума зоны, а не вокруг нового касания.
+	let dynamicExtreme = long ? Math.min(initExtreme, ltf[touch]!.low) : Math.max(initExtreme, ltf[touch]!.high)
 	for (let j = touch; j < Math.min(endIndex, touch + 30); j++) {
 		const c = ltf[j]!
 		dynamicExtreme = long ? Math.min(dynamicExtreme, c.low) : Math.max(dynamicExtreme, c.high)
@@ -226,27 +229,46 @@ export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle
 	for (const poi of pois) {
 		const long = poi.direction === 'long'
 		const lo = Math.min(poi.near, poi.far), hi = Math.max(poi.near, poi.far)
+		// Зона участвует в подтверждении только с момента, когда известна её итоговая геометрия:
+		// у склеенных зон границы уточняются позже knownAt самой ранней компоненты — иначе look-ahead.
+		const effectiveKnownAt = Math.max(poi.knownAt, poi.geometryKnownAt ?? poi.knownAt)
 		const result: PoiConfirmationResult = {
 			poiId: poi.id, direction: poi.direction, zoneClass: poi.zoneClass,
-			near: poi.near, far: poi.far, knownAt: poi.knownAt, endAt: poi.endAt, attempts: [],
+			near: poi.near, far: poi.far, knownAt: effectiveKnownAt, endAt: poi.endAt, attempts: [],
 		}
-		if (!ltf.length || ltf[0]!.timestamp > poi.knownAt) { out.push(result); continue }
-		let cursor = ltf.findIndex(c => c.timestamp >= poi.knownAt)
+		if (!ltf.length || ltf[0]!.timestamp > effectiveKnownAt) { out.push(result); continue }
+		let cursor = ltf.findIndex(c => c.timestamp >= effectiveKnownAt)
 		if (cursor < 0) { out.push(result); continue }
 		const endIdxRaw = ltf.findIndex(c => c.timestamp >= poi.endAt)
 		const endIndex = endIdxRaw < 0 ? ltf.length : endIdxRaw
 		let attemptCount = 0
+		// §14.2: касание = переход снаружи внутрь зоны. Если цена уже внутри на момент knownAt,
+		// касание не засчитывается, пока цена полностью не выйдет из зоны и не вернётся.
+		let wasInside = true
+		// Экстремум зоны копится по всем барам внутри зоны за всё окно (для передачи в runAttempt).
+		let zoneExtreme = long ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY
 		while (cursor < endIndex && attemptCount < MAX_ATTEMPTS_PER_POI) {
 			let touch = -1
 			for (let j = cursor; j < endIndex; j++) {
 				const c = ltf[j]!
-				if (c.low <= hi && c.high >= lo) { touch = j; break }
+				const inside = c.low <= hi && c.high >= lo
+				if (inside) zoneExtreme = long ? Math.min(zoneExtreme, c.low) : Math.max(zoneExtreme, c.high)
+				if (inside && !wasInside) { touch = j; break }
+				wasInside = inside
 			}
 			if (touch < 0) break
 			attemptCount++
-			const { attempt, nextCursor } = runAttempt(ltf, endIndex, touch, long, attemptCount)
+			const initExtreme = Number.isFinite(zoneExtreme) ? zoneExtreme : (long ? ltf[touch]!.low : ltf[touch]!.high)
+			const { attempt, nextCursor } = runAttempt(ltf, endIndex, touch, long, attemptCount, initExtreme)
 			result.attempts.push(attempt)
 			cursor = Math.max(nextCursor, touch + 1)
+			// Пробегаем пропущенные попыткой бары, чтобы zoneExtreme остался полным.
+			for (let j = touch; j < Math.min(cursor, endIndex); j++) {
+				const c = ltf[j]!
+				if (c.low <= hi && c.high >= lo) zoneExtreme = long ? Math.min(zoneExtreme, c.low) : Math.max(zoneExtreme, c.high)
+			}
+			// После попытки требуем полный выход из зоны перед следующим касанием.
+			wasInside = true
 		}
 		out.push(result)
 	}

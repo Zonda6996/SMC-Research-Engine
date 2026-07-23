@@ -358,8 +358,14 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
 		const lower = Math.min(x.near, x.far), upper = Math.max(x.near, x.far)
 		return current < lower ? lower - current : current > upper ? current - upper : 0
 	}
-	const nearestLong = fresh.filter(x => x.direction === 'long').sort((a, b) => distance(a) - distance(b))[0]
-	const nearestShort = fresh.filter(x => x.direction === 'short').sort((a, b) => distance(a) - distance(b))[0]
+	// При равной дистанции (перекрывающиеся зоны с общей near-границей) nearest получает
+	// зона с реальной ликвидностью на far-границе, затем более старший класс зоны.
+	const nearestPick = (a: LiquidityPoiCandidate, b: LiquidityPoiCandidate) =>
+		distance(a) - distance(b)
+		|| Number(b.boundarySource === 'liquidity-cluster') - Number(a.boundarySource === 'liquidity-cluster')
+		|| classRank(b.zoneClass) - classRank(a.zoneClass)
+	const nearestLong = fresh.filter(x => x.direction === 'long').sort(nearestPick)[0]
+	const nearestShort = fresh.filter(x => x.direction === 'short').sort(nearestPick)[0]
 	return areas.map(x => {
 		const priority: ZonePriority = x.zoneClass === 'outer-swing' && x.valid ? 'outer'
 			: x === nearestLong || x === nearestShort ? 'nearest' : 'secondary'
