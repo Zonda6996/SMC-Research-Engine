@@ -4,7 +4,7 @@ import type { LiquidityPoiCandidate } from './LiquidityPoiCalibration.js'
 // SPEC §14: уточнённое подтверждение, ведомое от уже откалиброванных v1.0 POI-зон (near/far), а не от самостоятельно
 // найденных OB/FVG как в RefinedPoiEngine в 0.2. Окно активности зоны — [knownAt, endAt) из самого POI-движка:
 // far-close invalidation (§14.6) уже зашито в endAt/failedAt той зоны, повторно здесь её не пересчитываем.
-export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.1-zone-extreme'
+export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.2-armed-touch'
 
 export interface ConfirmationTrace {
 	state: string
@@ -196,8 +196,10 @@ function runAttempt(
 	attempt.tp2 = long ? attempt.entry + 2 * risk : attempt.entry - 2 * risk
 	attempt.trace.push({ state: 'ENTRY', at: attempt.entryAt, price: attempt.entry })
 
+	// Позиция доигрывается до stop/TP по всей истории: реальная позиция не закрывается
+	// от того, что окно зоны (endAt) кончилось — иначе фильтр open показывает стопнутые сделки.
 	let exitIndex = endIndex - 1
-	for (let j = en + 1; j < endIndex; j++) {
+	for (let j = en + 1; j < ltf.length; j++) {
 		const c = ltf[j]!
 		const sl = long ? c.low <= attempt.stop! : c.high >= attempt.stop!
 		const tp = long ? c.high >= attempt.tp2! : c.low <= attempt.tp2!
@@ -242,9 +244,10 @@ export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle
 		const endIdxRaw = ltf.findIndex(c => c.timestamp >= poi.endAt)
 		const endIndex = endIdxRaw < 0 ? ltf.length : endIdxRaw
 		let attemptCount = 0
-		// §14.2: касание = переход снаружи внутрь зоны. Если цена уже внутри на момент knownAt,
-		// касание не засчитывается, пока цена полностью не выйдет из зоны и не вернётся.
-		let wasInside = true
+		// §14.2: касание = вход в зону со стороны сделки после «взвода» (armed): цена должна сначала
+		// полностью отойти от зоны (лонг: low > near + 0.25*ATR), затем войти. Вход снизу после
+		// прошива зоны и фитильный спам у границы касаниями не считаются.
+		let armed = false
 		// Экстремум зоны копится по всем барам внутри зоны за всё окно (для передачи в runAttempt).
 		let zoneExtreme = long ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY
 		while (cursor < endIndex && attemptCount < MAX_ATTEMPTS_PER_POI) {
@@ -253,8 +256,8 @@ export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle
 				const c = ltf[j]!
 				const inside = c.low <= hi && c.high >= lo
 				if (inside) zoneExtreme = long ? Math.min(zoneExtreme, c.low) : Math.max(zoneExtreme, c.high)
-				if (inside && !wasInside) { touch = j; break }
-				wasInside = inside
+				if (inside && armed) { touch = j; break }
+				if (!inside && (long ? c.low > hi + 0.25 * atr(ltf, j) : c.high < lo - 0.25 * atr(ltf, j))) armed = true
 			}
 			if (touch < 0) break
 			attemptCount++
@@ -267,8 +270,8 @@ export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle
 				const c = ltf[j]!
 				if (c.low <= hi && c.high >= lo) zoneExtreme = long ? Math.min(zoneExtreme, c.low) : Math.max(zoneExtreme, c.high)
 			}
-			// После попытки требуем полный выход из зоны перед следующим касанием.
-			wasInside = true
+			// После попытки требуем полный отход от зоны (re-arm) перед следующим касанием.
+			armed = false
 		}
 		out.push(result)
 	}

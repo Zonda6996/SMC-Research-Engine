@@ -688,3 +688,17 @@ docs/archive/SPEC-legacy-2026-07-21.md
 - timeframes 1d and 1w added to the TF switch (TF_MS extended with `1w`); heatmap and analysis params are bar-based and apply unchanged;
 - no auto-load on page open: the user picks symbol/TF/limit and presses Load (BTC/USDT stays the default symbol);
 - candle fetching is parallel: page windows are precomputed from the fixed since..end range and fetched in batches of 6 with timestamp dedup (short histories return the same left edge on early pages), replacing strictly sequential pagination — main win on the 10k-30k 5m context fetch.
+
+## 16.7 POI Confirmation 1.1/1.2 (23.07.2026)
+
+Правки поверх §14 после визуального QA пользователя (BTC 4h → 15m):
+
+- **Causality / geometryKnownAt.** Окно подтверждения начинается с `max(knownAt, geometryKnownAt)`: у консолидированных областей `knownAt` наследуется от самой ранней компоненты, а итоговые границы становятся известны позже. Сканирование от старого `knownAt` было look-ahead — зона «отрабатывала» за недели до того, как её геометрия существовала.
+- **Touch = вход со стороны сделки после re-arm.** Касание засчитывается только когда цена, полностью отойдя от зоны (LONG: `low > near + 0.25*ATR` confirmation TF), входит в неё. Бар рождения зоны, фитильный спам у границы и вход с противоположной стороны (снизу для LONG после прошива зоны на confirmation TF) касаниями не являются. После каждой попытки требуется новый re-arm.
+- **Zone-extreme anchoring.** Динамический экстремум попытки инициализируется самым глубоким экстремумом зоны, накопленным по всем барам внутри зоны за всё окно, а не экстремумом бара касания. Повторный заход с более мелким локальным экстремумом строит stopping вокруг исходного экстремума зоны (обобщение правила §14.5 «более глубокий low заменяет старый»).
+- **Исход позиции.** После entry позиция доигрывается до stop/TP по всей доступной истории, даже если окно зоны (`endAt`) закончилось. Раньше такие сделки помечались `open`, хотя визуально позже получали стоп вне окна.
+- **Nearest tie-break (Liquidity POI).** При равной дистанции до цены (перекрывающиеся зоны с общей near-границей) nearest получает зона с far по реальной ликвидности (`liquidity-cluster`), затем более старший класс.
+
+Версия: `poi-confirmation-1.2-armed-touch` (промежуточная 1.1-zone-extreme в бой не выходила). Буфер re-arm `0.25*ATR` — диагностический, менять только по итогам визуального QA.
+
+Открыто: `sweptNear` для outer-swing (сейчас false — зона не становится consumed); судьба ATR-fallback far-границ (в визуализаторе скрыты по умолчанию как не основные, но движок их создаёт и confirmation их обсчитывает).

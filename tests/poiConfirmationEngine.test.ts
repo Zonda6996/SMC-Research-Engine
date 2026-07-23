@@ -45,7 +45,7 @@ const baseline = (n: number, start: number, price: number): Candle[] =>
 	Array.from({ length: n }, (_, k) => ({ timestamp: start + k, open: price, high: price + 1, low: price - 1, close: price - 0.5, volume: 10 }))
 
 it('POI confirmation engine has a frozen version and returns empty for empty input', () => {
-	assert.equal(POI_CONFIRMATION_VERSION, 'poi-confirmation-1.1-zone-extreme')
+	assert.equal(POI_CONFIRMATION_VERSION, 'poi-confirmation-1.2-armed-touch')
 	assert.deepEqual(detectPoiConfirmation([], []), [])
 })
 
