@@ -1,10 +1,35 @@
 import type { Candle } from '../../models/price/Candle.js'
 import type { LiquidityPoiCandidate } from './LiquidityPoiCalibration.js'
 
-// SPEC §14: уточнённое подтверждение, ведомое от уже откалиброванных v1.0 POI-зон (near/far), а не от самостоятельно
-// найденных OB/FVG как в RefinedPoiEngine в 0.2. Окно активности зоны — [knownAt, endAt) из самого POI-движка:
-// far-close invalidation (§14.6) уже зашито в endAt/failedAt той зоны, повторно здесь её не пересчитываем.
-export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.2-armed-touch'
+// SPEC §16.8 (v1.7): ЕДИНАЯ последовательность подтверждения для всех классов зон, ведомая от v1.1 POI-зон.
+// Окно торговли зоны = [max(knownAt, geometryKnownAt), endAt) из POI-движка, где endAt — только провал
+// (4h close телом за far), отставка внешнего экстремума или «зона отработала» (ran-away). Использованность
+// (consumed) окно НЕ закрывает — это информационная пометка карты (§16.8 отменяет смерти из §13.1/13.2).
+// Fallback-зоны (far не от реальной ликвидности) подтверждением не торгуются.
+export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.3-unified-window'
+
+/**
+ * Все константы движка подтверждения (§16.8). Значения согласованы 23.07.2026; менять только
+ * по итогам визуального QA с явного согласия пользователя.
+ */
+export const POI_CONFIRMATION_CONFIG = {
+	/** Полный отход от зоны для (пере)взведения касания, в ATR confirmation TF (v1.6 armed touch, §16.7). */
+	rearmAtr: 0.25,
+	/** Глубина отскока от лоя попытки перед пересвипом, в ATR confirmation TF (§14.2 шаг 6). */
+	reboundAtr: 0.5,
+	/** Запас стопа за экстремумом пересвип-последовательности («с небольшим запасом», §14.2 шаг 13). */
+	stopBufferAtr: 0.05,
+	/** Диагностический полный тейк, в R (§14.2 шаг 14; частичные выходы — вне первого теста). */
+	tpR: 2,
+	/** Единый таймаут попытки в барах confirmation TF (~сутки на 15m). Заменяет окна 30/20/60/30/20 из 1.2. */
+	attemptTimeoutBars: 96,
+	/** Отмена входа: риск (вход→стоп) больше этого числа ATR — вход пропускается, попытка продолжается. */
+	entryMaxRiskAtr: 1.5,
+	/** Столько подряд close за лоем попытки: внутри зоны → перезапуск от нового экстремума, за far → отбраковка. */
+	failedProtectionCloses: 2,
+	/** SMA объёма за N баров ТФ зоны для пометки «пришли на объёме» (диагностика, НЕ фильтр). */
+	arrivalVolumeSma: 20,
+} as const
 
 export interface ConfirmationTrace {
 	state: string
@@ -17,8 +42,10 @@ export interface ConfirmationTrace {
 export interface ConfirmationAttempt {
 	attemptIndex: number
 	status: 'entered' | 'rejected'
+	/** timeout@<этап> | broke-below-zone | zone-ended | null для входа. */
 	rejectionReason: string | null
 	touchAt: number
+	/** Лой/хай попытки на момент последнего пересвипа (уровень, который снимали). */
 	stopLevel: number | null
 	entryAt: number | null
 	entry: number | null
@@ -26,6 +53,10 @@ export interface ConfirmationAttempt {
 	tp2: number | null
 	outcome: 'tp' | 'stop' | 'open' | null
 	grossR: number | null
+	/** Диагностика «пришли на объёме»: объём HTF-бара захода / SMA20 предыдущих; null без HTF-данных. */
+	arrivalVolumeRatio: number | null
+	/** Снял ли пересвип самый глубокий экстремум зоны за окно (QA-пометка решения по §16.8). */
+	sweptZoneExtreme: boolean | null
 	trace: ConfirmationTrace[]
 }
 
@@ -36,7 +67,12 @@ export interface PoiConfirmationResult {
 	near: number
 	far: number
 	knownAt: number
+	/** Эффективный конец окна торговли: конец зоны либо отработка по tp-hit. */
 	endAt: number
+	/** Зона отработала внутри окна подтверждения: попытка дошла до тейка. */
+	spentReason: 'tp-hit' | null
+	/** Покрытие 15m-историей: none → попыток нет из-за ДАННЫХ, не из-за логики. */
+	ltfCoverage: 'full' | 'partial' | 'none'
 	attempts: ConfirmationAttempt[]
 }
 
@@ -52,10 +88,18 @@ function atr(c: Candle[], i: number, n = 14): number {
 function dirBar(c: Candle, long: boolean): boolean {
 	return long ? c.close > c.open : c.close < c.open
 }
+/** Откатная свеча: закрытие ПРОТИВ направления сделки (доджи не считается). */
+function counterBar(c: Candle, long: boolean): boolean {
+	return long ? c.close < c.open : c.close > c.open
+}
+
+type Stage = 'stopping' | 'rebound' | 'sweep' | 'protect' | 'entry'
 
 /**
- * SPEC §14.2-14.5: одна попытка подтверждения внутри окна [cursor, endIndex). Возвращает последний
- * просмотренный индекс в ltf, чтобы вызовующая сторона знала, откуда искать следующую попытку (§14.5).
+ * Одна попытка = одно взведённое касание со всей цепочкой §16.8:
+ * заход → остановка (лой попытки, динамический §14.5) → отскок → пересвип ЭТОГО лоя → защита →
+ * тест слабости (объём свечи возобновления ВЫШЕ объёма последней откатной) → вход.
+ * Перезапуски внутри попытки (более глубокий заход, две close ниже лоя внутри зоны) не сжигают её.
  */
 function runAttempt(
 	ltf: Candle[],
@@ -63,215 +107,237 @@ function runAttempt(
 	touch: number,
 	long: boolean,
 	attemptIndex: number,
-	initExtreme: number,
+	zoneLo: number,
+	zoneHi: number,
+	zoneExtreme: { value: number },
+	arrivalVolumeRatio: number | null,
 ): { attempt: ConfirmationAttempt; nextCursor: number } {
+	const cfg = POI_CONFIRMATION_CONFIG
 	const attempt: ConfirmationAttempt = {
-		attemptIndex,
-		status: 'rejected',
-		rejectionReason: null,
-		touchAt: ltf[touch]!.timestamp,
-		stopLevel: null,
-		entryAt: null,
-		entry: null,
-		stop: null,
-		tp2: null,
-		outcome: null,
-		grossR: null,
+		attemptIndex, status: 'rejected', rejectionReason: null,
+		touchAt: ltf[touch]!.timestamp, stopLevel: null,
+		entryAt: null, entry: null, stop: null, tp2: null, outcome: null, grossR: null,
+		arrivalVolumeRatio, sweptZoneExtreme: null,
 		trace: [{ state: 'POI_TOUCH', at: ltf[touch]!.timestamp }],
 	}
-	// §14.2 шаги 1-5, §14.3: экстремум остаётся динамическим (углубляется) до первой close по стороне сделки.
-	let stopping = -1
-	// Экстремум наследуется от зоны (initExtreme): повторный заход с более мелким локальным экстремумом
-	// строит подтверждение вокруг исходного экстремума зоны, а не вокруг нового касания.
-	let dynamicExtreme = long ? Math.min(initExtreme, ltf[touch]!.low) : Math.max(initExtreme, ltf[touch]!.high)
-	for (let j = touch; j < Math.min(endIndex, touch + 30); j++) {
+	let stage: Stage = 'stopping'
+	// «Лой попытки» (для шорта — хай): динамический до остановки, §14.5 в пределах захода.
+	let low = long ? ltf[touch]!.low : ltf[touch]!.high
+	let reboundExtreme = Number.NaN
+	let sweepExtreme = Number.NaN
+	let belowCloses = 0
+	let impulseSeen = false
+	const beyondLow = (v: number) => (long ? v < low : v > low)
+	const closeBeyondFar = (c: Candle) => (long ? c.close < zoneLo : c.close > zoneHi)
+	const reject = (reason: string, nextCursor: number) => {
+		attempt.rejectionReason = reason
+		return { attempt, nextCursor }
+	}
+	const restart = (at: number, newLow: number) => {
+		low = newLow
+		stage = 'stopping'
+		reboundExtreme = Number.NaN
+		belowCloses = 0
+		impulseSeen = false
+		attempt.trace.push({ state: 'RESTART', at, price: low })
+	}
+	// Защита проверяется на самом свип-баре или следующих закрытиях (§14.2 шаги 8-9 + решение №12).
+	const protectOn = (c: Candle): boolean => {
+		if (long ? c.close > low : c.close < low) {
+			stage = 'entry'
+			belowCloses = 0
+			impulseSeen = dirBar(c, long)
+			attempt.trace.push({ state: 'PROTECTED', at: c.timestamp, price: low })
+			return true
+		}
+		belowCloses++
+		return false
+	}
+
+	for (let j = touch; j < endIndex; j++) {
+		if (j - touch >= cfg.attemptTimeoutBars) return reject(`timeout@${stage}`, j)
 		const c = ltf[j]!
-		dynamicExtreme = long ? Math.min(dynamicExtreme, c.low) : Math.max(dynamicExtreme, c.high)
-		if (dirBar(c, long)) { stopping = j; break }
-	}
-	if (stopping < 0) {
-		attempt.rejectionReason = 'no-stopping'
-		return { attempt, nextCursor: touch + 1 }
-	}
-	const stopLevel = dynamicExtreme
-	attempt.stopLevel = stopLevel
-	attempt.trace.push({ state: 'STOP_CONFIRMED', at: ltf[stopping]!.timestamp, price: stopLevel })
+		const zoneExtremeBefore = zoneExtreme.value
+		const insideZone = c.low <= zoneHi && c.high >= zoneLo
+		if (insideZone) zoneExtreme.value = long ? Math.min(zoneExtreme.value, c.low) : Math.max(zoneExtreme.value, c.high)
 
-	// §14.2 шаг 6: отскок, входа на первом отскоке нет.
-	const a = atr(ltf, stopping)
-	let rebound = -1
-	for (let j = stopping + 1; j < Math.min(endIndex, stopping + 20); j++) {
-		const span = ltf.slice(stopping + 1, j + 1)
-		const broken = span.some(c => (long ? c.low < stopLevel : c.high > stopLevel))
-		const move = long
-			? Math.max(...span.map(c => c.high)) - stopLevel
-			: stopLevel - Math.min(...span.map(c => c.low))
-		if (!broken && j - stopping >= 2 && move >= 0.5 * a) {
-			rebound = j
-			attempt.trace.push({ state: 'REBOUND', at: ltf[j]!.timestamp, price: stopLevel })
-			break
+		if (stage === 'stopping' || stage === 'rebound') {
+			// Снятие лоя до отскока = более глубокий заход, а не отбраковка (решение №1: попытка не сгорает).
+			if (stage === 'rebound' && beyondLow(long ? c.low : c.high)) restart(c.timestamp, long ? c.low : c.high)
+			if (stage === 'stopping') {
+				if (beyondLow(long ? c.low : c.high)) low = long ? c.low : c.high
+				if (dirBar(c, long)) {
+					stage = 'rebound'
+					reboundExtreme = long ? c.high : c.low
+					attempt.trace.push({ state: 'STOP_CONFIRMED', at: c.timestamp, price: low })
+				}
+			} else {
+				reboundExtreme = long ? Math.max(reboundExtreme, c.high) : Math.min(reboundExtreme, c.low)
+				const a = atr(ltf, j)
+				if (a && (long ? reboundExtreme - low : low - reboundExtreme) >= cfg.reboundAtr * a) {
+					stage = 'sweep'
+					attempt.trace.push({ state: 'REBOUND', at: c.timestamp, price: reboundExtreme })
+				}
+			}
+			continue
+		}
+
+		if (stage === 'sweep') {
+			if (beyondLow(long ? c.low : c.high)) {
+				sweepExtreme = long ? c.low : c.high
+				attempt.stopLevel = low
+				attempt.sweptZoneExtreme = long ? sweepExtreme <= zoneExtremeBefore : sweepExtreme >= zoneExtremeBefore
+				attempt.trace.push({ state: 'SECOND_SWEEP', at: c.timestamp, price: sweepExtreme })
+				stage = 'protect'
+				belowCloses = 0
+				protectOn(c)
+			}
+			continue
+		}
+
+		if (stage === 'protect') {
+			sweepExtreme = long ? Math.min(sweepExtreme, c.low) : Math.max(sweepExtreme, c.high)
+			if (!protectOn(c) && belowCloses >= cfg.failedProtectionCloses) {
+				// Решение №12: две close за лоем, но внутри зоны → строим дальше от нового экстремума;
+				// close за дальней границей → пробой организован, попытка отбраковывается.
+				if (closeBeyondFar(c)) return reject('broke-below-zone', j + 1)
+				restart(c.timestamp, sweepExtreme)
+			}
+			continue
+		}
+
+		// stage === 'entry': импульс → откат → возобновление (тест слабости, решение №13).
+		if (beyondLow(long ? c.low : c.high) && (long ? c.low < sweepExtreme : c.high > sweepExtreme)) {
+			// Более глубокий пересвип до входа — не смерть: защита проверяется заново (§16.8).
+			sweepExtreme = long ? c.low : c.high
+			attempt.sweptZoneExtreme = long ? sweepExtreme <= zoneExtremeBefore : sweepExtreme >= zoneExtremeBefore
+			attempt.trace.push({ state: 'SECOND_SWEEP', at: c.timestamp, price: sweepExtreme })
+			stage = 'protect'
+			belowCloses = 0
+			protectOn(c)
+			continue
+		}
+		if (long ? c.close < low : c.close > low) {
+			// Закрытие обратно за лоем — защита расстроилась, проверяем её заново.
+			stage = 'protect'
+			belowCloses = 1
+			continue
+		}
+		if (dirBar(c, long)) {
+			const prev = ltf[j - 1]
+			if (impulseSeen && prev && counterBar(prev, long) && c.volume > prev.volume) {
+				// Тест слабости пройден: объём свечи возобновления ВЫШЕ объёма последней откатной (50 > 40).
+				attempt.trace.push({ state: 'WEAKNESS_TEST', at: prev.timestamp, volume: prev.volume, volumeRatio: prev.volume > 0 ? c.volume / prev.volume : 0 })
+				const a = atr(ltf, j)
+				const stop = long ? sweepExtreme - cfg.stopBufferAtr * a : sweepExtreme + cfg.stopBufferAtr * a
+				const risk = Math.abs(c.close - stop)
+				if (a && risk > cfg.entryMaxRiskAtr * a) {
+					// Решение №3: цена уже убежала — вход отменяется, попытка ждёт следующий тест ближе.
+					attempt.trace.push({ state: 'ENTRY_CANCELLED', at: c.timestamp, price: c.close })
+					continue
+				}
+				attempt.status = 'entered'
+				attempt.rejectionReason = null
+				attempt.entryAt = c.timestamp
+				attempt.entry = c.close
+				attempt.stop = stop
+				attempt.tp2 = long ? c.close + cfg.tpR * risk : c.close - cfg.tpR * risk
+				attempt.trace.push({ state: 'ENTRY', at: c.timestamp, price: c.close })
+				// Позиция доигрывается до stop/TP по всей истории (v1.6) — окно зоны её не закрывает.
+				let exitIndex = j
+				for (let k = j + 1; k < ltf.length; k++) {
+					const x = ltf[k]!
+					const sl = long ? x.low <= attempt.stop! : x.high >= attempt.stop!
+					const tp = long ? x.high >= attempt.tp2! : x.low <= attempt.tp2!
+					if (sl) {
+						attempt.outcome = 'stop'; attempt.grossR = -1
+						attempt.trace.push({ state: 'STOP', at: x.timestamp, price: attempt.stop! })
+						exitIndex = k; break
+					}
+					if (tp) {
+						attempt.outcome = 'tp'; attempt.grossR = cfg.tpR
+						attempt.trace.push({ state: 'TP2', at: x.timestamp, price: attempt.tp2! })
+						exitIndex = k; break
+					}
+					exitIndex = k
+				}
+				if (!attempt.outcome) attempt.outcome = 'open'
+				return { attempt, nextCursor: exitIndex + 1 }
+			}
+			// Направленная свеча без валидного теста — часть импульса (или слабое возобновление): ждём.
+			impulseSeen = true
 		}
 	}
-	if (rebound < 0) {
-		attempt.rejectionReason = 'no-rebound'
-		return { attempt, nextCursor: stopping + 1 }
-	}
-
-	// §14.2 шаг 7: вторичный sweep stopLow/stopHigh.
-	let sweep = -1
-	for (let j = rebound + 1; j < Math.min(endIndex, rebound + 60); j++) {
-		const c = ltf[j]!
-		if (long ? c.low < stopLevel : c.high > stopLevel) {
-			sweep = j
-			attempt.trace.push({ state: 'SECOND_SWEEP', at: c.timestamp, price: long ? c.low : c.high })
-			break
-		}
-	}
-	if (sweep < 0) {
-		attempt.rejectionReason = 'no-second-sweep'
-		return { attempt, nextCursor: rebound + 1 }
-	}
-
-	// §14.2 шаги 8-9: защита на свип-свече или следующей.
-	let protect = -1
-	for (let j = sweep; j <= Math.min(sweep + 1, endIndex - 1); j++) {
-		if (long ? ltf[j]!.close > stopLevel : ltf[j]!.close < stopLevel) { protect = j; break }
-	}
-	if (protect < 0) {
-		attempt.rejectionReason = 'failed-protection'
-		return { attempt, nextCursor: sweep + 1 }
-	}
-	attempt.trace.push({ state: 'PROTECTED', at: ltf[protect]!.timestamp, price: stopLevel })
-
-	// §14.2 шаги 10-11, §14.4: импульс и low-volume test.
-	let impulse = -1, testEnd = -1
-	let secondExtremeBreak = false, highVolTest = false
-	for (let j = protect + 1; j < Math.min(endIndex, protect + 30); j++) {
-		const c = ltf[j]!
-		if (long ? c.low < ltf[sweep]!.low : c.high > ltf[sweep]!.high) { secondExtremeBreak = true; break }
-		if (dirBar(c, long)) { impulse = j; continue }
-		if (impulse >= 0 && c.volume < ltf[impulse]!.volume) {
-			testEnd = j
-			if (j + 1 < endIndex && !dirBar(ltf[j + 1]!, long) && ltf[j + 1]!.volume < ltf[impulse]!.volume) testEnd = j + 1
-			break
-		}
-		if (impulse >= 0) { highVolTest = true; break }
-	}
-	if (secondExtremeBreak) {
-		attempt.rejectionReason = 'second-extreme-break'
-		return { attempt, nextCursor: sweep + 1 }
-	}
-	if (highVolTest) {
-		attempt.rejectionReason = 'high-volume-test'
-		return { attempt, nextCursor: protect + 1 }
-	}
-	if (testEnd < 0) {
-		attempt.rejectionReason = 'no-low-volume-test'
-		return { attempt, nextCursor: protect + 1 }
-	}
-	attempt.trace.push({
-		state: 'LOW_VOLUME_TEST',
-		at: ltf[testEnd]!.timestamp,
-		volume: ltf[testEnd]!.volume,
-		volumeRatio: impulse >= 0 ? ltf[testEnd]!.volume / ltf[impulse]!.volume : undefined,
-	})
-
-	// §14.2 шаг 12: entry на первой закрытой свече по направлению сделки после успешного test.
-	let en = -1
-	for (let j = testEnd + 1; j < Math.min(endIndex, testEnd + 20); j++) {
-		if (long ? ltf[j]!.low < ltf[sweep]!.low : ltf[j]!.high > ltf[sweep]!.high) break
-		if (dirBar(ltf[j]!, long)) { en = j; break }
-	}
-	if (en < 0) {
-		attempt.rejectionReason = 'no-resumption'
-		return { attempt, nextCursor: testEnd + 1 }
-	}
-
-	// §14.2 шаги 13-14: stop за sweep-extreme с буфером, полный TP 2R (первый тест — без частичных выходов).
-	attempt.status = 'entered'
-	attempt.entryAt = ltf[en]!.timestamp
-	attempt.entry = ltf[en]!.close
-	attempt.stop = long ? ltf[sweep]!.low - 0.05 * a : ltf[sweep]!.high + 0.05 * a
-	const risk = Math.abs(attempt.entry - attempt.stop)
-	attempt.tp2 = long ? attempt.entry + 2 * risk : attempt.entry - 2 * risk
-	attempt.trace.push({ state: 'ENTRY', at: attempt.entryAt, price: attempt.entry })
-
-	// Позиция доигрывается до stop/TP по всей истории: реальная позиция не закрывается
-	// от того, что окно зоны (endAt) кончилось — иначе фильтр open показывает стопнутые сделки.
-	let exitIndex = endIndex - 1
-	for (let j = en + 1; j < ltf.length; j++) {
-		const c = ltf[j]!
-		const sl = long ? c.low <= attempt.stop! : c.high >= attempt.stop!
-		const tp = long ? c.high >= attempt.tp2! : c.low <= attempt.tp2!
-		if (sl) {
-			attempt.outcome = 'stop'; attempt.grossR = -1
-			attempt.trace.push({ state: 'STOP', at: c.timestamp, price: attempt.stop! })
-			exitIndex = j; break
-		}
-		if (tp) {
-			attempt.outcome = 'tp'; attempt.grossR = 2
-			attempt.trace.push({ state: 'TP2', at: c.timestamp, price: attempt.tp2! })
-			exitIndex = j; break
-		}
-		exitIndex = j
-	}
-	if (!attempt.outcome) attempt.outcome = 'open'
-	return { attempt, nextCursor: exitIndex + 1 }
+	return reject('zone-ended', endIndex)
 }
 
-const MAX_ATTEMPTS_PER_POI = 6
-
 /**
- * SPEC §14: уточнённое подтверждение на confirmation TF (15m для 4h POI, §14.1) ведомое от уже откалиброванных v1.0
- * POI-зон (near/far). Несколько попыток внутри одной POI — §14.5. Окно активности — [poi.knownAt, poi.endAt),
- * т.е. far-close invalidation (§14.6) уже учтена движком POI и повторно здесь не проверяется.
+ * SPEC §16.8: подтверждение на confirmation TF (15m для 4h POI, §14.1) для КАЖДОЙ торгуемой зоны v1.1.
+ * Лимита попыток нет (решение №10) — окно ограничено жизнью зоны, отработкой (tp-hit) и таймаутами попыток.
+ * htf — свечи ТФ зоны (4h) для диагностики «пришли на объёме»; без них пометка null.
  */
-export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle[]): PoiConfirmationResult[] {
+export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle[], htf?: Candle[]): PoiConfirmationResult[] {
+	const cfg = POI_CONFIRMATION_CONFIG
 	const out: PoiConfirmationResult[] = []
+	const htfMs = htf && htf.length > 1 ? htf[1]!.timestamp - htf[0]!.timestamp : 0
+	const arrivalRatio = (touchAt: number): number | null => {
+		if (!htf?.length || !htfMs) return null
+		const i = htf.findIndex(x => touchAt >= x.timestamp && touchAt < x.timestamp + htfMs)
+		if (i < 0) return null
+		const prev = htf.slice(Math.max(0, i - cfg.arrivalVolumeSma), i)
+		const sma = avg(prev.map(x => x.volume))
+		return sma > 0 ? htf[i]!.volume / sma : null
+	}
 	for (const poi of pois) {
+		// Решение №6: ATR-fallback зоны (без реальной ликвидности на far) подтверждением не торгуются.
+		if (poi.boundarySource !== 'liquidity-cluster') continue
 		const long = poi.direction === 'long'
 		const lo = Math.min(poi.near, poi.far), hi = Math.max(poi.near, poi.far)
-		// Зона участвует в подтверждении только с момента, когда известна её итоговая геометрия:
-		// у склеенных зон границы уточняются позже knownAt самой ранней компоненты — иначе look-ahead.
 		const effectiveKnownAt = Math.max(poi.knownAt, poi.geometryKnownAt ?? poi.knownAt)
+		const ltfStart = ltf[0]?.timestamp ?? Number.POSITIVE_INFINITY
+		const ltfCoverage: PoiConfirmationResult['ltfCoverage'] =
+			!ltf.length || poi.endAt <= ltfStart ? 'none' : ltfStart <= effectiveKnownAt ? 'full' : 'partial'
 		const result: PoiConfirmationResult = {
 			poiId: poi.id, direction: poi.direction, zoneClass: poi.zoneClass,
-			near: poi.near, far: poi.far, knownAt: effectiveKnownAt, endAt: poi.endAt, attempts: [],
+			near: poi.near, far: poi.far, knownAt: effectiveKnownAt, endAt: poi.endAt,
+			spentReason: null, ltfCoverage, attempts: [],
 		}
-		if (!ltf.length || ltf[0]!.timestamp > effectiveKnownAt) { out.push(result); continue }
+		if (ltfCoverage === 'none') { out.push(result); continue }
 		let cursor = ltf.findIndex(c => c.timestamp >= effectiveKnownAt)
 		if (cursor < 0) { out.push(result); continue }
 		const endIdxRaw = ltf.findIndex(c => c.timestamp >= poi.endAt)
 		const endIndex = endIdxRaw < 0 ? ltf.length : endIdxRaw
-		let attemptCount = 0
-		// §14.2: касание = вход в зону со стороны сделки после «взвода» (armed): цена должна сначала
-		// полностью отойти от зоны (лонг: low > near + 0.25*ATR), затем войти. Вход снизу после
-		// прошива зоны и фитильный спам у границы касаниями не считаются.
+		// v1.6 armed touch: касание = вход в зону со стороны сделки после полного отхода; re-arm после каждой попытки.
 		let armed = false
-		// Экстремум зоны копится по всем барам внутри зоны за всё окно (для передачи в runAttempt).
-		let zoneExtreme = long ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY
-		while (cursor < endIndex && attemptCount < MAX_ATTEMPTS_PER_POI) {
+		// Самый глубокий экстремум зоны за окно — для QA-пометки sweptZoneExtreme (не для якоря стопа, решение №9).
+		const zoneExtreme = { value: long ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY }
+		while (cursor < endIndex) {
 			let touch = -1
 			for (let j = cursor; j < endIndex; j++) {
 				const c = ltf[j]!
 				const inside = c.low <= hi && c.high >= lo
-				if (inside) zoneExtreme = long ? Math.min(zoneExtreme, c.low) : Math.max(zoneExtreme, c.high)
+				if (inside) zoneExtreme.value = long ? Math.min(zoneExtreme.value, c.low) : Math.max(zoneExtreme.value, c.high)
 				if (inside && armed) { touch = j; break }
-				if (!inside && (long ? c.low > hi + 0.25 * atr(ltf, j) : c.high < lo - 0.25 * atr(ltf, j))) armed = true
+				if (!inside && (long ? c.low > hi + cfg.rearmAtr * atr(ltf, j) : c.high < lo - cfg.rearmAtr * atr(ltf, j))) armed = true
 			}
 			if (touch < 0) break
-			attemptCount++
-			const initExtreme = Number.isFinite(zoneExtreme) ? zoneExtreme : (long ? ltf[touch]!.low : ltf[touch]!.high)
-			const { attempt, nextCursor } = runAttempt(ltf, endIndex, touch, long, attemptCount, initExtreme)
+			const { attempt, nextCursor } = runAttempt(
+				ltf, endIndex, touch, long, result.attempts.length + 1, lo, hi, zoneExtreme, arrivalRatio(ltf[touch]!.timestamp))
 			result.attempts.push(attempt)
 			cursor = Math.max(nextCursor, touch + 1)
-			// Пробегаем пропущенные попыткой бары, чтобы zoneExtreme остался полным.
+			// Пробегаем пропущенные попыткой бары, чтобы экстремум зоны остался полным.
 			for (let j = touch; j < Math.min(cursor, endIndex); j++) {
 				const c = ltf[j]!
-				if (c.low <= hi && c.high >= lo) zoneExtreme = long ? Math.min(zoneExtreme, c.low) : Math.max(zoneExtreme, c.high)
+				if (c.low <= hi && c.high >= lo) zoneExtreme.value = long ? Math.min(zoneExtreme.value, c.low) : Math.max(zoneExtreme.value, c.high)
 			}
-			// После попытки требуем полный отход от зоны (re-arm) перед следующим касанием.
 			armed = false
+			// Решение №10: tp-hit = зона отработала, дальше её не торгуем.
+			if (attempt.status === 'entered' && attempt.outcome === 'tp') {
+				result.spentReason = 'tp-hit'
+				const exitAt = attempt.trace.find(t => t.state === 'TP2')?.at
+				if (exitAt != null && exitAt < result.endAt) result.endAt = exitAt
+				break
+			}
 		}
 		out.push(result)
 	}

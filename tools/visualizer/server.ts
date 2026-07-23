@@ -21,7 +21,6 @@ import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, extname, resolve } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
-import { detectRefinedPoi, REFINED_POI_VERSION } from '../../src/core/confirmation/RefinedPoiEngine.js'
 import { detectLiquidityPoi, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
 import { detectLiquidityHeatmap, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
 import { detectPoiConfirmation, POI_CONFIRMATION_VERSION } from '../../src/core/confirmation/PoiConfirmationEngine.js'
@@ -358,7 +357,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const poiCandidates = timeframe === '4h'
 				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools })
 				: []
-			const poiConfirmations = timeframe === '4h' ? detectPoiConfirmation(poiCandidates, ltf15m) : []
+			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём 4h-бара захода / SMA20).
+			const poiConfirmations = timeframe === '4h' ? detectPoiConfirmation(poiCandidates, ltf15m, snapshot.candles) : []
 
 			sendJson(res, 200, {
 				strategy: {
@@ -376,7 +376,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
-				refinedPoi: { version: REFINED_POI_VERSION, candidates: timeframe === '4h' ? detectRefinedPoi(snapshot.candles, snapshot.events, ltf15m) : [] },
 				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),
 				structure: snapshot.structure,
 				trendHistory: snapshot.market.trendHistory,

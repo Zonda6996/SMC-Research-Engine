@@ -10,7 +10,7 @@ const candles = (n=40): Candle[] => Array.from({length:n},(_,i)=>({
 }))
 
 it('liquidity POI has a frozen non-trading structural-area version',()=>{
- assert.equal(LIQUIDITY_POI_VERSION,'liquidity-poi-1.0-liquidity-bound')
+ assert.equal(LIQUIDITY_POI_VERSION,'liquidity-poi-1.1-causal-liquidity')
  assert.deepEqual(detectLiquidityPoi([]),[])
 })
 
@@ -71,60 +71,67 @@ it('keeps local EQ only in aligned P/D when the causal range is known',()=>{
 })
 
 
-it('protected-structure needs a close beyond near to consume; a bare wick leaves it fresh',()=>{
- const c=candles();c[5]={...c[5]!,low:90}
+it('§16.8: consumed — информационная пометка; фитиль ставит consumedAt, зона живёт до far-close',()=>{
+ // Флэт у 93: цена не уходит на 3 ATR от near, «отработать» зона не может — проверяем чистый эффект фитиля.
+ const c=Array.from({length:20},(_,i):Candle=>({timestamp:i*14_400_000,open:93,high:94,low:92,close:93.5,volume:1}))
+ c[5]={...c[5]!,low:90}
  const life:ProtectedLevelLifecycle={id:'p1',direction:'long',point:{type:'low',label:'HL',index:5,price:90} as never,originAt:c[5]!.timestamp,knownAt:c[10]!.timestamp,supersededAt:null,breachedAt:null,endAt:null,active:true}
  c[12]={...c[12]!,low:89,close:91}
  let out=detectLiquidityPoi(c,[],{protectedHistory:[life]})[0]!
+ assert.equal(out.consumedAt,c[12]!.timestamp)
  assert.equal(out.lifecycleState,'fresh')
- assert.equal(out.consumedAt,null)
- c[13]={...c[13]!,low:85,close:89}
- out=detectLiquidityPoi(c,[],{protectedHistory:[life]})[0]!
- assert.equal(out.lifecycleState,'consumed')
- assert.equal(out.consumedAt,c[13]!.timestamp)
- assert.equal(out.failedAt,null)
- c[13]={...c[13]!,low:70,close:70}
+ assert.equal(out.valid,true)
+ assert.equal(out.endAt,c.at(-1)!.timestamp)
+ // 4h close телом за far — единственная ценовая смерть зоны.
+ c[16]={...c[16]!,low:85,close:85}
  out=detectLiquidityPoi(c,[],{protectedHistory:[life]})[0]!
  assert.equal(out.lifecycleState,'failed')
- assert.equal(out.failedAt,c[13]!.timestamp)
+ assert.equal(out.failedAt,c[16]!.timestamp)
 })
 
-it('local-eq still consumes on a bare wick sweep of near (spec 13.1, unchanged)',()=>{
- const c=Array.from({length:18},(_,i):Candle=>({timestamp:i*14_400_000,open:115,high:116,low:114,close:115,volume:1}))
+it('§16.8: зона отработала (ran-away) — после касания цена ушла на 3 ATR от near, зона spent',()=>{
+ const c=Array.from({length:20},(_,i):Candle=>({timestamp:i*14_400_000,open:115,high:116,low:114,close:115,volume:1}))
  const event={direction:'up',type:'bos',confirmIndex:0,confirmTimestamp:c[0]!.timestamp,breachIndex:0} as StructureEvent
  c[5]={...c[5]!,low:90};c[8]={...c[8]!,low:90.1}
- c[16]={...c[16]!,low:89,close:91}
- const out=detectLiquidityPoi(c,[event],{}).find(x=>x.zoneClass==='local-eq')!
+ // Фитиль на c18: бар за пределом подтверждения фракталов (i ≥ length-2), чтобы не влиться в EQ-кластер.
+ c[18]={...c[18]!,low:89,close:91}
+ const out=detectLiquidityPoi(c,[event],{}).find(x=>x.componentClasses.includes('local-eq'))!
  assert.ok(out)
  assert.equal(out.near,90)
- assert.equal(out.lifecycleState,'consumed')
- assert.equal(out.consumedAt,c[16]!.timestamp)
+ assert.equal(out.consumedAt,c[18]!.timestamp)
+ assert.equal(out.lifecycleState,'spent')
+ assert.equal(out.spentReason,'ran-away')
+ assert.equal(out.spentAt,c[19]!.timestamp)
+ assert.equal(out.endAt,c[19]!.timestamp)
 })
 
-it('outer-swing is never consumed by a near sweep; only far-close failure or retirement end it',()=>{
+it('§16.8: у внешнего экстремума consumed-пометка ставится как у всех классов',()=>{
  const c=candles(30);c[5]={...c[5]!,low:90}
+ const down={direction:'down',type:'bos',confirmIndex:2,confirmTimestamp:c[2]!.timestamp,breachIndex:2} as StructureEvent
  const up={direction:'up',type:'choch',confirmIndex:10,confirmTimestamp:c[10]!.timestamp,breachIndex:9} as StructureEvent
  const structure=[{index:5,timestamp:c[5]!.timestamp,price:90,type:'low',label:'LL'}] as never
  c[15]={...c[15]!,low:89,close:91}
- const out=detectLiquidityPoi(c,[up],{structure}).find(x=>x.zoneClass==='outer-swing'&&x.direction==='long')!
+ const out=detectLiquidityPoi(c,[down,up],{structure}).find(x=>x.componentClasses.includes('outer-swing')&&x.direction==='long')!
  assert.ok(out)
- assert.equal(out.consumedAt,null)
- assert.notEqual(out.lifecycleState,'consumed')
+ assert.equal(out.consumedAt,c[15]!.timestamp)
+ // Дальше цена уходит вверх → зона отработала (ran-away), а не «использована».
+ assert.equal(out.lifecycleState,'spent')
+ assert.equal(out.spentReason,'ran-away')
 })
 
-it('same-direction overlapping outer-swing and local-eq areas do not merge (spec 12.2: they coexist)',()=>{
+it('§16.8 (решение №7): перекрывающиеся зоны разных классов одной стороны склеиваются в одну область',()=>{
  const c=Array.from({length:18},(_,i):Candle=>({timestamp:i*14_400_000,open:115,high:116,low:114,close:115,volume:1}))
- const bos={direction:'up',type:'bos',confirmIndex:0,confirmTimestamp:c[0]!.timestamp,breachIndex:0} as StructureEvent
+ const down={direction:'down',type:'bos',confirmIndex:0,confirmTimestamp:c[0]!.timestamp,breachIndex:0} as StructureEvent
  const choch={direction:'up',type:'choch',confirmIndex:10,confirmTimestamp:c[10]!.timestamp,breachIndex:9} as StructureEvent
  const structure=[{index:5,timestamp:c[5]!.timestamp,price:90,type:'low',label:'LL'}] as never
  c[5]={...c[5]!,low:90};c[8]={...c[8]!,low:90.1}
- const out=detectLiquidityPoi(c,[bos,choch],{structure})
- const outer=out.filter(x=>x.zoneClass==='outer-swing'&&x.direction==='long')
- const local=out.filter(x=>x.zoneClass==='local-eq'&&x.direction==='long')
- assert.ok(outer.length>=1)
- assert.ok(local.length>=1)
- assert.ok(outer.every(x=>!x.componentClasses.includes('local-eq')))
- assert.ok(local.every(x=>!x.componentClasses.includes('outer-swing')))
+ const out=detectLiquidityPoi(c,[down,choch],{structure})
+ const merged=out.filter(x=>x.direction==='long'&&x.componentClasses.includes('outer-swing')&&x.componentClasses.includes('local-eq'))
+ assert.equal(merged.length,1)
+ assert.ok(merged[0]!.mergedCount>=1)
+ assert.equal(merged[0]!.near,90)
+ // Дублей поверх склеенной области не осталось.
+ assert.equal(out.filter(x=>x.direction==='long').length,1)
 })
 
 it('lineage supersession does not invalidate an unswept protected area',()=>{
@@ -152,32 +159,55 @@ it('generates one local-swing extreme per side of a structural segment',()=>{
  assert.ok(locals.some(x=>x.direction==='short'&&x.near===108))
 })
 
-it('uses a causal heatmap liquidity pool for far when one qualifies; otherwise falls back to ATR',()=>{
+it('§16.8: far по КАУЗАЛЬНОМУ весу — ранг по notional среди живых на момент рождения зоны; глобальный вес игнорируется',()=>{
  const c=candles();c[5]={...c[5]!,low:90}
  const life:ProtectedLevelLifecycle={id:'p1',direction:'long',point:{type:'low',label:'HL',index:5,price:90} as never,originAt:c[5]!.timestamp,knownAt:c[10]!.timestamp,supersededAt:null,breachedAt:null,endAt:null,active:true}
  const mkPool=(o:Record<string,unknown>)=>({id:'x',version:'v',spanBins:1,startIndex:0,lastContributionIndex:0,lastContributionAt:0,sweptIndex:null,contributions:5,volumeAccumulated:1,notional:1,remainingNotional:1,status:'active',endAt:0,...o}) as never
  const noPools=detectLiquidityPoi(c,[],{protectedHistory:[life]})[0]!
  assert.equal(noPools.boundarySource,'atr-calibration')
- const causal=mkPool({side:'buy-side',extremePrice:85,bandLow:84,bandHigh:86,startAt:c[8]!.timestamp,sweptAt:null,weight:0.6})
- const future=mkPool({side:'buy-side',extremePrice:70,bandLow:68,bandHigh:72,startAt:c[20]!.timestamp,sweptAt:null,weight:0.9})
- const weak=mkPool({side:'buy-side',extremePrice:82,bandLow:81,bandHigh:83,startAt:c[8]!.timestamp,sweptAt:null,weight:0.2})
- const alreadySwept=mkPool({side:'buy-side',extremePrice:86,bandLow:85.5,bandHigh:86.5,startAt:c[8]!.timestamp,sweptAt:c[9]!.timestamp,weight:0.8})
- const withPools=detectLiquidityPoi(c,[],{protectedHistory:[life],heatmapPools:[causal,future,weak,alreadySwept]})[0]!
+ // strong: живой, тяжёлый по notional среди живых — берётся, хотя глобальный weight 0 (движок его не смотрит).
+ const strong=mkPool({side:'buy-side',extremePrice:85,bandLow:84,bandHigh:86,startAt:c[8]!.timestamp,sweptAt:null,notional:10,weight:0})
+ // weak: лёгкий по notional среди живых — отбрасывается, хотя глобальный weight 0.9 прошёл бы старый фильтр.
+ const weak=mkPool({side:'buy-side',extremePrice:83.2,bandLow:83,bandHigh:83.5,startAt:c[8]!.timestamp,sweptAt:null,notional:1,weight:0.9})
+ // future: тяжелейший, но родился ПОСЛЕ knownAt зоны — не существует для неё.
+ const future=mkPool({side:'buy-side',extremePrice:70,bandLow:68,bandHigh:72,startAt:c[20]!.timestamp,sweptAt:null,notional:100,weight:0.95})
+ // swept: снят до knownAt — мёртв.
+ const alreadySwept=mkPool({side:'buy-side',extremePrice:86,bandLow:85.5,bandHigh:86.5,startAt:c[8]!.timestamp,sweptAt:c[9]!.timestamp,notional:50,weight:0.8})
+ const withPools=detectLiquidityPoi(c,[],{protectedHistory:[life],heatmapPools:[strong,weak,future,alreadySwept]})[0]!
  assert.equal(withPools.boundarySource,'liquidity-cluster')
  assert.equal(withPools.far,84)
  assert.equal(withPools.liquidityBands.length,1)
  assert.equal(withPools.liquidityBands[0]!.price,85)
+ assert.equal(withPools.liquidityBands[0]!.score,1)
 })
 
 it('retires a 4h outer area on opposite CHoCH instead of carrying it indefinitely',()=>{
  const c=candles(30);c[5]={...c[5]!,low:90}
+ const first={direction:'down',type:'bos',confirmIndex:2,confirmTimestamp:c[2]!.timestamp,breachIndex:2} as StructureEvent
  const up={direction:'up',type:'choch',confirmIndex:10,confirmTimestamp:c[10]!.timestamp,breachIndex:9} as StructureEvent
  const down={direction:'down',type:'choch',confirmIndex:20,confirmTimestamp:c[20]!.timestamp,breachIndex:19} as StructureEvent
  const structure=[{index:5,timestamp:c[5]!.timestamp,price:90,type:'low',label:'LL'}] as never
- const out=detectLiquidityPoi(c,[up,down],{structure})
- const outer=out.find(x=>x.zoneClass==='outer-swing'&&x.direction==='long')
+ const out=detectLiquidityPoi(c,[first,up,down],{structure})
+ const outer=out.find(x=>x.componentClasses.includes('outer-swing')&&x.direction==='long')
  assert.ok(outer)
- assert.equal(outer.lifecycleState,'retired')
  assert.equal(outer.retiredAt,c[21]!.timestamp)
  assert.equal(outer.active,false)
+})
+
+it('SPEC §13: слом без предыдущего противоположного события не строит якорь от начала датасета',()=>{
+ const c=candles(30);c[5]={...c[5]!,low:90}
+ const up={direction:'up',type:'choch',confirmIndex:10,confirmTimestamp:c[10]!.timestamp,breachIndex:9} as StructureEvent
+ const structure=[{index:5,timestamp:c[5]!.timestamp,price:90,type:'low',label:'LL'}] as never
+ const out=detectLiquidityPoi(c,[up],{structure})
+ assert.equal(out.filter(x=>x.componentClasses.includes('outer-swing')).length,0)
+})
+
+it('§16.8: knownAt локального пивота = закрытие подтверждающего бара i+2, не его open',()=>{
+ const c=Array.from({length:20},(_,i):Candle=>({timestamp:i*14_400_000,open:93,high:94,low:92,close:93.5,volume:1}))
+ const event={direction:'up',type:'bos',confirmIndex:0,confirmTimestamp:c[0]!.timestamp,breachIndex:0} as StructureEvent
+ const structure=[{index:6,timestamp:c[6]!.timestamp,price:90,type:'low',label:'LL'}] as never
+ c[6]={...c[6]!,low:90}
+ const out=detectLiquidityPoi(c,[event],{structure}).find(x=>x.componentClasses.includes('local-swing'))!
+ assert.ok(out)
+ assert.equal(out.knownAt,c[8]!.timestamp+14_400_000)
 })

@@ -4,13 +4,41 @@ import type { StructurePoint } from '../../models/structure/StructurePoint.js'
 import type { ProtectedLevelLifecycle } from '../../models/structure/ProtectedLevelLifecycle.js'
 import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.0-liquidity-bound'
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.1-causal-liquidity'
+
+/**
+ * Все константы POI-движка (§16.8). Значения согласованы 23.07.2026; менять только по итогам
+ * визуального QA с явного согласия пользователя.
+ */
+export const LIQUIDITY_POI_CONFIG = {
+	/** Период ATR (стандартная детекторная константа). */
+	atrPeriod: 14,
+	/** Глубина поиска реальной ликвидности за near, в ATR ТФ зоны. */
+	farLookbackAtr: 2.0,
+	/** Порог КАУЗАЛЬНОГО веса пула: ранг среди пулов, живых на момент рождения зоны (не по всей истории). */
+	farMinWeight: 0.4,
+	/** Гамма кривой веса — та же, что в LIQUIDITY_HEATMAP_CONFIG.gamma. */
+	weightGamma: 1.5,
+	/** Кластеризация равных экстремумов (local-eq): разброс ≤ этой доли ATR. */
+	eqClusterAtr: 0.25,
+	/** «Зона отработала» (ran-away): после касания цена ушла от near в сторону реакции на столько ATR по close. */
+	spentDistanceAtr: 3.0,
+	/** ATR-fallback ширина (только карта; подтверждение такие зоны не торгует — решение №6): лонг/шорт. */
+	fallbackLongAtr: 1.0,
+	fallbackShortAtr: 0.5,
+} as const
+
 export type LiquidityZoneClass = 'outer-swing' | 'protected-structure' | 'local-eq' | 'local-swing'
 export type BoundarySource = 'atr-calibration' | 'liquidity-cluster'
 export type PdZone = 'premium' | 'discount' | 'none'
 export type ZonePriority = 'nearest' | 'outer' | 'secondary'
 export type InteractionState = 'untouched' | 'touched' | 'retested'
-export type PoiLifecycleState = 'forming' | 'fresh' | 'in-play' | 'consumed' | 'failed' | 'retired'
+/**
+ * §16.8: использованность (consumed) больше НЕ состояние жизненного цикла, а информационная пометка
+ * consumedAt. Терминальные состояния: failed (4h close телом за far), retired (отставка внешнего
+ * экстремума), spent (зона отработала: цена ушла от неё в сторону реакции).
+ */
+export type PoiLifecycleState = 'forming' | 'fresh' | 'in-play' | 'spent' | 'failed' | 'retired'
 
 export interface LiquidityBand { price: number; score: number; touches: number }
 export interface LiquidityPoiContext {
@@ -48,9 +76,13 @@ export interface LiquidityPoiCandidate {
 	touchCount: number
 	armedAt: number | null
 	firstTouchAt: number | null
+	/** Информационная пометка «использована»: первый фитиль сквозь near после взведения (все классы одинаково). */
 	consumedAt: number | null
 	failedAt: number | null
 	retiredAt: number | null
+	/** «Зона отработала»: цена ушла от near в сторону реакции на spentDistanceAtr×ATR по 4h close после касания. */
+	spentAt: number | null
+	spentReason: 'ran-away' | null
 	geometryKnownAt: number
 	lineageSupersededAt: number | null
 	supersededAt: number | null
@@ -77,7 +109,7 @@ interface Anchor {
 }
 interface AreaCandidate extends LiquidityPoiCandidate { segment: number }
 
-function atr(c: Candle[], i: number, n = 14): number {
+function atr(c: Candle[], i: number, n = LIQUIDITY_POI_CONFIG.atrPeriod): number {
 	let sum = 0, count = 0
 	for (let j = Math.max(1, i - n + 1); j <= i; j++) {
 		const x = c[j], p = c[j - 1]
@@ -94,11 +126,14 @@ function eventSegment(events: StructureEvent[], index: number): number {
 
 function pivots(c: Candle[], events: StructureEvent[]): Pivot[] {
 	const out: Pivot[] = []
+	// §16.8: фрактал 2+2 подтверждается ЗАКРЫТИЕМ бара i+2 — knownAt = его open + tfMs (раньше брали
+	// open, что делало локальные зоны известными на один бар раньше возможного — look-ahead).
+	const tfMs = c.length > 1 ? c[1]!.timestamp - c[0]!.timestamp : 0
 	for (let i = 2; i < c.length - 2; i++) {
 		const x = c[i]!, a = atr(c, i)
 		if (!a) continue
 		const left = c.slice(i - 2, i), right = c.slice(i + 1, i + 3)
-		const known = c[i + 2]!.timestamp
+		const known = c[i + 2]!.timestamp + tfMs
 		const segment = eventSegment(events, i)
 		if (segment < 0) continue
 		if (left.every(v => x.low < v.low) && right.every(v => x.low < v.low)) out.push({ type: 'low', i, price: x.low, known, atr: a, segment })
@@ -109,28 +144,37 @@ function pivots(c: Candle[], events: StructureEvent[]): Pivot[] {
 
 /** Existing BTC visual-calibration geometry. No new boundary coefficient. */
 function calibratedFar(direction: 'long' | 'short', near: number, a: number): number {
-	return direction === 'long' ? near - a : near + 0.5 * a
+	return direction === 'long' ? near - LIQUIDITY_POI_CONFIG.fallbackLongAtr * a : near + LIQUIDITY_POI_CONFIG.fallbackShortAtr * a
 }
 
-const LIQ_FAR_LOOKBACK_ATR = 2.0
-const LIQ_FAR_MIN_WEIGHT = 0.4
-
-/** v1.0: граница far по реальным heatmap-пулам (каузально: только пулы, существовавшие и ещё не снятые на knownAt). Fallback — старая ATR-геометрия. */
+/**
+ * v1.1: граница far по реальным heatmap-пулам с КАУЗАЛЬНЫМ весом — ранг по notional среди пулов,
+ * живых на момент рождения зоны (та же кривая (rank/count)^gamma, что в heatmap). Глобальный вес
+ * из движка heatmap ранжируется по всей загруженной истории, включая будущие пулы: от него геометрия
+ * зон менялась в зависимости от limit (36% зон, в среднем 0.87 ATR). Fallback — старая ATR-геометрия.
+ */
 function liquidityFar(
 	direction: 'long' | 'short', near: number, a: number, knownAt: number, pools: LiquidityPool[] | undefined,
 ): { far: number; boundarySource: BoundarySource; liquidityBands: LiquidityBand[] } {
+	const cfg = LIQUIDITY_POI_CONFIG
 	const fallback = calibratedFar(direction, near, a)
-	if (!pools?.length) return { far: fallback, boundarySource: 'atr-calibration', liquidityBands: [] }
-	const lookback = a * LIQ_FAR_LOOKBACK_ATR
 	const side = direction === 'long' ? 'buy-side' : 'sell-side'
-	const alive = (p: LiquidityPool) => p.startAt <= knownAt && (p.sweptAt == null || p.sweptAt > knownAt)
-	const candidates = pools.filter(p => p.side === side && p.weight >= LIQ_FAR_MIN_WEIGHT && alive(p)
+	const lookback = a * cfg.farLookbackAtr
+	// Каузально живые пулы В ПОЛОСЕ ПОИСКА [near − lookback, near] (для шорта зеркально): ранг считается
+	// по локальной популяции, чтобы пулы из далёкой истории/других цен не сдвигали веса — иначе граница
+	// far менялась от того, сколько истории загружено.
+	const band = (pools ?? []).filter(p => p.side === side
+		&& p.startAt <= knownAt && (p.sweptAt == null || p.sweptAt > knownAt)
 		&& (direction === 'long'
 			? p.bandLow <= near && p.bandLow >= near - lookback
 			: p.bandHigh >= near && p.bandHigh <= near + lookback))
+	if (!band.length) return { far: fallback, boundarySource: 'atr-calibration', liquidityBands: [] }
+	const sorted = [...band].sort((x, y) => x.notional - y.notional)
+	const causalWeight = new Map(sorted.map((p, i) => [p, Math.pow((i + 1) / sorted.length, cfg.weightGamma)]))
+	const candidates = band.filter(p => causalWeight.get(p)! >= cfg.farMinWeight)
 	if (!candidates.length) return { far: fallback, boundarySource: 'atr-calibration', liquidityBands: [] }
 	const far = direction === 'long' ? Math.min(...candidates.map(p => p.bandLow)) : Math.max(...candidates.map(p => p.bandHigh))
-	const liquidityBands: LiquidityBand[] = candidates.map(p => ({ price: p.extremePrice, score: p.weight, touches: p.contributions }))
+	const liquidityBands: LiquidityBand[] = candidates.map(p => ({ price: p.extremePrice, score: causalWeight.get(p)!, touches: p.contributions }))
 	return { far, boundarySource: 'liquidity-cluster', liquidityBands }
 }
 
@@ -161,7 +205,10 @@ function structuralAnchors(c: Candle[], events: StructureEvent[], context: Liqui
 	for (const e of events.filter(x => x.type === 'choch')) {
 		const candidates = structure.filter(p => p.index < e.breachIndex && p.type === (e.direction === 'up' ? 'low' : 'high'))
 		const prevOpposite = [...events].reverse().find(x => x.confirmIndex < e.confirmIndex && x.direction !== e.direction)
-		const scoped = prevOpposite ? candidates.filter(p => p.index > prevOpposite.confirmIndex) : candidates
+		// SPEC §13: без подтверждённого предыдущего противоположного события начало leg неизвестно —
+		// кандидат ПРОПУСКАЕТСЯ (подставлять начало датасета запрещено, это баг v0.5.1).
+		if (!prevOpposite) continue
+		const scoped = candidates.filter(p => p.index > prevOpposite.confirmIndex)
 		if (!scoped.length) continue
 		const point = e.direction === 'up'
 			? scoped.reduce((a, b) => a.price < b.price ? a : b)
@@ -183,7 +230,7 @@ function localEqAnchors(ps: Pivot[]): Anchor[] {
 			const q = ps[j]!
 			if (used.has(j) || q.type !== p.type || q.segment !== p.segment) continue
 			const current = [...group.map(x => x.p.price), q.price]
-			if (Math.max(...current) - Math.min(...current) <= 0.25 * Math.max(p.atr, q.atr)) group.push({ p: q, j })
+			if (Math.max(...current) - Math.min(...current) <= LIQUIDITY_POI_CONFIG.eqClusterAtr * Math.max(p.atr, q.atr)) group.push({ p: q, j })
 		}
 		if (group.length < 2) continue
 		group.forEach(x => used.add(x.j))
@@ -202,6 +249,8 @@ function localEqAnchors(ps: Pivot[]): Anchor[] {
 
 function localSwingAnchors(c: Candle[], events: StructureEvent[], structure: StructurePoint[]): Anchor[] {
 	const grouped = new Map<number, StructurePoint[]>()
+	// §16.8: как и у pivots(), точка известна по ЗАКРЫТИЮ подтверждающего бара i+2, не по его open.
+	const tfMs = c.length > 1 ? c[1]!.timestamp - c[0]!.timestamp : 0
 	for (const point of structure) {
 		const segment = eventSegment(events, point.index)
 		if (segment < 0 || !c[point.index + 2]) continue
@@ -217,7 +266,7 @@ function localSwingAnchors(c: Candle[], events: StructureEvent[], structure: Str
 			const point = type === 'low'
 				? side.reduce((a, b) => a.price < b.price ? a : b)
 				: side.reduce((a, b) => a.price > b.price ? a : b)
-			const knownAt = c[point.index + 2]!.timestamp
+			const knownAt = c[point.index + 2]!.timestamp + tfMs
 			out.push({ id: `local-swing|${type}|${segment}|${point.index}`, direction: type === 'low' ? 'long' : 'short',
 				zoneClass: 'local-swing', i: point.index, knownAt, eventType: 'local-swing', pivots: [], segment,
 				supersededAt: null, invalidatedAt: null, active: true, retiredAt: null })
@@ -249,6 +298,7 @@ function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
 	const retireTimes = [a.retiredAt, b.retiredAt].filter((x): x is number => x != null)
 	const touchTimes = [a.firstTouchAt, b.firstTouchAt].filter((x): x is number => x != null)
 	const armedTimes = [a.armedAt, b.armedAt].filter((x): x is number => x != null)
+	const consumedTimes = [a.consumedAt, b.consumedAt].filter((x): x is number => x != null)
 	return {
 		...dominant,
 		id: `${LIQUIDITY_POI_VERSION}|area|${components.sort().join('+')}`,
@@ -263,7 +313,8 @@ function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
 		interaction: touchTimes.length ? 'touched' : 'untouched', touchCount: a.touchCount + b.touchCount,
 		armedAt: armedTimes.length ? Math.min(...armedTimes) : null,
 		firstTouchAt: touchTimes.length ? Math.min(...touchTimes) : null,
-		consumedAt: null, failedAt: null, invalidatedAt: null,
+		consumedAt: consumedTimes.length ? Math.min(...consumedTimes) : null,
+		failedAt: null, invalidatedAt: null, spentAt: null, spentReason: null,
 		retiredAt: retireTimes.length ? Math.min(...retireTimes) : null,
 		supersededAt: null, endAt: Math.max(a.endAt, b.endAt), mergedCount: components.length - 1,
 		suppressedCount: components.length - 1, segment: dominant.segment,
@@ -271,20 +322,24 @@ function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
 }
 
 function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
+	const cfg = LIQUIDITY_POI_CONFIG
+	const long = area.direction === 'long'
 	const start = c.findIndex(x => x.timestamp >= area.geometryKnownAt)
 	const lower = Math.min(area.near, area.far), upper = Math.max(area.near, area.far)
 	let armedAt = area.armedAt, firstTouchAt = area.firstTouchAt, touchCount = area.touchCount
-	let consumedAt: number | null = null, failedAt: number | null = null
+	let consumedAt: number | null = area.consumedAt, failedAt: number | null = null, spentAt: number | null = null
 	let inside = false
 	for (let i = Math.max(0, start); i < c.length; i++) {
 		const bar = c[i]!
 		if (area.retiredAt != null && bar.timestamp >= area.retiredAt) break
-		if (area.direction === 'long' ? bar.close < lower : bar.close > upper) {
+		// §14.6/§16.8: провал = close телом за дальней границей — единственная ценовая смерть зоны
+		// для всех классов (классовые правила смерти из §13.1/13.2 отменены решением №1).
+		if (long ? bar.close < lower : bar.close > upper) {
 			failedAt = bar.timestamp
 			break
 		}
 		if (armedAt == null) {
-			if (area.direction === 'long' ? bar.close > upper : bar.close < lower) armedAt = bar.timestamp
+			if (long ? bar.close > upper : bar.close < lower) armedAt = bar.timestamp
 			continue
 		}
 		const overlapsZone = bar.low <= upper && bar.high >= lower
@@ -293,22 +348,22 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 			firstTouchAt ??= bar.timestamp
 		}
 		inside = overlapsZone
-		const isLocalClass = area.zoneClass === 'local-eq' || area.zoneClass === 'local-swing'
-		const sweptNear = isLocalClass
-			? (area.direction === 'long' ? bar.low < area.near : bar.high > area.near)
-			: area.zoneClass === 'outer-swing'
-				? false
-				: (area.direction === 'long' ? bar.close < area.near : bar.close > area.near)
-		if (sweptNear) {
-			consumedAt = bar.timestamp
+		// §16.8: использованность — информационная пометка для карты (первый фитиль сквозь near
+		// после взведения, одинаково для всех классов), окно торговли она НЕ закрывает.
+		if (consumedAt == null && (long ? bar.low < area.near : bar.high > area.near)) consumedAt = bar.timestamp
+		// §16.8 «зона отработала» (ran-away): после касания цена ушла от near в сторону реакции
+		// на spentDistanceAtr×ATR по close — дальше её не торгуем («поезд уехал, ждём ниже»).
+		if (touchCount > 0 && !overlapsZone
+			&& (long ? bar.close >= area.near + cfg.spentDistanceAtr * area.atr : bar.close <= area.near - cfg.spentDistanceAtr * area.atr)) {
+			spentAt = bar.timestamp
 			break
 		}
 	}
 	const terminal = [
 		failedAt == null ? null : { state: 'failed' as const, at: failedAt },
-		consumedAt == null ? null : { state: 'consumed' as const, at: consumedAt },
+		spentAt == null ? null : { state: 'spent' as const, at: spentAt },
 		area.retiredAt == null ? null : { state: 'retired' as const, at: area.retiredAt },
-	].filter((x): x is { state: 'failed' | 'consumed' | 'retired'; at: number } => x != null)
+	].filter((x): x is { state: 'failed' | 'spent' | 'retired'; at: number } => x != null)
 		.sort((a, b) => a.at - b.at)[0]
 	const current = c.at(-1)!
 	const inPlay = armedAt != null && (current.low <= upper && current.high >= lower)
@@ -320,8 +375,10 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 	const valid = terminal == null && armedAt != null
 	return {
 		...area, lifecycleState, valid, armedAt, firstTouchAt, touchCount, interaction,
-		consumedAt: terminal?.state === 'consumed' ? terminal.at : null,
+		consumedAt,
 		failedAt: terminal?.state === 'failed' ? terminal.at : null,
+		spentAt: terminal?.state === 'spent' ? terminal.at : null,
+		spentReason: terminal?.state === 'spent' ? 'ran-away' : null,
 		invalidatedAt: terminal?.state === 'failed' ? terminal.at : null,
 		endAt: terminal?.at ?? current.timestamp,
 	}
@@ -345,7 +402,13 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
 		let area = evaluateArea(source, c)
 		if (isOpen(area)) {
 			for (;;) {
-				const index = areas.findIndex(x => isOpen(x) && x.direction === area.direction && x.zoneClass === area.zoneClass && overlaps(x, area))
+				// §16.8 (решение №7): склейка перекрывающихся ОТКРЫТЫХ зон одной стороны независимо
+				// от класса — торгово это одна зона/одна позиция; классы компонентов сохраняются в
+				// componentClasses. Склейка по пересечению времени жизни (а не «обе ещё открыты»)
+				// проверена и ОТКЛОНЕНА: цепочки поглощений строят мега-зоны через месяцы, а каждое
+				// поглощение сдвигает geometryKnownAt вперёд и съедает торговое окно подтверждения.
+				// Историческая дедупликация умерших дублей — отдельное открытое решение (§16.8).
+				const index = areas.findIndex(x => isOpen(x) && x.direction === area.direction && overlaps(x, area))
 				if (index < 0) break
 				area = evaluateArea(mergeArea(areas.splice(index, 1)[0]!, area), c)
 			}
@@ -360,7 +423,7 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
 	}
 	// При равной дистанции (перекрывающиеся зоны с общей near-границей) nearest получает
 	// зона с реальной ликвидностью на far-границе, затем более старший класс зоны.
-	const nearestPick = (a: LiquidityPoiCandidate, b: LiquidityPoiCandidate) =>
+	const nearestPick = (a: AreaCandidate, b: AreaCandidate) =>
 		distance(a) - distance(b)
 		|| Number(b.boundarySource === 'liquidity-cluster') - Number(a.boundarySource === 'liquidity-cluster')
 		|| classRank(b.zoneClass) - classRank(a.zoneClass)
@@ -398,7 +461,7 @@ export function detectLiquidityPoi(c: Candle[], events: StructureEvent[] = [], c
 			pivotTimes: x.pivots.length ? x.pivots.map(v => c[v.i]!.timestamp) : [candle.timestamp], eventType: x.eventType,
 			pdZone: pd.pdZone, pdAligned: pd.pdAligned, lifecycleState: 'forming', valid: false, active: false,
 			priority: 'secondary', interaction: 'untouched', touchCount: 0, armedAt: null, firstTouchAt: null,
-			consumedAt: null, failedAt: null, retiredAt: x.retiredAt, lineageSupersededAt: x.supersededAt,
+			consumedAt: null, failedAt: null, spentAt: null, spentReason: null, retiredAt: x.retiredAt, lineageSupersededAt: x.supersededAt,
 			supersededAt: null, invalidatedAt: null, endAt: c.at(-1)!.timestamp, mergedCount: 0, suppressedCount: 0,
 			segment: x.segment })
 	}
