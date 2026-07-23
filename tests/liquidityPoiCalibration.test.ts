@@ -10,7 +10,7 @@ const candles = (n=40): Candle[] => Array.from({length:n},(_,i)=>({
 }))
 
 it('liquidity POI has a frozen non-trading structural-area version',()=>{
- assert.equal(LIQUIDITY_POI_VERSION,'liquidity-poi-1.3-stack-far')
+ assert.equal(LIQUIDITY_POI_VERSION,'liquidity-poi-1.4-overlap-dedup')
  assert.deepEqual(detectLiquidityPoi([]),[])
 })
 

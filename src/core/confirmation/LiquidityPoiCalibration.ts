@@ -4,7 +4,7 @@ import type { StructurePoint } from '../../models/structure/StructurePoint.js'
 import type { ProtectedLevelLifecycle } from '../../models/structure/ProtectedLevelLifecycle.js'
 import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.3-stack-far'
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.4-overlap-dedup'
 
 /**
  * Все константы POI-движка (§16.8). Значения согласованы 23.07.2026; менять только по итогам
@@ -30,6 +30,8 @@ export const LIQUIDITY_POI_CONFIG = {
 	dupNearAtr: 0.25,
 	/** §16.10: расширение far по стеку — следующий пул присоединяется, если разрыв до него ≤ этой доли ATR. */
 	stackGapAtr: 0.5,
+	/** §16.11: дубль и по перекрытию — диапазоны одной стороны пересекаются на эту долю меньшей зоны. */
+	dupOverlapShare: 0.6,
 	/** §16.10: потолок ширины зоны при стековом расширении, в ATR — лестница ликвидаций непрерывна
 	 * почти всегда (без потолка far одной зоны утаскивало на +128% от цены). */
 	stackMaxAtr: 6.0,
@@ -462,8 +464,15 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
 		for (const junior of bySeniority) {
 			if (junior === senior || junior.duplicateOf != null) continue
 			if (junior.direction !== senior.direction) continue
-			if (Math.abs(junior.near - senior.near) > LIQUIDITY_POI_CONFIG.dupNearAtr * senior.atr) continue
 			if (!(senior.knownAt < junior.endAt && junior.knownAt < senior.endAt)) continue
+			// §16.11: дубль по близости near ИЛИ по перекрытию диапазонов (двум зонам с near чуть
+			// выше/чуть ниже нечего делать порознь — QA: «два стопа по факту в одной зоне»).
+			const nearDup = Math.abs(junior.near - senior.near) <= LIQUIDITY_POI_CONFIG.dupNearAtr * senior.atr
+			const sLo = Math.min(senior.near, senior.far), sHi = Math.max(senior.near, senior.far)
+			const jLo = Math.min(junior.near, junior.far), jHi = Math.max(junior.near, junior.far)
+			const overlap = Math.min(sHi, jHi) - Math.max(sLo, jLo)
+			const overlapDup = overlap > 0 && overlap >= LIQUIDITY_POI_CONFIG.dupOverlapShare * Math.min(sHi - sLo, jHi - jLo)
+			if (!nearDup && !overlapDup) continue
 			junior.duplicateOf = senior.id
 			senior.suppressedCount += 1
 		}
