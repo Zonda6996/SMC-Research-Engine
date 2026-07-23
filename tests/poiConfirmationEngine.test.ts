@@ -54,7 +54,7 @@ const mirror = (bars: Candle[]): Candle[] => bars.map(b => ({
 }))
 
 it('версия заморожена; пустой вход — пустой выход', () => {
-	assert.equal(POI_CONFIRMATION_VERSION, 'poi-confirmation-1.4-unswept-anchor')
+	assert.equal(POI_CONFIRMATION_VERSION, 'poi-confirmation-1.5-persistent-sweep')
 	assert.deepEqual(detectPoiConfirmation([], []), [])
 })
 
@@ -207,7 +207,7 @@ it('§16.9: после свипа якорь потрачен — новый к�
 	assert.equal(stop2!.price, 94.4) // не 93.7: выметенный экстремум не возвращается
 })
 
-it('защита (решение №12): две close ниже лоя, но внутри зоны → перезапуск, затем вход', () => {
+it('§16.10: потеря защиты внутри зоны → якорь глубже (ANCHOR_DEEPENED), пересвип без новой остановки → вход', () => {
 	const ltf: Candle[] = [
 		...baseline(7, 0, 110),
 		{ timestamp: 7, open: 105, high: 106, low: 95, close: 96, volume: 10 },
@@ -246,7 +246,12 @@ it('защита (решение №12): две close ниже лоя, но вн
 	assert.ok(result)
 	assert.equal(result!.attempts.length, 1)
 	const attempt = result!.attempts[0]!
-	assert.ok(attempt.trace.some(t => t.state === 'RESTART'))
+	assert.ok(attempt.trace.some(t => t.state === 'ANCHOR_DEEPENED'))
+	assert.ok(!attempt.trace.some(t => t.state === 'RESTART'))
+	// После переноса якоря НЕ требуется новая остановка/отскок — следующий пересвип идёт сразу.
+	const deepenIdx = attempt.trace.findIndex(t => t.state === 'ANCHOR_DEEPENED')
+	const after = attempt.trace.slice(deepenIdx + 1).map(t => t.state)
+	assert.ok(!after.includes('STOP_CONFIRMED') && !after.includes('REBOUND'))
 	assert.equal(attempt.status, 'entered')
 })
 
@@ -312,6 +317,84 @@ it('отмена входа (решение №3): риск больше entryMa
 	assert.ok(attempt.trace.some(t => t.state === 'ENTRY_CANCELLED'))
 	assert.ok(attempt.trace.every(t => t.state !== 'ENTRY'))
 	assert.equal(attempt.status, 'rejected')
+})
+
+it('§16.10: попытка с состоявшимся пересвипом доигрывается за концом окна зоны', () => {
+	// Окно зоны кончается на t21 (после пересвипа t19 и защиты t20, ДО входа t23) —
+	// попытка доигрывается до входа и тейка, новые касания после окна не стартуют.
+	const ltf: Candle[] = [...baseline(7, 0, 110), ...fullLongSequence(0)]
+	const poi = makePoi({ endAt: 21 })
+	const [result] = detectPoiConfirmation([poi], ltf)
+	assert.ok(result)
+	assert.equal(result!.attempts.length, 1)
+	assert.equal(result!.attempts[0]!.status, 'entered')
+	assert.equal(result!.attempts[0]!.outcome, 'tp')
+})
+
+it('§16.10: попытка БЕЗ пересвипа обрезается концом окна зоны (zone-ended)', () => {
+	// Окно кончается на t15 — пересвип (t19) ещё не случился → попытка обрезана.
+	const ltf: Candle[] = [...baseline(7, 0, 110), ...fullLongSequence(0)]
+	const poi = makePoi({ endAt: 15 })
+	const [result] = detectPoiConfirmation([poi], ltf)
+	assert.ok(result)
+	assert.equal(result!.attempts.length, 1)
+	assert.equal(result!.attempts[0]!.status, 'rejected')
+	assert.equal(result!.attempts[0]!.rejectionReason, 'zone-ended')
+})
+
+it('§16.10: тест слабости и отмена входа не продлевают попытку — смерть по бездействию после защиты', () => {
+	const ltf: Candle[] = [
+		...baseline(7, 0, 110),
+		...fullLongSequence(0).slice(0, 15),                                          // t7..t21: до импульса
+		{ timestamp: 22, open: 96, high: 96.3, low: 95, close: 95.3, volume: 5 },     // откатная
+		{ timestamp: 23, open: 95.3, high: 115, low: 95.2, close: 114, volume: 15 },  // возобновление-монстр → отмена (не событие для idle)
+		...baseline(130, 24, 114, 0.2),                                               // тишина: смерть через 96 баров после ЗАЩИТЫ (t20)
+	]
+	const poi = makePoi()
+	const [result] = detectPoiConfirmation([poi], ltf)
+	assert.ok(result)
+	const attempt = result!.attempts[0]!
+	assert.ok(attempt.trace.some(t => t.state === 'ENTRY_CANCELLED'))
+	assert.equal(attempt.status, 'rejected')
+	assert.equal(attempt.rejectionReason, 'timeout@entry')
+})
+
+it('§16.10: стоп за историческим экстремумом окна, если тот глубже свип-экстремума в пределах 0.5 ATR', () => {
+	// Попытка 1 свипает 93.7 (исторический экстремум окна) и умирает без входа; попытка 2 свипает
+	// только 94.25 — стоп ставится за 93.7 (структура), а не за фитилём 94.25.
+	const ltf: Candle[] = [
+		...baseline(7, 0, 110),
+		...fullLongSequence(0).slice(0, 12),                                              // t7..t18: лой 94, остановка, отскок
+		{ timestamp: 19, open: 97, high: 97.2, low: 93.7, close: 94.5, volume: 10 },      // пересвип 93.7 + защита той же свечой
+		{ timestamp: 20, open: 94.5, high: 96, low: 94.4, close: 95.8, volume: 10 },
+		{ timestamp: 21, open: 95.8, high: 101, low: 95.7, close: 100.8, volume: 10 },    // импульс вон из зоны
+		...baseline(97, 22, 103, 0.4),                                                    // бездействие → попытка 1 умирает
+		// Заход №2: лой 94.3, остановка, отскок, пересвип 94.25 (94.4-пост-свиповый pending) — исторический 93.7 в 0.55 от свипа при ATR~1.2
+		{ timestamp: 119, open: 103, high: 103.2, low: 94.3, close: 95, volume: 10 },     // заход №2 (лой 94.3 < pending 94.4)
+		{ timestamp: 120, open: 95, high: 95.6, low: 94.5, close: 95.2, volume: 10 },
+		{ timestamp: 121, open: 95.2, high: 95.8, low: 94.6, close: 95, volume: 10 },
+		{ timestamp: 122, open: 95, high: 95.7, low: 94.5, close: 95.4, volume: 10 },
+		{ timestamp: 123, open: 95.4, high: 96, low: 94.8, close: 95.7, volume: 10 },     // остановка (тихо 4 бара)
+		{ timestamp: 124, open: 95.7, high: 96.2, low: 95, close: 95.9, volume: 10 },
+		{ timestamp: 125, open: 95.9, high: 96.4, low: 95.1, close: 96.1, volume: 10 },
+		{ timestamp: 126, open: 96.1, high: 96.5, low: 95.3, close: 96.3, volume: 10 },
+		{ timestamp: 127, open: 96.3, high: 96.6, low: 95.4, close: 96.2, volume: 10 },
+		{ timestamp: 128, open: 96.2, high: 96.7, low: 95.5, close: 96.4, volume: 10 },
+		{ timestamp: 129, open: 96.4, high: 96.8, low: 95.6, close: 96.5, volume: 10 },   // отскок (6 баров)
+		{ timestamp: 130, open: 96.5, high: 96.6, low: 94.25, close: 94.8, volume: 10 },  // пересвип 94.25 (близко к 93.7)
+		{ timestamp: 131, open: 94.8, high: 95.8, low: 94.6, close: 95.5, volume: 12 },   // защита + импульс
+		{ timestamp: 132, open: 95.5, high: 95.7, low: 94.9, close: 95.1, volume: 5 },    // откатная
+		{ timestamp: 133, open: 95.1, high: 95.5, low: 95, close: 95.4, volume: 15 },     // возобновление → вход
+		{ timestamp: 134, open: 95.6, high: 101, low: 95.3, close: 100.5, volume: 10 },
+	]
+	const poi = makePoi()
+	const [result] = detectPoiConfirmation([poi], ltf)
+	assert.ok(result)
+	const second = result!.attempts[1]
+	assert.ok(second)
+	assert.equal(second!.status, 'entered')
+	// Стоп ниже исторического 93.7 (за структурой), а не сразу под свипом 94.25.
+	assert.ok(second!.stop! < 93.7)
 })
 
 it('пометка «пришли на объёме»: объём HTF-бара захода против SMA20 предыдущих (диагностика, не фильтр)', () => {

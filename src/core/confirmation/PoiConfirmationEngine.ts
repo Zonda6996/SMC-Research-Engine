@@ -3,15 +3,17 @@ import type { LiquidityPoiCandidate } from './LiquidityPoiCalibration.js'
 
 // SPEC §16.8/§16.9: ЕДИНАЯ последовательность подтверждения для всех зон, ведомая от POI-зон v1.2.
 // Окно торговли зоны = [max(knownAt, geometryKnownAt), endAt) из POI-движка (провал/отставка/отработка).
-// v1.4 (§16.9, по визуальному QA):
-//  - якорь пересвипа = самый глубокий НЕВЫМЕТЕННЫЙ экстремум зоны (стопы ритейла всё ещё за ним);
-//    после свипа он «потрачен», новый копится с этого момента;
-//  - проторговка против спама: остановка и отскок требуют ВРЕМЕНИ без обновления экстремума
-//    (раньше медиана обоих была 1 бар — машина работала на скорости свечного шума);
-//  - таймаут по бездействию: попытка умирает после N баров БЕЗ событий, а не по будильнику от касания
-//    (реальный пересвип приходил через 1 бар после смерти по старому таймауту).
+// v1.4 (§16.9): невыметенный якорь, проторговка (остановка/отскок требуют времени), таймаут по бездействию.
+// v1.5 (§16.10, по второму визуальному QA):
+//  - потеря защиты (две close за якорем внутри зоны) больше НЕ перезапускает остановку/отскок:
+//    якорь переносится на новый экстремум и попытка ждёт его пересвип (ANCHOR_DEEPENED);
+//  - тест слабости и отмена входа не продлевают жизнь попытки (idle-таймер не сбрасывают);
+//  - попытка с состоявшимся пересвипом ДОИГРЫВАЕТСЯ за концом окна зоны (как позиция за endAt):
+//    окно нужно для поиска сетапа, а не для обрыва его развязки;
+//  - стоп ставится за историческим экстремумом окна, если тот глубже свип-экстремума в пределах
+//    stopLookbehindAtr (кейс: стоп 74206.38 под фитилём при историческом лое 74203.6 — рынок добрал и развернул).
 // Fallback-зоны (far не от реальной ликвидности) и near-дубли (duplicateOf) не торгуются.
-export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.4-unswept-anchor'
+export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.5-persistent-sweep'
 
 /**
  * Все константы движка подтверждения (§16.8/§16.9). Значения согласованы 23.07.2026;
@@ -34,8 +36,10 @@ export const POI_CONFIRMATION_CONFIG = {
 	attemptIdleBars: 96,
 	/** Отмена входа: риск (вход→стоп) больше этого числа ATR — вход пропускается, попытка продолжается. */
 	entryMaxRiskAtr: 1.5,
-	/** Столько подряд close за лоем попытки: внутри зоны → перезапуск от нового экстремума, за far → отбраковка. */
+	/** Столько подряд close за лоем попытки: внутри зоны → якорь глубже (ждём новый пересвип), за far → отбраковка. */
 	failedProtectionCloses: 2,
+	/** §16.10: стоп ставится за историческим экстремумом окна, если тот глубже свип-экстремума в пределах этой доли ATR. */
+	stopLookbehindAtr: 0.5,
 	/** SMA объёма за N баров ТФ зоны для пометки «пришли на объёме» (диагностика, НЕ фильтр). */
 	arrivalVolumeSma: 20,
 } as const
@@ -145,8 +149,10 @@ function runAttempt(
 	let impulseSeen = false
 	const beyondLow = (v: number) => (long ? v < low : v > low)
 	const closeBeyondFar = (c: Candle) => (long ? c.close < zoneLo : c.close > zoneHi)
-	const mark = (j: number, state: string, extra: Omit<ConfirmationTrace, 'state' | 'at'> = {}) => {
-		lastEventBar = j
+	// §16.10: тест слабости и отмена входа НЕ продлевают жизнь попытки (refreshIdle=false) —
+	// иначе растущий рынок бесконечно кормил попытку слабыми тестами (кейс: 4 дня, 33 отмены).
+	const mark = (j: number, state: string, extra: Omit<ConfirmationTrace, 'state' | 'at'> = {}, refreshIdle = true) => {
+		if (refreshIdle) lastEventBar = j
 		attempt.trace.push({ state, at: ltf[j]!.timestamp, ...extra })
 	}
 	const reject = (reason: string, nextCursor: number) => {
@@ -176,7 +182,11 @@ function runAttempt(
 		return false
 	}
 
-	for (let j = touch; j < endIndex; j++) {
+	let sweepHappened = false
+	for (let j = touch; j < ltf.length; j++) {
+		// §16.10: конец окна зоны обрывает только попытку БЕЗ состоявшегося пересвипа. Попытка,
+		// чей свип уже случился, доигрывается до входа/отказа (как позиция доигрывается за endAt).
+		if (j >= endIndex && !sweepHappened) return reject('zone-ended', endIndex)
 		// §16.9: смерть по бездействию — столько баров подряд без единого события трейса.
 		if (j - lastEventBar >= cfg.attemptIdleBars) return reject(`timeout@${stage}`, j)
 		const c = ltf[j]!
@@ -216,6 +226,7 @@ function runAttempt(
 		if (stage === 'sweep') {
 			if (beyondLow(long ? c.low : c.high)) {
 				sweepExtreme = long ? c.low : c.high
+				sweepHappened = true
 				attempt.stopLevel = low
 				attempt.sweptZoneExtreme = long ? sweepExtreme <= windowExtremeBefore : sweepExtreme >= windowExtremeBefore
 				mark(j, 'SECOND_SWEEP', { price: sweepExtreme })
@@ -229,10 +240,17 @@ function runAttempt(
 		if (stage === 'protect') {
 			sweepExtreme = long ? Math.min(sweepExtreme, c.low) : Math.max(sweepExtreme, c.high)
 			if (!protectOn(j, c) && belowCloses >= cfg.failedProtectionCloses) {
-				// Решение №12: две close за лоем, но внутри зоны → строим дальше от нового экстремума;
 				// close за дальней границей → пробой организован, попытка отбраковывается.
 				if (closeBeyondFar(c)) return reject('broke-below-zone', j + 1)
-				restart(j, sweepExtreme)
+				// §16.10: потеря защиты внутри зоны — якорь переносится на новый экстремум, и попытка
+				// ждёт ЕГО пересвип. Остановка и отскок уже были — не перезапускаем их (раньше полный
+				// RESTART сжигал идеальные пересвипы: спайк не засчитывался, пока машина заново ждала
+				// остановку и отскок).
+				low = sweepExtreme
+				stage = 'sweep'
+				belowCloses = 0
+				impulseSeen = false
+				mark(j, 'ANCHOR_DEEPENED', { price: low })
 			}
 			continue
 		}
@@ -241,6 +259,7 @@ function runAttempt(
 		if (beyondLow(long ? c.low : c.high) && (long ? c.low < sweepExtreme : c.high > sweepExtreme)) {
 			// Более глубокий пересвип до входа — не смерть: защита проверяется заново (§16.8).
 			sweepExtreme = long ? c.low : c.high
+			sweepHappened = true
 			attempt.sweptZoneExtreme = long ? sweepExtreme <= windowExtremeBefore : sweepExtreme >= windowExtremeBefore
 			mark(j, 'SECOND_SWEEP', { price: sweepExtreme })
 			stage = 'protect'
@@ -258,14 +277,20 @@ function runAttempt(
 			const prev = ltf[j - 1]
 			if (impulseSeen && prev && counterBar(prev, long) && c.volume > prev.volume) {
 				// Тест слабости пройден: объём свечи возобновления ВЫШЕ объёма последней откатной (50 > 40).
-				mark(j, 'WEAKNESS_TEST', { volume: prev.volume, volumeRatio: prev.volume > 0 ? c.volume / prev.volume : 0 })
+				mark(j, 'WEAKNESS_TEST', { volume: prev.volume, volumeRatio: prev.volume > 0 ? c.volume / prev.volume : 0 }, false)
 				attempt.trace.at(-1)!.at = prev.timestamp
 				const a = atr(ltf, j)
-				const stop = long ? sweepExtreme - cfg.stopBufferAtr * a : sweepExtreme + cfg.stopBufferAtr * a
+				// §16.10: если исторический экстремум окна глубже свип-экстремума в пределах
+				// stopLookbehindAtr — стоп за НИМ (за структурой, а не за фитилём).
+				const hist = windowExtreme.value
+				const stopAnchor = long
+					? (Number.isFinite(hist) && hist < sweepExtreme && sweepExtreme - hist <= cfg.stopLookbehindAtr * a ? hist : sweepExtreme)
+					: (Number.isFinite(hist) && hist > sweepExtreme && hist - sweepExtreme <= cfg.stopLookbehindAtr * a ? hist : sweepExtreme)
+				const stop = long ? stopAnchor - cfg.stopBufferAtr * a : stopAnchor + cfg.stopBufferAtr * a
 				const risk = Math.abs(c.close - stop)
 				if (a && risk > cfg.entryMaxRiskAtr * a) {
 					// Решение №3: цена уже убежала — вход отменяется, попытка ждёт следующий тест ближе.
-					mark(j, 'ENTRY_CANCELLED', { price: c.close })
+					mark(j, 'ENTRY_CANCELLED', { price: c.close }, false)
 					continue
 				}
 				attempt.status = 'entered'
@@ -300,7 +325,8 @@ function runAttempt(
 			impulseSeen = true
 		}
 	}
-	return reject('zone-ended', endIndex)
+	// Данные кончились: попытка без свипа за окном зоны отвалилась бы выше; со свипом — живёт у края.
+	return reject(sweepHappened ? 'data-end' : 'zone-ended', Math.max(endIndex, ltf.length))
 }
 
 /**

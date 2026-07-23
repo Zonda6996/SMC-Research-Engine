@@ -4,7 +4,7 @@ import type { StructurePoint } from '../../models/structure/StructurePoint.js'
 import type { ProtectedLevelLifecycle } from '../../models/structure/ProtectedLevelLifecycle.js'
 import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.2-deduped'
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-1.3-stack-far'
 
 /**
  * Все константы POI-движка (§16.8). Значения согласованы 23.07.2026; менять только по итогам
@@ -28,6 +28,11 @@ export const LIQUIDITY_POI_CONFIG = {
 	fallbackShortAtr: 0.5,
 	/** §16.9: near-дубль — зона той же стороны с near в пределах этой доли ATR и пересекающимся окном. */
 	dupNearAtr: 0.25,
+	/** §16.10: расширение far по стеку — следующий пул присоединяется, если разрыв до него ≤ этой доли ATR. */
+	stackGapAtr: 0.5,
+	/** §16.10: потолок ширины зоны при стековом расширении, в ATR — лестница ликвидаций непрерывна
+	 * почти всегда (без потолка far одной зоны утаскивало на +128% от цены). */
+	stackMaxAtr: 6.0,
 } as const
 
 /** §16.9: local-swing удалён (мелкие зоны без ликвидности от каждого внутреннего колена). */
@@ -85,7 +90,7 @@ export interface LiquidityPoiCandidate {
 	retiredAt: number | null
 	/** «Зона отработала»: цена ушла от near в сторону реакции на spentDistanceAtr×ATR по 4h close после касания. */
 	spentAt: number | null
-	spentReason: 'ran-away' | null
+	spentReason: 'ran-away' | 'swept-through' | null
 	/** §16.9: near-дубль старшей зоны — подавлена, не торгуется и не показывается; геометрия не мутирует. */
 	duplicateOf: string | null
 	geometryKnownAt: number
@@ -111,8 +116,10 @@ interface Anchor {
 	invalidatedAt: number | null
 	active: boolean
 	retiredAt: number | null
+	/** §16.10: противоположный CHoCH — условная отставка (только для уже тронутой зоны). */
+	oppositeChochAt?: number | null
 }
-interface AreaCandidate extends LiquidityPoiCandidate { segment: number }
+interface AreaCandidate extends LiquidityPoiCandidate { segment: number; oppositeChochAt: number | null }
 
 function atr(c: Candle[], i: number, n = LIQUIDITY_POI_CONFIG.atrPeriod): number {
 	let sum = 0, count = 0
@@ -178,8 +185,33 @@ function liquidityFar(
 	const causalWeight = new Map(sorted.map((p, i) => [p, Math.pow((i + 1) / sorted.length, cfg.weightGamma)]))
 	const candidates = band.filter(p => causalWeight.get(p)! >= cfg.farMinWeight)
 	if (!candidates.length) return { far: fallback, boundarySource: 'atr-calibration', liquidityBands: [] }
-	const far = direction === 'long' ? Math.min(...candidates.map(p => p.bandLow)) : Math.max(...candidates.map(p => p.bandHigh))
-	const liquidityBands: LiquidityBand[] = candidates.map(p => ({ price: p.extremePrice, score: causalWeight.get(p)!, touches: p.contributions }))
+	let far = direction === 'long' ? Math.min(...candidates.map(p => p.bandLow)) : Math.max(...candidates.map(p => p.bandHigh))
+	// §16.10: far тянется по СТЕКУ — пока живые пулы продолжаются (перекрытие или разрыв ≤ stackGapAtr),
+	// граница углубляется за пределы стартовой полосы поиска. «Конец кластеров ликвидности» из §12.1
+	// буквально: жёсткое окно 2 ATR обрезало жирные полки (кейс 67255: стек до 70022 резался на 68366).
+	const aliveAll = (pools ?? []).filter(p => p.side === side
+		&& p.startAt <= knownAt && (p.sweptAt == null || p.sweptAt > knownAt))
+	const stack = new Set(candidates)
+	const farLimit = direction === 'long' ? near - cfg.stackMaxAtr * a : near + cfg.stackMaxAtr * a
+	// §16.10: расширение тянется только к пулам НЕ СЛАБЕЕ медианы базовых — стек идёт к жирным
+	// полкам за стартовой полосой, а не ползёт по шумовой лестнице ликвидаций до потолка.
+	const sortedBase = candidates.map(p => p.notional).sort((x, y) => x - y)
+	const baseMedian = sortedBase[Math.floor(sortedBase.length / 2)]!
+	for (;;) {
+		const next = aliveAll.filter(p => !stack.has(p) && p.notional >= baseMedian
+			&& (direction === 'long'
+				? p.bandHigh >= far - cfg.stackGapAtr * a && p.bandLow < far && p.bandLow >= farLimit
+				: p.bandLow <= far + cfg.stackGapAtr * a && p.bandHigh > far && p.bandHigh <= farLimit))
+		if (!next.length) break
+		for (const p of next) stack.add(p)
+		far = direction === 'long'
+			? Math.min(far, ...next.map(p => p.bandLow))
+			: Math.max(far, ...next.map(p => p.bandHigh))
+	}
+	// Вес для отображения — каузальный ранг внутри итогового стека.
+	const stackSorted = [...stack].sort((x, y) => x.notional - y.notional)
+	const stackWeight = new Map(stackSorted.map((p, i) => [p, Math.pow((i + 1) / stackSorted.length, cfg.weightGamma)]))
+	const liquidityBands: LiquidityBand[] = [...stack].map(p => ({ price: p.extremePrice, score: stackWeight.get(p)!, touches: p.contributions }))
 	return { far, boundarySource: 'liquidity-cluster', liquidityBands }
 }
 
@@ -277,6 +309,7 @@ function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
 	const touchTimes = [a.firstTouchAt, b.firstTouchAt].filter((x): x is number => x != null)
 	const armedTimes = [a.armedAt, b.armedAt].filter((x): x is number => x != null)
 	const consumedTimes = [a.consumedAt, b.consumedAt].filter((x): x is number => x != null)
+	const chochTimes = [a.oppositeChochAt, b.oppositeChochAt].filter((x): x is number => x != null)
 	return {
 		...dominant,
 		id: `${LIQUIDITY_POI_VERSION}|area|${components.sort().join('+')}`,
@@ -294,6 +327,7 @@ function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
 		consumedAt: consumedTimes.length ? Math.min(...consumedTimes) : null,
 		failedAt: null, invalidatedAt: null, spentAt: null, spentReason: null, duplicateOf: null,
 		retiredAt: retireTimes.length ? Math.min(...retireTimes) : null,
+		oppositeChochAt: chochTimes.length ? Math.min(...chochTimes) : null,
 		supersededAt: null, endAt: Math.max(a.endAt, b.endAt), mergedCount: components.length - 1,
 		suppressedCount: 0, segment: dominant.segment,
 	}
@@ -302,18 +336,34 @@ function mergeArea(a: AreaCandidate, b: AreaCandidate): AreaCandidate {
 function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 	const cfg = LIQUIDITY_POI_CONFIG
 	const long = area.direction === 'long'
+	const tfMs = c.length > 1 ? c[1]!.timestamp - c[0]!.timestamp : 0
 	const start = c.findIndex(x => x.timestamp >= area.geometryKnownAt)
 	const lower = Math.min(area.near, area.far), upper = Math.max(area.near, area.far)
 	let armedAt = area.armedAt, firstTouchAt = area.firstTouchAt, touchCount = area.touchCount
 	let consumedAt: number | null = area.consumedAt, failedAt: number | null = null, spentAt: number | null = null
+	let spentKind: 'ran-away' | 'swept-through' | null = null
+	let chochRetiredAt: number | null = null
 	let inside = false
 	for (let i = Math.max(0, start); i < c.length; i++) {
 		const bar = c[i]!
 		if (area.retiredAt != null && bar.timestamp >= area.retiredAt) break
-		// §14.6/§16.8: провал = close телом за дальней границей — единственная ценовая смерть зоны
-		// для всех классов (классовые правила смерти из §13.1/13.2 отменены решением №1).
+		// §16.10: противоположный CHoCH ретирит только УЖЕ ТРОНУТУЮ зону. Нетронутый экстремум
+		// с живыми стопами структурный флип не хоронит — зона ждёт цену.
+		if (area.oppositeChochAt != null && bar.timestamp >= area.oppositeChochAt
+			&& firstTouchAt != null && firstTouchAt <= area.oppositeChochAt) {
+			chochRetiredAt = area.oppositeChochAt
+			break
+		}
+		// §14.6/§16.8: провал = close телом за дальней границей.
 		if (long ? bar.close < lower : bar.close > upper) {
 			failedAt = bar.timestamp
+			break
+		}
+		// §16.10: проход НАСКВОЗЬ — фитиль за far — весь стек снят, зона отработана (swept-through).
+		// Момент известен на закрытии бара прохода (+tfMs): подтверждение доигрывает сам бар прохода.
+		if (long ? bar.low < lower : bar.high > upper) {
+			spentAt = bar.timestamp + tfMs
+			spentKind = 'swept-through'
 			break
 		}
 		if (armedAt == null) {
@@ -334,6 +384,7 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 		if (touchCount > 0 && !overlapsZone
 			&& (long ? bar.close >= area.near + cfg.spentDistanceAtr * area.atr : bar.close <= area.near - cfg.spentDistanceAtr * area.atr)) {
 			spentAt = bar.timestamp
+			spentKind = 'ran-away'
 			break
 		}
 	}
@@ -341,6 +392,7 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 		failedAt == null ? null : { state: 'failed' as const, at: failedAt },
 		spentAt == null ? null : { state: 'spent' as const, at: spentAt },
 		area.retiredAt == null ? null : { state: 'retired' as const, at: area.retiredAt },
+		chochRetiredAt == null ? null : { state: 'retired' as const, at: chochRetiredAt },
 	].filter((x): x is { state: 'failed' | 'spent' | 'retired'; at: number } => x != null)
 		.sort((a, b) => a.at - b.at)[0]
 	const current = c.at(-1)!
@@ -356,7 +408,8 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 		consumedAt,
 		failedAt: terminal?.state === 'failed' ? terminal.at : null,
 		spentAt: terminal?.state === 'spent' ? terminal.at : null,
-		spentReason: terminal?.state === 'spent' ? 'ran-away' : null,
+		spentReason: terminal?.state === 'spent' ? spentKind : null,
+		retiredAt: terminal?.state === 'retired' ? terminal.at : area.retiredAt,
 		invalidatedAt: terminal?.state === 'failed' ? terminal.at : null,
 		endAt: terminal?.at ?? current.timestamp,
 	}
@@ -367,10 +420,13 @@ function assignOuterRetirement(anchors: Anchor[], events: StructureEvent[], c: C
 	for (const x of outers) {
 		const opposite = events.find(e => e.type === 'choch' && e.confirmTimestamp > x.knownAt
 			&& e.direction === (x.direction === 'long' ? 'down' : 'up'))
-		const oppositeAt = opposite ? (c[opposite.confirmIndex + 1]?.timestamp ?? opposite.confirmTimestamp) : null
+		// §16.10: противоположный CHoCH — УСЛОВНАЯ отставка (применится в evaluateArea только к уже
+		// тронутой зоне). Нетронутый экстремум с живыми стопами структурный флип не хоронит
+		// (кейс 67255-68366: ретирнут при 0 касаний, над ним 11.5B живой ликвидности).
+		x.oppositeChochAt = opposite ? (c[opposite.confirmIndex + 1]?.timestamp ?? opposite.confirmTimestamp) : null
 		const nextExtreme = outers.find(y => y !== x && y.direction === x.direction && y.knownAt > x.knownAt
 			&& (x.direction === 'long' ? c[y.i]!.low < c[x.i]!.low : c[y.i]!.high > c[x.i]!.high))
-		x.retiredAt = [oppositeAt, nextExtreme?.knownAt].filter((v): v is number => v != null).sort((a, b) => a - b)[0] ?? null
+		x.retiredAt = nextExtreme?.knownAt ?? null
 	}
 }
 
@@ -460,9 +516,9 @@ export function detectLiquidityPoi(c: Candle[], events: StructureEvent[] = [], c
 			priority: 'secondary', interaction: 'untouched', touchCount: 0, armedAt: null, firstTouchAt: null,
 			consumedAt: null, failedAt: null, spentAt: null, spentReason: null, duplicateOf: null, retiredAt: x.retiredAt, lineageSupersededAt: x.supersededAt,
 			supersededAt: null, invalidatedAt: null, endAt: c.at(-1)!.timestamp, mergedCount: 0, suppressedCount: 0,
-			segment: x.segment })
+			segment: x.segment, oppositeChochAt: x.oppositeChochAt ?? null })
 	}
 	return consolidate(raw, c)
 		.sort((a, b) => Number(b.active) - Number(a.active) || Number(b.valid) - Number(a.valid) || b.geometryKnownAt - a.geometryKnownAt)
-		.map(({ segment: _segment, ...candidate }) => candidate)
+		.map(({ segment: _segment, oppositeChochAt: _choch, ...candidate }) => candidate)
 }
