@@ -4,7 +4,7 @@
 
 import { S } from '../lib/state.mjs'
 import { $, esc, fmtP, fmtN, dt, time, LIFE_RU, SPENT_RU, PRIO_RU, INTER_RU } from '../lib/format.mjs'
-import { zonesPrim, clearOverlays, restoreMainCandles, setMarkers, fitContent, setVisibleRange } from '../lib/chart.mjs'
+import { zonesPrim, clearOverlays, restoreMainCandles, setMarkers, setVisibleRange } from '../lib/chart.mjs'
 import { renderHeatmap } from './heatmap.mjs'
 
 const MY_KEY = 'smc-my-zones-v1'
@@ -94,8 +94,8 @@ export function renderZones() {
 	renderHeatmap()
 	$('poiZoneStatus').textContent = `Показано зон: ${xs.length}${all.length > xs.length ? ` из ${all.length}` : ''} · всего в наборе ${S.data?.liquidityPoi?.candidates?.length || 0}`
 	renderZoneDetail(focused, last)
+	// Зум не трогаем без фокуса: переключение фильтров/списков не должно дёргать график.
 	if (focused) setVisibleRange(focused.originAt - 20 * TF4H, (focused.endAt || last) + 20 * TF4H)
-	else fitContent()
 }
 
 function renderZoneList(xs) {
@@ -108,7 +108,7 @@ function renderZoneList(xs) {
 		el.innerHTML = `<span class="pill ${c.direction}">${c.direction === 'long' ? 'LONG' : 'SHORT'}</span>
 			<span class="mono">${fmtP(c.near)} → ${fmtP(c.far)}</span>
 			<span class="meter" title="Сила стека: ${Math.round(100 * (c.stackShare || 0))}% от сильнейшей полки стороны"><i style="width:${Math.min(100, Math.round(100 * (c.stackShare || 0)))}%"></i></span>
-			<span class="state">${(LIFE_RU[c.lifecycleState] || c.lifecycleState).toUpperCase()}</span>`
+			<span class="state">${(c.supersededAt ? 'заменена' : LIFE_RU[c.lifecycleState] || c.lifecycleState).toUpperCase()}</span>`
 		el.onclick = () => { S.poiFocusId = S.poiFocusId === c.id ? null : c.id; renderZones() }
 		box.appendChild(el)
 	}
@@ -119,7 +119,7 @@ function renderZoneDetail(c, last) {
 	if (!c) { box.innerHTML = ''; return }
 	box.innerHTML = `
 		<div class="detail-title"><span class="pill ${c.direction}">${c.direction === 'long' ? 'LONG' : 'SHORT'}</span> <b class="mono">${fmtP(c.near)} → ${fmtP(c.far)}</b></div>
-		<div class="kv"><span>Статус</span><b>${LIFE_RU[c.lifecycleState] || c.lifecycleState}${c.spentReason ? ` · ${SPENT_RU[c.spentReason] || c.spentReason}` : ''}</b></div>
+		<div class="kv"><span>Статус</span><b>${c.supersededAt ? 'заменена свежим поколением стека' : LIFE_RU[c.lifecycleState] || c.lifecycleState}${c.spentReason ? ` · ${SPENT_RU[c.spentReason] || c.spentReason}` : ''}</b></div>
 		<div class="kv"><span>Приоритет / касания</span><b>${PRIO_RU[c.priority] || c.priority} · ${INTER_RU[c.interaction] || c.interaction} (${c.touchCount || 0})</b></div>
 		${c.stackNotional != null ? `<div class="kv"><span>Сила стека</span><b>~${fmtN(c.stackNotional)} · ${Math.round(100 * (c.stackShare || 0))}% от сильнейшей${c.supersededAt ? ' · отставлена поколением ' + dt(c.supersededAt) : ''}</b></div>` : ''}
 		<div class="kv"><span>Пулы полки</span><b>${c.pivotCount} шт · far ${c.boundarySource === 'liquidity-cluster' ? 'по реальной ликвидности' : 'по ATR — не торгуется'}</b></div>

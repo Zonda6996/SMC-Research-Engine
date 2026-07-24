@@ -4,7 +4,6 @@
 import { S } from '../lib/state.mjs'
 import { $, esc, fmtP, fmtR, time, dt, C, REASON_RU, SPENT_RU, TRACE_RU } from '../lib/format.mjs'
 import { zonesPrim, line, seriesMarkers, setMarkers, clearOverlays, restoreMainCandles, setCandles, lineStyle, fitContent, setVisibleRange } from '../lib/chart.mjs'
-import { renderHeatmap } from './heatmap.mjs'
 
 export function confirmationAttempts() {
 	const out = []
@@ -38,7 +37,6 @@ export function renderConfirmation() {
 	if (!c) {
 		const total = confirmationAttempts().length
 		$('confStatusText').textContent = total ? `Всего попыток ${total}, по текущему фильтру 0 — выберите «Все попытки»` : 'Попыток нет: нет POI-зон на 4h или пуст ltf15m'
-		renderHeatmap()
 		return
 	}
 	const src = S.data.ltf15m || []
@@ -73,7 +71,8 @@ export function renderConfirmation() {
 		color: colors[x.state] || C.dim, shape: x.state === 'ENTRY' ? 'arrowUp' : 'circle', size: 1, text: x.state,
 	})).filter((x) => src.some((s0) => time(s0.timestamp) === x.time))
 	setMarkers(marks.sort((a, b) => a.time - b.time))
-	renderHeatmap()
+	// Полосы heatmap на 15m-свечи не рисуем (см. renderHeatmap): шкалы времени 4h и 15m несовместимы.
+	S.hmShownBands = []
 	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason || fmtR(c.grossR)}`
 	const traceRows = []
 	{

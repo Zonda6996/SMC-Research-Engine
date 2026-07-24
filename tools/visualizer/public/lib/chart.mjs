@@ -148,3 +148,6 @@ export const lineStyle = () => LWC().LineStyle
 export const fitContent = () => chart.timeScale().fitContent()
 export const setVisibleRange = (fromMs, toMs) => chart.timeScale().setVisibleRange({ from: time(fromMs), to: time(toMs) })
 export const priceAt = (y) => candlesSeries.coordinateToPrice(y)
+/** Сохранение/восстановление зума-позиции (логический диапазон — по индексам баров). */
+export const getLogicalRange = () => chart?.timeScale().getVisibleLogicalRange() ?? null
+export const setLogicalRange = (r) => { if (r) chart.timeScale().setVisibleLogicalRange(r) }

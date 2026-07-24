@@ -43,10 +43,19 @@ function render() {
 		return `${head}<div class="palette-item${i === active ? ' active' : ''}" data-i="${i}"><span>${esc(c.title)}</span>${c.hint ? `<kbd>${esc(c.hint)}</kbd>` : ''}</div>`
 	}).join('')
 	box.querySelectorAll('.palette-item').forEach((el) => {
-		el.onmouseenter = () => { active = Number(el.dataset.i); render() }
-		el.onclick = () => run(Number(el.dataset.i))
+		// Ховер меняет только классы (перерисовка DOM под курсором глотала клик),
+		// выбор — по mousedown, чтобы не потерять фокус инпута до срабатывания.
+		el.onmouseenter = () => {
+			box.querySelector('.palette-item.active')?.classList.remove('active')
+			active = Number(el.dataset.i)
+			el.classList.add('active')
+		}
+		el.onmousedown = (e) => { e.preventDefault(); run(Number(el.dataset.i)) }
 	})
-	box.querySelector('.palette-item.active')?.scrollIntoView({ block: 'nearest' })
+}
+
+function scrollActive() {
+	document.querySelector('#paletteList .palette-item.active')?.scrollIntoView({ block: 'nearest' })
 }
 
 function filter() {
@@ -78,8 +87,8 @@ export function wirePalette() {
 	$('paletteBackdrop').onclick = closePalette
 	$('paletteInput').oninput = filter
 	$('paletteInput').onkeydown = (e) => {
-		if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(filtered.length - 1, active + 1); render() }
-		else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(0, active - 1); render() }
+		if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(filtered.length - 1, active + 1); render(); scrollActive() }
+		else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(0, active - 1); render(); scrollActive() }
 		else if (e.key === 'Enter') { e.preventDefault(); run(active) }
 		else if (e.key === 'Escape') closePalette()
 	}

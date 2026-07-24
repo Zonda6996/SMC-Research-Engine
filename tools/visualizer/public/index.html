@@ -4,6 +4,7 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>SMC Research · Терминал ликвидности</title>
+	<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -12,9 +13,10 @@
 <body>
 	<header class="topbar">
 		<div class="brand">SMC<span class="brand-accent">Research</span></div>
-		<div class="field-inline">
-			<input class="input input-symbol" id="symbol" list="symbolsList" value="BTC/USDT" spellcheck="false" autocomplete="off" />
-			<datalist id="symbolsList"></datalist>
+		<div class="combo" id="symbolCombo">
+			<img class="combo-icon" id="symbolIcon" src="https://assets.coincap.io/assets/icons/btc@2x.png" alt="" />
+			<input class="combo-input" id="symbol" value="BTC/USDT" spellcheck="false" autocomplete="off" placeholder="Символ" />
+			<div class="combo-pop hidden" id="symbolPop"></div>
 		</div>
 		<div class="seg" id="tfGroup">
 			<button data-tf="15m">15m</button><button data-tf="30m">30m</button><button data-tf="1h">1h</button><button data-tf="4h" class="active">4h</button><button data-tf="1d">1d</button><button data-tf="1w">1w</button>
@@ -28,9 +30,6 @@
 		</select>
 		<button class="btn btn-primary" id="loadBtn">Загрузить</button>
 		<div class="spacer"></div>
-		<div class="funnel" id="funnel"></div>
-		<div class="dataset" id="dataset">—</div>
-		<span class="badge mono" id="version">—</span>
 		<button class="kbd-chip" id="paletteHint" title="Командная палитра"><kbd>⌘K</kbd></button>
 	</header>
 
@@ -45,11 +44,14 @@
 
 		<aside class="sidebar">
 			<!-- Обзор -->
-			<section class="section" id="overviewPanel">
-				<div class="section-head"><h2>Обзор · canon</h2><span class="muted-tag">risk-unscaled</span></div>
+			<section class="section collapsed" id="overviewPanel">
+				<div class="section-head"><h2>Обзор · canon</h2><span class="chevron"></span></div>
 				<div class="section-body">
+					<div class="funnel" id="funnel"></div>
+					<div class="meta-row"><span class="dataset" id="dataset">—</span></div>
+					<div class="meta-row"><span class="badge mono" id="version">—</span></div>
 					<div class="cards" id="cards"></div>
-					<div class="notice">First-5 gate: touch в первой 5m-свече HTF-бара пропускается. Bigbar — диагностическая метка, не фильтр.</div>
+					<details class="help"><summary>Справка</summary><p>First-5 gate: touch в первой 5m-свече HTF-бара пропускается (counterfactual). Bigbar — диагностическая метка, не фильтр. Цифры risk-unscaled.</p></details>
 				</div>
 			</section>
 
@@ -73,19 +75,19 @@
 			</section>
 
 			<!-- Зоны ликвидности -->
-			<section class="section" id="zonesPanel">
-				<div class="section-head"><h2>Зоны ликвидности <span class="ver">POI 2.3</span></h2><button class="btn btn-outline sm" id="poiZoneToggle">Открыть</button></div>
+			<section class="section mode" id="zonesPanel">
+				<div class="section-head" data-toggle="poiZoneToggle"><h2>Зоны ликвидности <span class="ver">POI 2.4</span></h2><button class="btn btn-outline sm" id="poiZoneToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="poiZoneControls">
 						<div class="grid2">
 							<select class="input" id="poiDirection"><option value="all">Long + Short</option><option value="long">Только Long</option><option value="short">Только Short</option></select>
-							<select class="input" id="poiLifecycle"><option value="open" selected>Открытые — готова или в игре</option><option value="all">Любой статус</option><option value="forming">Формируется</option><option value="fresh">Готова, ждёт</option><option value="in-play">В игре — цена внутри</option><option value="spent">Отработала</option><option value="failed">Пробита</option><option value="retired">Устарела / отставлена</option></select>
-							<select class="input" id="poiPriority"><option value="all">Любой приоритет</option><option value="nearest">Ближайшая к цене</option><option value="secondary">Фон</option></select>
-							<select class="input" id="poiMinStack"><option value="0">Сила стека: любая</option><option value="0.1" selected>Стек ≥ 10% сильнейшего</option><option value="0.25">Стек ≥ 25% сильнейшего</option></select>
+							<select class="input" id="poiLifecycle"><option value="open" selected>Открытые</option><option value="all">Любой статус</option><option value="forming">Формируется</option><option value="fresh">Готова</option><option value="in-play">В игре</option><option value="spent">Отработала</option><option value="failed">Пробита</option><option value="retired">Устарела / заменена</option></select>
+							<select class="input" id="poiPriority"><option value="all">Любой приоритет</option><option value="nearest">Ближайшая</option><option value="secondary">Фон</option></select>
+							<select class="input" id="poiMinStack"><option value="0">Стек: любой</option><option value="0.1" selected>Стек ≥ 10%</option><option value="0.25">Стек ≥ 25%</option></select>
 						</div>
 						<div class="check-row">
 							<label class="check"><input type="checkbox" id="poiActiveOnly" checked /> только активные</label>
-							<label class="check"><input type="checkbox" id="poiLiqOnly" checked /> скрывать ATR-границы</label>
+							<label class="check"><input type="checkbox" id="poiLiqOnly" checked /> без ATR-границ</label>
 							<label class="check"><input type="checkbox" id="myZonesShow" checked /> мои зоны</label>
 						</div>
 						<div class="status" id="poiZoneStatus">—</div>
@@ -103,19 +105,19 @@
 							<select class="input" id="myZoneSide"><option value="long">LONG</option><option value="short">SHORT</option></select>
 							<input class="input" id="myZoneFrom" type="number" step="any" placeholder="от" />
 							<input class="input" id="myZoneTo" type="number" step="any" placeholder="до" />
-							<input class="input grow" id="myZoneNote" type="text" placeholder="заметка (необязательно)" />
+							<input class="input grow" id="myZoneNote" type="text" placeholder="заметка" />
 							<button class="btn btn-outline sm" id="myZoneAdd">Добавить</button>
 						</div>
 						<div class="list" id="myZoneList"></div>
 
-						<div class="notice">Зоны рождаются от ликвидности (SPEC §16.12–§16.15): живые свежие пулы (кормились ≤ 300 баров назад) склеиваются в супер-цепи и режутся на полки по провалам плотности профиля (провал = ≥3 корзины по 0.4% цены ниже 25% пика). near — точный фитиль невыметенного экстремума у края полки (иначе край), far — конец полки, высота ≤ 8% от края. Родство стеков: зоны с ≥50% общего notional — один объект; тронутая старшая держит место, нетронутая заменяется свежим поколением, но только если оно удерживает массу старшей. Прямоугольник: сплошная граница — near, пунктир — far, яркость заливки — сила стека. Клик по прямоугольнику — фокус. Смерти: провал телом за far · насквозь фитилём · стек снят ≥50% · не кормился 300 баров.</div>
+						<details class="help"><summary>Справка по зонам</summary><p>Зона = полка ликвидности (стек свежих пулов, порезанный по провалам плотности) + невыметенный экстремум. Прямоугольник: сплошная граница — near, пунктир — far, яркость заливки — сила стека, клик — фокус. Смерти: провал телом за far · фитиль насквозь · снято ≥ 50% стека · 300 баров без подпитки. Родство стеков: ≥ 50% общего notional = один объект; тронутая старшая главнее, нетронутую заменяет поколение, удерживающее её массу. «Заменена» ≠ «устарела»: замену видно в деталях. Правила — SPEC §16.12–§16.16.</p></details>
 					</div>
 				</div>
 			</section>
 
 			<!-- Подтверждение -->
-			<section class="section" id="confPanel">
-				<div class="section-head"><h2>Подтверждение <span class="ver">1.6 · 4h→15m</span></h2><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
+			<section class="section mode" id="confPanel">
+				<div class="section-head" data-toggle="confToggle"><h2>Подтверждение <span class="ver">1.6 · 4h→15m</span></h2><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="confControls">
 						<div class="grid2">
@@ -132,32 +134,35 @@
 							<button class="btn btn-ghost sm" id="confBack">Обычный график</button>
 						</div>
 						<div class="detail" id="confTrace"></div>
-						<div class="notice">Попытка (SPEC §16.8–§16.11): заход → остановка (направленное закрытие после 4 тихих баров) → отскок (6 баров без нового экстремума) → пересвип невыметенного якоря → защита → тест слабости (объём возобновления выше последнего отката) → вход; стоп за экстремумом свипа (или историей в 0.5 ATR), тейк 2R. Потеря защиты переносит якорь и строит подтверждение заново; попытка умирает по бездействию (96 баров без структурных событий), пробою закрытиями или концу окна — попытка с состоявшимся свипом доигрывается. Вход отменяется при риске &gt; 1.5 ATR15. Тусклые зоны в «Зонах на 4h» — окно раньше 15m-истории (~208 дней): нет данных, не логики.</div>
+						<details class="help"><summary>Справка по подтверждению</summary><p>Последовательность: заход → остановка (направленное закрытие после 4 тихих баров) → отскок (6 баров) → пересвип невыметенного якоря → защита → тест слабости (объём возобновления выше отката) → вход; стоп за экстремумом свипа, тейк 2R. Попытка умирает: 96 баров бездействия · пробой закрытиями · конец окна зоны (со состоявшимся свипом — доигрывается). Вход отменяется при риске &gt; 1.5 ATR15. Тусклые зоны в обзоре 4h — раньше 15m-истории (~208 дней): нет данных, не логики.</p></details>
 					</div>
 				</div>
 			</section>
 
 			<!-- Heatmap -->
-			<section class="section" id="hmPanel">
-				<div class="section-head"><h2>Heatmap ликвидаций <span class="ver">2.0 · OI-гибрид</span></h2><button class="btn btn-outline sm" id="hmToggle">Показать</button></div>
+			<section class="section mode" id="hmPanel">
+				<div class="section-head" data-toggle="hmToggle"><h2>Heatmap ликвидаций <span class="ver">2.0 · OI</span></h2><button class="btn btn-outline sm" id="hmToggle">Показать</button></div>
 				<div class="section-body">
 					<div class="hidden" id="hmControls">
 						<div class="grid2">
-							<select class="input" id="hmSide"><option value="all">Buy + Sell side</option><option value="sell-side">Sell-side (красные)</option><option value="buy-side">Buy-side (зелёные)</option></select>
+							<select class="input" id="hmSide"><option value="all">Buy + Sell side</option><option value="sell-side">Sell-side</option><option value="buy-side">Buy-side</option></select>
 							<select class="input" id="hmMinWeight"><option value="0">Все пулы</option><option value="0.35">Вес ≥ 0.35</option><option value="0.55" selected>Вес ≥ 0.55</option><option value="0.75">Вес ≥ 0.75</option></select>
-							<select class="input" id="hmGroup"><option value="0">Забор (без склейки)</option><option value="0.001" selected>Слабая склейка</option><option value="0.0025">Норм</option><option value="0.005">Крупные полки</option><option value="0.012">Мега-полки</option></select>
+							<select class="input" id="hmGroup"><option value="0">Забор</option><option value="0.001" selected>Слабая склейка</option><option value="0.0025">Норм</option><option value="0.005">Крупные полки</option><option value="0.012">Мега-полки</option></select>
 							<select class="input" id="hmAge"><option value="500" selected>Свежая (500 баров)</option><option value="1000">1000 баров</option><option value="2000">2000 баров</option><option value="0">Вся история</option></select>
 						</div>
-						<div class="check-row"><label class="check"><input type="checkbox" id="hmShowSwept" /> показывать снятые</label></div>
+						<div class="check-row">
+							<label class="check"><input type="checkbox" id="hmShowSwept" /> показывать снятые</label>
+							<label class="check"><input type="checkbox" id="hmProfileShow" /> профиль у шкалы</label>
+						</div>
 						<div class="status" id="hmStatus">—</div>
-						<div class="notice">Модель потенциальных ликвидаций (coinglass-style): каждая свеча с объёмом выше среднего открывает позиции, уровни ликвидаций 5×–100× ложатся выше/ниже входа и копятся в ценовых бинах; соседние бины сливаются в полосы, крутилка склейки собирает полосы в полки. Яркость и толщина — накопленная плотность; проход цены снимает ликвидность. Где Binance отдаёт OI (~30 дней): вклад по росту открытого интереса, лонг/шорт по тейкер-объёму, maintenance margin 0.4%. Справа от графика — профиль плотности; в статусе — ближайшие «магниты».</div>
+						<details class="help"><summary>Справка по heatmap</summary><p>Каждая свеча с объёмом выше среднего открывает позиции; уровни ликвидаций 5×–100× копятся в ценовых бинах и сливаются в полосы (крутилка склейки — в полки). Яркость/толщина — накопленная плотность; проход цены снимает ликвидность. Где Binance отдаёт OI (~30 дней) — вклад по росту открытого интереса и тейкер-сплиту, maintenance margin 0.4%. В статусе — ближайшие «магниты».</p></details>
 					</div>
 				</div>
 			</section>
 
 			<!-- Decision Lab -->
-			<section class="section collapsed" id="labPanel">
-				<div class="section-head"><h2>Decision Lab <span class="ver">141/200/241</span></h2><button class="btn btn-outline sm" id="labToggle">Открыть</button></div>
+			<section class="section mode" id="labPanel">
+				<div class="section-head" data-toggle="labToggle"><h2>Decision Lab <span class="ver">141/200/241</span></h2><button class="btn btn-outline sm" id="labToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="labControls">
 						<div class="grid2">
@@ -201,7 +206,7 @@
 							<button class="btn btn-outline sm" id="labExport">Экспорт JSON</button>
 							<button class="btn btn-ghost sm" id="labClear">Очистить решение</button>
 						</div>
-						<div class="notice">Только structurally-active сетки; WAIT/+1 открывают по одной закрытой свече, TAKE/SKIP фиксируются до REVEAL, исход считается по 5m.</div>
+						<details class="help"><summary>Справка по Lab</summary><p>Только structurally-active сетки; WAIT/+1 открывают по одной закрытой свече, TAKE/SKIP фиксируются до REVEAL, исход считается по 5m.</p></details>
 					</div>
 				</div>
 			</section>
@@ -217,7 +222,7 @@
 						<select class="input sm" id="presetApply"><option value="">Пресет…</option></select>
 					</div>
 					<div id="cfgFields"></div>
-					<div class="notice">Константы движка зон и heatmap применяются на лету («Пересчитать» перезагружает данные с переопределениями) — движки на сервере получают их через config-override, дефолты в коде не меняются. Изменённые значения подсвечены. Правила и дефолты — SPEC §16.12–§16.15.</div>
+					<details class="help"><summary>Справка по настройкам</summary><p>Значения уходят движкам при «Пересчитать» (дефолты в коде не меняются, изменённое подсвечено). Наведи на подпись — там пояснение каждой ручки.</p></details>
 				</div>
 			</section>
 
@@ -233,8 +238,8 @@
 			</section>
 
 			<!-- Выбранная сделка -->
-			<section class="section" id="detailPanel">
-				<div class="section-head"><h2>Выбранная сделка</h2></div>
+			<section class="section collapsed" id="detailPanel">
+				<div class="section-head"><h2>Выбранная сделка</h2><span class="chevron"></span></div>
 				<div class="section-body"><div class="detail" id="detail"><div class="empty">Выберите сделку из списка</div></div></div>
 			</section>
 		</aside>

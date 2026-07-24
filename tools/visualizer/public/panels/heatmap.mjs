@@ -71,7 +71,8 @@ export function drawHmProfile() {
 	const ctx = cv.getContext('2d')
 	ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 	ctx.clearRect(0, 0, W, H)
-	if (!S.hmOn || !S.hmShownBands.length || !candlesSeries || !chart) return
+	// Профиль у ценовой шкалы — опционален (по умолчанию выключен: мешал возле шкалы).
+	if (!S.hmOn || !$('hmProfileShow')?.checked || !S.hmShownBands.length || !candlesSeries || !chart) return
 	try { cv.style.right = `${chart.priceScale('right').width() || 56}px` } catch { /* шкала ещё не готова */ }
 	let maxN = 0
 	for (const x of S.hmShownBands) maxN = Math.max(maxN, hmNotional(x.p))
@@ -88,6 +89,9 @@ export function drawHmProfile() {
 
 export function renderHeatmap() {
 	if (!S.data) return
+	// В режиме подтверждения на графике 15m-свечи — полосы heatmap (4h-таймлайн) сюда не рисуем:
+	// смешение шкал времени ломало график и вешало рендер (7-й QA).
+	if (S.mode === 'conf' && !S.confZonesMode) { S.hmShownBands = []; drawHmProfile(); return }
 	if (!S.hmOn) { $('hmStatus').textContent = '—'; S.hmShownBands = []; drawHmProfile(); return }
 	const raw = hmPools()
 	const gap = Number($('hmGroup').value)
@@ -143,5 +147,5 @@ export function wireHeatmapPanel(redraw) {
 		$('hmToggle').textContent = S.hmOn ? 'Скрыть' : 'Показать'
 		redraw()
 	}
-	for (const id of ['hmSide', 'hmMinWeight', 'hmGroup', 'hmShowSwept', 'hmAge']) $(id).onchange = () => redraw()
+	for (const id of ['hmSide', 'hmMinWeight', 'hmGroup', 'hmShowSwept', 'hmAge', 'hmProfileShow']) $(id).onchange = () => redraw()
 }

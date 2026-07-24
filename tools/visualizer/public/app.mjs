@@ -4,7 +4,7 @@
 
 import { S, setMode } from './lib/state.mjs'
 import { $, esc, time } from './lib/format.mjs'
-import { initChart, restoreMainCandles, setCandles, fitContent, priceAt, rectAt } from './lib/chart.mjs'
+import { initChart, restoreMainCandles, setCandles, fitContent, priceAt, rectAt, getLogicalRange, setLogicalRange } from './lib/chart.mjs'
 import { fetchAnalyze, fetchSymbols } from './lib/api.mjs'
 import { renderTradesMode, wireStatsPanel, navigateTrades, tradeTooltip, renderFunnel } from './panels/stats.mjs'
 import { hmBandTooltip, wireHeatmapPanel, hmApplyTfDefaults, drawHmProfile } from './panels/heatmap.mjs'
@@ -17,9 +17,12 @@ import { wirePalette, openPalette, closePalette, paletteOpen, setPaletteSymbols 
 // ---- Режимы ----
 
 const MODE_PANELS = { zones: 'poiZone', conf: 'conf', lab: 'lab' }
+/** Зум-позиция основного графика: сохраняется при уходе на 15m/5m (conf/lab) и возвращается. */
+let savedMainRange = null
 
 function activateMode(mode) {
-	// Свернуть контролы прежнего режима.
+	// Уходим с основного набора свечей — запоминаем зум, чтобы не «дёргать» график при возврате.
+	if ((mode === 'conf' || mode === 'lab') && S.mainShown) savedMainRange = getLogicalRange()
 	for (const [m, prefix] of Object.entries(MODE_PANELS)) {
 		const on = m === mode
 		$(`${prefix}Controls`).classList.toggle('hidden', !on)
@@ -38,10 +41,13 @@ function deactivateMode() {
 		$(`${prefix}Toggle`).classList.remove('on')
 	}
 	exitLabVisuals()
+	const wasMain = S.mainShown
 	setMode('trades')
 	restoreMainCandles()
 	redraw()
-	fitContent()
+	// Возврат без прыжка: восстанавливаем сохранённый зум; fitContent — только если восстанавливать нечего.
+	if (!wasMain && savedMainRange) { setLogicalRange(savedMainRange); savedMainRange = null }
+	else if (!wasMain) fitContent()
 }
 
 export function redraw() {
@@ -152,7 +158,10 @@ function randomHistoricalPeriod() {
 function wireSections() {
 	document.querySelectorAll('.section > .section-head').forEach((head) => {
 		head.addEventListener('click', (e) => {
-			if (e.target.closest('button, select, input, label')) return
+			if (e.target.closest('button, select, input, label, details')) return
+			// Панели-режимы: клик по всей шапке = кнопка «Открыть/Закрыть» (а не пустое сворачивание).
+			const toggleId = head.dataset.toggle
+			if (toggleId) { $(toggleId).click(); return }
 			head.parentElement.classList.toggle('collapsed')
 			drawHmProfile()
 		})
@@ -187,12 +196,73 @@ function wireHotkeys() {
 	})
 }
 
+// ---- Комбобокс символа (иконки монет + фильтр + клавиатура) ----
+
+let comboSymbols = []
+let comboShown = []
+let comboActive = 0
+const coinIcon = (sym) => `https://assets.coincap.io/assets/icons/${sym.split('/')[0].toLowerCase()}@2x.png`
+
+function comboSetIcon(sym) {
+	const img = $('symbolIcon')
+	img.classList.remove('hidden')
+	img.onerror = () => img.classList.add('hidden')
+	img.src = coinIcon(sym)
+}
+function comboClose() { $('symbolPop').classList.add('hidden') }
+function comboPick(sym) {
+	$('symbol').value = sym
+	comboSetIcon(sym)
+	comboClose()
+}
+function comboRender() {
+	const pop = $('symbolPop')
+	if (!comboShown.length) { comboClose(); return }
+	pop.innerHTML = comboShown.map((s, i) => `<div class="combo-item${i === comboActive ? ' active' : ''}" data-s="${esc(s)}"><img loading="lazy" src="${coinIcon(s)}" alt="" /><span>${esc(s)}</span></div>`).join('')
+	pop.classList.remove('hidden')
+	pop.querySelectorAll('.combo-item').forEach((el) => {
+		el.onmousedown = (e) => { e.preventDefault(); comboPick(el.dataset.s) }
+		const img = el.querySelector('img')
+		img.onerror = () => {
+			const f = document.createElement('span')
+			f.className = 'combo-fallback'
+			f.textContent = (el.dataset.s || '?')[0]
+			img.replaceWith(f)
+		}
+	})
+	pop.querySelector('.combo-item.active')?.scrollIntoView({ block: 'nearest' })
+}
+function comboFilter() {
+	const q = $('symbol').value.trim().toUpperCase()
+	const starts = comboSymbols.filter((s) => s.startsWith(q))
+	const rest = q ? comboSymbols.filter((s) => !s.startsWith(q) && s.includes(q)) : []
+	comboShown = [...starts, ...rest].slice(0, 14)
+	comboActive = 0
+	comboRender()
+}
+function wireCombo() {
+	const inp = $('symbol')
+	inp.addEventListener('focus', comboFilter)
+	inp.addEventListener('input', comboFilter)
+	inp.addEventListener('blur', () => setTimeout(comboClose, 120))
+	inp.addEventListener('keydown', (e) => {
+		const open = !$('symbolPop').classList.contains('hidden')
+		if (e.key === 'ArrowDown' && open) { e.preventDefault(); comboActive = Math.min(comboShown.length - 1, comboActive + 1); comboRender() }
+		else if (e.key === 'ArrowUp' && open) { e.preventDefault(); comboActive = Math.max(0, comboActive - 1); comboRender() }
+		else if (e.key === 'Enter') {
+			e.preventDefault()
+			if (open && comboShown[comboActive] && comboShown[comboActive] !== inp.value) comboPick(comboShown[comboActive])
+			else { comboClose(); load() }
+		} else if (e.key === 'Escape') comboClose()
+	})
+}
+
 // ---- Инициализация ----
 
 async function loadSymbols() {
 	const symbols = await fetchSymbols()
 	if (symbols.length) {
-		$('symbolsList').innerHTML = symbols.map((s) => `<option value="${esc(s)}">`).join('')
+		comboSymbols = symbols
 		setPaletteSymbols(symbols)
 	}
 }
@@ -212,7 +282,7 @@ function init() {
 
 	$('loadBtn').onclick = load
 	$('randomPeriod').onclick = randomHistoricalPeriod
-	$('symbol').addEventListener('keydown', (e) => { if (e.key === 'Enter') load() })
+	wireCombo()
 	document.querySelectorAll('#tfGroup button').forEach((b) => {
 		b.onclick = () => {
 			document.querySelectorAll('#tfGroup button').forEach((x) => x.classList.remove('active'))
