@@ -84,7 +84,7 @@ export function renderConfirmation() {
 	setMarkers(marks.sort((a, b) => a.time - b.time))
 	// Полосы heatmap на 15m-свечи не рисуем (см. renderHeatmap): шкалы времени 4h и 15m несовместимы.
 	S.hmShownBands = []
-	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason || fmtR(c.grossR)}`
+	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason || fmtR(c.grossR)}${c.duplicateEntryOf ? ' · ДУБЛЬ ВХОДА' : ''}${c.againstImpulse ? ' · ПРОТИВ ИМПУЛЬСА' : ''}`
 	const traceRows = []
 	{
 		let run = []
@@ -110,6 +110,8 @@ export function renderConfirmation() {
 		<div class="kv"><span>Свип экстремума зоны</span><b>${c.sweptZoneExtreme == null ? '—' : c.sweptZoneExtreme ? 'да' : 'нет (лой захода)'}</b></div>
 		${c.spentReason ? `<div class="kv"><span>Зона отработала</span><b>${SPENT_RU[c.spentReason] || c.spentReason}</b></div>` : ''}
 		${c.entry != null ? `<div class="kv"><span>Вход / Стоп / Тейк</span><b class="mono">${fmtP(c.entry)} / ${fmtP(c.stop)} / ${fmtP(c.tp2)} · ${fmtR(c.grossR)}</b></div>` : ''}
+		${c.impulseRet != null ? `<div class="kv"><span>Импульс на входе</span><b>${(c.impulseRet >= 0 ? '+' : '') + (c.impulseRet * 100).toFixed(1)}% за окно 4h${c.againstImpulse ? ' — ВХОД ПРОТИВ ИМПУЛЬСА (стопы таких входов чаще, пометка не фильтр)' : ''}</b></div>` : ''}
+		${c.duplicateEntryOf ? `<div class="kv"><span>Дубль входа</span><b title="${esc(c.duplicateEntryOf)}">один свип с зоной ${esc(String(c.duplicateEntryOf).split('|').pop())} — не торгуется («один свип = одна сделка», §16.18)</b></div>` : ''}
 		<div class="trace">${traceRows.map((x) => x.state === '…'
 			? `<div class="trace-row muted">… ещё ${x.collapsed} тестов/отмен свёрнуто …</div>`
 			: `<div class="trace-row"><b>${esc(x.state)}</b><span class="muted">${TRACE_RU[x.state] || ''}</span><span class="mono">${dt(x.at)}${x.price != null ? ' · ' + fmtP(x.price) : ''}${x.volumeRatio != null ? ' · vol×' + x.volumeRatio.toFixed(2) : ''}</span></div>`).join('')}</div>`

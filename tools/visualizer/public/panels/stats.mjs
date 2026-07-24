@@ -54,12 +54,15 @@ export function renderFunnel() {
 	const zones = S.data.liquidityPoi?.candidates || []
 	const active = zones.filter((z) => z.active && !z.duplicateOf).length
 	const attempts = (S.data.poiConfirmation?.results || []).reduce((s, r) => s + r.attempts.length, 0)
-	const entries = (S.data.poiConfirmation?.results || []).reduce((s, r) => s + r.attempts.filter((a) => a.status === 'entered').length, 0)
+	// §16.18: дубли входов («один свип = одна сделка») не торгуются — в воронке не считаются.
+	const allEntered = (S.data.poiConfirmation?.results || []).flatMap((r) => r.attempts.filter((a) => a.status === 'entered'))
+	const dupEntries = allEntered.filter((a) => a.duplicateEntryOf).length
+	const entries = allEntered.length - dupEntries
 	el.innerHTML = zones.length
 		? `<span class="chip" title="Всего зон в наборе">${zones.length} зон</span><span class="chip-sep">→</span>
 		   <span class="chip chip-accent" title="Активные (готова + в игре)">${active} активных</span><span class="chip-sep">→</span>
 		   <span class="chip" title="Попытки подтверждения на 15m">${attempts} попыток</span><span class="chip-sep">→</span>
-		   <span class="chip ${entries ? 'chip-green' : ''}" title="Входы">${entries} входов</span>`
+		   <span class="chip ${entries ? 'chip-green' : ''}" title="Входы (без дублей «один свип = одна сделка»)">${entries} входов${dupEntries ? ` <span class="muted">+${dupEntries} дубл.</span>` : ''}</span>`
 		: ''
 }
 
