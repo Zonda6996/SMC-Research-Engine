@@ -16,7 +16,14 @@ import type { LiquidityPoiCandidate } from './LiquidityPoiCalibration.js'
 // v1.7 (§16.17): лимит подряд ПРОВАЛЕННЫХ тестов слабости (weaknessFailLimit) — сетап без объёма
 // на возобновление отбраковывается, а не ждёт бесконечно; конфиг переопределяем параметром
 // (сетка калибровки, панель настроек в UI).
-export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.7-weakness-limit'
+// v1.8 (§16.18): дедуп входов «один свип = одна сделка» — попытки РАЗНЫХ зон, вошедшие с одного
+// финального пересвип-бара в одну сторону, дублируют одну ликвидность (кейс ETH 25.06.2026:
+// попытка отработанной полки съехала якорем в свежую нижнюю — два идентичных входа, двойной риск
+// на одном событии); торгуется зона с сильнейшим стеком, дубль помечается duplicateEntryOf.
+// Плюс пометка «против импульса» (againstImpulse): каузальный ход за impulseBars ЗАКРЫТЫХ баров
+// ТФ зоны против направления сделки сильнее impulseGatePct — маркер, НЕ фильтр (валидация
+// train/test на 8 монетах: направление подтверждено, величина нет — копим форвард-статистику).
+export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.8-sweep-dedup'
 
 /** Типизированный конфиг подтверждения: все значения переопределяемы 4-м аргументом detectPoiConfirmation. */
 export interface PoiConfirmationConfig {
@@ -32,6 +39,8 @@ export interface PoiConfirmationConfig {
 	stopLookbehindAtr: number
 	arrivalVolumeSma: number
 	weaknessFailLimit: number
+	impulseBars: number
+	impulseGatePct: number
 }
 
 /**
@@ -66,6 +75,14 @@ export const POI_CONFIRMATION_CONFIG: PoiConfirmationConfig = {
 	 * Успешный тест (даже с отменой входа по риску), перезапуск, перенос якоря и новый пересвип
 	 * обнуляют счётчик. */
 	weaknessFailLimit: 3,
+	/** §16.18: окно импульса для пометки «против импульса» — ход за столько ЗАКРЫТЫХ баров ТФ зоны
+	 * (4h) на момент входа; незакрытый бар не участвует (каузально). Валидация train/test на
+	 * 8 монетах: короткое окно ~1.7 суток — хребет эффекта, недельное окно сигнал теряет. */
+	impulseBars: 10,
+	/** §16.18: порог хода для пометки — вход ПРОТИВ движения сильнее этой доли цены помечается
+	 * againstImpulse (шорт при ходе > +порог, лонг при ходе < −порог). ПОМЕТКА, НЕ ФИЛЬТР:
+	 * на тесте фильтр резал только стопы (0 тейков), но событий мало — сначала форвард-статистика. */
+	impulseGatePct: 0.10,
 }
 
 export interface ConfirmationTrace {
@@ -94,6 +111,14 @@ export interface ConfirmationAttempt {
 	arrivalVolumeRatio: number | null
 	/** Снял ли пересвип абсолютный экстремум зоны за всё окно (включая уже выметенные) — QA-пометка. */
 	sweptZoneExtreme: boolean | null
+	/** §16.18: каузальный ход за impulseBars ЗАКРЫТЫХ баров ТФ зоны на момент входа (null без HTF/входа). */
+	impulseRet: number | null
+	/** §16.18: вход против свежего импульса сильнее impulseGatePct — пометка, НЕ фильтр. */
+	againstImpulse: boolean | null
+	/** §16.18: вход-дубль «один свип = одна сделка»: другая зона вошла с того же финального
+	 * пересвип-бара в ту же сторону; побеждает сильнейший стек (затем старшая по knownAt).
+	 * Дубль не торгуется и в статистике не участвует; трейс сохранён для QA. */
+	duplicateEntryOf: string | null
 	trace: ConfirmationTrace[]
 }
 
@@ -157,6 +182,7 @@ function runAttempt(
 		touchAt: ltf[touch]!.timestamp, stopLevel: null,
 		entryAt: null, entry: null, stop: null, tp2: null, outcome: null, grossR: null,
 		arrivalVolumeRatio, sweptZoneExtreme: null,
+		impulseRet: null, againstImpulse: null, duplicateEntryOf: null,
 		trace: [{ state: 'POI_TOUCH', at: ltf[touch]!.timestamp }],
 	}
 	let stage: Stage = 'stopping'
@@ -388,6 +414,16 @@ export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle
 		const sma = avg(prev.map(x => x.volume))
 		return sma > 0 ? htf[i]!.volume / sma : null
 	}
+	// §16.18: каузальный импульс на момент входа — закрытие последнего ЗАКРЫТОГО HTF-бара против
+	// закрытия impulseBars баров назад; незакрытый бар в расчёте не участвует (без look-ahead).
+	const impulseAt = (entryAt: number): number | null => {
+		if (!htf?.length || !htfMs) return null
+		let iPrev = -1
+		for (let i = htf.length - 1; i >= 0; i--) if (htf[i]!.timestamp + htfMs <= entryAt) { iPrev = i; break }
+		if (iPrev < cfg.impulseBars) return null
+		const past = htf[iPrev - cfg.impulseBars]!.close
+		return past > 0 ? htf[iPrev]!.close / past - 1 : null
+	}
 	for (const poi of pois) {
 		// Решение №6: ATR-fallback зоны не торгуются; §16.9: near-дубли (duplicateOf) не торгуются.
 		if (poi.boundarySource !== 'liquidity-cluster' || poi.duplicateOf != null) continue
@@ -430,6 +466,12 @@ export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle
 			if (touch < 0) break
 			const { attempt, nextCursor } = runAttempt(
 				ltf, endIndex, touch, long, result.attempts.length + 1, lo, hi, pending, windowExtreme, arrivalRatio(ltf[touch]!.timestamp), cfg)
+			// §16.18: пометка «против импульса» на входе (маркер для QA/UI, не фильтр).
+			if (attempt.entryAt != null) {
+				attempt.impulseRet = impulseAt(attempt.entryAt)
+				attempt.againstImpulse = attempt.impulseRet == null ? null
+					: long ? attempt.impulseRet < -cfg.impulseGatePct : attempt.impulseRet > cfg.impulseGatePct
+			}
 			result.attempts.push(attempt)
 			cursor = Math.max(nextCursor, touch + 1)
 			// §16.9: свип «тратит» невыметенный экстремум — новый копится с бара после последнего свипа.
@@ -450,6 +492,33 @@ export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle
 			}
 		}
 		out.push(result)
+	}
+	// §16.18: дедуп входов «один свип = одна сделка». Попытки РАЗНЫХ зон, вошедшие с одного
+	// финального пересвип-бара в одну сторону, торгуют одну и ту же снятую ликвидность — в реале
+	// это ×2 позиции на одном событии без ×2 эджа (кейс ETH 25.06.2026: −2R одним движением).
+	// Торгуется попытка зоны с СИЛЬНЕЙШИМ стеком (при равенстве — старшая по knownAt); остальные
+	// получают duplicateEntryOf (не торгуются, в статистику не идут; трейс сохранён для QA).
+	// Жизненный цикл зон не пересматривается — исход дубля остаётся диагностикой его зоны.
+	const stackOf = new Map(pois.map(p => [p.id, p.stackNotional ?? 0]))
+	const knownOf = new Map(pois.map(p => [p.id, p.knownAt]))
+	const bySweep = new Map<string, Array<{ poiId: string; a: ConfirmationAttempt }>>()
+	for (const r of out) {
+		for (const a of r.attempts) {
+			if (a.status !== 'entered') continue
+			const sweepAt = [...a.trace].reverse().find(t => t.state === 'SECOND_SWEEP')?.at
+			if (sweepAt == null) continue
+			const key = `${r.direction}|${sweepAt}`
+			if (!bySweep.has(key)) bySweep.set(key, [])
+			bySweep.get(key)!.push({ poiId: r.poiId, a })
+		}
+	}
+	for (const group of bySweep.values()) {
+		if (group.length < 2) continue
+		const winner = [...group].sort((x, y) =>
+			(stackOf.get(y.poiId) ?? 0) - (stackOf.get(x.poiId) ?? 0)
+			|| (knownOf.get(x.poiId) ?? 0) - (knownOf.get(y.poiId) ?? 0)
+			|| x.poiId.localeCompare(y.poiId))[0]!
+		for (const m of group) if (m !== winner) m.a.duplicateEntryOf = winner.poiId
 	}
 	return out
 }
