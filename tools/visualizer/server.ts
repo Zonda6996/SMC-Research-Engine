@@ -135,7 +135,11 @@ async function fetchTopSymbols(): Promise<string[]> {
 	} catch {
 		tickers = await new ccxt.binance().fetchTickers()
 	}
-	const symbols = Object.values(tickers)
+	// 9-й QA: суточный объём выносил мем-коины выше SOL. Мейджоры (universe исследований,
+	// CONTEXT §1) закреплены сверху в фиксированном порядке, остальное — по объёму.
+	const MAJORS = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'XRP/USDT', 'BNB/USDT', 'DOGE/USDT', 'ADA/USDT',
+		'AVAX/USDT', 'LINK/USDT', 'SUI/USDT', 'TON/USDT', 'NEAR/USDT', 'APT/USDT', 'LTC/USDT']
+	const byVolume = Object.values(tickers)
 		.filter((t) => t.symbol?.endsWith('/USDT:USDT') || t.symbol?.endsWith('/USDT'))
 		.map((t) => ({
 			symbol: (t.symbol ?? '').replace(':USDT', ''),
@@ -144,6 +148,8 @@ async function fetchTopSymbols(): Promise<string[]> {
 		.filter((t) => t.symbol && t.volume > 0)
 		.sort((a, b) => b.volume - a.volume)
 		.map((t) => t.symbol)
+	const rest = byVolume.filter((s) => !MAJORS.includes(s))
+	const symbols = [...MAJORS.filter((m) => byVolume.includes(m)), ...rest]
 	symbolsCache = { symbols, fetchedAt: Date.now() }
 	return symbols
 }
