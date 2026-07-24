@@ -20,7 +20,9 @@ import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 // для фильтра слабых полок в UI. Подтверждение (1.6) работает без изменений.
 // v2.3 (§16.15): замещение только при УДЕРЖАНИИ МАССЫ — младшая отставляет нетронутую старшую, лишь
 // удерживая ≥ stackKinshipShare СТАРШЕГО стека; сползшее вбок окно (роняющее массу) — дубль.
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-2.3-cover-supersede'
+// v2.4 (§16.16): stack-consumed наступает на ЗАКРЫТИИ бара снятия (+tfMs), консистентно со
+// swept-through §16.10 — пересвип внутри бара снятия больше не отрезается окном зоны.
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-2.4-consumed-at-close'
 
 /** Типизированный конфиг движка зон: все значения переопределяемы через LiquidityPoiContext.config. */
 export interface LiquidityPoiConfig {
@@ -359,6 +361,10 @@ function evaluateArea(area: AreaCandidate, c: Candle[], cfg: LiquidityPoiConfig)
 		if (consumedAt == null && (long ? bar.low < area.near : bar.high > area.near)) consumedAt = bar.timestamp
 	}
 	// §16.12: снятие стека по объёму — момент, когда снято ≥ stackConsumedShare суммарного notional полки.
+	// §16.16 (v2.4): момент = ЗАКРЫТИЕ бара снятия (+tfMs), как у swept-through (§16.10) — sweptAt пула
+	// указывает на НАЧАЛО 4h-бара, и окно резалось до пересвипа, случившегося внутри того же бара
+	// (кейс 7-го QA: глубокий свип 1858 снял ≥50% полки — попытка умерла zone-ended, не увидев свип;
+	// с закрытием бара пересвип засчитан, а попытка со свипом доигрывается за окном по §16.10).
 	let stackConsumedAt: number | null = null
 	const total = area.shelfPools.reduce((s, p) => s + p.notional, 0)
 	if (total > 0) {
@@ -366,7 +372,7 @@ function evaluateArea(area: AreaCandidate, c: Candle[], cfg: LiquidityPoiConfig)
 		let cum = 0
 		for (const p of sweeps) {
 			cum += p.notional
-			if (cum >= cfg.stackConsumedShare * total) { stackConsumedAt = p.sweptAt!; break }
+			if (cum >= cfg.stackConsumedShare * total) { stackConsumedAt = p.sweptAt! + tfMs; break }
 		}
 		if (stackConsumedAt != null && stackConsumedAt < area.geometryKnownAt) stackConsumedAt = area.geometryKnownAt
 	}

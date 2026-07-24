@@ -13,8 +13,8 @@ const mkPool = (o: Record<string, unknown>) => ({
 	notional: 10, remainingNotional: 10, status: 'active', endAt: 0, weight: 0, ...o,
 }) as never
 
-it('версия v2.3 заморожена; без пулов зон нет (liquidity-first)', () => {
-	assert.equal(LIQUIDITY_POI_VERSION, 'liquidity-poi-2.3-cover-supersede')
+it('версия v2.4 заморожена; без пулов зон нет (liquidity-first)', () => {
+	assert.equal(LIQUIDITY_POI_VERSION, 'liquidity-poi-2.4-consumed-at-close')
 	assert.deepEqual(detectLiquidityPoi([]), [])
 	assert.deepEqual(detectLiquidityPoi(flat(20), [], {}), [])
 	assert.deepEqual(detectLiquidityPoi(flat(20), [], { heatmapPools: [] }), [])
@@ -95,7 +95,7 @@ it('§14.6: close телом за far = провалена (failed)', () => {
 	assert.equal(out[0]!.failedAt, c[12]!.timestamp)
 })
 
-it('§16.12: стек снят по объёму (≥50% notional пулов) → отработана (stack-consumed)', () => {
+it('§16.12/§16.16: стек снят по объёму (≥50% notional) → отработана на ЗАКРЫТИИ бара снятия', () => {
 	const c = flat(20)
 	const at = c[2]!.timestamp
 	const pools = [
@@ -106,7 +106,9 @@ it('§16.12: стек снят по объёму (≥50% notional пулов) �
 	assert.equal(out.length, 1)
 	assert.equal(out[0]!.lifecycleState, 'spent')
 	assert.equal(out[0]!.spentReason, 'stack-consumed')
-	assert.equal(out[0]!.spentAt, c[10]!.timestamp)
+	// §16.16: sweptAt пула = НАЧАЛО бара; окно зоны живёт до его закрытия (+tfMs), чтобы
+	// пересвип внутри бара снятия попал в окно подтверждения (симметрия со swept-through §16.10).
+	assert.equal(out[0]!.spentAt, c[10]!.timestamp + TF)
 })
 
 it('§16.12: ran-away ОТМЕНЁН — касание и уход цены на 5+ ATR не хоронят зону с живым стеком', () => {
