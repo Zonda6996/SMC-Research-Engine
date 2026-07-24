@@ -13,13 +13,32 @@ import type { LiquidityPoiCandidate } from './LiquidityPoiCalibration.js'
 //  - стоп ставится за историческим экстремумом окна, если тот глубже свип-экстремума в пределах
 //    stopLookbehindAtr (кейс: стоп 74206.38 под фитилём при историческом лое 74203.6 — рынок добрал и развернул).
 // Fallback-зоны (far не от реальной ликвидности) и near-дубли (duplicateOf) не торгуются.
-export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.6-quiet-reanchor'
+// v1.7 (§16.17): лимит подряд ПРОВАЛЕННЫХ тестов слабости (weaknessFailLimit) — сетап без объёма
+// на возобновление отбраковывается, а не ждёт бесконечно; конфиг переопределяем параметром
+// (сетка калибровки, панель настроек в UI).
+export const POI_CONFIRMATION_VERSION = 'poi-confirmation-1.7-weakness-limit'
+
+/** Типизированный конфиг подтверждения: все значения переопределяемы 4-м аргументом detectPoiConfirmation. */
+export interface PoiConfirmationConfig {
+	rearmAtr: number
+	stopQuietBars: number
+	reboundMinBars: number
+	reboundAtr: number
+	stopBufferAtr: number
+	tpR: number
+	attemptIdleBars: number
+	entryMaxRiskAtr: number
+	failedProtectionCloses: number
+	stopLookbehindAtr: number
+	arrivalVolumeSma: number
+	weaknessFailLimit: number
+}
 
 /**
- * Все константы движка подтверждения (§16.8/§16.9). Значения согласованы 23.07.2026;
- * менять только по итогам визуального QA с явного согласия пользователя.
+ * Все константы движка подтверждения (§16.8/§16.9/§16.17). Значения согласованы;
+ * менять только по итогам визуального QA / сетки калибровки с явного согласия пользователя.
  */
-export const POI_CONFIRMATION_CONFIG = {
+export const POI_CONFIRMATION_CONFIG: PoiConfirmationConfig = {
 	/** Полный отход от зоны для (пере)взведения касания, в ATR confirmation TF (v1.6 armed touch, §16.7). */
 	rearmAtr: 0.25,
 	/** Остановка: направленное закрытие, при котором экстремум не обновлялся столько баров (проторговка у лоя). */
@@ -42,7 +61,12 @@ export const POI_CONFIRMATION_CONFIG = {
 	stopLookbehindAtr: 0.5,
 	/** SMA объёма за N баров ТФ зоны для пометки «пришли на объёме» (диагностика, НЕ фильтр). */
 	arrivalVolumeSma: 20,
-} as const
+	/** §16.17 (решение пользователя, 8-й QA): столько ПОДРЯД проваленных тестов слабости
+	 * (возобновление без превышения объёма отката) — попытка отбраковывается (weakness-failed).
+	 * Успешный тест (даже с отменой входа по риску), перезапуск, перенос якоря и новый пересвип
+	 * обнуляют счётчик. */
+	weaknessFailLimit: 3,
+}
 
 export interface ConfirmationTrace {
 	state: string
@@ -55,7 +79,7 @@ export interface ConfirmationTrace {
 export interface ConfirmationAttempt {
 	attemptIndex: number
 	status: 'entered' | 'rejected'
-	/** timeout@<этап> | broke-below-zone | zone-ended | null для входа. */
+	/** timeout@<этап> | broke-below-zone | zone-ended | weakness-failed | data-end | null для входа. */
 	rejectionReason: string | null
 	touchAt: number
 	/** Якорь попытки на момент последнего пересвипа (невыметенный экстремум, который снимали). */
@@ -126,8 +150,8 @@ function runAttempt(
 	pending: { value: number },
 	windowExtreme: { value: number },
 	arrivalVolumeRatio: number | null,
+	cfg: PoiConfirmationConfig,
 ): { attempt: ConfirmationAttempt; nextCursor: number } {
-	const cfg = POI_CONFIRMATION_CONFIG
 	const attempt: ConfirmationAttempt = {
 		attemptIndex, status: 'rejected', rejectionReason: null,
 		touchAt: ltf[touch]!.timestamp, stopLevel: null,
@@ -147,6 +171,8 @@ function runAttempt(
 	let sweepExtreme = Number.NaN
 	let belowCloses = 0
 	let impulseSeen = false
+	// §16.17: подряд проваленные тесты слабости; обнуляется успешным тестом/перезапуском/новым свипом.
+	let weaknessFails = 0
 	const beyondLow = (v: number) => (long ? v < low : v > low)
 	const closeBeyondFar = (c: Candle) => (long ? c.close < zoneLo : c.close > zoneHi)
 	// §16.10: тест слабости и отмена входа НЕ продлевают жизнь попытки (refreshIdle=false) —
@@ -167,6 +193,7 @@ function runAttempt(
 		reboundExtreme = Number.NaN
 		belowCloses = 0
 		impulseSeen = false
+		weaknessFails = 0
 		mark(j, 'RESTART', { price: low })
 	}
 	// Защита проверяется на самом свип-баре или следующих закрытиях (§14.2 шаги 8-9 + решение №12).
@@ -175,6 +202,7 @@ function runAttempt(
 			stage = 'entry'
 			belowCloses = 0
 			impulseSeen = dirBar(c, long)
+			weaknessFails = 0
 			mark(j, 'PROTECTED', { price: low })
 			return true
 		}
@@ -254,6 +282,7 @@ function runAttempt(
 				reboundExtreme = Number.NaN
 				belowCloses = 0
 				impulseSeen = false
+				weaknessFails = 0
 				mark(j, 'ANCHOR_DEEPENED', { price: low })
 			}
 			continue
@@ -279,8 +308,16 @@ function runAttempt(
 		}
 		if (dirBar(c, long)) {
 			const prev = ltf[j - 1]
+			// §16.17: тест слабости СОСТОЯЛСЯ (возобновление после отката), но объём НЕ выше отката —
+			// провал; weaknessFailLimit провалов подряд = сетап без топлива, попытка отбраковывается.
+			if (impulseSeen && prev && counterBar(prev, long) && c.volume <= prev.volume) {
+				weaknessFails++
+				mark(j, 'WEAKNESS_TEST_FAILED', { volume: prev.volume, volumeRatio: prev.volume > 0 ? c.volume / prev.volume : 0 }, false)
+				if (weaknessFails >= cfg.weaknessFailLimit) return reject('weakness-failed', j + 1)
+			}
 			if (impulseSeen && prev && counterBar(prev, long) && c.volume > prev.volume) {
 				// Тест слабости пройден: объём свечи возобновления ВЫШЕ объёма последней откатной (50 > 40).
+				weaknessFails = 0
 				mark(j, 'WEAKNESS_TEST', { volume: prev.volume, volumeRatio: prev.volume > 0 ? c.volume / prev.volume : 0 }, false)
 				attempt.trace.at(-1)!.at = prev.timestamp
 				const a = atr(ltf, j)
@@ -338,8 +375,9 @@ function runAttempt(
  * Лимита попыток нет — окно ограничено жизнью зоны, отработкой (tp-hit) и бездействием попыток.
  * htf — свечи ТФ зоны (4h) для диагностики «пришли на объёме»; без них пометка null.
  */
-export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle[], htf?: Candle[]): PoiConfirmationResult[] {
-	const cfg = POI_CONFIRMATION_CONFIG
+export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle[], htf?: Candle[], config?: Partial<PoiConfirmationConfig>): PoiConfirmationResult[] {
+	// §16.17: конфиг переопределяем (сетка калибровки, панель настроек UI); дефолты не мутируют.
+	const cfg: PoiConfirmationConfig = { ...POI_CONFIRMATION_CONFIG, ...config }
 	const out: PoiConfirmationResult[] = []
 	const htfMs = htf && htf.length > 1 ? htf[1]!.timestamp - htf[0]!.timestamp : 0
 	const arrivalRatio = (touchAt: number): number | null => {
@@ -391,7 +429,7 @@ export function detectPoiConfirmation(pois: LiquidityPoiCandidate[], ltf: Candle
 			}
 			if (touch < 0) break
 			const { attempt, nextCursor } = runAttempt(
-				ltf, endIndex, touch, long, result.attempts.length + 1, lo, hi, pending, windowExtreme, arrivalRatio(ltf[touch]!.timestamp))
+				ltf, endIndex, touch, long, result.attempts.length + 1, lo, hi, pending, windowExtreme, arrivalRatio(ltf[touch]!.timestamp), cfg)
 			result.attempts.push(attempt)
 			cursor = Math.max(nextCursor, touch + 1)
 			// §16.9: свип «тратит» невыметенный экстремум — новый копится с бара после последнего свипа.

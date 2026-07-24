@@ -55,8 +55,35 @@ const mirror = (bars: Candle[]): Candle[] => bars.map(b => ({
 }))
 
 it('версия заморожена; пустой вход — пустой выход', () => {
-	assert.equal(POI_CONFIRMATION_VERSION, 'poi-confirmation-1.6-quiet-reanchor')
+	assert.equal(POI_CONFIRMATION_VERSION, 'poi-confirmation-1.7-weakness-limit')
 	assert.deepEqual(detectPoiConfirmation([], []), [])
+})
+
+it('§16.17: weaknessFailLimit подряд проваленных тестов слабости — отбраковка weakness-failed', () => {
+	// До защиты — как в полной последовательности; дальше три возобновления подряд БЕЗ объёма
+	// (объём возобновления ≤ объёма отката) → weakness-failed на третьем провале.
+	const seq = fullLongSequence(0).slice(0, 14) // ...по бар 20 включительно (ЗАЩИТА)
+	const tail: Candle[] = [
+		{ timestamp: 21, open: 95, high: 96.5, low: 94.8, close: 96, volume: 20 },    // импульс
+		{ timestamp: 22, open: 96, high: 96.3, low: 95, close: 95.3, volume: 50 },    // откатная v50
+		{ timestamp: 23, open: 95.3, high: 96.5, low: 95.1, close: 95.9, volume: 40 }, // возобновление v40 ≤ 50 → провал 1
+		{ timestamp: 24, open: 95.9, high: 96.4, low: 95.2, close: 95.4, volume: 50 }, // откатная
+		{ timestamp: 25, open: 95.4, high: 96.6, low: 95.2, close: 96.1, volume: 45 }, // провал 2
+		{ timestamp: 26, open: 96.1, high: 96.5, low: 95.3, close: 95.5, volume: 50 }, // откатная
+		{ timestamp: 27, open: 95.5, high: 96.7, low: 95.3, close: 96.2, volume: 30 }, // провал 3 → отбраковка
+		{ timestamp: 28, open: 96.2, high: 96.4, low: 95.2, close: 95.4, volume: 50 }, // откатная
+		{ timestamp: 29, open: 95.4, high: 96.2, low: 95.2, close: 95.9, volume: 99 }, // возобновление с объёмом
+	]
+	const ltf: Candle[] = [...baseline(7, 0, 110), ...seq, ...tail]
+	const [result] = detectPoiConfirmation([makePoi()], ltf)
+	const attempt = result!.attempts[0]!
+	assert.equal(attempt.status, 'rejected')
+	assert.equal(attempt.rejectionReason, 'weakness-failed')
+	assert.equal(attempt.trace.filter(t => t.state === 'WEAKNESS_TEST_FAILED').length, 3)
+	// Контроль: с лимитом из конфига выше трёх — та же попытка доживает до четвёртого возобновления
+	// с объёмом (v99 > 50) и входит.
+	const [loose] = detectPoiConfirmation([makePoi()], ltf, undefined, { weaknessFailLimit: 99 })
+	assert.equal(loose!.attempts[0]!.status, 'entered')
 })
 
 it('полная LONG-последовательность: проторговка у лоя → остановка → отскок → пересвип → защита → тест слабости → вход → TP2', () => {
