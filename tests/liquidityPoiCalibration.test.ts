@@ -13,8 +13,8 @@ const mkPool = (o: Record<string, unknown>) => ({
 	notional: 10, remainingNotional: 10, status: 'active', endAt: 0, weight: 0, ...o,
 }) as never
 
-it('версия v2.1 заморожена; без пулов зон нет (liquidity-first)', () => {
-	assert.equal(LIQUIDITY_POI_VERSION, 'liquidity-poi-2.1-valley-shelves')
+it('версия v2.2 заморожена; без пулов зон нет (liquidity-first)', () => {
+	assert.equal(LIQUIDITY_POI_VERSION, 'liquidity-poi-2.2-stack-kinship')
 	assert.deepEqual(detectLiquidityPoi([]), [])
 	assert.deepEqual(detectLiquidityPoi(flat(20), [], {}), [])
 	assert.deepEqual(detectLiquidityPoi(flat(20), [], { heatmapPools: [] }), [])
@@ -158,13 +158,13 @@ it('§16.13: свежесть 300 — полка, не кормившаяся 30
 	assert.equal(out[0]!.retiredAt, c[2]!.timestamp + 300 * TF)
 })
 
-it('§16.13: гард высоты — полка, выросшая сильнее 2× вокруг старой узкой зоны, живёт рядом (не дубль)', () => {
+it('§16.14: родство стеков — НЕТРОНУТАЯ старшая отставляется свежей геометрией (supersededAt)', () => {
 	const c = flat(40)
 	const a2 = c[2]!.timestamp, a20 = c[20]!.timestamp
 	const pools = [
 		mkPool({ side: 'sell-side', extremePrice: 105, bandLow: 104, bandHigh: 106, notional: 5, startAt: a2, lastContributionAt: a2 }),
-		// Ре-аккумуляция: полка выросла до 103-108.5 (высота 5.5 > 2×2) — перекрытие 100% старой,
-		// но это НЕ «два стопа в одной зоне», а новый объект вокруг неё.
+		// Ре-аккумуляция: полка выросла до 103-108.5; общий пул = 100% стека старшей (родство),
+		// старшую никто не трогал → побеждает свежая геометрия, старшая отставлена поколением.
 		mkPool({ side: 'sell-side', extremePrice: 104.2, bandLow: 103, bandHigh: 106, notional: 10, startAt: a20, lastContributionAt: a20 }),
 		mkPool({ side: 'sell-side', extremePrice: 107.2, bandLow: 105.9, bandHigh: 108.5, notional: 10, startAt: a20, lastContributionAt: a20 }),
 	]
@@ -172,28 +172,55 @@ it('§16.13: гард высоты — полка, выросшая сильне
 	const senior = out.find(z => z.near === 104)
 	const junior = out.find(z => z.near === 103)
 	assert.ok(senior && junior)
-	assert.equal(senior!.duplicateOf, null)
-	assert.equal(junior!.duplicateOf, null) // без гарда §16.13 стал бы дублем (перекрытие 1.0 ≥ 0.6)
+	assert.equal(junior!.duplicateOf, null)
+	assert.equal(junior!.active, true)
+	assert.equal(senior!.duplicateOf, null) // отставлена, но НЕ дубль
+	assert.equal(senior!.supersededAt, junior!.knownAt)
+	assert.equal(senior!.lifecycleState, 'retired')
+	assert.equal(senior!.endAt, junior!.knownAt)
+	assert.equal(senior!.active, false)
 })
 
-it('§16.12: существенное обновление пулов полки (novelty ≥ 0.5) перерождает зону; дубль подавляется живой старшей', () => {
+it('§16.14: родство стеков — ТРОНУТАЯ старшая главнее (окно в работе), младшая = дубль', () => {
+	const c = flat(40)
+	c[10] = { ...c[10]!, high: 104.5 } // касание старшей зоны 104–106 до рождения младшей
+	const a2 = c[2]!.timestamp, a20 = c[20]!.timestamp
+	const pools = [
+		mkPool({ side: 'sell-side', extremePrice: 105, bandLow: 104, bandHigh: 106, notional: 5, startAt: a2, lastContributionAt: a2 }),
+		mkPool({ side: 'sell-side', extremePrice: 105.5, bandLow: 104.5, bandHigh: 106.5, notional: 10, startAt: a20, lastContributionAt: a20 }),
+	]
+	const out = detectLiquidityPoi(c, [], { heatmapPools: pools })
+	const senior = out.find(z => z.knownAt === a2 + TF)!
+	const junior = out.find(z => z.knownAt === a20 + TF)!
+	assert.ok(senior && junior)
+	assert.ok(senior.firstTouchAt != null && senior.firstTouchAt < junior.knownAt)
+	assert.equal(senior.supersededAt, null)
+	assert.equal(senior.active, true)
+	assert.equal(junior.duplicateOf, senior.id)
+	assert.equal(junior.active, false)
+})
+
+it('§16.12/§16.14: novelty ≥ 0.5 перерождает зону; нетронутое место обновляется поколением, эмиссия без обновления — одна', () => {
 	const c = flat(40)
 	const a2 = c[2]!.timestamp, a20 = c[20]!.timestamp
 	const pools = [
 		mkPool({ side: 'sell-side', extremePrice: 105, bandLow: 104, bandHigh: 106, notional: 5, startAt: a2, lastContributionAt: a2 }),
-		// Ре-аккумуляция: новый жирный пул в том же месте (novelty 10/15 ≥ 0.5) → новый кандидат.
+		// Ре-аккумуляция: новый жирный пул в том же месте (novelty 10/15 ≥ 0.5) → новый кандидат;
+		// старшую не трогали → §16.14 отдаёт место свежему поколению (supersede, не дубль).
 		mkPool({ side: 'sell-side', extremePrice: 105.5, bandLow: 104.5, bandHigh: 106.5, notional: 10, startAt: a20, lastContributionAt: a20 }),
 	]
 	const out = detectLiquidityPoi(c, [], { heatmapPools: pools })
 	const around104 = out.filter(z => Math.min(z.near, z.far) < 105)
 	assert.equal(around104.length, 2)
-	const senior = around104.find(z => z.duplicateOf == null)!
-	const dup = around104.find(z => z.duplicateOf != null)!
-	assert.ok(senior && dup)
-	assert.equal(dup.duplicateOf, senior.id) // старшая зона жива — новое поколение подавлено как дубль
-	assert.equal(dup.active, false)
-	assert.ok(senior.suppressedCount >= 1)
+	const senior = around104.find(z => z.knownAt === a2 + TF)!
+	const junior = around104.find(z => z.knownAt === a20 + TF)!
+	assert.equal(junior.duplicateOf, null)
+	assert.equal(junior.active, true)
+	assert.equal(senior.supersededAt, junior.knownAt)
+	assert.equal(senior.active, false)
 	// Без обновления пулов непрерывно значимая полка эмитится ровно один раз.
 	const single = detectLiquidityPoi(c, [], { heatmapPools: [pools[0]!] })
 	assert.equal(single.length, 1)
+	assert.equal(single[0]!.stackShare, 1) // §16.14: сила стека сильнейшей активной полки стороны = 1
+	assert.equal(single[0]!.stackNotional, 5)
 })

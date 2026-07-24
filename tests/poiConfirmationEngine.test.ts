@@ -13,6 +13,7 @@ function makePoi(overrides: Partial<LiquidityPoiCandidate> = {}): LiquidityPoiCa
 		pdZone: 'none', pdAligned: null, lifecycleState: 'fresh', valid: true, active: true,
 		priority: 'nearest', interaction: 'untouched', touchCount: 0, armedAt: 0, firstTouchAt: null,
 		consumedAt: null, failedAt: null, spentAt: null, spentReason: null, duplicateOf: null, retiredAt: null,
+		stackNotional: 0, stackShare: 1,
 		geometryKnownAt: 0, lineageSupersededAt: null,
 		supersededAt: null, invalidatedAt: null, endAt: 100_000, mergedCount: 0, suppressedCount: 0,
 		...overrides,

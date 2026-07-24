@@ -13,8 +13,12 @@ import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 // РАЗРЕЗАННАЯ ПО ПРОВАЛАМ ПЛОТНОСТИ notional-профиля (как провалы в правой панели heatmap, по которым
 // пользователь и рисует границы руками). Потолок высоты — % от цены края (ATR-потолок 6.0 дал гигантов
 // 9–11k при ATR рождения 1500–1800, а 3 ATR в спокойном режиме резал бы эталонные ручные зоны).
-// Подтверждение (1.6) работает без изменений — интерфейс LiquidityPoiCandidate сохранён.
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-2.1-valley-shelves'
+// v2.2 (5-й QA): РОДСТВО СТЕКОВ — зоны, делящие ≥ половины меньшего стека (общие пулы), считаются
+// одним объектом: «близнецы» сползших окон и вложенные поколения роста схлопываются; побеждает
+// старшая, если тронута до рождения младшей (окно подтверждения в работе), иначе младшая (свежая
+// геометрия), старшая отставляется (supersededAt). Плюс дисплей-метрика силы стека (stackShare)
+// для фильтра слабых полок в UI. Подтверждение (1.6) работает без изменений.
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-2.2-stack-kinship'
 
 /** Типизированный конфиг движка зон: все значения переопределяемы через LiquidityPoiContext.config. */
 export interface LiquidityPoiConfig {
@@ -32,6 +36,7 @@ export interface LiquidityPoiConfig {
 	dupOverlapShare: number
 	dupMaxHeightRatio: number
 	shelfIdentityShare: number
+	stackKinshipShare: number
 	shelfMinShare: number
 	shelfNoveltyShare: number
 }
@@ -76,6 +81,12 @@ export const LIQUIDITY_POI_CONFIG: LiquidityPoiConfig = {
 	dupMaxHeightRatio: 2.0,
 	/** Идентичность полки между барами при сканировании (анти-спам эмиссии): перекрытие ≥ этой доли. */
 	shelfIdentityShare: 0.6,
+	/** §16.14: родство стеков — две зоны считаются одним объектом ликвидности, если общий notional
+	 * их стеков ≥ этой доли МЕНЬШЕГО стека. Ловит «близнецов» (окно полки сползло: 71% общих пулов
+	 * при перекрытии цен 50%) и вложенные поколения роста. Победитель: старшая, если её окно уже
+	 * В РАБОТЕ (тронута до рождения младшей), иначе — младшая (свежая геометрия), старшая получает
+	 * supersededAt. Значение согласовано с shelfNoveltyShare: «наполовину тот же стек». */
+	stackKinshipShare: 0.5,
 	/** Значимость-пол: полка рождает зону, только если её notional ≥ этой доли суммы свежих пулов стороны
 	 * (отсекает одинокие тонкие пулы лестницы ликвидаций, пролезающие в топ-N в тонкие периоды).
 	 * §16.13: 0.05 → 0.03 — после разреза цепей по провалам нотионалы полок упали, 0.05 убивал
@@ -149,6 +160,11 @@ export interface LiquidityPoiCandidate {
 	spentReason: 'swept-through' | 'stack-consumed' | null
 	/** §16.9: near-дубль старшей зоны — подавлена, не торгуется и не показывается; геометрия не мутирует. */
 	duplicateOf: string | null
+	/** §16.14: суммарный notional стека зоны (пулы полки на момент рождения). */
+	stackNotional: number
+	/** §16.14: доля стека от сильнейшего АКТИВНОГО стека той же стороны на конец истории (0..1+,
+	 * у мёртвых зон может превышать 1) — дисплей-метрика «сила полки» для фильтра слабых зон в UI. */
+	stackShare: number
 	geometryKnownAt: number
 	lineageSupersededAt: number | null
 	supersededAt: number | null
@@ -385,10 +401,25 @@ function evaluateArea(area: AreaCandidate, c: Candle[], cfg: LiquidityPoiConfig)
 	}
 }
 
-/** §16.9/§16.11: подавление дублей (near ≤ dupNearAtr×ATR или перекрытие ≥ dupOverlapShare меньшей). */
+/**
+ * §16.9/§16.11/§16.14: родство стеков и подавление дублей.
+ * Родство (§16.14): общий notional стеков ≥ stackKinshipShare меньшего стека — один объект
+ * ликвидности («близнецы» сползшего окна, вложенные поколения роста). Победитель: старшая, если
+ * тронута ДО рождения младшей (окно в работе → младшая = дубль); иначе младшая (свежая геометрия),
+ * старшая отставляется (supersededAt, retired). Затем классика: near ≤ dupNearAtr×ATR или
+ * перекрытие ≥ dupOverlapShare меньшей при сопоставимой высоте (≤ dupMaxHeightRatio).
+ */
 function consolidate(raw: AreaCandidate[], c: Candle[], cfg: LiquidityPoiConfig): AreaCandidate[] {
 	const areas = [...raw].sort((a, b) => a.knownAt - b.knownAt || a.originAt - b.originAt).map(x => evaluateArea(x, c, cfg))
 	const bySeniority = [...areas].sort((a, b) => a.knownAt - b.knownAt || a.originAt - b.originAt)
+	const stackTotal = (x: AreaCandidate) => x.shelfPools.reduce((s, p) => s + p.notional, 0)
+	const sharedStack = (junior: AreaCandidate, senior: AreaCandidate) => {
+		const seniorIds = new Set(senior.componentAnchorIds)
+		let s = 0
+		for (let i = 0; i < junior.componentAnchorIds.length; i++)
+			if (seniorIds.has(junior.componentAnchorIds[i]!)) s += junior.shelfPools[i]?.notional ?? 0
+		return s
+	}
 	for (const senior of bySeniority) {
 		if (senior.duplicateOf != null) continue
 		for (const junior of bySeniority) {
@@ -396,6 +427,26 @@ function consolidate(raw: AreaCandidate[], c: Candle[], cfg: LiquidityPoiConfig)
 			if (junior.direction !== senior.direction) continue
 			if (junior.knownAt < senior.knownAt) continue
 			if (!(senior.knownAt < junior.endAt && junior.knownAt < senior.endAt)) continue
+			// §16.14: родство стеков.
+			const shared = sharedStack(junior, senior)
+			if (shared > 0 && shared >= cfg.stackKinshipShare * Math.min(stackTotal(junior), stackTotal(senior))) {
+				const touchedBeforeJunior = senior.firstTouchAt != null && senior.firstTouchAt < junior.knownAt
+				if (touchedBeforeJunior) {
+					junior.duplicateOf = senior.id
+					senior.suppressedCount += 1
+				} else {
+					senior.supersededAt = junior.knownAt
+					senior.endAt = junior.knownAt
+					senior.lifecycleState = 'retired'
+					senior.retiredAt = junior.knownAt
+					senior.failedAt = null
+					senior.spentAt = null
+					senior.spentReason = null
+					senior.invalidatedAt = null
+					senior.valid = false
+				}
+				continue
+			}
 			const nearDup = Math.abs(junior.near - senior.near) <= cfg.dupNearAtr * senior.atr
 			const sLo = Math.min(senior.near, senior.far), sHi = Math.max(senior.near, senior.far)
 			const jLo = Math.min(junior.near, junior.far), jHi = Math.max(junior.near, junior.far)
@@ -421,10 +472,14 @@ function consolidate(raw: AreaCandidate[], c: Candle[], cfg: LiquidityPoiConfig)
 		|| b.shelfPools.reduce((s, p) => s + p.notional, 0) - a.shelfPools.reduce((s, p) => s + p.notional, 0)
 	const nearestLong = fresh.filter(x => x.direction === 'long').sort(nearestPick)[0]
 	const nearestShort = fresh.filter(x => x.direction === 'short').sort(nearestPick)[0]
+	// §16.14: сила полки — доля стека от сильнейшего АКТИВНОГО стека стороны (дисплей-метрика).
+	const maxStack: Record<'long' | 'short', number> = { long: 0, short: 0 }
+	for (const x of fresh) maxStack[x.direction] = Math.max(maxStack[x.direction], stackTotal(x))
 	return areas.map(x => {
 		const priority: ZonePriority = x === nearestLong || x === nearestShort ? 'nearest' : 'secondary'
+		const sn = stackTotal(x)
 		// §16.12: «важные» = ближайшая пара + все свежие непод авленные зоны значимых полок.
-		return { ...x, priority, active: x.valid && x.duplicateOf == null }
+		return { ...x, priority, active: x.valid && x.duplicateOf == null, stackNotional: sn, stackShare: maxStack[x.direction] > 0 ? sn / maxStack[x.direction] : 1 }
 	})
 }
 
@@ -451,6 +506,9 @@ export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], 
 	// Реестр эмиссий: полка перерождает зону, только когда её пулы существенно ОБНОВИЛИСЬ
 	// (re-accumulation): доля notional новых пулов ≥ shelfNoveltyShare. Непрерывно значимая полка
 	// эмитится один раз; её умершая зона (стек снят) перерождается на новых пулах.
+	// (Проверено и отвергнуто в §16.14: реестр пулов на ВСЮ сторону — эмиссии замораживались на
+	// первом пересечении новизны, карта застывала на старых широких поколениях. Идентичность полки
+	// остаётся геометрической; родство стеков решает дедуп/поглощение в consolidate.)
 	const emissions: Record<'buy-side' | 'sell-side', Array<{ lo: number; hi: number; poolIds: Set<string> }>> = { 'buy-side': [], 'sell-side': [] }
 	for (let i = 0; i < c.length; i++) {
 		const bar = c[i]!
@@ -468,6 +526,10 @@ export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], 
 			if (!freshPools.length) continue
 			const sideTotal = freshPools.reduce((sm, p) => sm + p.notional, 0)
 			const shelves = buildShelves(freshPools, a, cfg)
+			// (§16.14: пик-фильтр рождения «≥ доли сильнейшей полки бара» проверен и отвергнут —
+			// выбивал ранние мелкие эмиссии-«прививки», после чего выросшие полки рождались гигантами
+			// одним куском, а мизеры тонких периодов всё равно выживали: при их рождении они сами были
+			// пиком стороны. Слабость стека — дисплей-метаданные stackShare + фильтр UI, не правило.)
 			const significant = [...shelves].sort((x, y) => y.notional - x.notional).slice(0, cfg.shelfTopN)
 				.filter(sh => sh.notional >= cfg.shelfMinShare * sideTotal)
 			for (const shelf of significant) {
@@ -513,7 +575,8 @@ export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], 
 					lifecycleState: 'forming', valid: false, active: false, priority: 'secondary',
 					interaction: 'untouched', touchCount: 0, armedAt: null, firstTouchAt: null,
 					consumedAt: null, failedAt: null, retiredAt: null, spentAt: null, spentReason: null,
-					duplicateOf: null, lineageSupersededAt: null, supersededAt: null, invalidatedAt: null,
+					duplicateOf: null, stackNotional: 0, stackShare: 1,
+					lineageSupersededAt: null, supersededAt: null, invalidatedAt: null,
 					endAt: c.at(-1)!.timestamp, mergedCount: 0, suppressedCount: 0,
 					shelfPools: shelf.pools.map(p => ({ notional: p.notional, sweptAt: p.sweptAt, lastContributionAt: p.lastContributionAt })),
 				})
