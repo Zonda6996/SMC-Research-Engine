@@ -4,31 +4,63 @@ import type { StructurePoint } from '../../models/structure/StructurePoint.js'
 import type { ProtectedLevelLifecycle } from '../../models/structure/ProtectedLevelLifecycle.js'
 import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 
-// SPEC §16.12 (v2.0, утверждено 23.07.2026): ЗОНЫ РОЖДАЮТСЯ ОТ ЛИКВИДНОСТИ, структура — пометка.
-// Три раунда визуального QA показали: генерация от структурных записей (protected/EQ/outer) даёт карту,
-// расходящуюся с ручной картой пользователя, у которого каждая зона = жирная СВЕЖАЯ полка heatmap +
-// ближайший невыметенный экстремум. v2.0: полка (стек живых свежих пулов) значима по силе×свежести →
-// зона [near=wick экстремума перед полкой или край полки, far=конец стека]; жизнь зоны = жизнь её стека.
-// Правило ran-away («3 ATR от near») ОТМЕНЕНО; отставка по CHoCH не применяется. Подтверждение (1.6)
-// работает без изменений — интерфейс LiquidityPoiCandidate сохранён.
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-2.0-liquidity-first'
+// SPEC §16.12 (v2.0) + §16.13 (v2.1, калибровка 24.07.2026): ЗОНЫ РОЖДАЮТСЯ ОТ ЛИКВИДНОСТИ.
+// v2.0: полка (стек живых свежих пулов) значима по силе×свежести → зона [near=wick экстремума перед
+// полкой или край полки, far=конец стека]; жизнь зоны = жизнь её стека. Ran-away и CHoCH-отставка отменены.
+// v2.1 (диагноз 4-го QA — зоны-гиганты): склейка соседних пулов по краям полос строила мега-цепи
+// (48–59k одной зоной), а дистанционная кластеризация ядер не работает в принципе: лестница ликвидаций
+// почти непрерывна с шагом в % от цены (бины), а не в ATR. Полка теперь = СУПЕР-ЦЕПЬ (склейка §16.10),
+// РАЗРЕЗАННАЯ ПО ПРОВАЛАМ ПЛОТНОСТИ notional-профиля (как провалы в правой панели heatmap, по которым
+// пользователь и рисует границы руками). Потолок высоты — % от цены края (ATR-потолок 6.0 дал гигантов
+// 9–11k при ATR рождения 1500–1800, а 3 ATR в спокойном режиме резал бы эталонные ручные зоны).
+// Подтверждение (1.6) работает без изменений — интерфейс LiquidityPoiCandidate сохранён.
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-2.1-valley-shelves'
+
+/** Типизированный конфиг движка зон: все значения переопределяемы через LiquidityPoiContext.config. */
+export interface LiquidityPoiConfig {
+	atrPeriod: number
+	stackGapAtr: number
+	stackMaxPct: number
+	shelfProfileBinPct: number
+	shelfValleyShare: number
+	shelfValleyMinBins: number
+	shelfTopN: number
+	shelfFreshBars: number
+	nearTolAtr: number
+	stackConsumedShare: number
+	dupNearAtr: number
+	dupOverlapShare: number
+	dupMaxHeightRatio: number
+	shelfIdentityShare: number
+	shelfMinShare: number
+	shelfNoveltyShare: number
+}
 
 /**
- * Все константы POI-движка (§16.12). Значения стартовые, калибруются по визуальному QA;
+ * Все константы POI-движка (§16.12/§16.13). Значения стартовые, калибруются по визуальному QA;
  * менять только с явного согласия пользователя.
  */
-export const LIQUIDITY_POI_CONFIG = {
+export const LIQUIDITY_POI_CONFIG: LiquidityPoiConfig = {
 	/** Период ATR (стандартная детекторная константа). */
 	atrPeriod: 14,
-	/** Стек: соседний пул присоединяется к полке при перекрытии или разрыве ≤ этой доли ATR (§16.10). */
+	/** Супер-цепь: соседний пул приклеивается при перекрытии или разрыве полос ≤ этой доли ATR (§16.10).
+	 * С v2.1 это только ПЕРВЫЙ шаг — границы зон задаёт разрез цепи по провалам плотности. */
 	stackGapAtr: 0.5,
-	/** Потолок высоты полки/зоны, в ATR — лестница ликвидаций почти непрерывна (§16.10). */
-	stackMaxAtr: 6.0,
+	/** §16.13: потолок высоты зоны — доля от цены ближнего края полки (стабильная единица: ручные зоны
+	 * пользователя ≤ ~7.8% от края; ATR-потолок был нестабилен между режимами волатильности). */
+	stackMaxPct: 0.08,
+	/** §16.13: ширина корзины notional-профиля полки (лог-шаг, доля цены) — как бин heatmap 4h. */
+	shelfProfileBinPct: 0.004,
+	/** §16.13: уровень провала — корзина «пустая», если её notional < этой доли ПИКА профиля цепи. */
+	shelfValleyShare: 0.25,
+	/** §16.13: разрез цепи там, где подряд ≥ этого числа пустых корзин (≈1.2% цены при бине 0.4%). */
+	shelfValleyMinBins: 3,
 	/** Значимость: полка рождает зону, только если входит в топ-N по notional на свою сторону. */
 	shelfTopN: 5,
-	/** Свежесть: пул участвует в полке, пока прошло ≤ этого числа баров ТФ зоны от его последнего
-	 * пополнения (согласовано с age-фильтром heatmap-вьюера — пользователь смотрит 500). */
-	shelfFreshBars: 500,
+	/** §16.13: свежесть 500 → 300 — пул участвует в полке, пока прошло ≤ этого числа баров ТФ зоны от
+	 * его последнего пополнения; 500 (83 дня) держало майские мега-полки против текущих. Та же константа
+	 * гасит устаревшие зоны (retired), укорачивая линии «через весь график». */
+	shelfFreshBars: 300,
 	/** Near = точный wick невыметенного 4h-экстремума, если он в пределах этой доли ATR от ближнего
 	 * края полки (§12.1); иначе near = край полки. */
 	nearTolAtr: 0.5,
@@ -38,15 +70,21 @@ export const LIQUIDITY_POI_CONFIG = {
 	dupNearAtr: 0.25,
 	/** §16.11: дубль и по перекрытию — диапазоны одной стороны пересекаются на эту долю меньшей зоны. */
 	dupOverlapShare: 0.6,
+	/** §16.13: гард перекрытия — дубль только при СОПОСТАВИМОЙ высоте (младшая ≤ этого множителя высоты
+	 * старшей). Правило перекрытия писалось под «два стопа в одной зоне»; без гарда старая узкая зона
+	 * маскировала полку, выросшую вокруг неё после ре-аккумуляции (кейс 53.2–57.4k: 12B без зоны). */
+	dupMaxHeightRatio: 2.0,
 	/** Идентичность полки между барами при сканировании (анти-спам эмиссии): перекрытие ≥ этой доли. */
 	shelfIdentityShare: 0.6,
 	/** Значимость-пол: полка рождает зону, только если её notional ≥ этой доли суммы свежих пулов стороны
-	 * (отсекает одинокие тонкие пулы лестницы ликвидаций, пролезающие в топ-N в тонкие периоды). */
-	shelfMinShare: 0.05,
+	 * (отсекает одинокие тонкие пулы лестницы ликвидаций, пролезающие в топ-N в тонкие периоды).
+	 * §16.13: 0.05 → 0.03 — после разреза цепей по провалам нотионалы полок упали, 0.05 убивал
+	 * эталонную полку 63–64.2k (6.7B при поле 7.5B). */
+	shelfMinShare: 0.03,
 	/** Перерождение полки: если ≥ этой доли notional текущей полки — из пулов, которых не было в прошлых
 	 * эмиссиях этого места, полка считается НОВЫМ поколением и рождает зону заново (re-accumulation). */
 	shelfNoveltyShare: 0.5,
-} as const
+}
 
 /** §16.12: структурные классы зон больше не рождаются; значение оставлено одно + легаси для типов. */
 export type LiquidityZoneClass = 'liquidity-shelf' | 'outer-swing' | 'protected-structure' | 'local-eq'
@@ -68,6 +106,9 @@ export interface LiquidityPoiContext {
 	protectedHistory?: ProtectedLevelLifecycle[]
 	/** Пулы heatmap того же TF — единственный источник зон в v2.0. Без них зон нет. */
 	heatmapPools?: LiquidityPool[]
+	/** §16.13: переопределение констант (диагностика вариантов, конфиги движков в UI визуализатора).
+	 * Без него используется LIQUIDITY_POI_CONFIG; правила значений те же — менять по согласованию. */
+	config?: Partial<LiquidityPoiConfig>
 }
 export interface LiquidityPoiCandidate {
 	id: string
@@ -172,9 +213,8 @@ function pdAt(c: Candle[], structure: StructurePoint[], knownAt: number, price: 
 	return { pdZone, pdAligned: direction === 'long' ? pdZone === 'discount' : pdZone === 'premium' }
 }
 
-/** Кластеризация живых свежих пулов стороны в полки: перекрытие или разрыв ≤ stackGapAtr×ATR. */
-function buildShelves(pools: LiquidityPool[], a: number): Shelf[] {
-	const cfg = LIQUIDITY_POI_CONFIG
+/** Кластеризация живых свежих пулов стороны в СУПЕР-ЦЕПИ: перекрытие или разрыв ≤ stackGapAtr×ATR. */
+function buildChains(pools: LiquidityPool[], a: number, cfg: LiquidityPoiConfig): Shelf[] {
 	const sorted = [...pools].sort((x, y) => x.bandLow - y.bandLow)
 	const shelves: Shelf[] = []
 	for (const p of sorted) {
@@ -189,6 +229,61 @@ function buildShelves(pools: LiquidityPool[], a: number): Shelf[] {
 		}
 	}
 	return shelves
+}
+
+/** Конверт полки по полосам её пулов. */
+function envelope(pools: LiquidityPool[]): Shelf {
+	let lo = Infinity, hi = -Infinity, notional = 0
+	for (const p of pools) {
+		lo = Math.min(lo, p.bandLow)
+		hi = Math.max(hi, p.bandHigh)
+		notional += p.notional
+	}
+	return { lo, hi, notional, pools }
+}
+
+/**
+ * §16.13: разрез супер-цепи по ПРОВАЛАМ ПЛОТНОСТИ. Notional пулов раскладывается по лог-корзинам
+ * shelfProfileBinPct; провал = подряд ≥ shelfValleyMinBins корзин с массой < shelfValleyShare × пик
+ * профиля цепи. Разрез — по середине провала; пулы распределяются по ядрам (extremePrice). Лестница
+ * ликвидаций почти непрерывна, поэтому дистанция между ядрами не разделяет полки — их разделяют
+ * именно провалы массы, которые пользователь видит в профиле heatmap и по которым рисует границы.
+ * Тонкие хвосты цепи (провал у края) отрезаются теми же правилами и умирают о shelfMinShare/topN.
+ */
+function splitChainAtValleys(chain: Shelf, cfg: LiquidityPoiConfig): Shelf[] {
+	if (chain.pools.length < 2) return [chain]
+	const step = Math.log(1 + cfg.shelfProfileBinPct)
+	const k0 = Math.floor(Math.log(chain.lo) / step)
+	const k1 = Math.floor(Math.log(chain.hi) / step)
+	const n = k1 - k0 + 1
+	if (n < cfg.shelfValleyMinBins + 2) return [chain]
+	const density = new Array<number>(n).fill(0)
+	for (const p of chain.pools) {
+		const a = Math.max(k0, Math.floor(Math.log(p.bandLow) / step))
+		const b = Math.min(k1, Math.floor(Math.log(p.bandHigh) / step))
+		const cover = Math.max(1, b - a + 1)
+		for (let k = a; k <= b; k++) density[k - k0]! += p.notional / cover
+	}
+	const cut = cfg.shelfValleyShare * Math.max(...density)
+	const splits: number[] = []
+	let runStart = -1
+	for (let i = 0; i <= n; i++) {
+		const below = i < n && density[i]! < cut
+		if (below && runStart < 0) runStart = i
+		if (!below && runStart >= 0) {
+			if (i - runStart >= cfg.shelfValleyMinBins) splits.push(Math.exp((k0 + runStart + (i - runStart) / 2) * step))
+			runStart = -1
+		}
+	}
+	if (!splits.length) return [chain]
+	const parts: LiquidityPool[][] = Array.from({ length: splits.length + 1 }, () => [])
+	for (const p of chain.pools) parts[splits.filter(s => p.extremePrice >= s).length]!.push(p)
+	return parts.filter(x => x.length).map(envelope)
+}
+
+/** §16.13: полки стороны = супер-цепи, разрезанные по провалам плотности. */
+function buildShelves(pools: LiquidityPool[], a: number, cfg: LiquidityPoiConfig): Shelf[] {
+	return buildChains(pools, a, cfg).flatMap(chain => splitChainAtValleys(chain, cfg))
 }
 
 const overlapShare = (aLo: number, aHi: number, bLo: number, bHi: number): number => {
@@ -210,8 +305,7 @@ function isOpen(x: AreaCandidate): boolean {
  * (фитиль за far, момент = закрытие бара прохода), снятие стека по объёму (≥ stackConsumedShare
  * суммарного notional полки — по sweptAt пулов). Ran-away и CHoCH-отставка отменены.
  */
-function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
-	const cfg = LIQUIDITY_POI_CONFIG
+function evaluateArea(area: AreaCandidate, c: Candle[], cfg: LiquidityPoiConfig): AreaCandidate {
 	const long = area.direction === 'long'
 	const tfMs = c.length > 1 ? c[1]!.timestamp - c[0]!.timestamp : 0
 	const start = c.findIndex(x => x.timestamp >= area.geometryKnownAt)
@@ -292,9 +386,8 @@ function evaluateArea(area: AreaCandidate, c: Candle[]): AreaCandidate {
 }
 
 /** §16.9/§16.11: подавление дублей (near ≤ dupNearAtr×ATR или перекрытие ≥ dupOverlapShare меньшей). */
-function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
-	const cfg = LIQUIDITY_POI_CONFIG
-	const areas = [...raw].sort((a, b) => a.knownAt - b.knownAt || a.originAt - b.originAt).map(x => evaluateArea(x, c))
+function consolidate(raw: AreaCandidate[], c: Candle[], cfg: LiquidityPoiConfig): AreaCandidate[] {
+	const areas = [...raw].sort((a, b) => a.knownAt - b.knownAt || a.originAt - b.originAt).map(x => evaluateArea(x, c, cfg))
 	const bySeniority = [...areas].sort((a, b) => a.knownAt - b.knownAt || a.originAt - b.originAt)
 	for (const senior of bySeniority) {
 		if (senior.duplicateOf != null) continue
@@ -306,7 +399,11 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
 			const nearDup = Math.abs(junior.near - senior.near) <= cfg.dupNearAtr * senior.atr
 			const sLo = Math.min(senior.near, senior.far), sHi = Math.max(senior.near, senior.far)
 			const jLo = Math.min(junior.near, junior.far), jHi = Math.max(junior.near, junior.far)
-			const overlapDup = overlapShare(sLo, sHi, jLo, jHi) >= cfg.dupOverlapShare
+			// §16.13: перекрытие считается дублем только при сопоставимой высоте — полка, выросшая
+			// сильнее dupMaxHeightRatio вокруг старой узкой зоны, живёт рядом как отдельный объект
+			// (геометрия и окна подтверждения обеих не трогаются).
+			const comparable = (jHi - jLo) <= cfg.dupMaxHeightRatio * (sHi - sLo)
+			const overlapDup = comparable && overlapShare(sLo, sHi, jLo, jHi) >= cfg.dupOverlapShare
 			if (!nearDup && !overlapDup) continue
 			junior.duplicateOf = senior.id
 			senior.suppressedCount += 1
@@ -340,7 +437,7 @@ function consolidate(raw: AreaCandidate[], c: Candle[]): AreaCandidate[] {
  */
 export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], context: LiquidityPoiContext = {}): LiquidityPoiCandidate[] {
 	if (!c.length) return []
-	const cfg = LIQUIDITY_POI_CONFIG
+	const cfg: LiquidityPoiConfig = { ...LIQUIDITY_POI_CONFIG, ...context.config }
 	const pools = context.heatmapPools ?? []
 	if (!pools.length) return []
 	const structure = context.structure ?? []
@@ -358,7 +455,7 @@ export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], 
 	for (let i = 0; i < c.length; i++) {
 		const bar = c[i]!
 		const t = bar.timestamp + tfMs // состояние пулов известно на ЗАКРЫТИИ бара
-		const a = atr(c, i)
+		const a = atr(c, i, cfg.atrPeriod)
 		if (!a) continue
 		for (const side of ['buy-side', 'sell-side'] as const) {
 			const direction = side === 'buy-side' ? 'long' : 'short'
@@ -370,7 +467,7 @@ export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], 
 				&& t <= p.lastContributionAt + cfg.shelfFreshBars * tfMs)
 			if (!freshPools.length) continue
 			const sideTotal = freshPools.reduce((sm, p) => sm + p.notional, 0)
-			const shelves = buildShelves(freshPools, a)
+			const shelves = buildShelves(freshPools, a, cfg)
 			const significant = [...shelves].sort((x, y) => y.notional - x.notional).slice(0, cfg.shelfTopN)
 				.filter(sh => sh.notional >= cfg.shelfMinShare * sideTotal)
 			for (const shelf of significant) {
@@ -381,10 +478,12 @@ export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], 
 				const novelNotional = shelf.pools.filter(p => !knownIds.has(p.id)).reduce((sm, p) => sm + p.notional, 0)
 				if (knownIds.size > 0 && novelNotional < cfg.shelfNoveltyShare * shelf.notional) continue
 				emissions[side].push({ lo: shelf.lo, hi: shelf.hi, poolIds: new Set(shelf.pools.map(p => p.id)) })
-				// Потолок высоты зоны: стек режется от БЛИЖНЕГО края (для лонга — сверху вниз).
+				// §16.13: потолок высоты зоны — % от цены края; стек режется от БЛИЖНЕГО края
+				// (для лонга — сверху вниз). ATR-потолок отменён: раздувался в высоковолатильные
+				// рождения (6×1500=9k) и резал бы эталонные полки в спокойные (3×400=1.2k).
 				const edge = direction === 'long' ? shelf.hi : shelf.lo
-				const farLimit = direction === 'long' ? edge - cfg.stackMaxAtr * a : edge + cfg.stackMaxAtr * a
-				const far = direction === 'long' ? Math.max(shelf.lo, farLimit) : Math.min(shelf.hi, farLimit)
+				const capDist = cfg.stackMaxPct * edge
+				const far = direction === 'long' ? Math.max(shelf.lo, edge - capDist) : Math.min(shelf.hi, edge + capDist)
 				// Near: точный wick невыметенного экстремума перед полкой (±nearTolAtr от края), иначе край.
 				const tol = cfg.nearTolAtr * a
 				const candidates = fr.filter(f => f.type === (direction === 'long' ? 'low' : 'high')
@@ -421,7 +520,7 @@ export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], 
 			}
 		}
 	}
-	return consolidate(raw, c)
+	return consolidate(raw, c, cfg)
 		.sort((a, b) => Number(b.active) - Number(a.active) || Number(b.valid) - Number(a.valid) || b.geometryKnownAt - a.geometryKnownAt)
 		.map(({ shelfPools: _shelfPools, ...candidate }) => candidate)
 }
