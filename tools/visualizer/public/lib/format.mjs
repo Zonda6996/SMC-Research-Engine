@@ -26,11 +26,13 @@ export const REASON_RU = {
 	'zone-ended': 'окно зоны закрылось (провал/отработка/отставка)', 'broke-below-zone': 'пробой зоны закрытиями', 'data-end': 'край данных',
 	'timeout@stopping': 'бездействие: ждали остановку', 'timeout@rebound': 'бездействие: ждали отскок', 'timeout@sweep': 'бездействие: ждали пересвип',
 	'timeout@protect': 'бездействие: ждали защиту', 'timeout@entry': 'бездействие: ждали вход',
+	'weakness-failed': 'подряд проваленные тесты слабости — возобновление без объёма',
 }
 export const PRIO_RU = { nearest: 'ближайшая', outer: 'outer', secondary: 'фон' }
 export const INTER_RU = { untouched: 'не трогали', touched: 'тронута 1×', retested: 'тронута повторно' }
 export const TRACE_RU = {
 	POI_TOUCH: 'заход в зону', STOP_CONFIRMED: 'остановка (лой)', RESTART: 'перезапуск от нового экстремума',
 	ANCHOR_DEEPENED: 'якорь глубже — ждём его пересвип', REBOUND: 'отскок', SECOND_SWEEP: 'пересвип', PROTECTED: 'защита',
-	WEAKNESS_TEST: 'тест слабости', ENTRY_CANCELLED: 'вход отменён (далеко)', ENTRY: 'вход', STOP: 'стоп', TP2: 'тейк 2R',
+	WEAKNESS_TEST: 'тест слабости', WEAKNESS_TEST_FAILED: 'тест слабости провален (нет объёма)',
+	ENTRY_CANCELLED: 'вход отменён (далеко)', ENTRY: 'вход', STOP: 'стоп', TP2: 'тейк 2R',
 }

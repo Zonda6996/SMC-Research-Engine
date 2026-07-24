@@ -108,6 +108,7 @@ function status(text) {
 }
 
 async function load() {
+	comboSetIcon($('symbol').value.trim())
 	$('loadBtn').disabled = true
 	document.body.classList.add('is-loading')
 	status('Загрузка данных…')
@@ -240,10 +241,23 @@ function comboFilter() {
 	comboActive = 0
 	comboRender()
 }
+function comboShowAll() {
+	comboShown = comboSymbols.slice(0, 20)
+	comboActive = Math.max(0, comboShown.indexOf($('symbol').value))
+	comboRender()
+}
 function wireCombo() {
 	const inp = $('symbol')
-	inp.addEventListener('focus', comboFilter)
-	inp.addEventListener('input', comboFilter)
+	// Фокус: текст выделяется (ввод сразу заменяет), список открывается ПОЛНЫЙ —
+	// не нужно стирать текущий символ, чтобы увидеть варианты (8-й QA).
+	inp.addEventListener('focus', () => { inp.select(); comboSymbols.length ? comboShowAll() : comboFilter() })
+	inp.addEventListener('input', () => {
+		comboFilter()
+		const v = inp.value.trim().toUpperCase()
+		const hit = comboSymbols.find((s) => s.toUpperCase() === v)
+		if (hit) comboSetIcon(hit)
+		else $('symbolIcon').classList.add('hidden') // неизвестный символ — без чужой иконки
+	})
 	inp.addEventListener('blur', () => setTimeout(comboClose, 120))
 	inp.addEventListener('keydown', (e) => {
 		const open = !$('symbolPop').classList.contains('hidden')

@@ -12,11 +12,11 @@ const PRESETS_KEY = 'smc-viz-presets-v1'
 const POI_FIELDS = {
 	stackGapAtr: ['Склейка супер-цепи, ATR', 'Пул приклеивается к цепи при разрыве полос ≤ этой доли ATR'],
 	shelfProfileBinPct: ['Корзина профиля, доля цены', 'Лог-шаг корзин notional-профиля полки (0.004 = 0.4%)'],
-	shelfValleyShare: ['Порог провала, × пика', 'Корзина «пустая», если масса < этой доли пика цепи — по провалам режутся полки'],
-	shelfValleyMinBins: ['Ширина провала, корзин', 'Разрез цепи при ≥ N пустых корзин подряд'],
+	shelfValleyShare: ['Порог провала, × пика', 'ВЫШЕ — полки режутся чаще (мельче зоны), НИЖЕ — крупнее зоны'],
+	shelfValleyMinBins: ['Ширина провала, корзин', 'БОЛЬШЕ — режем реже (крупнее зоны), МЕНЬШЕ — чаще'],
 	stackMaxPct: ['Потолок высоты, доля цены', 'Максимальная высота зоны от ближнего края полки (0.08 = 8%)'],
 	shelfTopN: ['Топ-N полок стороны', 'Зону рождают только N сильнейших полок стороны'],
-	shelfFreshBars: ['Свежесть полки, баров', 'Пул участвует, пока кормился не дальше N баров назад; та же константа гасит устаревшие зоны'],
+	shelfFreshBars: ['Свежесть полки, баров', 'МЕНЬШЕ — зоны раньше «устаревают», БОЛЬШЕ — старые полки живут дольше. «Зона устарела, а полка актуальна» — крути это'],
 	shelfMinShare: ['Мин. доля стороны', 'Полка рождает зону при notional ≥ этой доли свежей суммы стороны'],
 	shelfNoveltyShare: ['Порог перерождения', 'Полка рождает зону заново при ≥ этой доле нового notional (re-accumulation)'],
 	stackKinshipShare: ['Родство стеков', 'Общий notional ≥ этой доли меньшего стека — один объект (близнецы/поколения)'],
@@ -27,6 +27,20 @@ const POI_FIELDS = {
 	dupMaxHeightRatio: ['Гард высоты дубля', 'Перекрытие — дубль только при высоте младшей ≤ × старшей'],
 	shelfIdentityShare: ['Идентичность эмиссии', 'Полка считается той же между барами при перекрытии ≥ этой доли'],
 	atrPeriod: ['Период ATR', 'Стандартная детекторная константа'],
+}
+const CONF_FIELDS = {
+	attemptIdleBars: ['Смерть по бездействию, баров', 'Столько 15m-баров без структурных событий — попытка умирает (timeout@…). Больше — попытки живут дольше'],
+	entryMaxRiskAtr: ['Гард входа, ATR', 'Риск вход→стоп больше этого — вход пропускается. Больше — больше входов, но дальше от стопа'],
+	weaknessFailLimit: ['Провалов теста подряд', 'Столько подряд возобновлений БЕЗ объёма — попытка отбраковывается (weakness-failed)'],
+	stopQuietBars: ['Проторговка у лоя, баров', 'Тишина у экстремума до остановки. Больше — строже (меньше попыток, качественнее)'],
+	reboundMinBars: ['Отскок, баров', 'Минимум баров от остановки до отскока'],
+	reboundAtr: ['Мин. отход отскока, ATR', 'Нижняя планка расстояния отскока'],
+	rearmAtr: ['Перевзвод касания, ATR', 'Полный отход от зоны, после которого следующее касание = новая попытка'],
+	failedProtectionCloses: ['Закрытий за якорем', 'Столько close за якорем подряд — перенос якоря (за far — пробой)'],
+	stopLookbehindAtr: ['Стоп за историей, ATR', 'Исторический экстремум глубже свипа в этих пределах — стоп за ним'],
+	stopBufferAtr: ['Запас стопа, ATR', 'Отступ стопа за экстремум свипа'],
+	tpR: ['Тейк, R', 'Диагностический полный тейк'],
+	arrivalVolumeSma: ['SMA объёма прихода', 'Окно средней для пометки «пришли на объёме» (не фильтр)'],
 }
 const HM_FIELDS = {
 	binPct: ['Бин, доля цены', 'Ширина логарифмического ценового бина heatmap'],
@@ -42,7 +56,7 @@ const HM_FIELDS = {
 let defaults = { poi: null, heatmap: null }
 
 function stored() {
-	try { return JSON.parse(localStorage.getItem(KEY) || '{"poi":{},"hm":{}}') } catch { return { poi: {}, hm: {} } }
+	try { return JSON.parse(localStorage.getItem(KEY) || '{"poi":{},"hm":{},"conf":{}}') } catch { return { poi: {}, hm: {}, conf: {} } }
 }
 function save(x) { localStorage.setItem(KEY, JSON.stringify(x)) }
 
@@ -57,7 +71,7 @@ export function engineOverrides() {
 		}
 		return out
 	}
-	return { poi: pick(st.poi, defaults.poi), hm: pick(st.hm, defaults.heatmap) }
+	return { poi: pick(st.poi, defaults.poi), hm: pick(st.hm, defaults.heatmap), conf: pick(st.conf, defaults.confirmation) }
 }
 
 function fieldRow(engine, key, label, hint, def, cur) {
@@ -77,6 +91,7 @@ export function renderConfigPanel() {
 		.filter(([k]) => typeof defs[k] === 'number')
 		.map(([k, [label, hint]]) => fieldRow(engine, k, label, hint, defs[k], over?.[k])).join('')}</div>`
 	box.innerHTML = group('Зоны · LIQUIDITY_POI_CONFIG', 'poi', POI_FIELDS, defaults.poi, st.poi)
+		+ (defaults.confirmation ? group('Подтверждение · POI_CONFIRMATION_CONFIG', 'conf', CONF_FIELDS, defaults.confirmation, st.conf) : '')
 		+ group('Heatmap · ликвидации', 'hm', HM_FIELDS, defaults.heatmap, st.hm)
 	box.querySelectorAll('.cfg-input').forEach((inp) => {
 		inp.onchange = () => {
@@ -97,7 +112,7 @@ export function renderConfigPanel() {
 
 function updateBadge() {
 	const ov = engineOverrides()
-	const n = Object.keys(ov.poi).length + Object.keys(ov.hm).length
+	const n = Object.keys(ov.poi).length + Object.keys(ov.hm).length + Object.keys(ov.conf).length
 	const b = $('cfgBadge')
 	b.textContent = n ? `изменено: ${n}` : ''
 	b.style.display = n ? '' : 'none'

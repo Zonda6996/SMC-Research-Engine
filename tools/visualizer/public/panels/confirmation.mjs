@@ -5,6 +5,17 @@ import { S } from '../lib/state.mjs'
 import { $, esc, fmtP, fmtR, time, dt, C, REASON_RU, SPENT_RU, TRACE_RU } from '../lib/format.mjs'
 import { zonesPrim, line, seriesMarkers, setMarkers, clearOverlays, restoreMainCandles, setCandles, lineStyle, fitContent, setVisibleRange } from '../lib/chart.mjs'
 
+/** Чем именно закончилось окно зоны (джойн с POI-кандидатом): «zone-ended» без контекста бесил на QA. */
+function zoneEndInfo(poiId) {
+	const z = (S.data?.liquidityPoi?.candidates || []).find((x) => x.id === poiId)
+	if (!z) return ''
+	if (z.supersededAt) return `зона заменена свежим поколением стека (${dt(z.supersededAt)})`
+	if (z.spentReason) return `зона отработала: ${SPENT_RU[z.spentReason] || z.spentReason}${z.spentAt ? ` (${dt(z.spentAt)})` : ''}`
+	if (z.failedAt) return `зона провалена: 4h-закрытие телом за far (${dt(z.failedAt)})`
+	if (z.retiredAt) return `зона устарела: полка не кормилась (${dt(z.retiredAt)})`
+	return 'окно закрылось на краю данных'
+}
+
 export function confirmationAttempts() {
 	const out = []
 	for (const r of (S.data?.poiConfirmation?.results || []))
@@ -60,7 +71,7 @@ export function renderConfirmation() {
 		mark(c.stop, C.red, `STOP ${fmtP(c.stop)}`)
 		mark(c.tp2, C.green, `TP2 ${fmtP(c.tp2)}`)
 	}
-	const colors = { POI_TOUCH: C.blue, STOP_CONFIRMED: C.amber, RESTART: C.amber, ANCHOR_DEEPENED: C.amber, REBOUND: C.blue, SECOND_SWEEP: C.red, PROTECTED: C.green, WEAKNESS_TEST: C.dim, ENTRY_CANCELLED: C.amber, ENTRY: C.green, STOP: C.red, TP2: C.green }
+	const colors = { POI_TOUCH: C.blue, STOP_CONFIRMED: C.amber, RESTART: C.amber, ANCHOR_DEEPENED: C.amber, REBOUND: C.blue, SECOND_SWEEP: C.red, PROTECTED: C.green, WEAKNESS_TEST: C.dim, WEAKNESS_TEST_FAILED: C.dim, ENTRY_CANCELLED: C.amber, ENTRY: C.green, STOP: C.red, TP2: C.green }
 	const anchorEvents = c.trace.filter((x) => ['STOP_CONFIRMED', 'RESTART', 'ANCHOR_DEEPENED'].includes(x.state) && x.price != null)
 	for (let i = 0; i < anchorEvents.length; i++) {
 		const ev = anchorEvents[i], nextAt = anchorEvents[i + 1]?.at ?? c.trace[c.trace.length - 1].at
@@ -86,7 +97,7 @@ export function renderConfirmation() {
 			run = []
 		}
 		for (const x of c.trace) {
-			if (x.state === 'WEAKNESS_TEST' || x.state === 'ENTRY_CANCELLED') run.push(x)
+			if (x.state === 'WEAKNESS_TEST' || x.state === 'ENTRY_CANCELLED' || x.state === 'WEAKNESS_TEST_FAILED') run.push(x)
 			else { flush(); traceRows.push(x) }
 		}
 		flush()
@@ -94,6 +105,7 @@ export function renderConfirmation() {
 	$('confTrace').innerHTML = `<div class="kv"><span>Зона</span><b class="mono">${fmtP(Math.min(c.near, c.far))} – ${fmtP(Math.max(c.near, c.far))}</b></div>
 		<div class="kv"><span>Известна</span><b>${dt(c.knownAt)}</b></div>
 		${c.rejectionReason ? `<div class="kv"><span>Отказ</span><b>${esc(c.rejectionReason)} — ${REASON_RU[c.rejectionReason] || ''}</b></div>` : ''}
+		${c.rejectionReason === 'zone-ended' ? `<div class="kv"><span>Чем кончилась зона</span><b>${zoneEndInfo(c.poiId)}</b></div>` : ''}
 		<div class="kv"><span>Объём прихода</span><b>${c.arrivalVolumeRatio != null ? '×' + c.arrivalVolumeRatio.toFixed(2) + (c.arrivalVolumeRatio >= 1.5 ? ' — пришли на объёме' : '') : '—'}</b></div>
 		<div class="kv"><span>Свип экстремума зоны</span><b>${c.sweptZoneExtreme == null ? '—' : c.sweptZoneExtreme ? 'да' : 'нет (лой захода)'}</b></div>
 		${c.spentReason ? `<div class="kv"><span>Зона отработала</span><b>${SPENT_RU[c.spentReason] || c.spentReason}</b></div>` : ''}

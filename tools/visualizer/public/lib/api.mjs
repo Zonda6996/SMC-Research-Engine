@@ -17,6 +17,7 @@ export async function fetchAnalyze() {
 	const ov = engineOverrides()
 	if (Object.keys(ov.poi).length) q.set('poiConfig', JSON.stringify(ov.poi))
 	if (Object.keys(ov.hm).length) q.set('hmConfig', JSON.stringify(ov.hm))
+	if (Object.keys(ov.conf).length) q.set('confConfig', JSON.stringify(ov.conf))
 	const r = await fetch(`/api/analyze?${q}`)
 	const json = await r.json()
 	if (json.error) throw new Error(json.error)
