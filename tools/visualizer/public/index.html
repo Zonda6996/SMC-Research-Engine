@@ -3,87 +3,254 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>SMC Battle Visualizer</title>
-	<style>
-		:root{--bg:#0b0f17;--panel:#121824;--panel2:#171f2e;--border:#263247;--text:#e5eaf2;--dim:#8290a8;--blue:#5b8cff;--cyan:#33c7d8;--green:#35c59a;--red:#ff6675;--amber:#ffbd5b;--purple:#a98bff}
-		*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}body{font:13px Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
-		button,input,select{font:inherit}.toolbar{height:58px;display:flex;align-items:center;gap:9px;padding:9px 14px;background:rgba(18,24,36,.97);border-bottom:1px solid var(--border);box-shadow:0 8px 30px #0004;position:relative;z-index:3}
-		.brand{font-weight:800;letter-spacing:.2px;margin-right:5px;white-space:nowrap}.brand b{color:var(--blue)}.version{font:10px ui-monospace,monospace;color:var(--dim);border:1px solid var(--border);padding:2px 6px;border-radius:99px}
-		.control{height:34px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:0 9px;outline:none}.control:focus{border-color:var(--blue)}#symbol{width:118px}#limit{width:78px}
-		.tf{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden}.tf button{height:32px;padding:0 10px;border:0;border-right:1px solid var(--border);background:var(--bg);color:var(--dim);cursor:pointer}.tf button:last-child{border:0}.tf button.active{background:#25324a;color:white}
-		.primary{height:34px;border:0;border-radius:7px;background:linear-gradient(135deg,var(--blue),#426ee0);color:white;padding:0 16px;font-weight:700;cursor:pointer}.primary:disabled{opacity:.5}.spacer{flex:1}.dataset{color:var(--dim);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
-		.layout{height:calc(100% - 58px);display:grid;grid-template-columns:minmax(0,1fr) 410px}.chart-wrap{position:relative;min-width:0}#chart{width:100%;height:100%}.loading{display:none;position:absolute;left:16px;top:16px;z-index:5;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--dim);box-shadow:0 10px 30px #0007}
-		.tooltip{display:none;position:absolute;pointer-events:none;z-index:8;max-width:360px;background:#111827f2;border:1px solid var(--border);border-radius:9px;padding:10px 12px;box-shadow:0 12px 35px #0009;line-height:1.55}.tooltip strong{font-size:13px}.tooltip .muted{color:var(--dim)}
-		.sidebar{border-left:1px solid var(--border);background:var(--panel);overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px}.section{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px}.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--dim)}
-		.cards{display:grid;grid-template-columns:1fr 1fr;gap:7px}.card{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:9px}.card .name{color:var(--dim);font-size:10px;text-transform:uppercase}.card .value{font-size:18px;font-weight:800;margin-top:3px}.card .sub{font-size:10px;color:var(--dim);margin-top:2px}.pos{color:var(--green)}.neg{color:var(--red)}.amber{color:var(--amber)}.purple{color:var(--purple)}
-		.filters{display:grid;grid-template-columns:1fr 1fr;gap:7px}.filters select{width:100%;height:31px;background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:0 7px}.check-row{display:flex;flex-wrap:wrap;gap:8px 13px;margin-top:9px}.check{display:flex;align-items:center;gap:6px;color:var(--dim);font-size:11px}.check input{accent-color:var(--blue)}
-		.notice{border-left:3px solid var(--amber);background:#ffbd5b10;padding:8px 9px;border-radius:5px;color:#d9c69e;font-size:11px;line-height:1.45;margin-top:8px}
-		.trade-head{display:flex;align-items:center;gap:6px}.navbtn{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:5px;width:26px;height:25px;cursor:pointer}.count{color:var(--dim);font-size:11px;margin-left:auto}.trade-list{display:flex;flex-direction:column;gap:4px;max-height:330px;overflow:auto;padding-right:2px}.trade{display:grid;grid-template-columns:48px 50px 1fr auto;align-items:center;gap:6px;border:1px solid transparent;border-radius:7px;padding:7px;background:var(--panel2);cursor:pointer}.trade:hover{border-color:#3c4b65}.trade.selected{border-color:var(--blue);box-shadow:0 0 0 1px #5b8cff30}.pill{font-size:9px;font-weight:800;text-align:center;border-radius:4px;padding:3px 2px}.pill.long{background:#35c59a1d;color:var(--green)}.pill.short{background:#ff66751d;color:var(--red)}.stream{font-weight:700}.meta{font-size:10px;color:var(--dim)}.result{font-weight:800;text-align:right}.trade.poi{grid-template-columns:48px 92px 1fr auto}.trade.poi .stream{font-size:9px;line-height:1.25}.badge{display:inline-block;font-size:8px;padding:2px 4px;border-radius:3px;margin-left:4px}.bb{background:#ffbd5b22;color:var(--amber)}.shadow{background:#a98bff22;color:var(--purple)}.skip{background:#8290a822;color:#b8c2d4}
-		.detail{line-height:1.65;font-size:12px}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}.detail .label{color:var(--dim)}.empty{padding:18px;text-align:center;color:var(--dim)}
-		body.lab-blind #symbol,body.lab-blind #dataset,body.lab-blind #historyUntil{filter:blur(8px);user-select:none}.lab-outcome{border:1px solid var(--border);background:var(--panel2);border-radius:7px;padding:9px;margin:7px 0;font-size:12px;line-height:1.5}.lab-outcome.win{border-color:#35c59a88;color:var(--green)}.lab-outcome.loss{border-color:#ff667588;color:var(--red)}.lab-outcome.neutral{border-color:#ffbd5b88;color:var(--amber)}.lab-actions{display:flex;gap:6px;flex-wrap:wrap}.labbtn{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:6px;padding:6px 9px;cursor:pointer}.labbtn.take{border-color:#35c59a88;color:var(--green)}.labbtn.skip{border-color:#ff667588;color:var(--red)}.labbtn.reveal{border-color:#ffbd5b88;color:var(--amber)}.labbtn.active{background:#5b8cff22;border-color:var(--blue)}.tag-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0}.lab-note{width:100%;min-height:48px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px;resize:vertical}.lab-status{font-size:11px;color:var(--dim);margin:7px 0}
-		@media(max-width:1000px){.layout{grid-template-columns:minmax(0,1fr) 350px}.dataset{display:none}.toolbar{gap:6px}}@media(max-width:760px){body{overflow:auto}.toolbar{height:auto;flex-wrap:wrap}.layout{height:auto;display:flex;flex-direction:column}.chart-wrap{height:62vh}.sidebar{border-left:0;border-top:1px solid var(--border)}.spacer{display:none}}
-	</style>
+	<title>SMC Research · Терминал ликвидности</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-	<header class="toolbar">
-		<div class="brand">SMC <b>Battle</b></div><span class="version" id="version">—</span>
-		<input class="control" id="symbol" list="symbolsList" value="BTC/USDT" /><datalist id="symbolsList"></datalist>
-		<div class="tf" id="tfGroup"><button data-tf="15m">15m</button><button data-tf="30m" class="active">30m</button><button data-tf="1h">1h</button><button data-tf="4h">4h</button><button data-tf="1d">1d</button><button data-tf="1w">1w</button></div>
-		<input class="control" type="number" id="limit" value="5000" min="500" max="20000" step="500" title="Количество свечей" />
-		<input class="control" type="date" id="historyUntil" title="История до конца выбранного дня; пусто = сейчас" />
-		<button class="navbtn" id="randomPeriod" title="Случайная дата от 2024 года">🎲</button>
-		<select class="control" id="source"><option value="fresh">Binance Futures</option><option value="fixture">Fixture offline</option></select>
-		<button class="primary" id="loadBtn">Загрузить</button><div class="spacer"></div><div class="dataset" id="dataset">—</div>
+	<header class="topbar">
+		<div class="brand">SMC<span class="brand-accent">Research</span></div>
+		<div class="field-inline">
+			<input class="input input-symbol" id="symbol" list="symbolsList" value="BTC/USDT" spellcheck="false" autocomplete="off" />
+			<datalist id="symbolsList"></datalist>
+		</div>
+		<div class="seg" id="tfGroup">
+			<button data-tf="15m">15m</button><button data-tf="30m">30m</button><button data-tf="1h">1h</button><button data-tf="4h" class="active">4h</button><button data-tf="1d">1d</button><button data-tf="1w">1w</button>
+		</div>
+		<input class="input input-limit" type="number" id="limit" value="5000" min="500" max="25000" step="500" title="Количество свечей" />
+		<input class="input input-date" type="date" id="historyUntil" title="История до конца выбранного дня; пусто — по сейчас" />
+		<button class="btn btn-ghost icon" id="randomPeriod" title="Случайная дата от марта 2024">🎲</button>
+		<select class="input input-source" id="source" title="Источник данных">
+			<option value="fresh">Binance Futures</option>
+			<option value="fixture">Fixture (офлайн)</option>
+		</select>
+		<button class="btn btn-primary" id="loadBtn">Загрузить</button>
+		<div class="spacer"></div>
+		<div class="funnel" id="funnel"></div>
+		<div class="dataset" id="dataset">—</div>
+		<span class="badge mono" id="version">—</span>
+		<button class="kbd-chip" id="paletteHint" title="Командная палитра"><kbd>⌘K</kbd></button>
 	</header>
+
 	<main class="layout">
-		<section class="chart-wrap"><div id="chart"></div><canvas id="hmProfile" style="position:absolute;top:0;right:56px;width:110px;height:100%;pointer-events:none;z-index:3"></canvas><div class="loading" id="loading"></div><div class="tooltip" id="tooltip"></div></section>
+		<section class="chart-wrap">
+			<div id="chart"></div>
+			<canvas id="hmProfile" class="hm-profile"></canvas>
+			<div class="loading hidden" id="loading"></div>
+			<div class="hover-card hidden" id="tooltip"></div>
+			<div class="hover-card hover-zone hidden" id="zoneHover"></div>
+		</section>
+
 		<aside class="sidebar">
-			<section class="section"><div class="section-title">Executable статистика <span>risk-unscaled</span></div><div class="cards" id="cards"></div><div class="notice">FIRST-5 GATE: touch в первой 5m-свече HTF-бара пропускается. Bigbar остаётся диагностической меткой.</div></section>
-			<section class="section" id="filtersPanel">
-				<div class="section-title"><span>Фильтры</span><button class="labbtn" id="filtersToggle">Показать</button></div>
-				<div id="filtersControls" style="display:none">
-				<div class="filters">
-					<select id="fStream"><option value="all">Deep + OTE</option><option value="deep">Deep</option><option value="ote">OTE</option></select>
-					<select id="fDirection"><option value="all">Long + Short</option><option value="long">Long</option><option value="short">Short</option></select>
-					<select id="fResult"><option value="all">Все исходы</option><option value="tp">Только TP</option><option value="stop">Только Stop</option><option value="timestop">Time-stop</option><option value="open">Открытые</option><option value="first5-skip">First-5 skip</option><option value="cost-skip">Cost skip</option></select>
-					<select id="fTrigger"><option value="all">BOS + CHoCH</option><option value="bos">BOS</option><option value="choch">CHoCH</option></select>
-				</div>
-				<div class="check-row">
-					<label class="check"><input type="checkbox" id="bigbarOnly">только bigbar</label>
-					<label class="check"><input type="checkbox" id="showSkipped">показывать first-5 skip</label>
-					<label class="check"><input type="checkbox" id="showEvents" checked>BOS/CHoCH</label>
-					<label class="check"><input type="checkbox" id="showProtected">protected</label>
-				</div>
+			<!-- Обзор -->
+			<section class="section" id="overviewPanel">
+				<div class="section-head"><h2>Обзор · canon</h2><span class="muted-tag">risk-unscaled</span></div>
+				<div class="section-body">
+					<div class="cards" id="cards"></div>
+					<div class="notice">First-5 gate: touch в первой 5m-свече HTF-бара пропускается. Bigbar — диагностическая метка, не фильтр.</div>
 				</div>
 			</section>
-			<section class="section" id="heatmapPanel"><div class="section-title"><span>Liquidity Heatmap · EQ pools</span><button class="labbtn" id="hmToggle">Показать</button></div><div id="hmControls" style="display:none"><div class="filters"><select id="hmSide"><option value="all">Buy + Sell side</option><option value="sell-side">Sell-side (красные)</option><option value="buy-side">Buy-side (зелёные)</option></select><select id="hmMinWeight"><option value="0">Все пулы</option><option value="0.35" selected>Вес ≥ 0.35</option><option value="0.55">Вес ≥ 0.55</option><option value="0.75">Вес ≥ 0.75</option></select><select id="hmGroup"><option value="0">Забор (без склейки)</option><option value="0.001">Слабая склейка</option><option value="0.0025" selected>Норм</option><option value="0.005">Крупные полки</option><option value="0.012">Мега-полки</option></select><select id="hmAge"><option value="500" selected>Свежая (500 баров)</option><option value="1000">1000 баров</option><option value="2000">2000 баров</option><option value="0">Вся история</option></select></div><div class="filters"><label style="font-size:12px;color:#8290a8"><input type="checkbox" id="hmShowSwept"> показывать снятые (обрываются на sweep)</label></div><div class="lab-status" id="hmStatus">—</div><div class="notice">Модель потенциальных ликвидаций (coinglass-style): каждая свеча открывает позиции пропорционально объёму, уровни ликвидаций 5x–100x ложатся выше/ниже входа и копятся в ценовых бинах (ширина зависит от ТФ), соседние бины сливаются в единые кластерные полосы. Крутилка склейки собирает соседние полосы в полки прямо на графике — от «забора» до мега-полок. Сливаются только полосы, живущие одновременно и с одинаковым статусом; высота полки ограничена (5× порога склейки), поэтому всё в одну полку не схлопывается. Яркость/толщина — накопленная плотность (объём в приоритете). Проход цены снимает ликвидность (полоса гаснет, когда снято больше половины её объёма), дальше она копится заново. Ликвидность рождают свечи с объёмом выше среднего (порог зависит от ТФ); яркость и толщина = сила кластера; короткоживущий снесённый шум у цены отфильтрован. v2.0: где биржа отдаёт историю OI (~30 дней у Binance), вклад свечи считается по росту открытого интереса (нет роста — нет новых позиций), лонг/шорт делится по тейкер-объёму, а не 50/50, уровни учитывают maintenance margin (0.4%), частично съеденные полки тускнеют по остатку. Справа от графика — профиль суммарной ликвидности, наведение на полосу показывает тултип, в статусе — ближайшие «магниты». Не участвует в battle/PnL и пока не влияет на POI-зоны.</div></div></section><section class="section" id="poiZonePanel"><div class="section-title"><span>Liquidity POI 2.2 · stack kinship</span><button class="labbtn" id="poiZoneToggle">Открыть</button></div><div id="poiZoneControls" style="display:none"><div class="filters"><select id="poiDirection"><option value="all">Long + Short</option><option value="long">Long zones</option><option value="short">Short zones</option></select><select id="poiLifecycle"><option value="open" selected>Открытые — готова или в игре</option><option value="all">Любой статус</option><option value="forming">Forming — формируется</option><option value="fresh">Fresh — готова, ждёт</option><option value="in-play">In-play — цена внутри сейчас</option><option value="spent">Spent — отработала (цена ушла)</option><option value="failed">Failed — пробита без сценария</option><option value="retired">Retired — устарела</option></select><select id="poiPriority"><option value="all">Любой приоритет</option><option value="nearest">Nearest — ближайшая к цене</option><option value="outer">Outer — валидный outer-swing</option><option value="secondary">Secondary — фон, не в приоритете</option></select><select id="poiMinStack"><option value="0">Сила стека: любая</option><option value="0.1" selected>Стек ≥ 10% сильнейшего</option><option value="0.25">Стек ≥ 25% сильнейшего</option></select></div><div class="filters"><label style="font-size:12px;color:#8290a8"><input type="checkbox" id="poiActiveOnly" checked> только важные (nearest/outer, не второстепеные)</label> <label style="font-size:12px;color:#8290a8"><input type="checkbox" id="poiLiqOnly" checked> скрывать зоны без ликвидности (ATR-граница)</label></div><div class="lab-status" id="poiZoneStatus">—</div><div class="lab-actions"><button class="labbtn" id="poiZonePrev">��</button><button class="labbtn" id="poiZoneNext">→</button><button class="labbtn" id="poiZoneExport">Экспорт JSON</button><button class="labbtn" id="poiZoneBack">Обычный график</button></div><div class="trade-list" id="poiZoneList" style="max-height:220px"></div><div class="detail" id="poiZoneDetail"></div><div class="notice">Все зоны по фильтру рисуются одновременно (near — сплошная, far — пунктир). Клик по зоне в списке или ←/→ фокусирует её и центрирует график на её жизни [knownAt, endAt); остальные остаются видны тусклее. Зоны рождаются ОТ ЛИКВИДНОСТИ (v2.1, §16.12–§16.13): живые свежие пулы стороны (последнее пополнение ≤ 300 баров) склеиваются в супер-цепь (разрыв полос ≤ 0.5 ATR), цепь режется на полки по ПРОВАЛАМ ПЛОТНОСТИ notional-профиля (провал = ≥3 корзины по 0.4% цены подряд ниже 25% пика цепи — как провалы в правой панели heatmap); зону рождает полка из топ-5 стороны с долей ≥ 3% свежего notional. near = точный wick невыметенного 4h-экстремума перед полкой (в пределах 0.5 ATR), иначе край полки; far = конец полки, высота ≤ 8% от цены края. Зона умирает, когда: (1) 4h-свеча закрылась ТЕЛОМ за far — провалена; (2) фитиль прошёл НАСКВОЗЬ за far — стек снят, отработана; (3) снято ≥ 50% notional полки — отработана; (4) полка не кормилась 300 баров — устарела. Снятие near-фитиля («использована») — информационная пометка, зону НЕ убивает. Ре-аккумуляция (≥ 50% нового notional) перерождает полку. РОДСТВО СТЕКОВ (v2.2): зоны, делящие ≥ 50% notional меньшего стека (общие пулы), — один объект; если старшую уже ТРОНУЛИ (окно подтверждения в работе) — младшая становится дублем, если нет — старшая отставляется свежим поколением (пометка «отставлена свежим поколением» в деталях). Прочие дубли (near ближе 0.25 ATR или перекрытие ≥ 0.6 меньшей при сопоставимой высоте ≤ 2×) схлопываются к старшей. Фильтр «Сила стека» скрывает слабые полки (доля notional стека от сильнейшей активной полки стороны; мизерные одно-пульные зоны — это обычно &lt; 10%). Зоны без реальной ликвидности на far (ATR-граница) подтверждением не торгуются.</div></div></section><section class="section" id="confirmationPanel"><div class="section-title"><span>POI Confirmation 1.6 · 4h→15m</span><button class="labbtn" id="confToggle">Открыть</button></div><div id="confControls" style="display:none"><div class="filters"><select id="confStatus"><option value="all">Все попытки</option><option value="entered">Entered</option><option value="rejected">Rejected</option></select><select id="confOutcome"><option value="all">Любой исход</option><option value="tp">TP2</option><option value="stop">Stop</option><option value="open">Open</option></select><select id="confReason"><option value="all">Все причины</option></select></div><div class="lab-status" id="confStatusText">—</div><div class="lab-actions"><button class="labbtn" id="confPrev">←</button><button class="labbtn" id="confNext">→</button><button class="labbtn" id="confZonesBtn">Зоны на 4h</button><button class="labbtn" id="confExport">Экспорт JSON</button><button class="labbtn" id="confBack">Обычный график</button></div><div class="detail" id="confTrace"></div><div class="notice">Каждая попытка — цикл §16.9: заход (после полного отхода-«взведения») → остановка (направленное закрытие после 4 тихих баров у экстремума — проторговка, а не первая зелёная) → отскок (ещё 6 баров без нового экстремума) → пересвип НЕВЫМЕТЕННОГО экстремума зоны (стопы ритейла; после свипа он потрачен, новый копится) → защита → тест слабости (объём свечи возобновления выше объёма последней откатной) → вход; стоп за экстремумом пересвипа, тейк 2R. Глубокий заход до отскока перезапускает попытку; потеря защиты (две close за якорем внутри зоны) переносит якорь глубже БЕЗ новой остановки/отскока — ждём пересвип нового якоря (жёлтый пунктир на графике — текущий якорь). Попытка умирает по бездействию (96 баров без СТРУКТУРНЫХ событий: тесты слабости и отмены входа жизнь не продлевают), пробою зоны закрытиями или концу окна; попытка с состоявшимся пересвипом доигрывается за концом окна зоны. Стоп ставится за историческим экстремумом окна, если тот глубже свип-экстремума в пределах 0.5 ATR. Лимита попыток нет; тейк = зона отработала. Вход отменяется при риске больше 1.5 ATR15. Серые зоны в «Зонах на 4h» — окно раньше начала 15m-истории (нет данных).</div></div></section>
-			
-			<section class="section" id="labPanel">
-				<div class="section-title"><span>141 / 200 / 241 Decision Lab</span><button class="labbtn" id="labToggle">Включить</button></div>
-				<div id="labControls" style="display:none">
-					<div class="filters"><select id="labLevel"><option value="all">Все уровни</option><option value="141">141</option><option value="200">200</option><option value="241">241</option></select><select id="labContext"><option value="5m">5m</option><option value="15m">15m</option><option value="30m">30m</option><option value="45m">45m</option><option value="1h">1h</option><option value="2h">2h</option><option value="3h">3h</option><option value="4h">4h</option></select></div>
-					<div class="filters" style="margin-top:7px"><select id="labHistory"><option value="100">100 свечей слева</option><option value="250" selected>250 свечей слева</option><option value="500">500 свечей слева</option><option value="1000">1000 свечей слева</option></select><select id="labAge"><option value="50">возраст ≤50 HTF</option><option value="100">возраст ≤100 HTF</option><option value="200" selected>возраст ≤200 HTF</option><option value="all">любой возраст</option></select></div>
-					<div class="filters" style="margin-top:7px"><input class="control" id="labSeed" value="141241" title="Seed случайной очереди" /><span></span></div>
-					<div class="check-row"><label class="check"><input type="checkbox" id="labRandom" checked>случайная очередь</label><label class="check"><input type="checkbox" id="labExact" checked>только exact 5m</label><label class="check"><input type="checkbox" id="labBlind">скрыть symbol/дату</label></div>
-					<div class="filters" style="margin-top:7px"><select id="labEntryStyle"><option value="reaction-close">Вход: close встречной свечи</option><option value="touch">Вход: touch уровня</option><option value="manual">Вход: вручную/другое</option></select><select id="labTarget"><option value="78.6">TP 78.6</option><option value="100">TP 100</option><option value="141" selected>TP 141</option><option value="200">TP 200</option><option value="manual">TP вручную</option></select></div>
-					<div class="filters" style="margin-top:7px"><select id="labStop"><option value="161">SL 161</option><option value="176">SL 176</option><option value="200">SL 200</option><option value="241">SL 241</option><option value="261">SL 261</option><option value="300">SL 300</option><option value="manual">SL вручную</option></select><span></span></div>
-					<div class="lab-status" id="labStatus">—</div><div class="lab-outcome" id="labOutcome" style="display:none"></div><div class="lab-status" id="labAnalytics"></div>
-					<div class="lab-actions"><button class="labbtn" id="labShuffle">↻ RANDOM</button><button class="labbtn" id="labPrev">←</button><button class="labbtn" id="labNext">→</button><button class="labbtn" id="labStep">STEP +1</button><button class="labbtn" id="labWait">WAIT</button><button class="labbtn take" id="labTake">TAKE</button><button class="labbtn skip" id="labSkip">SKIP</button><button class="labbtn reveal" id="labReveal">REVEAL</button></div>
-					<div class="tag-grid">
-						<label class="check"><input type="checkbox" data-lab-tag="opposite-candle">встречная свеча</label><label class="check"><input type="checkbox" data-lab-tag="stopping">остановка</label>
-						<label class="check"><input type="checkbox" data-lab-tag="liquidity-sweep">снятие ликвидности</label><label class="check"><input type="checkbox" data-lab-tag="strong-zone">сильная зона</label>
-						<label class="check"><input type="checkbox" data-lab-tag="oversold">перепроданность</label><label class="check"><input type="checkbox" data-lab-tag="trend-context">контекст тренда</label>
+
+			<!-- Фильтры канона -->
+			<section class="section collapsed" id="filtersPanel">
+				<div class="section-head"><h2>Фильтры сделок</h2><span class="chevron"></span></div>
+				<div class="section-body">
+					<div class="grid2">
+						<select class="input" id="fStream"><option value="all">Deep + OTE</option><option value="deep">Deep</option><option value="ote">OTE</option></select>
+						<select class="input" id="fDirection"><option value="all">Long + Short</option><option value="long">Long</option><option value="short">Short</option></select>
+						<select class="input" id="fResult"><option value="all">Все исходы</option><option value="tp">Только TP</option><option value="stop">Только Stop</option><option value="timestop">Time-stop</option><option value="open">Открытые</option><option value="first5-skip">First-5 skip</option><option value="cost-skip">Cost skip</option></select>
+						<select class="input" id="fTrigger"><option value="all">BOS + CHoCH</option><option value="bos">BOS</option><option value="choch">CHoCH</option></select>
 					</div>
-					<textarea class="lab-note" id="labNote" placeholder="Что увидели до входа…"></textarea>
-					<div class="lab-actions" style="margin-top:7px"><button class="labbtn" id="labExport">Экспорт JSON</button><button class="labbtn" id="labClear">Очистить решение</button></div>
-					<div class="notice">Показываются только structurally-active сетки; default возраст ≤200 исходных HTF-баров. WAIT/STEP открывают по одной закрытой свече. TAKE/SKIP фиксируются до REVEAL.</div>
+					<div class="check-row">
+						<label class="check"><input type="checkbox" id="bigbarOnly" /> только bigbar</label>
+						<label class="check"><input type="checkbox" id="showSkipped" /> показывать skip</label>
+						<label class="check"><input type="checkbox" id="showEvents" checked /> BOS/CHoCH</label>
+						<label class="check"><input type="checkbox" id="showProtected" /> protected</label>
+					</div>
 				</div>
 			</section>
-			<section class="section" id="tradesPanel"><div class="section-title trade-head"><span>Сделки</span><button class="navbtn" id="prevBtn">↑</button><button class="navbtn" id="nextBtn">↓</button><span class="count" id="count"></span><button class="labbtn" id="tradesToggle">Показать</button></div><div id="tradesControls" style="display:none"><div class="trade-list" id="tradeList"></div></div></section>
-			<section class="section"><div class="section-title">Выбранная сделка</div><div class="detail" id="detail"><div class="empty">Выберите сделку из списка</div></div></section>
+
+			<!-- Зоны ликвидности -->
+			<section class="section" id="zonesPanel">
+				<div class="section-head"><h2>Зоны ликвидности <span class="ver">POI 2.3</span></h2><button class="btn btn-outline sm" id="poiZoneToggle">Открыть</button></div>
+				<div class="section-body">
+					<div class="hidden" id="poiZoneControls">
+						<div class="grid2">
+							<select class="input" id="poiDirection"><option value="all">Long + Short</option><option value="long">Только Long</option><option value="short">Только Short</option></select>
+							<select class="input" id="poiLifecycle"><option value="open" selected>Открытые — готова или в игре</option><option value="all">Любой статус</option><option value="forming">Формируется</option><option value="fresh">Готова, ждёт</option><option value="in-play">В игре — цена внутри</option><option value="spent">Отработала</option><option value="failed">Пробита</option><option value="retired">Устарела / отставлена</option></select>
+							<select class="input" id="poiPriority"><option value="all">Любой приоритет</option><option value="nearest">Ближайшая к цене</option><option value="secondary">Фон</option></select>
+							<select class="input" id="poiMinStack"><option value="0">Сила стека: любая</option><option value="0.1" selected>Стек ≥ 10% сильнейшего</option><option value="0.25">Стек ≥ 25% сильнейшего</option></select>
+						</div>
+						<div class="check-row">
+							<label class="check"><input type="checkbox" id="poiActiveOnly" checked /> только активные</label>
+							<label class="check"><input type="checkbox" id="poiLiqOnly" checked /> скрывать ATR-границы</label>
+							<label class="check"><input type="checkbox" id="myZonesShow" checked /> мои зоны</label>
+						</div>
+						<div class="status" id="poiZoneStatus">—</div>
+						<div class="btn-row">
+							<button class="btn btn-outline sm" id="poiZonePrev">←</button>
+							<button class="btn btn-outline sm" id="poiZoneNext">→</button>
+							<button class="btn btn-outline sm" id="poiZoneExport">Экспорт JSON</button>
+							<button class="btn btn-ghost sm" id="poiZoneBack">Обычный график</button>
+						</div>
+						<div class="list" id="poiZoneList"></div>
+						<div class="detail" id="poiZoneDetail"></div>
+
+						<div class="subhead">Мои зоны <span class="muted-tag">ручная разметка</span></div>
+						<div class="my-zone-form">
+							<select class="input" id="myZoneSide"><option value="long">LONG</option><option value="short">SHORT</option></select>
+							<input class="input" id="myZoneFrom" type="number" step="any" placeholder="от" />
+							<input class="input" id="myZoneTo" type="number" step="any" placeholder="до" />
+							<input class="input grow" id="myZoneNote" type="text" placeholder="заметка (необязательно)" />
+							<button class="btn btn-outline sm" id="myZoneAdd">Добавить</button>
+						</div>
+						<div class="list" id="myZoneList"></div>
+
+						<div class="notice">Зоны рождаются от ликвидности (SPEC §16.12–§16.15): живые свежие пулы (кормились ≤ 300 баров назад) склеиваются в супер-цепи и режутся на полки по провалам плотности профиля (провал = ≥3 корзины по 0.4% цены ниже 25% пика). near — точный фитиль невыметенного экстремума у края полки (иначе край), far — конец полки, высота ≤ 8% от края. Родство стеков: зоны с ≥50% общего notional — один объект; тронутая старшая держит место, нетронутая заменяется свежим поколением, но только если оно удерживает массу старшей. Прямоугольник: сплошная граница — near, пунктир — far, яркость заливки — сила стека. Клик по прямоугольнику — фокус. Смерти: провал телом за far · насквозь фитилём · стек снят ≥50% · не кормился 300 баров.</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Подтверждение -->
+			<section class="section" id="confPanel">
+				<div class="section-head"><h2>Подтверждение <span class="ver">1.6 · 4h→15m</span></h2><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
+				<div class="section-body">
+					<div class="hidden" id="confControls">
+						<div class="grid2">
+							<select class="input" id="confStatus"><option value="all">Все попытки</option><option value="entered">Entered</option><option value="rejected">Rejected</option></select>
+							<select class="input" id="confOutcome"><option value="all">Любой исход</option><option value="tp">TP2</option><option value="stop">Stop</option><option value="open">Open</option></select>
+							<select class="input" id="confReason"><option value="all">Все причины</option></select>
+						</div>
+						<div class="status" id="confStatusText">—</div>
+						<div class="btn-row">
+							<button class="btn btn-outline sm" id="confPrev">←</button>
+							<button class="btn btn-outline sm" id="confNext">→</button>
+							<button class="btn btn-outline sm" id="confZonesBtn">Зоны на 4h</button>
+							<button class="btn btn-outline sm" id="confExport">Экспорт JSON</button>
+							<button class="btn btn-ghost sm" id="confBack">Обычный график</button>
+						</div>
+						<div class="detail" id="confTrace"></div>
+						<div class="notice">Попытка (SPEC §16.8–§16.11): заход → остановка (направленное закрытие после 4 тихих баров) → отскок (6 баров без нового экстремума) → пересвип невыметенного якоря → защита → тест слабости (объём возобновления выше последнего отката) → вход; стоп за экстремумом свипа (или историей в 0.5 ATR), тейк 2R. Потеря защиты переносит якорь и строит подтверждение заново; попытка умирает по бездействию (96 баров без структурных событий), пробою закрытиями или концу окна — попытка с состоявшимся свипом доигрывается. Вход отменяется при риске &gt; 1.5 ATR15. Тусклые зоны в «Зонах на 4h» — окно раньше 15m-истории (~208 дней): нет данных, не логики.</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Heatmap -->
+			<section class="section" id="hmPanel">
+				<div class="section-head"><h2>Heatmap ликвидаций <span class="ver">2.0 · OI-гибрид</span></h2><button class="btn btn-outline sm" id="hmToggle">Показать</button></div>
+				<div class="section-body">
+					<div class="hidden" id="hmControls">
+						<div class="grid2">
+							<select class="input" id="hmSide"><option value="all">Buy + Sell side</option><option value="sell-side">Sell-side (красные)</option><option value="buy-side">Buy-side (зелёные)</option></select>
+							<select class="input" id="hmMinWeight"><option value="0">Все пулы</option><option value="0.35">Вес ≥ 0.35</option><option value="0.55" selected>Вес ≥ 0.55</option><option value="0.75">Вес ≥ 0.75</option></select>
+							<select class="input" id="hmGroup"><option value="0">Забор (без склейки)</option><option value="0.001" selected>Слабая склейка</option><option value="0.0025">Норм</option><option value="0.005">Крупные полки</option><option value="0.012">Мега-полки</option></select>
+							<select class="input" id="hmAge"><option value="500" selected>Свежая (500 баров)</option><option value="1000">1000 баров</option><option value="2000">2000 баров</option><option value="0">Вся история</option></select>
+						</div>
+						<div class="check-row"><label class="check"><input type="checkbox" id="hmShowSwept" /> показывать снятые</label></div>
+						<div class="status" id="hmStatus">—</div>
+						<div class="notice">Модель потенциальных ликвидаций (coinglass-style): каждая свеча с объёмом выше среднего открывает позиции, уровни ликвидаций 5×–100× ложатся выше/ниже входа и копятся в ценовых бинах; соседние бины сливаются в полосы, крутилка склейки собирает полосы в полки. Яркость и толщина — накопленная плотность; проход цены снимает ликвидность. Где Binance отдаёт OI (~30 дней): вклад по росту открытого интереса, лонг/шорт по тейкер-объёму, maintenance margin 0.4%. Справа от графика — профиль плотности; в статусе — ближайшие «магниты».</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Decision Lab -->
+			<section class="section collapsed" id="labPanel">
+				<div class="section-head"><h2>Decision Lab <span class="ver">141/200/241</span></h2><button class="btn btn-outline sm" id="labToggle">Открыть</button></div>
+				<div class="section-body">
+					<div class="hidden" id="labControls">
+						<div class="grid2">
+							<select class="input" id="labLevel"><option value="all">Все уровни</option><option value="141">141</option><option value="200">200</option><option value="241">241</option></select>
+							<select class="input" id="labContext"><option value="5m">5m</option><option value="15m">15m</option><option value="30m">30m</option><option value="45m">45m</option><option value="1h">1h</option><option value="2h">2h</option><option value="3h">3h</option><option value="4h">4h</option></select>
+							<select class="input" id="labHistory"><option value="100">100 свечей слева</option><option value="250" selected>250 свечей слева</option><option value="500">500 свечей слева</option><option value="1000">1000 свечей слева</option></select>
+							<select class="input" id="labAge"><option value="50">возраст ≤50 HTF</option><option value="100">возраст ≤100 HTF</option><option value="200" selected>возраст ≤200 HTF</option><option value="all">любой возраст</option></select>
+							<input class="input" id="labSeed" value="141241" title="Seed случайной очереди" />
+							<select class="input" id="labEntryStyle"><option value="reaction-close">Вход: close встречной</option><option value="touch">Вход: touch уровня</option><option value="manual">Вход: вручную</option></select>
+							<select class="input" id="labTarget"><option value="78.6">TP 78.6</option><option value="100">TP 100</option><option value="141" selected>TP 141</option><option value="200">TP 200</option><option value="manual">TP вручную</option></select>
+							<select class="input" id="labStop"><option value="161">SL 161</option><option value="176">SL 176</option><option value="200">SL 200</option><option value="241">SL 241</option><option value="261">SL 261</option><option value="300">SL 300</option><option value="manual">SL вручную</option></select>
+						</div>
+						<div class="check-row">
+							<label class="check"><input type="checkbox" id="labRandom" checked /> случайная очередь</label>
+							<label class="check"><input type="checkbox" id="labExact" checked /> только exact 5m</label>
+							<label class="check"><input type="checkbox" id="labBlind" /> скрыть символ/дату</label>
+						</div>
+						<div class="status" id="labStatus">—</div>
+						<div class="lab-outcome hidden" id="labOutcome"></div>
+						<div class="status" id="labAnalytics"></div>
+						<div class="btn-row">
+							<button class="btn btn-outline sm" id="labShuffle">↻</button>
+							<button class="btn btn-outline sm" id="labPrev">←</button>
+							<button class="btn btn-outline sm" id="labNext">→</button>
+							<button class="btn btn-outline sm" id="labStep">+1 свеча</button>
+							<button class="btn btn-outline sm" id="labWait">WAIT</button>
+							<button class="btn btn-take sm" id="labTake">TAKE</button>
+							<button class="btn btn-skip sm" id="labSkip">SKIP</button>
+							<button class="btn btn-reveal sm" id="labReveal">REVEAL</button>
+						</div>
+						<div class="tag-grid">
+							<label class="check"><input type="checkbox" data-lab-tag="opposite-candle" /> встречная свеча</label>
+							<label class="check"><input type="checkbox" data-lab-tag="stopping" /> остановка</label>
+							<label class="check"><input type="checkbox" data-lab-tag="liquidity-sweep" /> снятие ликвидности</label>
+							<label class="check"><input type="checkbox" data-lab-tag="strong-zone" /> сильная зона</label>
+							<label class="check"><input type="checkbox" data-lab-tag="oversold" /> перепроданность</label>
+							<label class="check"><input type="checkbox" data-lab-tag="trend-context" /> контекст тренда</label>
+						</div>
+						<textarea class="input lab-note" id="labNote" placeholder="Что увидели до входа…"></textarea>
+						<div class="btn-row">
+							<button class="btn btn-outline sm" id="labExport">Экспорт JSON</button>
+							<button class="btn btn-ghost sm" id="labClear">Очистить решение</button>
+						</div>
+						<div class="notice">Только structurally-active сетки; WAIT/+1 открывают по одной закрытой свече, TAKE/SKIP фиксируются до REVEAL, исход считается по 5m.</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Настройки движков -->
+			<section class="section collapsed" id="configPanel">
+				<div class="section-head"><h2>Настройки движков</h2><span class="badge accent" id="cfgBadge"></span><span class="chevron"></span></div>
+				<div class="section-body">
+					<div class="btn-row">
+						<button class="btn btn-primary sm" id="cfgApply">Пересчитать</button>
+						<button class="btn btn-ghost sm" id="cfgReset">Сбросить</button>
+						<button class="btn btn-outline sm" id="presetSave">Сохранить пресет</button>
+						<select class="input sm" id="presetApply"><option value="">Пресет…</option></select>
+					</div>
+					<div id="cfgFields"></div>
+					<div class="notice">Константы движка зон и heatmap применяются на лету («Пересчитать» перезагружает данные с переопределениями) — движки на сервере получают их через config-override, дефолты в коде не меняются. Изменённые значения подсвечены. Правила и дефолты — SPEC §16.12–§16.15.</div>
+				</div>
+			</section>
+
+			<!-- Сделки -->
+			<section class="section collapsed" id="tradesPanel">
+				<div class="section-head"><h2>Сделки</h2>
+					<span class="badge" id="count"></span>
+					<button class="btn btn-ghost sm icon" id="prevBtn" title="Предыдущая (↑)">↑</button>
+					<button class="btn btn-ghost sm icon" id="nextBtn" title="Следующая (↓)">↓</button>
+					<span class="chevron"></span>
+				</div>
+				<div class="section-body"><div class="list list-tall" id="tradeList"></div></div>
+			</section>
+
+			<!-- Выбранная сделка -->
+			<section class="section" id="detailPanel">
+				<div class="section-head"><h2>Выбранная сделка</h2></div>
+				<div class="section-body"><div class="detail" id="detail"><div class="empty">Выберите сделку из списка</div></div></div>
+			</section>
 		</aside>
 	</main>
+
+	<!-- Командная палитра -->
+	<div class="palette hidden" id="palette">
+		<div class="palette-backdrop" id="paletteBackdrop"></div>
+		<div class="palette-panel">
+			<input class="palette-input" id="paletteInput" placeholder="Команда, символ, панель…" spellcheck="false" />
+			<div class="palette-list" id="paletteList"></div>
+			<div class="palette-foot"><kbd>↑↓</kbd> навигация · <kbd>Enter</kbd> выполнить · <kbd>Esc</kbd> закрыть</div>
+		</div>
+	</div>
+
 	<script src="https://unpkg.com/lightweight-charts@5.2.0/dist/lightweight-charts.standalone.production.js"></script>
-	<script src="app.js"></script>
+	<script type="module" src="app.mjs"></script>
 </body>
 </html>

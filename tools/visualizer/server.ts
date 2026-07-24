@@ -21,8 +21,8 @@ import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, extname, resolve } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
-import { detectLiquidityPoi, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
-import { detectLiquidityHeatmap, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
+import { detectLiquidityPoi, LIQUIDITY_POI_CONFIG, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
+import { detectLiquidityHeatmap, heatmapConfigForTf, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
 import { detectPoiConfirmation, POI_CONFIRMATION_VERSION } from '../../src/core/confirmation/PoiConfirmationEngine.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
@@ -51,6 +51,8 @@ interface AnalyzeQuery {
 	until?: string | undefined
 	contextTf?: string | undefined
 	historyBars?: string | undefined
+	poiConfig?: string | undefined
+	hmConfig?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -64,7 +66,27 @@ function parseQuery(qs: string): AnalyzeQuery {
 		until: params.get('until') ?? undefined,
 		contextTf: params.get('contextTf') ?? undefined,
 		historyBars: params.get('historyBars') ?? undefined,
+		poiConfig: params.get('poiConfig') ?? undefined,
+		hmConfig: params.get('hmConfig') ?? undefined,
 	}
+}
+
+/**
+ * §16.15: переопределения констант движков из UI (панель «Настройки движков»).
+ * Принимаются ТОЛЬКО числовые ключи, существующие в дефолтном конфиге, — защита от мусора;
+ * сами дефолты в коде не меняются (правило «магические числа по согласованию» остаётся).
+ */
+function pickNumericOverrides<T extends object>(defaults: T, rawJson: string | undefined): Partial<T> {
+	if (!rawJson) return {}
+	let parsed: unknown
+	try { parsed = JSON.parse(rawJson) } catch { return {} }
+	if (parsed == null || typeof parsed !== 'object') return {}
+	const out: Record<string, number> = {}
+	for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+		if (k in defaults && typeof (defaults as Record<string, unknown>)[k] === 'number'
+			&& typeof v === 'number' && Number.isFinite(v)) out[k] = v
+	}
+	return out as Partial<T>
 }
 
 const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
@@ -353,9 +375,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			])
 			const ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
 
-			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, undefined, heatmapAux ?? undefined)
+			// §16.15: конфиги движков с переопределениями из UI (числовые ключи, whitelisted).
+			const hmBase = heatmapConfigForTf(htfMs)
+			const hmOverrides = pickNumericOverrides(hmBase, q.hmConfig)
+			const poiOverrides = pickNumericOverrides(LIQUIDITY_POI_CONFIG, q.poiConfig)
+			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, { ...hmBase, ...hmOverrides }, heatmapAux ?? undefined)
 			const poiCandidates = timeframe === '4h'
-				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools })
+				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools, config: poiOverrides })
 				: []
 			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём 4h-бара захода / SMA20).
 			const poiConfirmations = timeframe === '4h' ? detectPoiConfirmation(poiCandidates, ltf15m, snapshot.candles) : []
@@ -370,6 +396,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					mirror: 'removed',
 				},
 				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
+				// §16.15: дефолты и применённые переопределения — для панели «Настройки движков».
+				engineDefaults: { poi: LIQUIDITY_POI_CONFIG, heatmap: hmBase },
+				appliedOverrides: { poi: poiOverrides, hm: hmOverrides },
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
 				ltf15m,

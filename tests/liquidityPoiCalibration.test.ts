@@ -13,8 +13,8 @@ const mkPool = (o: Record<string, unknown>) => ({
 	notional: 10, remainingNotional: 10, status: 'active', endAt: 0, weight: 0, ...o,
 }) as never
 
-it('версия v2.2 заморожена; без пулов зон нет (liquidity-first)', () => {
-	assert.equal(LIQUIDITY_POI_VERSION, 'liquidity-poi-2.2-stack-kinship')
+it('версия v2.3 заморожена; без пулов зон нет (liquidity-first)', () => {
+	assert.equal(LIQUIDITY_POI_VERSION, 'liquidity-poi-2.3-cover-supersede')
 	assert.deepEqual(detectLiquidityPoi([]), [])
 	assert.deepEqual(detectLiquidityPoi(flat(20), [], {}), [])
 	assert.deepEqual(detectLiquidityPoi(flat(20), [], { heatmapPools: [] }), [])
@@ -179,6 +179,26 @@ it('§16.14: родство стеков — НЕТРОНУТАЯ старшая
 	assert.equal(senior!.lifecycleState, 'retired')
 	assert.equal(senior!.endAt, junior!.knownAt)
 	assert.equal(senior!.active, false)
+})
+
+it('§16.15: сползшее вбок окно (роняет массу старшей) — дубль, место держит старшая', () => {
+	const c = flat(320)
+	const a2 = c[2]!.timestamp, a305 = c[305]!.timestamp
+	const pools = [
+		// Старшая полка {A, B} 104–108; к бару 305 пул A устарел (кормился только на баре 2),
+		// но B кормится — старшая зона жива. Младшее окно {B, C} сползло вверх и держит лишь
+		// 6 из 18 notional старшей (< 50%) — это не рост места, а потеря массы → дубль.
+		mkPool({ side: 'sell-side', extremePrice: 105, bandLow: 104, bandHigh: 106, notional: 12, startAt: a2, lastContributionAt: a2 }),
+		mkPool({ side: 'sell-side', extremePrice: 107, bandLow: 106, bandHigh: 108, notional: 6, startAt: a2, lastContributionAt: a305 }),
+		mkPool({ side: 'sell-side', extremePrice: 109, bandLow: 108, bandHigh: 110, notional: 6, startAt: a305, lastContributionAt: a305 }),
+	]
+	const out = detectLiquidityPoi(c, [], { heatmapPools: pools })
+	const senior = out.find(z => z.near === 104)!
+	const junior = out.find(z => z.near === 106)!
+	assert.ok(senior && junior)
+	assert.equal(senior.supersededAt, null) // сползание не отставляет старшую
+	assert.equal(junior.duplicateOf, senior.id)
+	assert.equal(junior.active, false)
 })
 
 it('§16.14: родство стеков — ТРОНУТАЯ старшая главнее (окно в работе), младшая = дубль', () => {

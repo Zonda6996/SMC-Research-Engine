@@ -18,7 +18,9 @@ import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 // старшая, если тронута до рождения младшей (окно подтверждения в работе), иначе младшая (свежая
 // геометрия), старшая отставляется (supersededAt). Плюс дисплей-метрика силы стека (stackShare)
 // для фильтра слабых полок в UI. Подтверждение (1.6) работает без изменений.
-export const LIQUIDITY_POI_VERSION = 'liquidity-poi-2.2-stack-kinship'
+// v2.3 (§16.15): замещение только при УДЕРЖАНИИ МАССЫ — младшая отставляет нетронутую старшую, лишь
+// удерживая ≥ stackKinshipShare СТАРШЕГО стека; сползшее вбок окно (роняющее массу) — дубль.
+export const LIQUIDITY_POI_VERSION = 'liquidity-poi-2.3-cover-supersede'
 
 /** Типизированный конфиг движка зон: все значения переопределяемы через LiquidityPoiContext.config. */
 export interface LiquidityPoiConfig {
@@ -431,7 +433,12 @@ function consolidate(raw: AreaCandidate[], c: Candle[], cfg: LiquidityPoiConfig)
 			const shared = sharedStack(junior, senior)
 			if (shared > 0 && shared >= cfg.stackKinshipShare * Math.min(stackTotal(junior), stackTotal(senior))) {
 				const touchedBeforeJunior = senior.firstTouchAt != null && senior.firstTouchAt < junior.knownAt
-				if (touchedBeforeJunior) {
+				// §16.15: свежая геометрия ЗАМЕЩАЕТ старшую, только если удерживает ≥ stackKinshipShare
+				// СТАРШЕГО стека (рост/обновление места). Сползшее вбок окно, роняющее массу старшей
+				// (кейс ETH: свежая 2096–2150 осиротила полку 2030 — старшая 1992–2115 была отставлена,
+				// а новых зон над массой novelty уже не рождала), становится дублем — место держит старшая.
+				const coversSenior = shared >= cfg.stackKinshipShare * stackTotal(senior)
+				if (touchedBeforeJunior || !coversSenior) {
 					junior.duplicateOf = senior.id
 					senior.suppressedCount += 1
 				} else {
