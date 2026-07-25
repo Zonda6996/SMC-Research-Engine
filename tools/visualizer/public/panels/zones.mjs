@@ -10,11 +10,22 @@ import { renderHeatmap } from './heatmap.mjs'
 const MY_KEY = 'smc-my-zones-v1'
 const TF4H = 14_400_000
 
+/** §16.20: слои карты — свинг 1D→1h и локальный 1h→5m поверх контекстных зон (рабочий вид 4h). */
+export function layerZones() {
+	const out = []
+	for (const L of (S.data?.mtfLayers || [])) {
+		if (L.role === 'swing' && !$('mtfSwingShow')?.checked) continue
+		if (L.role === 'local' && !$('mtfLocalShow')?.checked) continue
+		for (const z of L.candidates) out.push({ ...z, __layer: L.contextTf, __role: L.role, __confTf: L.confTf })
+	}
+	return out
+}
+
 export function zoneCandidates() {
 	const d = $('poiDirection').value, life = $('poiLifecycle').value, pr = $('poiPriority').value
 	const activeOnly = $('poiActiveOnly').checked, liqOnly = $('poiLiqOnly').checked
 	const minStack = Number($('poiMinStack')?.value || 0)
-	return (S.data?.liquidityPoi?.candidates || []).filter((x) => {
+	return [...(S.data?.liquidityPoi?.candidates || []), ...layerZones()].filter((x) => {
 		if (x.duplicateOf) return false
 		if (liqOnly && x.boundarySource !== 'liquidity-cluster') return false
 		if (activeOnly && !(x.active && x.valid)) return false
@@ -72,14 +83,15 @@ export function renderZones() {
 	renderMyZoneList()
 	const last = S.data.candles[S.data.candles.length - 1].timestamp
 	const focusId = S.poiFocusId
+	const zid = (c) => (c.__layer ? `${c.__layer}:${c.id}` : c.id)
 	const rects = xs.map((c) => ({
-		id: c.id,
+		id: zid(c),
 		t1: time(Math.max(c.knownAt, c.geometryKnownAt || 0)),
 		t2: time(c.endAt || last),
 		p1: c.near, p2: c.far, side: c.direction,
-		focused: c.id === focusId, dim: !!focusId && c.id !== focusId,
-		alpha: Math.min(1, c.stackShare ?? 1),
-		label: `${c.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(c.near)} · ${LIFE_RU[c.lifecycleState] || c.lifecycleState}`,
+		focused: zid(c) === focusId, dim: !!focusId && zid(c) !== focusId,
+		alpha: Math.min(1, (c.stackShare ?? 1) * (c.__role === 'local' ? 0.7 : 1)),
+		label: `${c.__layer ? c.__layer.toUpperCase() + (c.__role === 'swing' ? '·СВИНГ' : '·ЛОК') + ' ' : ''}${c.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(c.near)} · ${LIFE_RU[c.lifecycleState] || c.lifecycleState}`,
 	}))
 	if ($('myZonesShow').checked) {
 		for (const z of myList()) rects.push({
@@ -89,10 +101,11 @@ export function renderZones() {
 			label: `МОЯ ${fmtP(z.lo)}–${fmtP(z.hi)}${z.note ? ' · ' + z.note : ''}`,
 		})
 	}
-	const focused = xs.find((x) => x.id === focusId)
+	const focused = xs.find((x) => zid(x) === focusId)
 	zonesPrim.setRects(rects, focused ? { min: Math.min(focused.near, focused.far), max: Math.max(focused.near, focused.far) } : null)
 	renderHeatmap()
-	$('poiZoneStatus').textContent = `Показано зон: ${xs.length}${all.length > xs.length ? ` из ${all.length}` : ''} · всего в наборе ${S.data?.liquidityPoi?.candidates?.length || 0}`
+	const layersInfo = (S.data?.mtfLayers || []).length ? ` · слои: ${xs.filter((x) => x.__role === 'swing').length} свинг 1D, ${xs.filter((x) => x.__role === 'local').length} лок 1h` : ''
+	$('poiZoneStatus').textContent = `Показано зон: ${xs.length}${all.length > xs.length ? ` из ${all.length}` : ''}${layersInfo} · в наборе ${S.data?.liquidityPoi?.candidates?.length || 0} (${S.data?.dataset?.timeframe ?? ''})`
 	renderZoneDetail(focused, last)
 	// Зум не трогаем без фокуса: переключение фильтров/списков не должно дёргать график.
 	if (focused) setVisibleRange(focused.originAt - 20 * TF4H, (focused.endAt || last) + 20 * TF4H)
@@ -104,12 +117,13 @@ function renderZoneList(xs) {
 	if (!xs.length) { box.innerHTML = '<div class="empty">Нет зон по текущим фильтрам</div>'; return }
 	for (const c of xs) {
 		const el = document.createElement('div')
-		el.className = 'list-item zone' + (c.id === S.poiFocusId ? ' selected' : '')
-		el.innerHTML = `<span class="pill ${c.direction}">${c.direction === 'long' ? 'LONG' : 'SHORT'}</span>
+		const cid = c.__layer ? `${c.__layer}:${c.id}` : c.id
+		el.className = 'list-item zone' + (cid === S.poiFocusId ? ' selected' : '')
+		el.innerHTML = `<span class="pill ${c.direction}">${c.direction === 'long' ? 'LONG' : 'SHORT'}</span>${c.__layer ? `<span class="pill" title="Слой ${c.__role === 'swing' ? 'свинг' : 'локальный'} · подтверждение ${c.__confTf}">${c.__layer}</span>` : ''}
 			<span class="mono">${fmtP(c.near)} → ${fmtP(c.far)}</span>
 			<span class="meter" title="Сила стека: ${Math.round(100 * (c.stackShare || 0))}% от сильнейшей полки стороны"><i style="width:${Math.min(100, Math.round(100 * (c.stackShare || 0)))}%"></i></span>
 			<span class="state">${(c.supersededAt ? 'заменена' : LIFE_RU[c.lifecycleState] || c.lifecycleState).toUpperCase()}</span>`
-		el.onclick = () => { S.poiFocusId = S.poiFocusId === c.id ? null : c.id; renderZones() }
+		el.onclick = () => { S.poiFocusId = S.poiFocusId === cid ? null : cid; renderZones() }
 		box.appendChild(el)
 	}
 }
@@ -138,9 +152,9 @@ export function zoneHoverHtml(c) {
 export function moveZoneFocus(step) {
 	const xs = zoneCandidates().slice(0, 80)
 	if (!xs.length) return
-	let i = xs.findIndex((x) => x.id === S.poiFocusId)
+	let i = xs.findIndex((x) => (x.__layer ? `${x.__layer}:${x.id}` : x.id) === S.poiFocusId)
 	i = (i < 0 ? 0 : i + step + xs.length) % xs.length
-	S.poiFocusId = xs[i].id
+	S.poiFocusId = xs[i].__layer ? `${xs[i].__layer}:${xs[i].id}` : xs[i].id
 	renderZones()
 }
 
@@ -160,7 +174,7 @@ export function wireZonesPanel(activate, deactivate) {
 	$('poiZoneNext').onclick = () => moveZoneFocus(1)
 	$('poiZoneExport').onclick = exportZones
 	$('poiZoneBack').onclick = () => deactivate()
-	for (const id of ['poiDirection', 'poiLifecycle', 'poiPriority', 'poiActiveOnly', 'poiLiqOnly', 'poiMinStack', 'myZonesShow'])
+	for (const id of ['poiDirection', 'poiLifecycle', 'poiPriority', 'poiActiveOnly', 'poiLiqOnly', 'poiMinStack', 'myZonesShow', 'mtfSwingShow', 'mtfLocalShow'])
 		$(id).onchange = () => { if (id !== 'myZonesShow') S.poiFocusId = null; renderZones() }
 	$('myZoneAdd').onclick = () => {
 		addMyZone($('myZoneSide').value, Number($('myZoneFrom').value), Number($('myZoneTo').value), $('myZoneNote').value.trim())

@@ -52,6 +52,8 @@ const dataCache = new Map<string, {
 	heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
 	/** §16.19: итоговый ряд ТФ подтверждения (архивы + API-хвост) — «Пересчитать» архивы не перечитывает. */
 	ltfConf: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+	/** §16.20: 1h-ряд подтверждения свинг-слоя 1D (архивы + хвост из 5m) на рабочем виде 4h. */
+	ltfSwing1h: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 }>()
 const DATA_TTL_LIVE = 90_000
 const DATA_TTL_HIST = 60 * 60 * 1000
@@ -403,9 +405,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			let ltf5m: Awaited<ReturnType<typeof fetchCandlesPaginated>> | null
 			let heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
 			let ltfConf: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+			let ltfSwing1h: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 			let snapshot: ReturnType<typeof runAnalysis>
 			if (cachedData && Date.now() - cachedData.at < ttl) {
-				({ candles, ltf5m, heatmapAux, ltfConf } = cachedData)
+				({ candles, ltf5m, heatmapAux, ltfConf, ltfSwing1h } = cachedData)
 				snapshot = runAnalysis(candles)
 			} else {
 				candles = useFixture ? loadFixtureCandles() : await fetchCandlesPaginated(symbol, timeframe, limit, market, untilMs)
@@ -430,8 +433,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 						console.error('[archiveConf] fail-soft, работаем на API-глубине:', err instanceof Error ? err.message : err)
 					}
 				}
+				// §16.20: 1h-ряд для подтверждения СВИНГ-слоя 1D на рабочем виде 4h (архивы от начала
+				// 4h-окна + хвост из 5m-агрегации). Fail-soft: без архивов — хвост покрывает ~208 дней.
+				ltfSwing1h = timeframe === '4h' && ltf5m?.length ? aggregateCandles(ltf5m, '5m', '1h') : []
+				if (fullLtf && !useFixture && timeframe === '4h' && candles.length) {
+					try {
+						const archive1h = await fetchArchiveKlines(symbol, '1h', market, candles[0]!.timestamp, untilMs)
+						ltfSwing1h = mergeCandleSeries(archive1h, ltfSwing1h)
+					} catch (err) {
+						console.error('[archiveSwing1h] fail-soft:', err instanceof Error ? err.message : err)
+					}
+				}
 				if (!useFixture) {
-					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltfConf })
+					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltfConf, ltfSwing1h })
 					// Потолок кэша: держим последние 8 наборов (каждый — десятки МБ 5m-свечей).
 					while (dataCache.size > 8) dataCache.delete(dataCache.keys().next().value as string)
 				}
@@ -449,6 +463,27 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				: []
 			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём бара захода ТФ зоны / SMA20).
 			const poiConfirmations = confTf != null ? detectPoiConfirmation(poiCandidates, ltfConf, snapshot.candles, confOverrides) : []
+
+			// §16.20 (решение пользователя, 25.07): свинговые и локальные зоны — СЛОИ ОДНОЙ КАРТЫ
+			// (§12.2: «локальные и swing-зоны существуют одновременно»). На рабочем виде 4h строятся
+			// дополнительные слои: СВИНГ 1D→1h (дневные свечи агрегацией из загруженного 4h-окна —
+			// идентичны нативным: UTC-границы) и ЛОКАЛЬНЫЙ 1h→5m (1h из 5m-окна API, ~208 дней —
+			// локальные зоны свежие по своей природе). Движки те же, константы те же (в барах своего
+			// ТФ); слои считаются на тех же overrides. Кнопки ТФ (1d/1h) остаются одиночными видами.
+			const mtfLayers: Array<{ contextTf: string; confTf: string; role: 'swing' | 'local'; candles: number; candidates: unknown[]; results: unknown[]; ltfConf: unknown[] | null }> = []
+			if (timeframe === '4h' && candles.length) {
+				const layer = (ctxTf: string, role: 'swing' | 'local', ctxCandles: typeof candles, confSeries: typeof candles, includeSeries: boolean) => {
+					if (!ctxCandles.length) return
+					const pools = detectLiquidityHeatmap(ctxCandles, { ...heatmapConfigForTf(TF_MS[ctxTf]!), ...pickNumericOverrides(heatmapConfigForTf(TF_MS[ctxTf]!), q.hmConfig) }, undefined)
+					const zones = detectLiquidityPoi(ctxCandles, [], { heatmapPools: pools, config: poiOverrides })
+					const confs = detectPoiConfirmation(zones, confSeries, ctxCandles, confOverrides)
+					mtfLayers.push({ contextTf: ctxTf, confTf: CONFIRMATION_TF[ctxTf]!, role, candles: ctxCandles.length, candidates: zones, results: confs, ltfConf: includeSeries ? confSeries : null })
+				}
+				const candles1d = aggregateCandles(candles, '4h', '1d')
+				layer('1d', 'swing', candles1d, ltfSwing1h, true)
+				const candles1h = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '1h') : []
+				layer('1h', 'local', candles1h, ltf5m ?? [], false) // 5m-ряд уже в payload (ltf5m) — не дублируем
+			}
 
 			sendJson(res, 200, {
 				strategy: {
@@ -469,6 +504,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
+				// §16.20: слои карты (свинг 1D→1h, локальный 1h→5m) на рабочем виде 4h.
+				mtfLayers,
 				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : [], htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),
 				structure: snapshot.structure,
 				trendHistory: snapshot.market.trendHistory,

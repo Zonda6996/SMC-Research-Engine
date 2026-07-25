@@ -58,8 +58,14 @@ export function renderFunnel() {
 	const allEntered = (S.data.poiConfirmation?.results || []).flatMap((r) => r.attempts.filter((a) => a.status === 'entered'))
 	const dupEntries = allEntered.filter((a) => a.duplicateEntryOf).length
 	const entries = allEntered.length - dupEntries
+	// §16.20: сводка слоёв (свинг 1D→1h, локальный 1h→5m) — входы без дублей.
+	const layerChips = (S.data.mtfLayers || []).map((L) => {
+		const ent = L.results.flatMap((r) => r.attempts.filter((a) => a.status === 'entered' && !a.duplicateEntryOf)).length
+		const act = L.candidates.filter((z) => z.active && !z.duplicateOf).length
+		return `<span class="chip" title="Слой ${L.role === 'swing' ? 'свинг' : 'локальный'} ${L.contextTf}→${L.confTf}">${L.contextTf}: ${act} акт · ${ent} вх</span>`
+	}).join('')
 	el.innerHTML = zones.length
-		? `<span class="chip" title="Всего зон в наборе">${zones.length} зон</span><span class="chip-sep">→</span>
+		? `${layerChips ? layerChips + '<span class="chip-sep">|</span>' : ''}<span class="chip" title="Всего зон в наборе (${S.data?.dataset?.timeframe ?? ''})">${zones.length} зон</span><span class="chip-sep">→</span>
 		   <span class="chip chip-accent" title="Активные (готова + в игре)">${active} активных</span><span class="chip-sep">→</span>
 		   <span class="chip" title="Попытки уточнённого подтверждения (${S.data?.dataset?.confTf ?? '15m'})">${attempts} попыток</span><span class="chip-sep">→</span>
 		   <span class="chip ${entries ? 'chip-green' : ''}" title="Входы (без дублей «один свип = одна сделка»)">${entries} входов${dupEntries ? ` <span class="muted">+${dupEntries} дубл.</span>` : ''}</span>`

@@ -8,7 +8,7 @@ import { zonesPrim, line, seriesMarkers, setMarkers, clearOverlays, restoreMainC
 
 /** Чем именно закончилось окно зоны (джойн с POI-кандидатом): «zone-ended» без контекста бесил на QA. */
 function zoneEndInfo(poiId) {
-	const z = (S.data?.liquidityPoi?.candidates || []).find((x) => x.id === poiId)
+	const z = (confLayerData().candidates || []).find((x) => x.id === poiId)
 	if (!z) return ''
 	if (z.supersededAt) return `зона заменена свежим поколением стека (${dt(z.supersededAt)})`
 	if (z.spentReason) return `зона отработала: ${SPENT_RU[z.spentReason] || z.spentReason}${z.spentAt ? ` (${dt(z.spentAt)})` : ''}`
@@ -17,9 +17,26 @@ function zoneEndInfo(poiId) {
 	return 'окно закрылось на краю данных'
 }
 
+/** §16.20: активная связка панели — контекстная (ТФ графика) или слой (свинг 1D→1h / локальный 1h→5m). */
+export function confLayerData() {
+	const sel = $('confLayer')?.value ?? 'ctx'
+	const L = (S.data?.mtfLayers || []).find((x) => (sel === 'swing' ? x.role === 'swing' : x.role === 'local'))
+	if (sel !== 'ctx' && L) {
+		return {
+			results: L.results, candidates: L.candidates,
+			src: L.ltfConf ?? (L.confTf === '5m' ? S.data?.ltf5m : null) ?? [],
+			confTf: L.confTf, zoneTf: L.contextTf,
+		}
+	}
+	return {
+		results: S.data?.poiConfirmation?.results || [], candidates: S.data?.liquidityPoi?.candidates || [],
+		src: S.data?.ltfConf || [], confTf: S.data?.dataset?.confTf, zoneTf: S.data?.dataset?.timeframe,
+	}
+}
+
 export function confirmationAttempts() {
 	const out = []
-	for (const r of (S.data?.poiConfirmation?.results || []))
+	for (const r of (confLayerData().results || []))
 		for (const a of r.attempts)
 			out.push({ ...a, poiId: r.poiId, direction: r.direction, zoneClass: r.zoneClass, near: r.near, far: r.far, knownAt: r.knownAt, endAt: r.endAt, spentReason: r.spentReason, ltfCoverage: r.ltfCoverage })
 	return out
@@ -42,22 +59,23 @@ function currentConfirmation() {
 
 export function renderConfirmation() {
 	if (!S.data || S.mode !== 'conf') return
-	if (S.confZonesMode) { S.confZonesMode = false; $('confZonesBtn').textContent = 'Зоны на 4h' }
+	if (S.confZonesMode) { S.confZonesMode = false; $('confZonesBtn').textContent = `Зоны на ${confLayerData().zoneTf ?? '4h'}` }
 	clearOverlays()
 	setMarkers([])
 	const c = currentConfirmation(), xs = confirmationCandidates()
 	if (!c) {
 		const total = confirmationAttempts().length
-		$('confStatusText').textContent = total ? `Всего попыток ${total}, по текущему фильтру 0 — выберите «Все попытки»` : `Попыток нет: нет POI-зон на ${S.data?.dataset?.timeframe ?? 'этом ТФ'} или пуст ряд подтверждения`
+		$('confStatusText').textContent = total ? `Всего попыток ${total}, по текущему фильтру 0 — выберите «Все попытки»` : `Попыток нет: нет POI-зон связки ${confLayerData().zoneTf ?? ''}→${confLayerData().confTf ?? ''} или пуст ряд подтверждения`
 		return
 	}
-	const src = S.data.ltfConf || []
+	const src = confLayerData().src || []
 	if (!src.length) return
 	setCandles(src)
 	const times = c.trace.map((x) => x.at)
 	const lo = Math.min(c.knownAt, ...times), hi = Math.max(c.endAt || lo, ...times)
-	const from = time(Math.max(src[0].timestamp, lo - 8 * 900000))
-	const to = time(Math.min(src[src.length - 1].timestamp, hi + 8 * 900000))
+	const srcTfMs = src.length > 1 ? src[1].timestamp - src[0].timestamp : 900000
+	const from = time(Math.max(src[0].timestamp, lo - 8 * srcTfMs))
+	const to = time(Math.min(src[src.length - 1].timestamp, hi + 8 * srcTfMs))
 	// Зона — прямоугольником на всю ширину окна попытки.
 	zonesPrim.setRects([{
 		id: c.poiId, t1: from, t2: to, p1: c.near, p2: c.far, side: c.direction,
@@ -124,7 +142,7 @@ export function renderConfZones() {
 	clearOverlays()
 	setMarkers([])
 	restoreMainCandles()
-	const rs = S.data?.poiConfirmation?.results || []
+	const rs = confLayerData().results || []
 	const src = S.data.candles || []
 	if (!src.length) return
 	const first = src[0].timestamp, last = src[src.length - 1].timestamp
@@ -141,11 +159,11 @@ export function renderConfZones() {
 		rects.push({
 			id: r.poiId, t1: time(fromTs), t2: time(toTs), p1: r.near, p2: r.far, side: r.direction,
 			alpha: dead ? 0.15 : 1, dim: dead, focused: entered,
-			label: dead ? `нет ${S.data?.dataset?.confTf ?? ''} данных` : `${r.attempts.length} поп.${entered ? ' · ВХОД' : ''}${r.spentReason === 'tp-hit' ? ' · тейк' : ''}${r.ltfCoverage === 'partial' ? ` · ${S.data?.dataset?.confTf ?? 'LTF'} частично` : ''}`,
+			label: dead ? `нет ${confLayerData().confTf ?? ''} данных` : `${r.attempts.length} поп.${entered ? ' · ВХОД' : ''}${r.spentReason === 'tp-hit' ? ' · тейк' : ''}${r.ltfCoverage === 'partial' ? ` · ${confLayerData().confTf ?? 'LTF'} частично` : ''}`,
 		})
 	}
 	zonesPrim.setRects(rects)
-	$('confStatusText').textContent = `Зоны подтверждения на ${S.data?.dataset?.timeframe ?? ''}: ${n} шт (${noData} тусклых — окно раньше истории ТФ подтверждения: нет данных, не логики) · рамка near сплошная, far пунктир`
+	$('confStatusText').textContent = `Зоны подтверждения (${confLayerData().zoneTf ?? ''}→${confLayerData().confTf ?? ''}): ${n} шт (${noData} тусклых — окно раньше истории ТФ подтверждения: нет данных, не логики) · рамка near сплошная, far пунктир`
 	fitContent()
 }
 
@@ -179,8 +197,8 @@ export function wireConfirmationPanel(activate, deactivate) {
 	$('confZonesBtn').onclick = () => {
 		if (S.mode !== 'conf') return
 		S.confZonesMode = !S.confZonesMode
-		if (S.confZonesMode) { $('confZonesBtn').textContent = `Назад к ${S.data?.dataset?.confTf ?? 'LTF'}`; renderConfZones() }
+		if (S.confZonesMode) { $('confZonesBtn').textContent = `Назад к ${confLayerData().confTf ?? 'LTF'}`; renderConfZones() }
 		else renderConfirmation()
 	}
-	for (const id of ['confStatus', 'confOutcome', 'confReason']) $(id).onchange = () => { S.confIndex = 0; renderConfirmation() }
+	for (const id of ['confStatus', 'confOutcome', 'confReason', 'confLayer']) $(id).onchange = () => { S.confIndex = 0; renderConfirmation() }
 }

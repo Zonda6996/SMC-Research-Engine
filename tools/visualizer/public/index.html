@@ -90,6 +90,8 @@
 							<label class="check"><input type="checkbox" id="poiActiveOnly" checked /> только активные</label>
 							<label class="check"><input type="checkbox" id="poiLiqOnly" checked /> без ATR-границ</label>
 							<label class="check"><input type="checkbox" id="myZonesShow" checked /> мои зоны</label>
+							<label class="check" title="§16.20: свинговые дневные зоны (подтверждение 1h) поверх рабочего вида 4h"><input type="checkbox" id="mtfSwingShow" checked /> слой 1D свинг</label>
+							<label class="check" title="§16.20: локальные часовые зоны (подтверждение 5m) поверх рабочего вида 4h; фильтры (сила стека и пр.) применяются и к слоям"><input type="checkbox" id="mtfLocalShow" checked /> слой 1h локальные</label>
 						</div>
 						<div class="status" id="poiZoneStatus">—</div>
 						<div class="btn-row">
@@ -122,6 +124,7 @@
 				<div class="section-body">
 					<div class="hidden" id="confControls">
 						<div class="grid2">
+							<select class="input" id="confLayer" title="§16.20: связка «ТФ зоны → ТФ подтверждения»: контекст графика или слой карты"><option value="ctx" selected>Связка графика</option><option value="swing">Свинг 1D→1h</option><option value="local">Локальный 1h→5m</option></select>
 							<select class="input" id="confStatus"><option value="all">Все попытки</option><option value="entered">Entered</option><option value="rejected">Rejected</option></select>
 							<select class="input" id="confOutcome"><option value="all">Любой исход</option><option value="tp">TP2</option><option value="stop">Stop</option><option value="open">Open</option></select>
 							<select class="input" id="confReason"><option value="all">Все причины</option></select>
