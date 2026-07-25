@@ -14,6 +14,7 @@ export async function fetchAnalyze() {
 		contextTf: $('labContext').value, historyBars: $('labHistory').value,
 	})
 	if (until) q.set('until', until)
+	if (!$('fullLtf').checked) q.set('fullLtf', '0') // §16.19: дефолт ВКЛ, шлём только выключение
 	const ov = engineOverrides()
 	if (Object.keys(ov.poi).length) q.set('poiConfig', JSON.stringify(ov.poi))
 	if (Object.keys(ov.hm).length) q.set('hmConfig', JSON.stringify(ov.hm))

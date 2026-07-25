@@ -24,6 +24,7 @@
 		<input class="input input-limit" type="number" id="limit" value="5000" min="500" max="25000" step="500" title="Количество свечей" />
 		<input class="input input-date" type="date" id="historyUntil" title="История до конца выбранного дня; пусто — по сейчас" />
 		<button class="btn btn-ghost icon" id="randomPeriod" title="Случайная дата от марта 2024">🎲</button>
+		<label class="check" id="fullLtfWrap" title="Полная 15m-история для подтверждения: глубокая часть из архивов data.binance.vision, свежий хвост из API. Первая загрузка символа дольше на несколько секунд — дальше дисковый кэш. Выключено — старый потолок API (~208 дней)"><input type="checkbox" id="fullLtf" checked /> 15m: вся история</label>
 		<select class="input input-source" id="source" title="Источник данных">
 			<option value="fresh">Binance Futures</option>
 			<option value="fixture">Fixture (офлайн)</option>

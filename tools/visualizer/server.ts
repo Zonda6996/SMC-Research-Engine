@@ -28,6 +28,7 @@ import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
 import { aggregateCandles, fetchCandlesPaginated, fetchHeatmapAux, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
+import { fetchArchiveKlines, mergeCandleSeries } from '../shared/archiveKlines.js'
 import { plannedFullStop } from '../shared/executionCostGate.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -49,6 +50,8 @@ const dataCache = new Map<string, {
 	candles: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 	ltf5m: Awaited<ReturnType<typeof fetchCandlesPaginated>> | null
 	heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
+	/** §16.19: итоговый 15m-ряд (архивы + API-хвост) — чтобы «Пересчитать» не перечитывал архивы. */
+	ltf15m: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 }>()
 const DATA_TTL_LIVE = 90_000
 const DATA_TTL_HIST = 60 * 60 * 1000
@@ -60,6 +63,8 @@ interface AnalyzeQuery {
 	source?: string | undefined
 	market?: string | undefined
 	until?: string | undefined
+	/** §16.19: '0' выключает полную 15m-историю из архивов (дефолт ВКЛ). */
+	fullLtf?: string | undefined
 	contextTf?: string | undefined
 	historyBars?: string | undefined
 	poiConfig?: string | undefined
@@ -76,6 +81,7 @@ function parseQuery(qs: string): AnalyzeQuery {
 		source: params.get('source') ?? undefined,
 		market: params.get('market') ?? undefined,
 		until: params.get('until') ?? undefined,
+		fullLtf: params.get('fullLtf') ?? undefined,
 		contextTf: params.get('contextTf') ?? undefined,
 		historyBars: params.get('historyBars') ?? undefined,
 		poiConfig: params.get('poiConfig') ?? undefined,
@@ -369,6 +375,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			if (q.until && !Number.isFinite(parsedUntil)) throw new Error(`Invalid until date: ${q.until}`)
 			const untilMs = parsedUntil == null ? null : Math.min(parsedUntil, Date.now())
 
+			// §16.19: полная 15m-история из архивов data.binance.vision (дефолт ВКЛ, fullLtf=0 выключает).
+			const fullLtf = q.fullLtf !== '0'
 			const useFixture = q.source !== 'fresh'
 			const htfMs = TF_MS[timeframe]
 			if (!htfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
@@ -386,15 +394,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			// §16.17: кэш данных — «Пересчитать» с новыми конфигами движков не должен заново качать
 			// свечи с биржи (сеть = почти всё время загрузки). Ключ — параметры ДАННЫХ (не конфиги);
 			// живые данные устаревают за DATA_TTL_LIVE, исторические (until) — за DATA_TTL_HIST.
-			const cacheKey = `${symbol}|${timeframe}|${limit}|${market}|${untilMs ?? 'live'}|${ltfNeed}`
+			const cacheKey = `${symbol}|${timeframe}|${limit}|${market}|${untilMs ?? 'live'}|${ltfNeed}|full${fullLtf ? 1 : 0}`
 			const cachedData = useFixture ? undefined : dataCache.get(cacheKey)
 			const ttl = untilMs == null ? DATA_TTL_LIVE : DATA_TTL_HIST
 			let candles: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 			let ltf5m: Awaited<ReturnType<typeof fetchCandlesPaginated>> | null
 			let heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
+			let ltf15m: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 			let snapshot: ReturnType<typeof runAnalysis>
 			if (cachedData && Date.now() - cachedData.at < ttl) {
-				({ candles, ltf5m, heatmapAux } = cachedData)
+				({ candles, ltf5m, heatmapAux, ltf15m } = cachedData)
 				snapshot = runAnalysis(candles)
 			} else {
 				candles = useFixture ? loadFixtureCandles() : await fetchCandlesPaginated(symbol, timeframe, limit, market, untilMs)
@@ -404,13 +413,27 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					fetchCandlesPaginated(symbol, '5m', ltfNeed, market, untilMs, MAX_CANDLES_LTF),
 					fetchHeatmapAux(symbol, timeframe, snapshot.candles, market),
 				])
+				ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
+				// §16.19: полная 15m-история — архивы data.binance.vision от начала 4h-окна, поверх
+				// них API-хвост (свежие сутки-двое: дневной архив запаздывает). Глубина автоматическая
+				// (первый бар загруженного окна), новых констант нет. Fail-soft: сеть/парсер упали —
+				// работаем на API-глубине, как раньше.
+				if (fullLtf && !useFixture && timeframe === '4h' && candles.length) {
+					try {
+						const t0 = Date.now()
+						const archive = await fetchArchiveKlines(symbol, '15m', market, candles[0]!.timestamp, untilMs)
+						ltf15m = mergeCandleSeries(archive, ltf15m)
+						console.log(`[archive15m] ${symbol}: ${archive.length} баров из архивов за ${((Date.now() - t0) / 1000).toFixed(1)}с, итог ${ltf15m.length}×15m`)
+					} catch (err) {
+						console.error('[archive15m] fail-soft, работаем на API-глубине:', err instanceof Error ? err.message : err)
+					}
+				}
 				if (!useFixture) {
-					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux })
+					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltf15m })
 					// Потолок кэша: держим последние 8 наборов (каждый — десятки МБ 5m-свечей).
 					while (dataCache.size > 8) dataCache.delete(dataCache.keys().next().value as string)
 				}
 			}
-			const ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
 
 			// §16.15: конфиги движков с переопределениями из UI (числовые ключи, whitelisted).
 			const hmBase = heatmapConfigForTf(htfMs)
@@ -433,7 +456,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					executionCostGate: BATTLE_CONFIG.executionCostGate,
 					mirror: 'removed',
 				},
-				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
+				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, ltf15mCount: ltf15m.length, ltf15mFrom: ltf15m[0]?.timestamp ?? null, fullLtf, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
 				// §16.15: дефолты и применённые переопределения — для панели «Настройки движков».
 				engineDefaults: { poi: LIQUIDITY_POI_CONFIG, heatmap: hmBase, confirmation: POI_CONFIRMATION_CONFIG },
 				appliedOverrides: { poi: poiOverrides, hm: hmOverrides, conf: confOverrides },
