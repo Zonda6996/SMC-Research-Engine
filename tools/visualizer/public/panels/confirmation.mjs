@@ -1,4 +1,5 @@
-// panels/confirmation.mjs — подтверждение 4h→15m: трейс попытки на 15m-свечах (зона —
+// panels/confirmation.mjs — уточнённое подтверждение по лестнице ТФ (1D→1h, 4h→15m, 1h→5m):
+// трейс попытки на свечах ТФ подтверждения (зона —
 // прямоугольником, вход/стоп/тейк — линиями, якорь — жёлтым пунктиром) и обзор «Зоны на 4h».
 
 import { S } from '../lib/state.mjs'
@@ -47,10 +48,10 @@ export function renderConfirmation() {
 	const c = currentConfirmation(), xs = confirmationCandidates()
 	if (!c) {
 		const total = confirmationAttempts().length
-		$('confStatusText').textContent = total ? `Всего попыток ${total}, по текущему фильтру 0 — выберите «Все попытки»` : 'Попыток нет: нет POI-зон на 4h или пуст ltf15m'
+		$('confStatusText').textContent = total ? `Всего попыток ${total}, по текущему фильтру 0 — выберите «Все попытки»` : `Попыток нет: нет POI-зон на ${S.data?.dataset?.timeframe ?? 'этом ТФ'} или пуст ряд подтверждения`
 		return
 	}
-	const src = S.data.ltf15m || []
+	const src = S.data.ltfConf || []
 	if (!src.length) return
 	setCandles(src)
 	const times = c.trace.map((x) => x.at)
@@ -140,11 +141,11 @@ export function renderConfZones() {
 		rects.push({
 			id: r.poiId, t1: time(fromTs), t2: time(toTs), p1: r.near, p2: r.far, side: r.direction,
 			alpha: dead ? 0.15 : 1, dim: dead, focused: entered,
-			label: dead ? 'нет 15m данных' : `${r.attempts.length} поп.${entered ? ' · ВХОД' : ''}${r.spentReason === 'tp-hit' ? ' · тейк' : ''}${r.ltfCoverage === 'partial' ? ' · 15m частично' : ''}`,
+			label: dead ? `нет ${S.data?.dataset?.confTf ?? ''} данных` : `${r.attempts.length} поп.${entered ? ' · ВХОД' : ''}${r.spentReason === 'tp-hit' ? ' · тейк' : ''}${r.ltfCoverage === 'partial' ? ` · ${S.data?.dataset?.confTf ?? 'LTF'} частично` : ''}`,
 		})
 	}
 	zonesPrim.setRects(rects)
-	$('confStatusText').textContent = `Зоны подтверждения на 4h: ${n} шт (${noData} тусклых — окно раньше 15m-истории: нет данных, не логики) · рамка near сплошная, far пунктир`
+	$('confStatusText').textContent = `Зоны подтверждения на ${S.data?.dataset?.timeframe ?? ''}: ${n} шт (${noData} тусклых — окно раньше истории ТФ подтверждения: нет данных, не логики) · рамка near сплошная, far пунктир`
 	fitContent()
 }
 
@@ -178,7 +179,7 @@ export function wireConfirmationPanel(activate, deactivate) {
 	$('confZonesBtn').onclick = () => {
 		if (S.mode !== 'conf') return
 		S.confZonesMode = !S.confZonesMode
-		if (S.confZonesMode) { $('confZonesBtn').textContent = 'Назад к 15m'; renderConfZones() }
+		if (S.confZonesMode) { $('confZonesBtn').textContent = `Назад к ${S.data?.dataset?.confTf ?? 'LTF'}`; renderConfZones() }
 		else renderConfirmation()
 	}
 	for (const id of ['confStatus', 'confOutcome', 'confReason']) $(id).onchange = () => { S.confIndex = 0; renderConfirmation() }

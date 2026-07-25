@@ -27,7 +27,7 @@ import { detectPoiConfirmation, POI_CONFIRMATION_CONFIG, POI_CONFIRMATION_VERSIO
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
-import { aggregateCandles, fetchCandlesPaginated, fetchHeatmapAux, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
+import { aggregateCandles, CONFIRMATION_TF, fetchCandlesPaginated, fetchHeatmapAux, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
 import { fetchArchiveKlines, mergeCandleSeries } from '../shared/archiveKlines.js'
 import { plannedFullStop } from '../shared/executionCostGate.js'
 
@@ -50,8 +50,8 @@ const dataCache = new Map<string, {
 	candles: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 	ltf5m: Awaited<ReturnType<typeof fetchCandlesPaginated>> | null
 	heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
-	/** §16.19: итоговый 15m-ряд (архивы + API-хвост) — чтобы «Пересчитать» не перечитывал архивы. */
-	ltf15m: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+	/** §16.19: итоговый ряд ТФ подтверждения (архивы + API-хвост) — «Пересчитать» архивы не перечитывает. */
+	ltfConf: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 }>()
 const DATA_TTL_LIVE = 90_000
 const DATA_TTL_HIST = 60 * 60 * 1000
@@ -375,8 +375,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			if (q.until && !Number.isFinite(parsedUntil)) throw new Error(`Invalid until date: ${q.until}`)
 			const untilMs = parsedUntil == null ? null : Math.min(parsedUntil, Date.now())
 
-			// §16.19: полная 15m-история из архивов data.binance.vision (дефолт ВКЛ, fullLtf=0 выключает).
+			// §16.19: полная история ТФ подтверждения из архивов (дефолт ВКЛ, fullLtf=0 выключает).
 			const fullLtf = q.fullLtf !== '0'
+			// §16.19/§14.1: ТФ уточнённого подтверждения по лестнице (1d→1h, 4h→15m, 1h→5m); null — зон нет.
+			const confTf = CONFIRMATION_TF[timeframe] ?? null
 			const useFixture = q.source !== 'fresh'
 			const htfMs = TF_MS[timeframe]
 			if (!htfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
@@ -390,7 +392,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const minLtfLeftBars = Math.ceil(historyBars * contextMs / TF_MS['5m']!)
 			// Ещё 5000×5m оставляем справа от минимального контекста, чтобы в
 			// окне было достаточно candidate touches и будущего для outcome.
-			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(timeframe === '4h' ? 30_000 : 10_000, minLtfLeftBars + 5_000))
+			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(confTf != null ? 30_000 : 10_000, minLtfLeftBars + 5_000))
 			// §16.17: кэш данных — «Пересчитать» с новыми конфигами движков не должен заново качать
 			// свечи с биржи (сеть = почти всё время загрузки). Ключ — параметры ДАННЫХ (не конфиги);
 			// живые данные устаревают за DATA_TTL_LIVE, исторические (until) — за DATA_TTL_HIST.
@@ -400,10 +402,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			let candles: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 			let ltf5m: Awaited<ReturnType<typeof fetchCandlesPaginated>> | null
 			let heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
-			let ltf15m: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+			let ltfConf: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 			let snapshot: ReturnType<typeof runAnalysis>
 			if (cachedData && Date.now() - cachedData.at < ttl) {
-				({ candles, ltf5m, heatmapAux, ltf15m } = cachedData)
+				({ candles, ltf5m, heatmapAux, ltfConf } = cachedData)
 				snapshot = runAnalysis(candles)
 			} else {
 				candles = useFixture ? loadFixtureCandles() : await fetchCandlesPaginated(symbol, timeframe, limit, market, untilMs)
@@ -413,23 +415,23 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					fetchCandlesPaginated(symbol, '5m', ltfNeed, market, untilMs, MAX_CANDLES_LTF),
 					fetchHeatmapAux(symbol, timeframe, snapshot.candles, market),
 				])
-				ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
-				// §16.19: полная 15m-история — архивы data.binance.vision от начала 4h-окна, поверх
-				// них API-хвост (свежие сутки-двое: дневной архив запаздывает). Глубина автоматическая
-				// (первый бар загруженного окна), новых констант нет. Fail-soft: сеть/парсер упали —
-				// работаем на API-глубине, как раньше.
-				if (fullLtf && !useFixture && timeframe === '4h' && candles.length) {
+				// §14.1/§16.19: ряд ТФ подтверждения. Хвост — из уже скачанных 5m (агрегация или сами 5m,
+				// новых API-путей нет); глубокая часть — архивы data.binance.vision от ПЕРВОГО бара
+				// загруженного окна зон (глубина автоматическая, констант нет). Fail-soft: сеть/парсер
+				// упали — работаем на API-глубине, как раньше.
+				ltfConf = ltf5m?.length && confTf ? (confTf === '5m' ? ltf5m : aggregateCandles(ltf5m, '5m', confTf)) : []
+				if (fullLtf && !useFixture && confTf && candles.length) {
 					try {
 						const t0 = Date.now()
-						const archive = await fetchArchiveKlines(symbol, '15m', market, candles[0]!.timestamp, untilMs)
-						ltf15m = mergeCandleSeries(archive, ltf15m)
-						console.log(`[archive15m] ${symbol}: ${archive.length} баров из архивов за ${((Date.now() - t0) / 1000).toFixed(1)}с, итог ${ltf15m.length}×15m`)
+						const archive = await fetchArchiveKlines(symbol, confTf, market, candles[0]!.timestamp, untilMs)
+						ltfConf = mergeCandleSeries(archive, ltfConf)
+						console.log(`[archiveConf] ${symbol}: ${archive.length}×${confTf} из архивов за ${((Date.now() - t0) / 1000).toFixed(1)}с, итог ${ltfConf.length}`)
 					} catch (err) {
-						console.error('[archive15m] fail-soft, работаем на API-глубине:', err instanceof Error ? err.message : err)
+						console.error('[archiveConf] fail-soft, работаем на API-глубине:', err instanceof Error ? err.message : err)
 					}
 				}
 				if (!useFixture) {
-					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltf15m })
+					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltfConf })
 					// Потолок кэша: держим последние 8 наборов (каждый — десятки МБ 5m-свечей).
 					while (dataCache.size > 8) dataCache.delete(dataCache.keys().next().value as string)
 				}
@@ -441,11 +443,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const poiOverrides = pickNumericOverrides(LIQUIDITY_POI_CONFIG, q.poiConfig)
 			const confOverrides = pickNumericOverrides(POI_CONFIRMATION_CONFIG, q.confConfig)
 			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, { ...hmBase, ...hmOverrides }, heatmapAux ?? undefined)
-			const poiCandidates = timeframe === '4h'
+			// §14.1/§16.19: зоны и подтверждение — для всех ТФ лестницы (1d→1h, 4h→15m, 1h→5m).
+			const poiCandidates = confTf != null
 				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools, config: poiOverrides })
 				: []
-			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём 4h-бара захода / SMA20).
-			const poiConfirmations = timeframe === '4h' ? detectPoiConfirmation(poiCandidates, ltf15m, snapshot.candles, confOverrides) : []
+			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём бара захода ТФ зоны / SMA20).
+			const poiConfirmations = confTf != null ? detectPoiConfirmation(poiCandidates, ltfConf, snapshot.candles, confOverrides) : []
 
 			sendJson(res, 200, {
 				strategy: {
@@ -456,17 +459,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					executionCostGate: BATTLE_CONFIG.executionCostGate,
 					mirror: 'removed',
 				},
-				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, ltf15mCount: ltf15m.length, ltf15mFrom: ltf15m[0]?.timestamp ?? null, fullLtf, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
+				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, confTf, ltfConfCount: ltfConf.length, ltfConfFrom: ltfConf[0]?.timestamp ?? null, fullLtf, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
 				// §16.15: дефолты и применённые переопределения — для панели «Настройки движков».
 				engineDefaults: { poi: LIQUIDITY_POI_CONFIG, heatmap: hmBase, confirmation: POI_CONFIRMATION_CONFIG },
 				appliedOverrides: { poi: poiOverrides, hm: hmOverrides, conf: confOverrides },
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
-				ltf15m,
+				ltfConf,
 				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
-				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),
+				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : [], htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),
 				structure: snapshot.structure,
 				trendHistory: snapshot.market.trendHistory,
 				finalTrend: snapshot.market.trend,

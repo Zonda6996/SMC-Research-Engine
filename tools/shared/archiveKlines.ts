@@ -142,13 +142,21 @@ async function loadPeriod(
 	const marketPath = market === 'futures' ? 'futures/um' : 'spot'
 	const url = `${BASE_URL}/${marketPath}/${kind}/klines/${sym}/${tf}/${sym}-${tf}-${period}.zip`
 	const fetchImpl = opts.fetchImpl ?? fetch
-	const res = await fetchImpl(url)
-	if (res.status === 404) { missing.add(key); return null }
-	if (!res.ok) throw new Error(`data.binance.vision ${res.status} для ${sym}-${tf}-${period}`)
-	const candles = parseKlinesCsv(unzipCsv(Buffer.from(await res.arrayBuffer())))
-	mkdirSync(cacheDir, { recursive: true })
-	writeFileSync(cacheFile, JSON.stringify(candles))
-	return candles
+	// Транзиентные 5xx: до 3 попыток с бэкоффом; после — период пропускается с предупреждением
+	// (один битый файл не должен ронять 80 хороших; в missing НЕ пишем — следующий процесс дотянет).
+	for (let attempt = 0; ; attempt++) {
+		const res = await fetchImpl(url)
+		if (res.status === 404) { missing.add(key); return null }
+		if (!res.ok) {
+			if (attempt < 2) { await new Promise((r) => setTimeout(r, 300 * (attempt + 1))); continue }
+			console.error(`[archiveKlines] пропускаю ${sym}-${tf}-${period}: ${res.status} после ретраев`)
+			return null
+		}
+		const candles = parseKlinesCsv(unzipCsv(Buffer.from(await res.arrayBuffer())))
+		mkdirSync(cacheDir, { recursive: true })
+		writeFileSync(cacheFile, JSON.stringify(candles))
+		return candles
+	}
 }
 
 /**
@@ -168,12 +176,23 @@ export async function fetchArchiveKlines(
 		...months.map((p) => async () => {
 			const monthly = await loadPeriod(sym, tf, market, 'monthly', p, opts)
 			if (monthly) return monthly
-			// monthly ещё не выложен (начало месяца) — добираем этот месяц дневными.
+			// monthly отсутствует: либо месяц до листинга символа (дневных тоже нет — проверяем
+			// пробами 1-го и 15-го, чтобы не бомбить 30 запросами), либо свежий месяц ещё не
+			// выложен целиком — добираем дневными.
 			const [y, m] = p.split('-').map(Number)
-			const dayJobs: Promise<Candle[] | null>[] = []
-			for (let t = Date.UTC(y!, m! - 1, 1); t < Math.min(until, Date.UTC(y!, m!, 1)); t += DAY_MS) {
+			const dayId = (t: number) => {
 				const d = new Date(t)
-				dayJobs.push(loadPeriod(sym, tf, market, 'daily', `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`, opts))
+				return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
+			}
+			const monthStart = Date.UTC(y!, m! - 1, 1)
+			const probes = await Promise.all([
+				loadPeriod(sym, tf, market, 'daily', dayId(monthStart), opts),
+				loadPeriod(sym, tf, market, 'daily', dayId(monthStart + 14 * DAY_MS), opts),
+			])
+			if (!probes[0] && !probes[1]) return []
+			const dayJobs: Promise<Candle[] | null>[] = []
+			for (let t = monthStart; t < Math.min(until, Date.UTC(y!, m!, 1)); t += DAY_MS) {
+				dayJobs.push(loadPeriod(sym, tf, market, 'daily', dayId(t), opts))
 			}
 			return (await Promise.all(dayJobs)).flatMap((x) => x ?? [])
 		}),

@@ -24,7 +24,7 @@
 		<input class="input input-limit" type="number" id="limit" value="5000" min="500" max="25000" step="500" title="Количество свечей" />
 		<input class="input input-date" type="date" id="historyUntil" title="История до конца выбранного дня; пусто — по сейчас" />
 		<button class="btn btn-ghost icon" id="randomPeriod" title="Случайная дата от марта 2024">🎲</button>
-		<label class="check" id="fullLtfWrap" title="Полная 15m-история для подтверждения: глубокая часть из архивов data.binance.vision, свежий хвост из API. Первая загрузка символа дольше на несколько секунд — дальше дисковый кэш. Выключено — старый потолок API (~208 дней)"><input type="checkbox" id="fullLtf" checked /> 15m: вся история</label>
+		<label class="check" id="fullLtfWrap" title="Полная история ТФ подтверждения (1h для 1D-зон, 15m для 4h, 5m для 1h): глубокая часть из архивов data.binance.vision, свежий хвост из API. Первая загрузка символа дольше на несколько секунд — дальше дисковый кэш. Выключено — потолок API"><input type="checkbox" id="fullLtf" checked /> подтверждение: вся история</label>
 		<select class="input input-source" id="source" title="Источник данных">
 			<option value="fresh">Binance Futures</option>
 			<option value="fixture">Fixture (офлайн)</option>
@@ -118,7 +118,7 @@
 
 			<!-- Подтверждение -->
 			<section class="section mode" id="confPanel">
-				<div class="section-head" data-toggle="confToggle"><h2>Подтверждение <span class="ver">1.6 · 4h→15m</span></h2><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
+				<div class="section-head" data-toggle="confToggle"><h2>Подтверждение <span class="ver">1D→1h · 4h→15m · 1h→5m</span></h2><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="confControls">
 						<div class="grid2">
@@ -135,7 +135,7 @@
 							<button class="btn btn-ghost sm" id="confBack">Обычный график</button>
 						</div>
 						<div class="detail" id="confTrace"></div>
-						<details class="help"><summary>Справка по подтверждению</summary><p>Последовательность: заход → остановка (направленное закрытие после 4 тихих баров) → отскок (6 баров) → пересвип невыметенного якоря → защита → тест слабости (объём возобновления выше отката) → вход; стоп за экстремумом свипа, тейк 2R. Попытка умирает: 96 баров бездействия · пробой закрытиями · конец окна зоны (со состоявшимся свипом — доигрывается). Вход отменяется при риске &gt; 1.5 ATR15. Тусклые зоны в обзоре 4h — раньше 15m-истории (~208 дней): нет данных, не логики.</p></details>
+						<details class="help"><summary>Справка по подтверждению</summary><p>Последовательность: заход → остановка (направленное закрытие после 4 тихих баров) → отскок (6 баров) → пересвип невыметенного якоря → защита → тест слабости (объём возобновления выше отката) → вход; стоп за экстремумом свипа, тейк 2R. Попытка умирает: 96 баров бездействия · пробой закрытиями · конец окна зоны (со состоявшимся свипом — доигрывается). Вход отменяется при риске &gt; 1.5 ATR15. Уточнённое подтверждение по лестнице ТФ: 1D-зоны → 1h, 4h → 15m, 1h → 5m; константы движка — в барах ТФ подтверждения (время масштабируется с ТФ контекста). Пометка «против импульса» калибрована на связке 4h→15m. Тусклые зоны — окно раньше истории ТФ подтверждения: нет данных, не логики.</p></details>
 					</div>
 				</div>
 			</section>

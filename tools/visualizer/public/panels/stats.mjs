@@ -61,7 +61,7 @@ export function renderFunnel() {
 	el.innerHTML = zones.length
 		? `<span class="chip" title="Всего зон в наборе">${zones.length} зон</span><span class="chip-sep">→</span>
 		   <span class="chip chip-accent" title="Активные (готова + в игре)">${active} активных</span><span class="chip-sep">→</span>
-		   <span class="chip" title="Попытки подтверждения на 15m">${attempts} попыток</span><span class="chip-sep">→</span>
+		   <span class="chip" title="Попытки уточнённого подтверждения (${S.data?.dataset?.confTf ?? '15m'})">${attempts} попыток</span><span class="chip-sep">→</span>
 		   <span class="chip ${entries ? 'chip-green' : ''}" title="Входы (без дублей «один свип = одна сделка»)">${entries} входов${dupEntries ? ` <span class="muted">+${dupEntries} дубл.</span>` : ''}</span>`
 		: ''
 }

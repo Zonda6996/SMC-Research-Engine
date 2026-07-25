@@ -114,3 +114,22 @@ it('archive: fetchArchiveKlines — символ нормализуется, 404
 	assert.equal(calls.length, callsBefore)
 	assert.ok(readdirSync(cacheDir).some((f) => f.includes('2026-05')))
 })
+
+it('archive: транзиентный 5xx ретраится, стойкий — пропускается без падения (fail-soft периода)', async () => {
+	const cacheDir = mkdtempSync(join(tmpdir(), 'arch-'))
+	const csv = `${Date.UTC(2026, 4, 2)},1,2,0.5,1.5,3,0,0,0,0,0,0\n`
+	let mayHits = 0
+	const fetchImpl = (async (url: string | URL | Request) => {
+		const u = String(url)
+		if (u.includes('-2026-05.zip')) {
+			mayHits++
+			if (mayHits < 3) return new Response('bad gateway', { status: 502 }) // 2 фейла → 3-я попытка ок
+			return new Response(new Uint8Array(makeZip('x.csv', Buffer.from(csv), 8)))
+		}
+		if (u.includes('-2026-06.zip')) return new Response('bad gateway', { status: 502 }) // стойкий 5xx
+		return new Response('нет', { status: 404 })
+	}) as typeof fetch
+	const out = await fetchArchiveKlines('ETH/USDT', '1d', 'futures', Date.UTC(2026, 4, 1), Date.UTC(2026, 6, 1), { fetchImpl, cacheDir })
+	assert.equal(out.length, 1) // май дотянулся через ретраи; июнь пропущен (5xx после ретраев + дневные 404)
+	assert.equal(mayHits, 3)
+})
