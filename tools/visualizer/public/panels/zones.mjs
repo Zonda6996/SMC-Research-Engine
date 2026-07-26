@@ -25,7 +25,8 @@ export function zoneCandidates() {
 	const d = $('poiDirection').value, life = $('poiLifecycle').value, pr = $('poiPriority').value
 	const activeOnly = $('poiActiveOnly').checked, liqOnly = $('poiLiqOnly').checked
 	const minStack = Number($('poiMinStack')?.value || 0)
-	return [...(S.data?.liquidityPoi?.candidates || []), ...layerZones()].filter((x) => {
+	const ctxZones = ($('mtfCtxShow')?.checked ?? true) ? (S.data?.liquidityPoi?.candidates || []) : []
+	return [...ctxZones, ...layerZones()].filter((x) => {
 		if (x.duplicateOf) return false
 		if (liqOnly && x.boundarySource !== 'liquidity-cluster') return false
 		if (activeOnly && !(x.active && x.valid)) return false
@@ -84,9 +85,13 @@ export function renderZones() {
 	const last = S.data.candles[S.data.candles.length - 1].timestamp
 	const focusId = S.poiFocusId
 	const zid = (c) => (c.__layer ? `${c.__layer}:${c.id}` : c.id)
+	// §16.21: слоёные зоны рисуются компактно (правая треть окна данных) — «прилипание» длинных
+	// прямоугольников к левому краю мешало чтению; фокус-зона рисуется полной длиной.
+	const first = S.data.candles[0].timestamp
+	const compactFrom = last - (last - first) * 0.3
 	const rects = xs.map((c) => ({
 		id: zid(c),
-		t1: time(Math.max(c.knownAt, c.geometryKnownAt || 0)),
+		t1: time(c.__layer && zid(c) !== focusId ? Math.max(c.knownAt, c.geometryKnownAt || 0, compactFrom) : Math.max(c.knownAt, c.geometryKnownAt || 0)),
 		t2: time(c.endAt || last),
 		p1: c.near, p2: c.far, side: c.direction,
 		focused: zid(c) === focusId, dim: !!focusId && zid(c) !== focusId,
@@ -174,7 +179,7 @@ export function wireZonesPanel(activate, deactivate) {
 	$('poiZoneNext').onclick = () => moveZoneFocus(1)
 	$('poiZoneExport').onclick = exportZones
 	$('poiZoneBack').onclick = () => deactivate()
-	for (const id of ['poiDirection', 'poiLifecycle', 'poiPriority', 'poiActiveOnly', 'poiLiqOnly', 'poiMinStack', 'myZonesShow', 'mtfSwingShow', 'mtfLocalShow'])
+	for (const id of ['poiDirection', 'poiLifecycle', 'poiPriority', 'poiActiveOnly', 'poiLiqOnly', 'poiMinStack', 'myZonesShow', 'mtfSwingShow', 'mtfLocalShow', 'mtfCtxShow'])
 		$(id).onchange = () => { if (id !== 'myZonesShow') S.poiFocusId = null; renderZones() }
 	$('myZoneAdd').onclick = () => {
 		addMyZone($('myZoneSide').value, Number($('myZoneFrom').value), Number($('myZoneTo').value), $('myZoneNote').value.trim())

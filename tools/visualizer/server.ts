@@ -29,6 +29,7 @@ import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/st
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
 import { aggregateCandles, CONFIRMATION_TF, fetchCandlesPaginated, fetchHeatmapAux, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
 import { fetchArchiveKlines, mergeCandleSeries } from '../shared/archiveKlines.js'
+import { liquidityPoiProfileForTf } from '../shared/poiProfiles.js'
 import { plannedFullStop } from '../shared/executionCostGate.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -458,8 +459,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const confOverrides = pickNumericOverrides(POI_CONFIRMATION_CONFIG, q.confConfig)
 			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, { ...hmBase, ...hmOverrides }, heatmapAux ?? undefined)
 			// §14.1/§16.19: зоны и подтверждение — для всех ТФ лестницы (1d→1h, 4h→15m, 1h→5m).
+			// §16.21: per-TF профиль зон (иерархия слоёв пользователя) под UI-overrides; 4h = дефолты.
+			const poiProfile = liquidityPoiProfileForTf(htfMs)
 			const poiCandidates = confTf != null
-				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools, config: poiOverrides })
+				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools, config: { ...poiProfile, ...poiOverrides } })
 				: []
 			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём бара захода ТФ зоны / SMA20).
 			const poiConfirmations = confTf != null ? detectPoiConfirmation(poiCandidates, ltfConf, snapshot.candles, confOverrides) : []
@@ -475,7 +478,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				const layer = (ctxTf: string, role: 'swing' | 'local', ctxCandles: typeof candles, confSeries: typeof candles, includeSeries: boolean) => {
 					if (!ctxCandles.length) return
 					const pools = detectLiquidityHeatmap(ctxCandles, { ...heatmapConfigForTf(TF_MS[ctxTf]!), ...pickNumericOverrides(heatmapConfigForTf(TF_MS[ctxTf]!), q.hmConfig) }, undefined)
-					const zones = detectLiquidityPoi(ctxCandles, [], { heatmapPools: pools, config: poiOverrides })
+					// §16.21: слой считается со своим per-TF профилем (1h локальный / 1d свинг) под overrides.
+					const zones = detectLiquidityPoi(ctxCandles, [], { heatmapPools: pools, config: { ...liquidityPoiProfileForTf(TF_MS[ctxTf]!), ...poiOverrides } })
 					const confs = detectPoiConfirmation(zones, confSeries, ctxCandles, confOverrides)
 					mtfLayers.push({ contextTf: ctxTf, confTf: CONFIRMATION_TF[ctxTf]!, role, candles: ctxCandles.length, candidates: zones, results: confs, ltfConf: includeSeries ? confSeries : null })
 				}
@@ -498,6 +502,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				// §16.15: дефолты и применённые переопределения — для панели «Настройки движков».
 				engineDefaults: { poi: LIQUIDITY_POI_CONFIG, heatmap: hmBase, confirmation: POI_CONFIRMATION_CONFIG },
 				appliedOverrides: { poi: poiOverrides, hm: hmOverrides, conf: confOverrides },
+				// §16.21: per-TF профиль зон текущего вида (слои несут свои: 1h локальный, 1d свинг).
+				poiProfile,
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
 				ltfConf,
