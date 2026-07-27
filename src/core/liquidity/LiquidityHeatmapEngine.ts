@@ -9,7 +9,7 @@
 // является источником POI-зон. Все коэффициенты — display-настройки.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-1.5-honest-shelves'
+export const LIQUIDITY_HEATMAP_VERSION = 'liquidity-heatmap-2.0-oi-hybrid'
 
 export type LiquiditySide = 'buy-side' | 'sell-side'
 export type LiquidityPoolStatus = 'active' | 'swept'
@@ -41,6 +41,8 @@ export interface LiquidityHeatmapConfig {
 	minWeight: number
 	/** Кривая яркости: weight = (rank/count)^gamma внутри стороны; gamma > 1 делает большинство полос бледными, а топ — насыщенным. */
 	gamma: number
+	/** Maintenance margin: реальная ликвидация срабатывает раньше чистого 1/leverage (Binance BTC tier-1 = 0.4%). */
+	maintenanceMarginRate: number
 	/** Аварийный потолок размера выдачи (топ по весу) — защита payload, а НЕ визуальный фильтр: обрезка по историческому рангу делала 15k-загрузку пустее 5k. */
 	maxPools: number
 }
@@ -62,7 +64,19 @@ export const LIQUIDITY_HEATMAP_CONFIG: LiquidityHeatmapConfig = {
 	maxGapBars: 12,
 	minWeight: 0,
 	gamma: 1.5,
+	maintenanceMarginRate: 0.004,
 	maxPools: 10_000,
+}
+
+/**
+ * Внешние ряды точности (v2.0), выровненные по индексам свечей; null там, где данных нет.
+ * Всё fail-soft: без aux формула работает как раньше (объём-прокси, 50/50).
+ */
+export interface LiquidityHeatmapAux {
+	/** Open interest (базовый актив): вклад свечи = положительная дельта OI; нет роста OI — нет новых позиций. */
+	oi?: Array<number | null>
+	/** Доля тейкер-покупок в объёме свечи (0..1): делит вклад на лонги/шорты по факту, а не 50/50. */
+	takerBuyRatio?: Array<number | null>
 }
 
 const HOUR_4_MS = 14_400_000
@@ -113,6 +127,8 @@ export interface LiquidityPool {
 	volumeAccumulated: number
 	/** Накопленный условный объём (volume x price x share) — основа яркости. */
 	notional: number
+	/** Остаток после частичного потребления: notional минус снятые бины (для затухания яркости). */
+	remainingNotional: number
 	weight: number
 	status: LiquidityPoolStatus
 	endAt: number
@@ -143,7 +159,7 @@ interface Cluster {
 	midNum: number
 }
 
-function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: number): Segment[] {
+function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: number, aux?: LiquidityHeatmapAux): Segment[] {
 	const binOf = (price: number): number => Math.floor(Math.log(price) / logStep)
 	const binLow = (k: number): number => Math.exp(k * logStep)
 	const binHigh = (k: number): number => Math.exp((k + 1) * logStep)
@@ -151,6 +167,24 @@ function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: n
 	// Закрытые по гэпу окна накопления: всё ещё живая ликвидность, снимается вместе с бином.
 	const dormant = new Map<string, Segment[]>()
 	const done: Segment[] = []
+	// v2.0 OI-гибрид: положительная дельта OI = реально открытые позиции; нормируем к шкале объёма,
+	// чтобы OI-покрытый хвост и объёмная история жили в одном ранге. Покрытый бар без роста OI позиций не открывает.
+	const effVol: number[] = c.map(bar => bar.volume)
+	const oi = aux?.oi
+	if (oi && oi.length === c.length) {
+		const deltas: Array<number | null> = c.map((_, i) =>
+			i > 0 && oi[i] != null && oi[i - 1] != null ? Math.max(0, oi[i]! - oi[i - 1]!) : null)
+		let volCovered = 0
+		let deltaCovered = 0
+		for (let i = 0; i < c.length; i++) {
+			if (deltas[i] == null) continue
+			volCovered += c[i]!.volume
+			deltaCovered += deltas[i]!
+		}
+		const scale = deltaCovered > 0 ? volCovered / deltaCovered : 0
+		for (let i = 0; i < c.length; i++) if (deltas[i] != null) effVol[i] = deltas[i]! * scale
+	}
+	const takerR = aux?.takerBuyRatio
 	const volWindow: number[] = []
 	let volSum = 0
 	for (let i = 0; i < c.length; i++) {
@@ -177,10 +211,16 @@ function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: n
 		volSum += bar.volume
 		if (volWindow.length > config.volumeLookback) volSum -= volWindow.shift()!
 		if (relVolume < config.minRelVolume) continue
+		if (effVol[i]! <= 0) continue
 		const entry = (bar.high + bar.low + bar.close) / 3
+		const takerRatio = takerR && takerR.length === c.length && takerR[i] != null ? Math.min(1, Math.max(0, takerR[i]!)) : 0.5
 		for (const tier of config.leverageTiers) {
+			const dist = Math.max(1 / tier.leverage - config.maintenanceMarginRate, 0.001)
 			for (const side of ['sell-side', 'buy-side'] as const) {
-				const level = side === 'sell-side' ? entry * (1 + 1 / tier.leverage) : entry * (1 - 1 / tier.leverage)
+				// Тейкер-сплит: сумма долей сторон = 2, как в симметричной модели 50/50.
+				const sideShare = side === 'sell-side' ? 2 * (1 - takerRatio) : 2 * takerRatio
+				if (sideShare <= 0) continue
+				const level = side === 'sell-side' ? entry * (1 + dist) : entry * (1 - dist)
 				const k = binOf(level)
 				const key = `${side}|${k}`
 				let seg = alive.get(key)
@@ -198,8 +238,8 @@ function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: n
 				}
 				seg.lastIndex = i
 				seg.contributions++
-				seg.volume += bar.volume * tier.share
-				seg.notional += bar.volume * entry * tier.share
+				seg.volume += effVol[i]! * tier.share * sideShare
+				seg.notional += effVol[i]! * entry * tier.share * sideShare
 			}
 		}
 	}
@@ -275,13 +315,13 @@ function resolveSweptIndex(cl: Cluster, kMid: number): number | null {
 	return Math.min(byLevel, byMass)
 }
 
-export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmapConfig): LiquidityPool[] {
+export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmapConfig, aux?: LiquidityHeatmapAux): LiquidityPool[] {
 	if (c.length === 0) return []
 	const config = configArg ?? heatmapConfigForTf(inferTfMs(c))
 	const logStep = Math.log(1 + config.binPct)
 	const lastIndex = c.length - 1
 	const lastTs = c[lastIndex]!.timestamp
-	const segments = collectSegments(c, config, logStep).filter(seg => {
+	const segments = collectSegments(c, config, logStep, aux).filter(seg => {
 		if (seg.contributions < config.minContributions) return false
 		// Короткоживущий снесённый шум у цены не показываем; активные свежие остаются.
 		if (seg.sweptIndex != null && seg.sweptIndex - seg.startIndex < config.minLifetimeBars) return false
@@ -303,6 +343,8 @@ export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmap
 		if (weight < config.minWeight) continue
 		const extremePrice = cl.midNum / cl.notional
 		const sweptIndex = resolveSweptIndex(cl, Math.floor(Math.log(extremePrice) / logStep))
+		let sweptNotional = 0
+		for (const sw of cl.sweeps) sweptNotional += sw.notional
 		pools.push({
 			id: `${LIQUIDITY_HEATMAP_VERSION}|${cl.side}|${cl.minK}:${cl.maxK}|${cl.startIndex}`,
 			version: LIQUIDITY_HEATMAP_VERSION,
@@ -320,6 +362,7 @@ export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmap
 			contributions: cl.contributions,
 			volumeAccumulated: cl.volume,
 			notional: cl.notional,
+			remainingNotional: Math.max(0, cl.notional - sweptNotional),
 			weight,
 			status: sweptIndex == null ? 'active' : 'swept',
 			endAt: sweptIndex == null ? lastTs : c[sweptIndex]!.timestamp,

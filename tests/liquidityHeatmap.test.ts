@@ -10,6 +10,8 @@ function series(highs: number[], volume = 100): Candle[] {
 const cfg: LiquidityHeatmapConfig = {
 	...LIQUIDITY_HEATMAP_CONFIG,
 	leverageTiers: [{ leverage: 10, share: 1 }],
+	// Геометрические тесты якорятся на чистый 1/leverage; mmr проверяется отдельным v2.0-тестом.
+	maintenanceMarginRate: 0,
 	binPct: 0.005,
 	minRelVolume: 0,
 	minLifetimeBars: 0,
@@ -151,4 +153,39 @@ it('tf profiles: all tfs group into wide bands, daily+ widest', () => {
 	const w1 = heatmapConfigForTf(604_800_000)
 	assert.equal(w1.binPct, 0.009)
 	assert.equal(w1.maxClusterBins, 5)
+})
+
+// ===== v2.0 oi-hybrid: maintenance margin, taker split, OI-дельта, частичное потребление =====
+const v2c = (n: number, spikeAt: number) =>
+	Array.from({ length: n }, (_, i) => ({
+		timestamp: i * 3_600_000, open: 100, high: 100.05, low: 99.95, close: 100,
+		volume: i === spikeAt ? 10 : 1,
+	}))
+const v2ok = (cond: boolean, msg: string): void => { if (!cond) throw new Error(msg) }
+const V2_CFG = { ...LIQUIDITY_HEATMAP_CONFIG, minLifetimeBars: 0 }
+
+it('v2.0: maintenance margin придвигает уровни ликвидаций к входу', () => {
+	const c = v2c(60, 30)
+	const maxSell = (cfg: typeof V2_CFG): number =>
+		Math.max(...detectLiquidityHeatmap(c, cfg).filter(p => p.side === 'sell-side').map(p => p.extremePrice))
+	v2ok(maxSell({ ...V2_CFG, maintenanceMarginRate: 0.004 }) < maxSell({ ...V2_CFG, maintenanceMarginRate: 0 }), 'mmr must pull short-liq levels closer to entry')
+})
+
+it('v2.0: taker buy ratio = 1 рождает только buy-side ликвидность', () => {
+	const c = v2c(60, 30)
+	const pools = detectLiquidityHeatmap(c, V2_CFG, { takerBuyRatio: c.map(() => 1) })
+	v2ok(pools.length > 0, 'expected pools')
+	v2ok(pools.every(p => p.side === 'buy-side'), 'ratio=1 means longs only')
+})
+
+it('v2.0: плоский OI гасит новые позиции (вклады только с непокрытого бара 0)', () => {
+	const c = v2c(60, 30)
+	const pools = detectLiquidityHeatmap(c, V2_CFG, { oi: c.map(() => 500) })
+	v2ok(pools.every(p => p.startIndex === 0), 'flat OI must not open positions after bar 0')
+})
+
+it('v2.0: remainingNotional присутствует и не превышает notional', () => {
+	const pools = detectLiquidityHeatmap(v2c(60, 30), V2_CFG)
+	v2ok(pools.length > 0, 'expected pools')
+	v2ok(pools.every(p => p.remainingNotional != null && p.remainingNotional <= p.notional + 1e-9), 'remainingNotional invariant')
 })

@@ -21,13 +21,15 @@ import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, extname, resolve } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
-import { detectRefinedPoi, REFINED_POI_VERSION } from '../../src/core/confirmation/RefinedPoiEngine.js'
-import { detectLiquidityPoi, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
-import { detectLiquidityHeatmap, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
+import { detectLiquidityPoi, LIQUIDITY_POI_CONFIG, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
+import { detectLiquidityHeatmap, heatmapConfigForTf, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
+import { detectPoiConfirmation, POI_CONFIRMATION_CONFIG, POI_CONFIRMATION_VERSION } from '../../src/core/confirmation/PoiConfirmationEngine.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
-import { aggregateCandles, fetchCandlesPaginated, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
+import { aggregateCandles, CONFIRMATION_TF, fetchCandlesPaginated, fetchHeatmapAux, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
+import { fetchArchiveKlines, mergeCandleSeries } from '../shared/archiveKlines.js'
+import { liquidityPoiProfileForTf } from '../shared/poiProfiles.js'
 import { plannedFullStop } from '../shared/executionCostGate.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -40,7 +42,20 @@ const MIME: Record<string, string> = {
 	'.mjs': 'application/javascript; charset=utf-8',
 	'.css': 'text/css; charset=utf-8',
 	'.json': 'application/json; charset=utf-8',
+	'.svg': 'image/svg+xml',
 }
+
+/** §16.17: кэш свечей/OI между запросами — крутить ручки движков без повторной сетевой загрузки. */
+const dataCache = new Map<string, {
+	at: number
+	candles: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+	ltf5m: Awaited<ReturnType<typeof fetchCandlesPaginated>> | null
+	heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
+	/** §16.19: итоговый ряд ТФ подтверждения (архивы + API-хвост) — «Пересчитать» архивы не перечитывает. */
+	ltfConf: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+}>()
+const DATA_TTL_LIVE = 90_000
+const DATA_TTL_HIST = 60 * 60 * 1000
 
 interface AnalyzeQuery {
 	symbol?: string | undefined
@@ -49,8 +64,13 @@ interface AnalyzeQuery {
 	source?: string | undefined
 	market?: string | undefined
 	until?: string | undefined
+	/** §16.19: '0' выключает полную 15m-историю из архивов (дефолт ВКЛ). */
+	fullLtf?: string | undefined
 	contextTf?: string | undefined
 	historyBars?: string | undefined
+	poiConfig?: string | undefined
+	hmConfig?: string | undefined
+	confConfig?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -62,9 +82,31 @@ function parseQuery(qs: string): AnalyzeQuery {
 		source: params.get('source') ?? undefined,
 		market: params.get('market') ?? undefined,
 		until: params.get('until') ?? undefined,
+		fullLtf: params.get('fullLtf') ?? undefined,
 		contextTf: params.get('contextTf') ?? undefined,
 		historyBars: params.get('historyBars') ?? undefined,
+		poiConfig: params.get('poiConfig') ?? undefined,
+		hmConfig: params.get('hmConfig') ?? undefined,
+		confConfig: params.get('confConfig') ?? undefined,
 	}
+}
+
+/**
+ * §16.15: переопределения констант движков из UI (панель «Настройки движков»).
+ * Принимаются ТОЛЬКО числовые ключи, существующие в дефолтном конфиге, — защита от мусора;
+ * сами дефолты в коде не меняются (правило «магические числа по согласованию» остаётся).
+ */
+function pickNumericOverrides<T extends object>(defaults: T, rawJson: string | undefined): Partial<T> {
+	if (!rawJson) return {}
+	let parsed: unknown
+	try { parsed = JSON.parse(rawJson) } catch { return {} }
+	if (parsed == null || typeof parsed !== 'object') return {}
+	const out: Record<string, number> = {}
+	for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+		if (k in defaults && typeof (defaults as Record<string, unknown>)[k] === 'number'
+			&& typeof v === 'number' && Number.isFinite(v)) out[k] = v
+	}
+	return out as Partial<T>
 }
 
 const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
@@ -85,7 +127,8 @@ let symbolsCache: { symbols: string[]; fetchedAt: number } | null = null
 const SYMBOLS_CACHE_TTL_MS = 60 * 60 * 1000
 
 /**
- * Топ-100 USDT-пар по суточному объёму с Binance USDT-M futures.
+ * ВСЕ USDT-пары Binance USDT-M futures, отсортированные по суточному объёму
+ * (8-й QA: пользователю нужен полный список монет, фронт фильтрует локально).
  * Публичный endpoint, без API-ключей.
  */
 async function fetchTopSymbols(): Promise<string[]> {
@@ -99,7 +142,11 @@ async function fetchTopSymbols(): Promise<string[]> {
 	} catch {
 		tickers = await new ccxt.binance().fetchTickers()
 	}
-	const symbols = Object.values(tickers)
+	// 9-й QA: суточный объём выносил мем-коины выше SOL. Мейджоры (universe исследований,
+	// CONTEXT §1) закреплены сверху в фиксированном порядке, остальное — по объёму.
+	const MAJORS = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'XRP/USDT', 'BNB/USDT', 'DOGE/USDT', 'ADA/USDT',
+		'AVAX/USDT', 'LINK/USDT', 'SUI/USDT', 'TON/USDT', 'NEAR/USDT', 'APT/USDT', 'LTC/USDT']
+	const byVolume = Object.values(tickers)
 		.filter((t) => t.symbol?.endsWith('/USDT:USDT') || t.symbol?.endsWith('/USDT'))
 		.map((t) => ({
 			symbol: (t.symbol ?? '').replace(':USDT', ''),
@@ -107,8 +154,9 @@ async function fetchTopSymbols(): Promise<string[]> {
 		}))
 		.filter((t) => t.symbol && t.volume > 0)
 		.sort((a, b) => b.volume - a.volume)
-		.slice(0, 100)
 		.map((t) => t.symbol)
+	const rest = byVolume.filter((s) => !MAJORS.includes(s))
+	const symbols = [...MAJORS.filter((m) => byVolume.includes(m)), ...rest]
 	symbolsCache = { symbols, fetchedAt: Date.now() }
 	return symbols
 }
@@ -328,11 +376,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			if (q.until && !Number.isFinite(parsedUntil)) throw new Error(`Invalid until date: ${q.until}`)
 			const untilMs = parsedUntil == null ? null : Math.min(parsedUntil, Date.now())
 
+			// §16.19: полная история ТФ подтверждения из архивов (дефолт ВКЛ, fullLtf=0 выключает).
+			const fullLtf = q.fullLtf !== '0'
+			// §16.19/§14.1: ТФ уточнённого подтверждения по лестнице (1d→1h, 4h→15m, 1h→5m); null — зон нет.
+			const confTf = CONFIRMATION_TF[timeframe] ?? null
 			const useFixture = q.source !== 'fresh'
-			const candles = useFixture
-				? loadFixtureCandles()
-				: await fetchCandlesPaginated(symbol, timeframe, limit, market, untilMs)
-			const snapshot = runAnalysis(candles)
 			const htfMs = TF_MS[timeframe]
 			if (!htfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
 			// Загружаем не просто replay-хвост, а запрошенный левый контекст.
@@ -345,10 +393,107 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const minLtfLeftBars = Math.ceil(historyBars * contextMs / TF_MS['5m']!)
 			// Ещё 5000×5m оставляем справа от минимального контекста, чтобы в
 			// окне было достаточно candidate touches и будущего для outcome.
-			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(timeframe === '4h' ? 30_000 : 10_000, minLtfLeftBars + 5_000))
-			const ltf5m = useFixture ? null : await fetchCandlesPaginated(symbol, '5m',
-				ltfNeed, market, untilMs, MAX_CANDLES_LTF)
-			const ltf15m = ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : []
+			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(confTf != null ? 30_000 : 10_000, minLtfLeftBars + 5_000))
+			// §16.17: кэш данных — «Пересчитать» с новыми конфигами движков не должен заново качать
+			// свечи с биржи (сеть = почти всё время загрузки). Ключ — параметры ДАННЫХ (не конфиги);
+			// живые данные устаревают за DATA_TTL_LIVE, исторические (until) — за DATA_TTL_HIST.
+			const cacheKey = `${symbol}|${timeframe}|${limit}|${market}|${untilMs ?? 'live'}|${ltfNeed}|full${fullLtf ? 1 : 0}`
+			const cachedData = useFixture ? undefined : dataCache.get(cacheKey)
+			const ttl = untilMs == null ? DATA_TTL_LIVE : DATA_TTL_HIST
+			let candles: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+			let ltf5m: Awaited<ReturnType<typeof fetchCandlesPaginated>> | null
+			let heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
+			let ltfConf: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+			let snapshot: ReturnType<typeof runAnalysis>
+			if (cachedData && Date.now() - cachedData.at < ttl) {
+				({ candles, ltf5m, heatmapAux, ltfConf } = cachedData)
+				snapshot = runAnalysis(candles)
+			} else {
+				candles = useFixture ? loadFixtureCandles() : await fetchCandlesPaginated(symbol, timeframe, limit, market, untilMs)
+				snapshot = runAnalysis(candles)
+				// v2.0: OI + taker-ряды качаются параллельно с LTF (fail-soft: ошибка = null-ряды, объём-прокси).
+				;[ltf5m, heatmapAux] = useFixture ? [null, null] as [null, null] : await Promise.all([
+					fetchCandlesPaginated(symbol, '5m', ltfNeed, market, untilMs, MAX_CANDLES_LTF),
+					fetchHeatmapAux(symbol, timeframe, snapshot.candles, market),
+				])
+				// §14.1/§16.19: ряд ТФ подтверждения. Хвост — из уже скачанных 5m (агрегация или сами 5m,
+				// новых API-путей нет); глубокая часть — архивы data.binance.vision от ПЕРВОГО бара
+				// загруженного окна зон (глубина автоматическая, констант нет). Fail-soft: сеть/парсер
+				// упали — работаем на API-глубине, как раньше.
+				ltfConf = ltf5m?.length && confTf ? (confTf === '5m' ? ltf5m : aggregateCandles(ltf5m, '5m', confTf)) : []
+				if (fullLtf && !useFixture && confTf && candles.length) {
+					try {
+						const t0 = Date.now()
+						const archive = await fetchArchiveKlines(symbol, confTf, market, candles[0]!.timestamp, untilMs)
+						ltfConf = mergeCandleSeries(archive, ltfConf)
+						console.log(`[archiveConf] ${symbol}: ${archive.length}×${confTf} из архивов за ${((Date.now() - t0) / 1000).toFixed(1)}с, итог ${ltfConf.length}`)
+					} catch (err) {
+						console.error('[archiveConf] fail-soft, работаем на API-глубине:', err instanceof Error ? err.message : err)
+					}
+				}
+				if (!useFixture) {
+					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltfConf })
+					// Потолок кэша: держим последние 8 наборов (каждый — десятки МБ 5m-свечей).
+					while (dataCache.size > 8) dataCache.delete(dataCache.keys().next().value as string)
+				}
+			}
+
+			// §16.15: конфиги движков с переопределениями из UI (числовые ключи, whitelisted).
+			const hmBase = heatmapConfigForTf(htfMs)
+			const hmOverrides = pickNumericOverrides(hmBase, q.hmConfig)
+			const poiOverrides = pickNumericOverrides(LIQUIDITY_POI_CONFIG, q.poiConfig)
+			const confOverrides = pickNumericOverrides(POI_CONFIRMATION_CONFIG, q.confConfig)
+			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, { ...hmBase, ...hmOverrides }, heatmapAux ?? undefined)
+			// §14.1/§16.19: зоны и подтверждение — для всех ТФ лестницы (1d→1h, 4h→15m, 1h→5m).
+			// §16.21: per-TF профиль зон (иерархия слоёв пользователя) под UI-overrides; 4h = дефолты.
+			const poiProfile = liquidityPoiProfileForTf(htfMs)
+			const poiCandidates = confTf != null
+				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools, config: { ...poiProfile, ...poiOverrides } })
+				: []
+			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём бара захода ТФ зоны / SMA20).
+			const poiConfirmations = confTf != null ? detectPoiConfirmation(poiCandidates, ltfConf, snapshot.candles, confOverrides) : []
+
+			// §16.20/§16.23: свинговые и локальные зоны — СЛОИ ОДНОЙ КАРТЫ (§12.2). Слои строятся на
+			// ЛЮБОМ виде лестницы (1h/4h/1d) как остальные её ступени, каждый на своём КАНОНИЧЕСКОМ
+			// окне (1d — вся история листинга, 4h — 5000×4h, 1h — 5000×1h): карта слоя одинакова,
+			// с какого ТФ ни смотри. Данные слоя: архивы (fullLtf, дисковый кэш) + деривация из уже
+			// загруженного (агрегация вверх из candles/5m). Движки те же, per-TF профили §16.21,
+			// overrides пользователя поверх.
+			const mtfLayers: Array<{ contextTf: string; confTf: string; role: 'swing' | 'mid' | 'local'; candles: number; candidates: unknown[]; results: unknown[]; ltfConf: unknown[] | null }> = []
+			if (confTf != null && candles.length) {
+				const ROLE: Record<string, 'swing' | 'mid' | 'local'> = { '1d': 'swing', '4h': 'mid', '1h': 'local' }
+				// Деривация ряда из загруженного: старше текущего ТФ — из candles, младше — из 5m.
+				const derived = (tf: string): typeof candles => {
+					if (tf === timeframe) return candles
+					if (TF_MS[tf]! > htfMs) return aggregateCandles(candles, timeframe, tf)
+					if (tf === '5m') return ltf5m ?? []
+					return ltf5m?.length ? aggregateCandles(ltf5m, '5m', tf) : []
+				}
+				const layerSeries = async (tf: string, fromMs: number | null): Promise<typeof candles> => {
+					let out = derived(tf)
+					if (fullLtf && !useFixture) {
+						try {
+							const from = fromMs ?? ((untilMs ?? Date.now()) - 5100 * TF_MS[tf]!)
+							out = mergeCandleSeries(await fetchArchiveKlines(symbol, tf, market, from, untilMs), out)
+						} catch (err) {
+							console.error(`[layer ${tf}] fail-soft:`, err instanceof Error ? err.message : err)
+						}
+					}
+					return out
+				}
+				for (const ctxTf of ['1d', '4h', '1h']) {
+					if (ctxTf === timeframe) continue
+					const ctxCandles = (await layerSeries(ctxTf, ctxTf === '1d' ? Date.UTC(2019, 8, 1) : null)).slice(-5000)
+					if (!ctxCandles.length) continue
+					const lConfTf = CONFIRMATION_TF[ctxTf]!
+					const confSeries = await layerSeries(lConfTf, ctxCandles[0]!.timestamp)
+					const pools = detectLiquidityHeatmap(ctxCandles, { ...heatmapConfigForTf(TF_MS[ctxTf]!), ...pickNumericOverrides(heatmapConfigForTf(TF_MS[ctxTf]!), q.hmConfig) }, undefined)
+					const zones = detectLiquidityPoi(ctxCandles, [], { heatmapPools: pools, config: { ...liquidityPoiProfileForTf(TF_MS[ctxTf]!), ...poiOverrides } })
+					const confs = detectPoiConfirmation(zones, confSeries, ctxCandles, confOverrides)
+					// 5m-ряд не дублируем, если он ровно ltf5m; остальные conf-ряды слоёв едут в payload.
+					mtfLayers.push({ contextTf: ctxTf, confTf: lConfTf, role: ROLE[ctxTf]!, candles: ctxCandles.length, candidates: zones, results: confs, ltfConf: confSeries === ltf5m ? null : confSeries })
+				}
+			}
 
 			sendJson(res, 200, {
 				strategy: {
@@ -359,14 +504,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					executionCostGate: BATTLE_CONFIG.executionCostGate,
 					mirror: 'removed',
 				},
-				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
+				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, confTf, ltfConfCount: ltfConf.length, ltfConfFrom: ltfConf[0]?.timestamp ?? null, fullLtf, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
+				// §16.15: дефолты и применённые переопределения — для панели «Настройки движков».
+				engineDefaults: { poi: LIQUIDITY_POI_CONFIG, heatmap: hmBase, confirmation: POI_CONFIRMATION_CONFIG },
+				appliedOverrides: { poi: poiOverrides, hm: hmOverrides, conf: confOverrides },
+				// §16.21: per-TF профиль зон текущего вида (слои несут свои: 1h локальный, 1d свинг).
+				poiProfile,
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
-				ltf15m,
-				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: detectLiquidityHeatmap(snapshot.candles) },
-				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: timeframe === '4h' ? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory }) : [] },
-				refinedPoi: { version: REFINED_POI_VERSION, candidates: timeframe === '4h' ? detectRefinedPoi(snapshot.candles, snapshot.events, ltf15m) : [] },
-				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf15m, htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),
+				ltfConf,
+				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
+				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
+				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
+				// §16.20: слои карты (свинг 1D→1h, локальный 1h→5m) на рабочем виде 4h.
+				mtfLayers,
+				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : [], htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),
 				structure: snapshot.structure,
 				trendHistory: snapshot.market.trendHistory,
 				finalTrend: snapshot.market.trend,
