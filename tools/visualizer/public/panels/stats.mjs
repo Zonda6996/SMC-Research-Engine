@@ -62,7 +62,7 @@ export function renderFunnel() {
 	const layerChips = (S.data.mtfLayers || []).map((L) => {
 		const ent = L.results.flatMap((r) => r.attempts.filter((a) => a.status === 'entered' && !a.duplicateEntryOf)).length
 		const act = L.candidates.filter((z) => z.active && !z.duplicateOf).length
-		return `<span class="chip" title="Слой ${L.role === 'swing' ? 'свинг' : 'локальный'} ${L.contextTf}→${L.confTf}">${L.contextTf}: ${act} акт · ${ent} вх</span>`
+		return `<span class="chip" title="Слой ${L.role === 'swing' ? 'свинг' : L.role === 'mid' ? 'среднесрок' : 'локальный'} ${L.contextTf}→${L.confTf}">${L.contextTf}: ${act} акт · ${ent} вх</span>`
 	}).join('')
 	el.innerHTML = zones.length
 		? `${layerChips ? layerChips + '<span class="chip-sep">|</span>' : ''}<span class="chip" title="Всего зон в наборе (${S.data?.dataset?.timeframe ?? ''})">${zones.length} зон</span><span class="chip-sep">→</span>

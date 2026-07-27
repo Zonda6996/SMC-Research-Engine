@@ -10,12 +10,17 @@ import { renderHeatmap } from './heatmap.mjs'
 const MY_KEY = 'smc-my-zones-v1'
 const TF4H = 14_400_000
 
-/** §16.20: слои карты — свинг 1D→1h и локальный 1h→5m поверх контекстных зон (рабочий вид 4h). */
+/** §16.23: чип слоя (1d/4h/1h) включён? Чип текущего ТФ управляет контекстными зонами. */
+export function layerChipOn(tf) {
+	const b = document.querySelector(`#layerChips [data-layer="${tf}"]`)
+	return !b || b.classList.contains('active')
+}
+
+/** §16.20/§16.23: слои карты — остальные ступени лестницы поверх зон текущего ТФ. */
 export function layerZones() {
 	const out = []
 	for (const L of (S.data?.mtfLayers || [])) {
-		if (L.role === 'swing' && !$('mtfSwingShow')?.checked) continue
-		if (L.role === 'local' && !$('mtfLocalShow')?.checked) continue
+		if (!layerChipOn(L.contextTf)) continue
 		for (const z of L.candidates) out.push({ ...z, __layer: L.contextTf, __role: L.role, __confTf: L.confTf })
 	}
 	return out
@@ -25,12 +30,12 @@ export function zoneCandidates() {
 	const d = $('poiDirection').value, life = $('poiLifecycle').value, pr = $('poiPriority').value
 	const activeOnly = $('poiActiveOnly').checked, liqOnly = $('poiLiqOnly').checked
 	const minStack = Number($('poiMinStack')?.value || 0)
-	const ctxZones = ($('mtfCtxShow')?.checked ?? true) ? (S.data?.liquidityPoi?.candidates || []) : []
+	const ctxZones = layerChipOn(S.data?.dataset?.timeframe) ? (S.data?.liquidityPoi?.candidates || []) : []
 	const px = S.data?.candles?.at(-1)?.close
-	// §16.22: локальный слой по умолчанию — только БЛИЖАЙШИЕ к цене зоны (сверху и снизу):
-	// «зачем мне весь график в часовых зонах» — дальняя локальная ликвидность не нужна.
+	// §16.22/§16.23: 1h-СЛОЙ всегда показывает только БЛИЖАЙШИЕ к цене зоны (сверху/снизу + в игре);
+	// полная 1h-карта — на самом 1h-виде (там зоны контекстные, фильтр их не трогает).
 	const nearestLocal = (zs) => {
-		if (!($('mtfLocalNearest')?.checked ?? true) || px == null) return zs
+		if (px == null) return zs
 		const locals = zs.filter((x) => x.__role === 'local')
 		const inPlay = locals.filter((x) => Math.min(x.near, x.far) <= px && px <= Math.max(x.near, x.far))
 		const above = locals.filter((x) => Math.min(x.near, x.far) > px).sort((a, b) => Math.min(a.near, a.far) - Math.min(b.near, b.far))[0]
@@ -122,7 +127,7 @@ export function renderZones() {
 	const focused = xs.find((x) => zid(x) === focusId)
 	zonesPrim.setRects(rects, focused ? { min: Math.min(focused.near, focused.far), max: Math.max(focused.near, focused.far) } : null)
 	renderHeatmap()
-	const layersInfo = (S.data?.mtfLayers || []).length ? ` · слои: ${xs.filter((x) => x.__role === 'swing').length} свинг 1D, ${xs.filter((x) => x.__role === 'local').length} лок 1h` : ''
+	const layersInfo = (S.data?.mtfLayers || []).length ? ` · слои: ${(S.data.mtfLayers || []).map((L) => `${xs.filter((x) => x.__layer === L.contextTf).length} ${L.contextTf}`).join(', ')}` : ''
 	$('poiZoneStatus').textContent = `Показано зон: ${xs.length}${all.length > xs.length ? ` из ${all.length}` : ''}${layersInfo} · в наборе ${S.data?.liquidityPoi?.candidates?.length || 0} (${S.data?.dataset?.timeframe ?? ''})`
 	renderZoneDetail(focused, last)
 	// Зум не трогаем без фокуса: переключение фильтров/списков не должно дёргать график.
@@ -192,8 +197,11 @@ export function wireZonesPanel(activate, deactivate) {
 	$('poiZoneNext').onclick = () => moveZoneFocus(1)
 	$('poiZoneExport').onclick = exportZones
 	$('poiZoneBack').onclick = () => deactivate()
-	for (const id of ['poiDirection', 'poiLifecycle', 'poiPriority', 'poiActiveOnly', 'poiLiqOnly', 'poiMinStack', 'myZonesShow', 'mtfSwingShow', 'mtfLocalShow', 'mtfCtxShow', 'mtfLocalNearest'])
+	for (const id of ['poiDirection', 'poiLifecycle', 'poiPriority', 'poiActiveOnly', 'poiLiqOnly', 'poiMinStack', 'myZonesShow'])
 		$(id).onchange = () => { if (id !== 'myZonesShow') S.poiFocusId = null; renderZones() }
+	document.querySelectorAll('#layerChips [data-layer]').forEach((b) => {
+		b.onclick = () => { b.classList.toggle('active'); S.poiFocusId = null; renderZones() }
+	})
 	$('myZoneAdd').onclick = () => {
 		addMyZone($('myZoneSide').value, Number($('myZoneFrom').value), Number($('myZoneTo').value), $('myZoneNote').value.trim())
 		$('myZoneFrom').value = ''; $('myZoneTo').value = ''; $('myZoneNote').value = ''

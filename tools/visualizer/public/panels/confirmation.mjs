@@ -20,7 +20,7 @@ function zoneEndInfo(poiId) {
 /** §16.20: активная связка панели — контекстная (ТФ графика) или слой (свинг 1D→1h / локальный 1h→5m). */
 export function confLayerData() {
 	const sel = $('confLayer')?.value ?? 'ctx'
-	const L = (S.data?.mtfLayers || []).find((x) => (sel === 'swing' ? x.role === 'swing' : x.role === 'local'))
+	const L = (S.data?.mtfLayers || []).find((x) => x.contextTf === sel)
 	if (sel !== 'ctx' && L) {
 		return {
 			results: L.results, candidates: L.candidates,
