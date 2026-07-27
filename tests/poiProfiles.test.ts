@@ -11,8 +11,8 @@ it('§16.21: per-TF профили зон — 1h локальный (этажи 
 	assert.equal(h1.shelfValleyMinBins, 2)
 	const d1 = liquidityPoiProfileForTf(86_400_000)
 	assert.equal(d1.shelfValleyShare, 0.15)
-	assert.equal(d1.shelfMinShare, 0.12)
-	assert.equal(d1.shelfTopN, 3)
+	assert.equal(d1.shelfMinShare, 0.03) // 12-й QA (DOGE): глобальный топ душил ближние полки
+	assert.equal(d1.shelfTopN, 8)
 	// профили — Partial поверх дефолтов: ключи существуют в конфиге движка
 	for (const k of [...Object.keys(h1), ...Object.keys(d1)]) assert.ok(k in LIQUIDITY_POI_CONFIG, k)
 	// дефолты движка не менялись профилями

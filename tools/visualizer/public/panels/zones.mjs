@@ -26,7 +26,19 @@ export function zoneCandidates() {
 	const activeOnly = $('poiActiveOnly').checked, liqOnly = $('poiLiqOnly').checked
 	const minStack = Number($('poiMinStack')?.value || 0)
 	const ctxZones = ($('mtfCtxShow')?.checked ?? true) ? (S.data?.liquidityPoi?.candidates || []) : []
-	return [...ctxZones, ...layerZones()].filter((x) => {
+	const px = S.data?.candles?.at(-1)?.close
+	// §16.22: локальный слой по умолчанию — только БЛИЖАЙШИЕ к цене зоны (сверху и снизу):
+	// «зачем мне весь график в часовых зонах» — дальняя локальная ликвидность не нужна.
+	const nearestLocal = (zs) => {
+		if (!($('mtfLocalNearest')?.checked ?? true) || px == null) return zs
+		const locals = zs.filter((x) => x.__role === 'local')
+		const inPlay = locals.filter((x) => Math.min(x.near, x.far) <= px && px <= Math.max(x.near, x.far))
+		const above = locals.filter((x) => Math.min(x.near, x.far) > px).sort((a, b) => Math.min(a.near, a.far) - Math.min(b.near, b.far))[0]
+		const below = locals.filter((x) => Math.max(x.near, x.far) < px).sort((a, b) => Math.max(b.near, b.far) - Math.max(a.near, a.far))[0]
+		const keep = new Set([...inPlay, above, below].filter(Boolean))
+		return zs.filter((x) => x.__role !== 'local' || keep.has(x))
+	}
+	return nearestLocal([...ctxZones, ...layerZones()].filter((x) => {
 		if (x.duplicateOf) return false
 		if (liqOnly && x.boundarySource !== 'liquidity-cluster') return false
 		if (activeOnly && !(x.active && x.valid)) return false
@@ -35,7 +47,7 @@ export function zoneCandidates() {
 		if (pr !== 'all' && x.priority !== pr) return false
 		if (minStack > 0 && x.stackShare != null && x.stackShare < minStack) return false
 		return true
-	}).sort((a, b) => b.knownAt - a.knownAt)
+	})).sort((a, b) => b.knownAt - a.knownAt)
 }
 
 // ---- Мои зоны (ручная разметка) ----
@@ -85,13 +97,14 @@ export function renderZones() {
 	const last = S.data.candles[S.data.candles.length - 1].timestamp
 	const focusId = S.poiFocusId
 	const zid = (c) => (c.__layer ? `${c.__layer}:${c.id}` : c.id)
-	// §16.21: слоёные зоны рисуются компактно (правая треть окна данных) — «прилипание» длинных
-	// прямоугольников к левому краю мешало чтению; фокус-зона рисуется полной длиной.
-	const first = S.data.candles[0].timestamp
-	const compactFrom = last - (last - first) * 0.3
+	// §16.22: слоёные зоны рисуются с ПОСЛЕДНЕГО ВКЛАДА в полку (max startAt пулов) — «правая треть
+	// окна данных» из §16.21 на зуме в последние недели всё равно оставалась слева экрана.
+	// Семантика: зона тянется с последней ре-аккумуляции; фокус-зона — полной длиной.
 	const rects = xs.map((c) => ({
 		id: zid(c),
-		t1: time(c.__layer && zid(c) !== focusId ? Math.max(c.knownAt, c.geometryKnownAt || 0, compactFrom) : Math.max(c.knownAt, c.geometryKnownAt || 0)),
+		t1: time(c.__layer && zid(c) !== focusId
+			? Math.max(c.knownAt, c.geometryKnownAt || 0, ...(c.pivotTimes?.length ? [Math.max(...c.pivotTimes)] : []))
+			: Math.max(c.knownAt, c.geometryKnownAt || 0)),
 		t2: time(c.endAt || last),
 		p1: c.near, p2: c.far, side: c.direction,
 		focused: zid(c) === focusId, dim: !!focusId && zid(c) !== focusId,
@@ -179,7 +192,7 @@ export function wireZonesPanel(activate, deactivate) {
 	$('poiZoneNext').onclick = () => moveZoneFocus(1)
 	$('poiZoneExport').onclick = exportZones
 	$('poiZoneBack').onclick = () => deactivate()
-	for (const id of ['poiDirection', 'poiLifecycle', 'poiPriority', 'poiActiveOnly', 'poiLiqOnly', 'poiMinStack', 'myZonesShow', 'mtfSwingShow', 'mtfLocalShow', 'mtfCtxShow'])
+	for (const id of ['poiDirection', 'poiLifecycle', 'poiPriority', 'poiActiveOnly', 'poiLiqOnly', 'poiMinStack', 'myZonesShow', 'mtfSwingShow', 'mtfLocalShow', 'mtfCtxShow', 'mtfLocalNearest'])
 		$(id).onchange = () => { if (id !== 'myZonesShow') S.poiFocusId = null; renderZones() }
 	$('myZoneAdd').onclick = () => {
 		addMyZone($('myZoneSide').value, Number($('myZoneFrom').value), Number($('myZoneTo').value), $('myZoneNote').value.trim())

@@ -14,8 +14,11 @@
 // Значения подобраны сканом по IoU с эталонными боксами (tmp/diag/profileScan.ts):
 // 1h: потолок высоты 2% (max этажа эталона), разрез по менее глубоким провалам (0.4×пика)
 //     шириной от 2 корзин — цепь лестницы режется на этажи, а не остаётся куском 6–7%.
-// 1d: разрез только по глубоким провалам (0.15×пика) — области консолидируются; полка рождает
-//     зону при ≥12% свежей стороны и только из топ-3 — карта из «отчётливо видимой» ликвидности.
+// 1d: разрез только по глубоким провалам (0.15×пика) — области консолидируются. Рождение НЕ душим
+//     глобальным топом (12-й QA, DOGE: 69% свежего sell-нотионала стоял выше 0.14 — topN 3 и
+//     minShare 0.12 отдавали все места старым вершинам 0.22+, ближние полки 0.095–0.13 из эталона
+//     пользователя не рождались) — top8/minShare 0.03; чистоту карты держат родство стеков, дедуп
+//     и UI-фильтр силы. BTC-эталон §16.21 при этом сохраняется 1-в-1.
 import type { LiquidityPoiConfig } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
 
 const HOUR_MS = 3_600_000
@@ -24,6 +27,6 @@ const DAY_MS = 86_400_000
 /** Профиль зон для ТФ контекста; {} = дефолты движка (4h и всё прочее). */
 export function liquidityPoiProfileForTf(tfMs: number): Partial<LiquidityPoiConfig> {
 	if (tfMs <= HOUR_MS) return { stackMaxPct: 0.02, shelfValleyShare: 0.4, shelfValleyMinBins: 2 }
-	if (tfMs >= DAY_MS) return { shelfValleyShare: 0.15, shelfMinShare: 0.12, shelfTopN: 3 }
+	if (tfMs >= DAY_MS) return { shelfValleyShare: 0.15, shelfMinShare: 0.03, shelfTopN: 8 }
 	return {}
 }

@@ -103,7 +103,7 @@ export function renderConfirmation() {
 	setMarkers(marks.sort((a, b) => a.time - b.time))
 	// Полосы heatmap на 15m-свечи не рисуем (см. renderHeatmap): шкалы времени 4h и 15m несовместимы.
 	S.hmShownBands = []
-	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason || fmtR(c.grossR)}${c.duplicateEntryOf ? ' · ДУБЛЬ ВХОДА' : ''}${c.againstImpulse ? ' · ПРОТИВ ИМПУЛЬСА' : ''}`
+	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.rejectionReason === 'data-end' ? 'ЖИВАЯ У КРАЯ ДАННЫХ' : c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason === 'data-end' ? 'ждёт продолжения' : (c.rejectionReason || fmtR(c.grossR))}${c.duplicateEntryOf ? ' · ДУБЛЬ ВХОДА' : ''}${c.againstImpulse ? ' · ПРОТИВ ИМПУЛЬСА' : ''}`
 	const traceRows = []
 	{
 		let run = []
@@ -123,7 +123,7 @@ export function renderConfirmation() {
 	}
 	$('confTrace').innerHTML = `<div class="kv"><span>Зона</span><b class="mono">${fmtP(Math.min(c.near, c.far))} – ${fmtP(Math.max(c.near, c.far))}</b></div>
 		<div class="kv"><span>Известна</span><b>${dt(c.knownAt)}</b></div>
-		${c.rejectionReason ? `<div class="kv"><span>Отказ</span><b>${esc(c.rejectionReason)} — ${REASON_RU[c.rejectionReason] || ''}</b></div>` : ''}
+		${c.rejectionReason === 'data-end' ? `<div class="kv"><span>Статус</span><b>попытка ЖИВАЯ — данные закончились на середине цикла (это не отказ; после пересвипа §16.10 доигрывается, обнови данные позже)</b></div>` : c.rejectionReason ? `<div class="kv"><span>Отказ</span><b>${esc(c.rejectionReason)} — ${REASON_RU[c.rejectionReason] || ''}</b></div>` : ''}
 		${c.rejectionReason === 'zone-ended' ? `<div class="kv"><span>Чем кончилась зона</span><b>${zoneEndInfo(c.poiId)}</b></div>` : ''}
 		<div class="kv"><span>Объём прихода</span><b>${c.arrivalVolumeRatio != null ? '×' + c.arrivalVolumeRatio.toFixed(2) + (c.arrivalVolumeRatio >= 1.5 ? ' — пришли на объёме' : '') : '—'}</b></div>
 		<div class="kv"><span>Свип экстремума зоны</span><b>${c.sweptZoneExtreme == null ? '—' : c.sweptZoneExtreme ? 'да' : 'нет (лой захода)'}</b></div>
