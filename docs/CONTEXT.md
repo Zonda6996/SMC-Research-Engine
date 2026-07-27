@@ -1,6 +1,6 @@
 # Контекст проекта SMC Research Engine для нового ИИ
 
-> Обновлено: 2026-07-24, вечер (хэндофф после 9 раундов QA за день). Ветка: `liquidity-improvements-v1`, HEAD — docs-коммит хэндоффа поверх `9ffcb62`. Актуальный фронт работ — раздел 0.5, читать его ПЕРВЫМ; правила движков — SPEC §16.8–§16.17.
+> Обновлено: 2026-07-27, вечер. Ветка: **`simplified-mode-v1`** (liquidity-improvements-v1 слита в main 27.07, PR #7, merge 45a91f6 — 13 QA-раундов приняты). Актуальный фронт работ — раздел 0.5, читать его ПЕРВЫМ; правила движков — SPEC §16.8–§16.24.
 >
 > Это файл быстрого восстановления контекста, **не замена `SPEC.md`**. `SPEC.md` — главный источник истории решений, результатов и отрицательного знания. Код, особенно `src/strategy/battleConfig.ts`, — источник истины о текущем боевом поведении.
 
@@ -45,7 +45,7 @@ npx tsc --noEmit
 
 Активная работа — liquidity-ветка (SPEC §14, §16.x). Canon/battle-пайплайн (разделы 2–8) — фоновый контекст, не трогать без явной просьбы.
 
-### Состояние ветки (всё запушено в liquidity-improvements-v1)
+### Состояние (наследие liquidity-improvements-v1 — слито в main; новая работа — в simplified-mode-v1)
 
 Поверх хэндоффа b184733 за 24.07 (десятый QA):
 
@@ -114,7 +114,7 @@ docs: этот хэндофф
 
 - Песочница: Binance API гео-блокирован; данные — data.binance.vision (архивы klines futures/um, monthly+daily CSV, ts в ms, с 2025 в МИКРОсекундах — делить на 1000 при ts>1e14; дневной архив с задержкой ~сутки). Сетевые домены песочницы требуют одобрения пользователем (registry.npmjs.org, data.binance.vision); движки запускаются и БЕЗ npm — Node 24 нативно исполняет .ts (все импорты движков типовые).
 - tmp/diag (не пушится) пересобран 24.07: download.sh/download-alts.sh (306+510 архивов), buildData.mjs (датасеты 8 монет: {sym}-4h-full.json 5250 баров + {sym}-15m-full.json 84000 баров, 2024-03-01..2026-07-23, gaps=0; срез «как в сетке» — cutoffClose 2026-07-24T00:00Z → последние 5000/80000), run.mjs (пайплайн как в server.ts, сверен со SPEC §16.17 бит-в-бит), extract.mjs (кейсы с метриками), report*.mjs (4 веб-отчёта), grid.mjs/combo.mjs (ячейки+правила), sweepRunner.mjs + configs-stage{1,2}.json + analyze{1,2}.mjs (большая сетка train/test), gate.mjs (валидация гейта, правило отбора в шапке).
-- Пуш — MCP-действие github__push_files (owner Zonda6996, repo SMC-Research-Engine, branch liquidity-improvements-v1); после пуша git fetch + diff origin (пуст) + git reset --hard origin/…; тяжёлые payload — через paramsFile.
+- Пуш — MCP-действие github__push_files (owner Zonda6996, repo SMC-Research-Engine, branch **simplified-mode-v1**); после пуша git fetch + diff origin (пуст) + git reset --hard origin/…; тяжёлые payload — через paramsFile. Merge в main — только по явной просьбе (последний: PR #7, 27.07).
 - Проверки после правок: `npx tsx --test tests/*.test.ts` (298/298), `npx tsc --noEmit`, `node --check tools/visualizer/public/*.mjs tools/visualizer/public/{lib,panels}/*.mjs`.
 - QA-цикл: скрин пользователя = ТЗ; кейсы воспроизводить на данных ДО правок; предлагать → согласовывать → реализовывать с тестами → SPEC-секция → пуш. Пользователь смотрит 4h limit 5000; у него heatmap с OI-гибридом (песочница — volume-proxy, свежие ~30 дней могут отличаться).
 - Методика анти-подгонки для любых будущих калибровок: train/test-разрез по времени входа (движки каузальны — прогон один на полной истории), правило отбора фиксировать ДО взгляда на test, предпочитать плато одиноким пикам, смотреть net (комиссии ≈ 0.1–0.2R/сделку съедают «около нуля»).
