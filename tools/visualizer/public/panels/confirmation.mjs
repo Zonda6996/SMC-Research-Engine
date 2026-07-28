@@ -58,9 +58,13 @@ function currentConfirmation() {
 }
 
 /**
- * §16.28: полосы GGI и его сигналы на ТФ подтверждения. Рисуются поверх выбранного окна,
- * чтобы было видно, растянута ли цена в момент входа. Сигнал полос помечает ХУДШИЕ входы
- * (§16.29) — поэтому крестики на графике это предупреждение, а не приглашение.
+ * §16.28–16.30: полосы GGI и сигналы вендора на ТФ подтверждения.
+ * Пунктирные линии — ВНУТРЕННИЕ края зон (mean ∓ 5.6·dev), сплошная синяя — средняя.
+ * Метки BUY/SELL ставятся по КАНОНУ ВЕНДОРА: касание ВНЕШНЕГО края (mean ∓ 9.6·dev) —
+ * редкое событие у самого экстремума; у пользователя внешние линии в «Стиле» отключены,
+ * поэтому на его графике внешний край виден только по заливке.
+ * ВНИМАНИЕ: в НАШЕЙ системе близость к зоне экстремума — признак ХУДШЕГО входа (§16.29),
+ * поэтому метка рядом со входом это предупреждение, а не подтверждение.
  */
 function drawGgi(src, from, to) {
 	if (!$('ggiChk')?.checked) return
@@ -79,7 +83,7 @@ function drawGgi(src, from, to) {
 		seriesMarkers(s0, sig.map((x) => ({
 			time: time(x.at), position: x.direction === 'long' ? 'belowBar' : 'aboveBar',
 			color: '#c9a227', shape: 'circle', size: 1,
-			text: x.direction === 'long' ? 'GGI BUY (растянуто вниз)' : 'GGI SELL (растянуто вверх)',
+			text: x.direction === 'long' ? 'GGI BUY' : 'GGI SELL',
 		})).sort((a, b) => a.time - b.time))
 	}
 }
@@ -137,6 +141,7 @@ function renderSimplified() {
 		<div class="kv"><span>Частичка 25%</span><b class="mono">${fmtP(e.partialPrice)} · 0.40R · +${(Math.abs(e.partialPrice - e.entry) / e.entry * 100).toFixed(2)}% цены</b></div>
 		<div class="kv"><span>Фулл</span><b class="mono">${fmtP(e.fullPrice)} · 12R · +${(Math.abs(e.fullPrice - e.entry) / e.entry * 100).toFixed(2)}% цены</b></div>
 		<div class="kv"><span>Попытка зоны</span><b>${e.idx + 1}</b></div>
+		<div class="kv"><span>Полосы GGI</span><b>метки BUY/SELL — касание ВНЕШНЕГО края (канон вендора). В пресете v0.4 вето работает по ЗАХОДУ в зону (внутренний край), окно 200 баров: такие входы отброшены как «цена растянута»</b></div>
 		<div class="trace">${(e.events || []).map((x) => `<div class="trace-row"><b>${esc(x.state)}</b><span class="muted">${RU[x.state] || ''}</span><span class="mono">${dt(x.at)} · ${fmtP(x.price)}</span></div>`).join('') || '<div class="trace-row muted">событий нет — стоп без частички</div>'}</div>`
 	setVisibleRange(e.entryAt - 24 * 3600000, lastAt + 24 * 3600000)
 }
