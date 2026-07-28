@@ -49,3 +49,6 @@ tools/batch/results/
 # forward runner artifacts (журнал сигналов и стейт — локальные данные)
 tmp/forward/
 tmp/viz-archive-cache/
+
+# исследовательский стенд диагностики (пересобирается по описанию в docs/CONTEXT.md §0.5)
+tmp/diag/
