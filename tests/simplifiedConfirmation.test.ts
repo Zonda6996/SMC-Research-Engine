@@ -5,7 +5,7 @@ import type { LiquidityPoiCandidate } from '../src/core/confirmation/LiquidityPo
 import type { StructureEvent } from '../src/models/events/StructureEvent.js'
 import {
 	detectSimplifiedConfirmation, SIMPLIFIED_CONFIRMATION_VERSION, SIMPLIFIED_HIGH_WR_PRESET,
-	buildRegimeTimeline, regimeAt, SIMPLIFIED_CONFIRMATION_CONFIG, SIMPLIFIED_HIGH_WR_PRESET_V4,
+	buildRegimeTimeline, regimeAt, SIMPLIFIED_CONFIRMATION_CONFIG, SIMPLIFIED_HIGH_WR_PRESET_V4, SIMPLIFIED_VENDOR_SIGNAL_PRESET,
 } from '../src/core/confirmation/SimplifiedConfirmationEngine.js'
 
 function makePoi(overrides: Partial<LiquidityPoiCandidate> = {}): LiquidityPoiCandidate {
@@ -26,7 +26,7 @@ const bar = (ts: number, o: number, h: number, l: number, c: number): Candle => 
 const away = (n: number, start: number) => Array.from({ length: n }, (_, k) => bar(start + k, 110, 111, 109, 110)) // выше зоны → взводит
 
 it('simplified v0.1: касание → первая направленная свеча → вход; частичка → БУ → фулл', () => {
-	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.4-ggi-exclusion')
+	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.5-zone-visit-veto')
 	const ltf: Candle[] = [
 		...away(7, 0),
 		bar(7, 105, 106, 95, 94),        // заход в зону, МЕДВЕЖЬЯ — не триггер
@@ -207,4 +207,9 @@ it('v0.4: инвертированный GGI-фильтр выключен по 
 	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.partialAtR, 0.40)
 	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.fullAtR, 12)
 	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.maxChaseAtr, 1.0)
+	// вето работает по ЗАХОДУ в зону (внутренний край), а не по сигналу вендора
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.ggiParams?.signalMode, 'inner')
+	// вариант «как у вендора» — внешний край и короткое окно
+	assert.equal(SIMPLIFIED_VENDOR_SIGNAL_PRESET.ggiExcludeBars, 50)
+	assert.equal(SIMPLIFIED_VENDOR_SIGNAL_PRESET.ggiParams?.signalMode, 'outer')
 })

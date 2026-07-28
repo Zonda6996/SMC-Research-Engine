@@ -10,13 +10,14 @@ const bar = (ts: number, o: number, h: number, l: number, c: number): Candle =>
 	({ timestamp: ts, open: o, high: h, low: l, close: c, volume: 10 })
 
 it('GGI Zone: параметры вендора зафиксированы буквально', () => {
-	assert.equal(GGI_ZONE_ENGINE_VERSION, 'ggi-zone-2.0-vendor-params')
+	assert.equal(GGI_ZONE_ENGINE_VERSION, 'ggi-zone-2.2-outer-edge-signal')
 	assert.equal(GGI_ZONE_PARAMS.lookback, 200)
 	assert.equal(GGI_ZONE_PARAMS.kInner, 5.6)
 	assert.equal(GGI_ZONE_PARAMS.kOuter, 9.6)
 	assert.equal(GGI_ZONE_PARAMS.meanType, 'ema')
 	assert.equal(GGI_ZONE_PARAMS.devType, 'atr')
 	assert.equal(GGI_ZONE_PARAMS.widthScale, 1)
+	assert.equal(GGI_ZONE_PARAMS.signalMode, 'outer')
 })
 
 it('GGI Zone: полосы симметричны относительно средней и упорядочены', () => {
@@ -50,7 +51,7 @@ it('GGI Zone: источник цены — hlc3, а не close', () => {
 it('GGI Zone: сигнал один на заход в зону, повтор только после возврата к средней', () => {
 	// множители сужены намеренно: проверяется логика перевзведения, а не ширина полос вендора.
 	// Прокол берём с большим запасом (50×dev), чтобы рост dev от самого прокола не «увёл» край.
-	const P = { lookback: 10, kInner: 1, kOuter: 2 } as const
+	const P = { lookback: 10, kInner: 1, kOuter: 2, signalMode: 'inner' } as const
 	const c: Candle[] = []
 	for (let i = 0; i < 40; i++) c.push(bar(i, 100, 101, 99, 100))
 	const dip = () => {
@@ -73,7 +74,7 @@ it('GGI Zone: сигнал один на заход в зону, повтор т
 })
 
 it('GGI Zone: шорт-сигнал зеркален лонгу', () => {
-	const P = { lookback: 10, kInner: 1, kOuter: 2 } as const
+	const P = { lookback: 10, kInner: 1, kOuter: 2, signalMode: 'inner' } as const
 	const c: Candle[] = []
 	for (let i = 0; i < 40; i++) c.push(bar(i, 100, 101, 99, 100))
 	const b = computeGgiBands(c, P)
@@ -91,4 +92,17 @@ it('GGI Zone: состояние на баре по касанию внутре�
 	assert.equal(ggiStateAt(bar(0, 100, 106, 99, 105), b), 'overbought')
 	assert.equal(ggiStateAt(bar(0, 100, 101, 99, 100), b), 'neutral')
 	assert.equal(ggiStateAt(bar(0, 100, 101, 99, 100), { ...b, mean: NaN }), 'neutral')
+})
+
+it('GGI Zone: внешний край даёт сигнал реже внутреннего (канон вендора)', () => {
+	// пила с усиливающимся размахом — цена достаёт то внутренний, то внешний край
+	const c: Candle[] = []
+	for (let i = 0; i < 400; i++) {
+		const amp = 1 + (i % 50) * 0.4
+		const p = 100 + (i % 2 ? amp : -amp)
+		c.push(bar(i, p, p + amp, p - amp, p))
+	}
+	const inner = detectGgiSignals(c, { lookback: 20, signalMode: 'inner' })
+	const outer = detectGgiSignals(c, { lookback: 20, signalMode: 'outer' })
+	assert.ok(outer.length <= inner.length, 'внешний край не может срабатывать чаще внутреннего')
 })

@@ -14,7 +14,7 @@
 // топливо продолжения, а не разворот (группа C разбора стопов §16.18).
 import type { Candle } from '../../models/price/Candle.js'
 
-export const GGI_ZONE_ENGINE_VERSION = 'ggi-zone-2.0-vendor-params'
+export const GGI_ZONE_ENGINE_VERSION = 'ggi-zone-2.2-outer-edge-signal'
 
 export interface GgiZoneParams {
 	/** Lookback Period из настроек индикатора. */
@@ -29,12 +29,26 @@ export interface GgiZoneParams {
 	devType: 'atr' | 'atrSma' | 'hl'
 	/** Калибровочный множитель ширины (1 = ровно как в настройках вендора). */
 	widthScale: number
+	/**
+	 * Когда считать сигнал. Проверено на эталонном скрине BTC 15m (12–16.07.2026):
+	 * метка BUY вендора стоит на баре АБСОЛЮТНОГО МИНИМУМА окна (13.07 18:15, low 61806;
+	 * на шкале пользователя «Мин. 61 824,97» — та же точка, другая биржа), и именно на этом
+	 * баре цена достала ВНЕШНИЙ край зелёной зоны (61883). До этого она провела 46 баров
+	 * ВНУТРИ зоны, не давая сигнала. Слова автора в видео — «касание ВНЕШНЕЙ полосы».
+	 *  'outer' — касание ВНЕШНЕГО края (mean ∓ 9.6·dev). Канон вендора; редкое событие,
+	 *            естественно попадающее в экстремум, полностью каузальное;
+	 *  'inner' — касание внутреннего края (mean ∓ 5.6·dev): срабатывает намного раньше и
+	 *            чаще. Сохранено для сравнения и воспроизводимости прогонов §16.29;
+	 *  'exit'  — цена побывала в зоне и закрылась обратно за внутренним краем (разворот).
+	 */
+	signalMode: 'outer' | 'inner' | 'exit'
 }
 
 /** Ровно значения из скрина настроек индикатора. Не менять без новых якорей. */
 export const GGI_ZONE_PARAMS: GgiZoneParams = {
 	lookback: 200, kInner: 5.6, kOuter: 9.6,
 	meanType: 'ema', devType: 'atr', widthScale: 1,
+	signalMode: 'outer',
 }
 
 export interface GgiBand {
@@ -107,26 +121,56 @@ export interface GgiSignal {
 }
 
 /**
- * Сигналы индикатора: касание ВНУТРЕННЕГО края полосы; повторный сигнал той же стороны
- * возможен только после возврата цены к средней линии (перевзведение). Правило снято
- * с поведения оригинала: метки появляются не на каждом касании, а один раз на заход в зону.
+ * Сигналы индикатора. Правило снято с поведения оригинала на скринах BTC 15m: метка
+ * появляется НЕ на каждом касании и НЕ на заходе в зону, а у экстремума — после того как
+ * цена побывала внутри зоны и вернулась за её внутренний край (разворот). Повторный сигнал
+ * той же стороны возможен только после возврата цены к средней линии (перевзведение).
  */
 export function detectGgiSignals(candles: Candle[], paramsArg: Partial<GgiZoneParams> = {}): GgiSignal[] {
-	const bands = computeGgiBands(candles, paramsArg)
+	const p: GgiZoneParams = { ...GGI_ZONE_PARAMS, ...paramsArg }
+	const bands = computeGgiBands(candles, p)
 	const out: GgiSignal[] = []
 	let armedLong = true, armedShort = true
+	// «побывали в зоне» — устанавливается ПРЕДЫДУЩИМИ барами: закрытие обратно за край
+	// на том же баре, что и заход, сигналом не считается (порядок внутри бара неизвестен).
+	let wasInGreen = false, wasInRed = false
 	for (let i = 0; i < candles.length; i++) {
 		const c = candles[i]!, b = bands[i]!
 		if (!Number.isFinite(b.mean) || !Number.isFinite(b.dev)) continue
+		// перевзведение: цена вернулась к средней — сторона снова готова дать сигнал
 		if (!armedLong && c.close >= b.mean) armedLong = true
 		if (!armedShort && c.close <= b.mean) armedShort = true
-		if (armedLong && c.low <= b.greenHi) {
+
+		if (p.signalMode !== 'exit') {
+			// 'outer' — канон вендора; 'inner' — раннее и частое срабатывание
+			const lvlLong = p.signalMode === 'outer' ? b.greenLo : b.greenHi
+			const lvlShort = p.signalMode === 'outer' ? b.redHi : b.redLo
+			if (armedLong && c.low <= lvlLong) {
+				out.push({ at: c.timestamp, direction: 'long', close: c.close, edge: lvlLong })
+				armedLong = false
+			} else if (armedShort && c.high >= lvlShort) {
+				out.push({ at: c.timestamp, direction: 'short', close: c.close, edge: lvlShort })
+				armedShort = false
+			}
+			continue
+		}
+
+		// 'exit': разворот ИЗ зоны — цена была внутри, а теперь закрылась обратно за краем
+		if (armedLong && wasInGreen && c.close > b.greenHi) {
 			out.push({ at: c.timestamp, direction: 'long', close: c.close, edge: b.greenHi })
 			armedLong = false
-		} else if (armedShort && c.high >= b.redLo) {
+			wasInGreen = false
+		} else if (armedShort && wasInRed && c.close < b.redLo) {
 			out.push({ at: c.timestamp, direction: 'short', close: c.close, edge: b.redLo })
 			armedShort = false
+			wasInRed = false
 		}
+		// пометки на СЛЕДУЮЩИЙ бар
+		if (c.low <= b.greenHi) wasInGreen = true
+		if (c.high >= b.redLo) wasInRed = true
+		// уход к средней сбрасывает «побывали»
+		if (c.close >= b.mean) wasInGreen = false
+		if (c.close <= b.mean) wasInRed = false
 	}
 	return out
 }
