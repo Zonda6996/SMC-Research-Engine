@@ -2,7 +2,11 @@ import assert from 'node:assert/strict'
 import { it } from 'node:test'
 import type { Candle } from '../src/models/price/Candle.js'
 import type { LiquidityPoiCandidate } from '../src/core/confirmation/LiquidityPoiCalibration.js'
-import { detectSimplifiedConfirmation, SIMPLIFIED_CONFIRMATION_VERSION } from '../src/core/confirmation/SimplifiedConfirmationEngine.js'
+import type { StructureEvent } from '../src/models/events/StructureEvent.js'
+import {
+	detectSimplifiedConfirmation, SIMPLIFIED_CONFIRMATION_VERSION, SIMPLIFIED_HIGH_WR_PRESET,
+	buildRegimeTimeline, regimeAt, SIMPLIFIED_CONFIRMATION_CONFIG,
+} from '../src/core/confirmation/SimplifiedConfirmationEngine.js'
 
 function makePoi(overrides: Partial<LiquidityPoiCandidate> = {}): LiquidityPoiCandidate {
 	return {
@@ -22,7 +26,7 @@ const bar = (ts: number, o: number, h: number, l: number, c: number): Candle => 
 const away = (n: number, start: number) => Array.from({ length: n }, (_, k) => bar(start + k, 110, 111, 109, 110)) // выше зоны → взводит
 
 it('simplified v0.1: касание → первая направленная свеча → вход; частичка → БУ → фулл', () => {
-	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.1')
+	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.3-r-targets')
 	const ltf: Candle[] = [
 		...away(7, 0),
 		bar(7, 105, 106, 95, 94),        // заход в зону, МЕДВЕЖЬЯ — не триггер
@@ -114,4 +118,84 @@ it('simplified: SHORT зеркален; вход после endAt зоны не 
 	// endAt = 5: касание на ts7 уже вне окна — входов нет
 	const [ended] = detectSimplifiedConfirmation([makePoi({ endAt: 5 })], ltfLong)
 	assert.equal(ended!.entries.length, 0)
+})
+
+// ─────────────────────────── v0.3 (§16.26) ───────────────────────────
+
+const ev = (type: 'bos' | 'choch', direction: 'up' | 'down', at: number): StructureEvent => ({
+	type, direction, levelPrice: 100, levelType: direction === 'up' ? 'high' : 'low', levelIndex: 0,
+	levelLabel: 'HH', breachIndex: 0, breachTimestamp: at, confirmIndex: 0, confirmTimestamp: at,
+	sweptBefore: false, sweptDepth: 0, oppositeSweptBefore: false,
+})
+
+it('v0.3: дефолты сохраняют поведение v0.1 (цели в % цены), targetMode=r считает цели от риска', () => {
+	// тот же сценарий, что в первом тесте: вход 100, стоп far 89 → риск 11 = 11% цены
+	const ltf: Candle[] = [
+		...away(7, 0),
+		bar(7, 96, 106, 95, 100),        // ВХОД 100, стоп 89
+		bar(8, 100, 104.5, 99, 104.4),   // +0.4R = 100 + 0.4×11 = 104.4 → PARTIAL, стоп в БУ
+		bar(9, 104.4, 106, 99.9, 100.1), // возврат в БУ → BE
+	]
+	const [r] = detectSimplifiedConfirmation([makePoi()], ltf, { targetMode: 'r', partialAtR: 0.4, fullAtR: 12, partialFraction: 0.25 })
+	const e = r!.entries[0]!
+	assert.equal(e.outcome, 'be')
+	assert.ok(Math.abs(e.partialPrice - 104.4) < 1e-9)
+	// БУ-исход = частичка × доля = 0.4R × 0.25 = 0.1R; в долях хода 0.1 × 11% = 1.1%
+	assert.ok(Math.abs(e.grossMovePct! - 0.011) < 1e-9)
+	assert.ok(Math.abs(e.grossR! - 0.1) < 1e-9)
+})
+
+it('v0.3: фильтр «без погони» пропускает вход, убежавший от края зоны', () => {
+	const ltf: Candle[] = [
+		...away(7, 0),
+		bar(7, 96, 106, 95, 105),   // заход и закрытие в 105: |105 − near 100| / atr 4 = 1.25 ATR
+		bar(8, 105, 106, 104, 105.5),
+	]
+	// без фильтра вход есть
+	assert.equal(detectSimplifiedConfirmation([makePoi()], ltf)[0]!.entries.length, 1)
+	// с порогом 1.0 ATR — вход отброшен
+	assert.equal(detectSimplifiedConfirmation([makePoi()], ltf, { maxChaseAtr: 1.0 })[0]!.entries.length, 0)
+	// с порогом 2.0 ATR — снова проходит
+	assert.equal(detectSimplifiedConfirmation([makePoi()], ltf, { maxChaseAtr: 2.0 })[0]!.entries.length, 1)
+})
+
+it('v0.3: тренд по правилу bos-bos-choch, регион на баре подтверждения', () => {
+	const tl = buildRegimeTimeline([ev('bos', 'up', 10), ev('bos', 'up', 20), ev('choch', 'down', 30), ev('bos', 'down', 40)])
+	assert.equal(regimeAt(tl, 5), 'range')   // до событий
+	assert.equal(regimeAt(tl, 10), 'range')  // один BOS — ещё не тренд
+	assert.equal(regimeAt(tl, 20), 'up')     // два BOS вверх — тренд вверх
+	assert.equal(regimeAt(tl, 30), 'range')  // CHoCH сбрасывает
+	assert.equal(regimeAt(tl, 45), 'range')  // один BOS вниз — ещё не тренд
+})
+
+it('v0.3: тренд-фильтр блокирует лонг в тренде вниз и требует тренда в режиме onlyWith', () => {
+	const ltf: Candle[] = [
+		...away(7, 0),
+		bar(7, 96, 106, 95, 100),
+		bar(8, 100, 108, 99, 107.6),
+		bar(9, 107.6, 118, 106, 117.6),
+	]
+	const down = [ev('bos', 'down', 1), ev('bos', 'down', 2)]
+	const up = [ev('bos', 'up', 1), ev('bos', 'up', 2)]
+	// лонг против тренда вниз — заблокирован
+	assert.equal(detectSimplifiedConfirmation([makePoi()], ltf, { trendFilter: 'notAgainst' }, { events: down })[0]!.entries.length, 0)
+	// в тренде вверх — проходит
+	assert.equal(detectSimplifiedConfirmation([makePoi()], ltf, { trendFilter: 'notAgainst' }, { events: up })[0]!.entries.length, 1)
+	// боковик: notAgainst разрешает, onlyWith запрещает
+	assert.equal(detectSimplifiedConfirmation([makePoi()], ltf, { trendFilter: 'notAgainst' }, { events: [] })[0]!.entries.length, 1)
+	assert.equal(detectSimplifiedConfirmation([makePoi()], ltf, { trendFilter: 'onlyWith' }, { events: [] })[0]!.entries.length, 0)
+})
+
+it('v0.3: пресет высокого вин рейта не трогает канонические дефолты', () => {
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET.targetMode, 'r')
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET.partialAtR, 0.40)
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET.partialFraction, 0.25)
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET.fullAtR, 12)
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET.maxChaseAtr, 1.0)
+	// дефолты движка остались v0.1-совместимыми
+	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.targetMode, 'pct')
+	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.maxChaseAtr, 0)
+	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.trendFilter, 'off')
+	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.partialAtMovePct, 0.075)
+	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.fullAtMovePct, 0.175)
 })

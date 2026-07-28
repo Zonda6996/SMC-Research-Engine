@@ -1,5 +1,6 @@
 import type { Candle } from '../../models/price/Candle.js'
 import type { LiquidityPoiCandidate } from './LiquidityPoiCalibration.js'
+import type { StructureEvent } from '../../models/events/StructureEvent.js'
 
 // §16.24: УПРОЩЁННОЕ подтверждение (метод пользователя, ответы 27.07.2026). Лестница §14.1,
 // первый ТФ пары: 1D-зона → 4h-свеча, 4h → 1h, 1h → 15m. Цикл: касание зоны (взведение как в
@@ -12,7 +13,14 @@ import type { LiquidityPoiCandidate } from './LiquidityPoiCalibration.js'
 // (после стопа/БУ — новое взведение, пока зона жива; после фулла зона отработана).
 // Позиция доигрывается за endAt зоны (как в уточнённом §16.10); новые входы после endAt не берутся.
 // ВСЕ параметры — на сравнение train/test (§16.18-методика); дефолты ниже = стартовые, не канон.
-export const SIMPLIFIED_CONFIRMATION_VERSION = 'simplified-confirmation-0.1'
+// v0.3 (28.07.2026, §16.26): цели можно задавать В ДОЛЯХ НАЧАЛЬНОГО РИСКА (R), а не только в
+// % цены. Причина структурная, не подгоночная: в v0.1 частичка 7.5% ЦЕНЫ при медианном стопе
+// 2.15% цены стоит на 3.5R — до неё доходит четверть сделок, отсюда вин рейт 26%. Цели в R
+// подстраиваются под фактический риск каждой сделки, поэтому ОДНА настройка работает на всех
+// монетах и всех ступенях лестницы. Плюс два фильтра входа флагами (по умолчанию ВЫКЛ):
+// «без погони» (вход не дальше maxChaseAtr от края зоны) и тренд-фильтр (bos-bos-choch).
+// Дефолты = поведение v0.1 бит-в-бит; новое включается конфигом или пресетом.
+export const SIMPLIFIED_CONFIRMATION_VERSION = 'simplified-confirmation-0.3-r-targets'
 
 export interface SimplifiedConfirmationConfig {
 	/** Полный отход от зоны для (пере)взведения касания, в ATR упрощённого ТФ (как в уточнённом). */
@@ -31,6 +39,26 @@ export interface SimplifiedConfirmationConfig {
 	fullAtMovePct: number
 	/** Повторные входы: 'once' — один вход на зону; 'rearm' — после стопа/БУ новое взведение. */
 	reentry: 'once' | 'rearm'
+	/** v0.3: единица целей. 'pct' — доля цены (v0.1); 'r' — доля НАЧАЛЬНОГО РИСКА (вход→стоп). */
+	targetMode: 'pct' | 'r'
+	/** v0.3: частичка в R (используется при targetMode='r'). */
+	partialAtR: number
+	/** v0.3: полный тейк в R (используется при targetMode='r'). */
+	fullAtR: number
+	/**
+	 * v0.3: фильтр «без погони» — максимальное расстояние входа от БЛИЖНЕЙ границы зоны,
+	 * в ATR зоны. 0 = выключен. Смысл структурный: вход далеко от зоны при стопе за её
+	 * дальним краем раздувает риск, не улучшая сигнал.
+	 */
+	maxChaseAtr: number
+	/**
+	 * v0.3: тренд-фильтр по правилу пользователя «bos-bos-choch» (§16.25). Требует событий
+	 * структуры ТФ зоны в context.events. 'off' — выключен; 'notAgainst' — не входить против
+	 * тренда; 'onlyWith' — входить только по тренду (боковик пропускается).
+	 */
+	trendFilter: 'off' | 'notAgainst' | 'onlyWith'
+	/** v0.3: сколько BOS одного направления после последнего CHoCH считается трендом. */
+	trendMinBos: number
 }
 
 /** Стартовые значения (метод пользователя); сравнение вариантов — train/test-сеткой, не канон. */
@@ -42,6 +70,29 @@ export const SIMPLIFIED_CONFIRMATION_CONFIG: SimplifiedConfirmationConfig = {
 	partialFraction: 0.5,
 	partialAtMovePct: 0.075,
 	fullAtMovePct: 0.175,
+	reentry: 'rearm',
+	// v0.3: дефолты сохраняют поведение v0.1 бит-в-бит — новое включается явно.
+	targetMode: 'pct',
+	partialAtR: 0.40,
+	fullAtR: 12,
+	maxChaseAtr: 0,
+	trendFilter: 'off',
+	trendMinBos: 2,
+}
+
+/**
+ * §16.26: пресет «высокий вин рейт», найденный train/test-поиском на 8 монетах и связке
+ * 1h→15m (train 2021-01→2024-12: 8965 сделок, WR 74.8%, экспектация +0.094R;
+ * test 2025-01→2026-07, в отборе НЕ участвовал: 3064 сделки, WR 73.4%, +0.124R, PF 1.46).
+ * Это ПРЕСЕТ, а не новые дефолты: канон v0.1 остаётся точкой отсчёта для истории SPEC.
+ */
+export const SIMPLIFIED_HIGH_WR_PRESET: Partial<SimplifiedConfirmationConfig> = {
+	targetMode: 'r',
+	partialAtR: 0.40,
+	partialFraction: 0.25,
+	fullAtR: 12,
+	maxChaseAtr: 1.0,
+	stopMode: 'far',
 	reentry: 'rearm',
 }
 
@@ -60,6 +111,44 @@ export interface SimplifiedEntry {
 	grossMovePct: number | null
 	/** То же в R от НАЧАЛЬНОГО риска (вход→стоп) — для сравнения со связкой уточнённого режима. */
 	grossR: number | null
+}
+
+/** Контекст движка: структурные события ТФ ЗОНЫ — нужны только тренд-фильтру. */
+export interface SimplifiedContext {
+	events?: StructureEvent[]
+}
+
+export type SimplifiedRegime = 'up' | 'down' | 'range'
+
+/**
+ * Режим рынка по правилу пользователя «bos-bos-choch» (§16.25): ≥ minBos подряд идущих BOS
+ * одного направления после последнего CHoCH = тренд этого направления, иначе боковик.
+ * Регион меняется на баре ПОДТВЕРЖДЕНИЯ события — каузально, без заглядывания вперёд.
+ */
+export function buildRegimeTimeline(events: StructureEvent[], minBos = 2): Array<{ at: number; regime: SimplifiedRegime }> {
+	const sorted = [...events].sort((a, b) => a.confirmTimestamp - b.confirmTimestamp)
+	const out: Array<{ at: number; regime: SimplifiedRegime }> = []
+	let up = 0, down = 0
+	for (const e of sorted) {
+		if (e.type === 'choch') { up = 0; down = 0 }
+		else if (e.type === 'bos') { if (e.direction === 'up') up++; else down++ }
+		const regime: SimplifiedRegime = up >= minBos && up >= down ? 'up' : down >= minBos ? 'down' : 'range'
+		const last = out[out.length - 1]
+		if (last && last.at === e.confirmTimestamp) last.regime = regime
+		else out.push({ at: e.confirmTimestamp, regime })
+	}
+	return out
+}
+
+/** Режим на момент ts: последнее подтверждённое событие не позже ts. */
+export function regimeAt(timeline: Array<{ at: number; regime: SimplifiedRegime }>, ts: number): SimplifiedRegime {
+	let lo = 0, hi = timeline.length - 1
+	let res: SimplifiedRegime = 'range'
+	while (lo <= hi) {
+		const mid = (lo + hi) >> 1
+		if (timeline[mid]!.at <= ts) { res = timeline[mid]!.regime; lo = mid + 1 } else hi = mid - 1
+	}
+	return res
 }
 
 export interface SimplifiedConfirmationResult {
@@ -90,16 +179,16 @@ function atr(c: Candle[], i: number, n = 14): number {
 function playPosition(
 	ltf: Candle[], from: number, long: boolean, entry: number, stop0: number,
 	partialPrice: number, fullPrice: number, cfg: SimplifiedConfirmationConfig,
-	out: SimplifiedEntry,
+	out: SimplifiedEntry, partialMovePct: number, fullMovePct: number,
 ): number {
 	let stop = stop0
 	let partialTaken = false
 	const risk = Math.abs(entry - stop0)
 	const done = (outcome: SimplifiedEntry['outcome'], k: number): number => {
 		out.outcome = outcome
-		const partMove = cfg.partialAtMovePct * cfg.partialFraction
+		const partMove = partialMovePct * cfg.partialFraction
 		const restShare = 1 - cfg.partialFraction
-		out.grossMovePct = outcome === 'full' ? partMove + cfg.fullAtMovePct * restShare
+		out.grossMovePct = outcome === 'full' ? partMove + fullMovePct * restShare
 			: outcome === 'be' ? partMove
 			: -(Math.abs(entry - stop0) / entry) // полный стоп всей позицией
 		out.grossR = risk > 0 ? (out.grossMovePct * entry) / risk : null
@@ -137,8 +226,10 @@ function playPosition(
  */
 export function detectSimplifiedConfirmation(
 	pois: LiquidityPoiCandidate[], ltf: Candle[], config?: Partial<SimplifiedConfirmationConfig>,
+	context: SimplifiedContext = {},
 ): SimplifiedConfirmationResult[] {
 	const cfg: SimplifiedConfirmationConfig = { ...SIMPLIFIED_CONFIRMATION_CONFIG, ...config }
+	const regimeTl = cfg.trendFilter === 'off' ? [] : buildRegimeTimeline(context.events ?? [], cfg.trendMinBos)
 	const out: SimplifiedConfirmationResult[] = []
 	for (const poi of pois) {
 		if (poi.boundarySource !== 'liquidity-cluster' || poi.duplicateOf != null) continue
@@ -172,17 +263,39 @@ export function detectSimplifiedConfirmation(
 			}
 			if (entryIdx < 0) break
 			const ec = ltf[entryIdx]!
+			// v0.3 «без погони»: вход слишком далеко от ближней границы — сделка пропускается,
+			// но цикл зоны продолжается (следующее взведение).
+			if (cfg.maxChaseAtr > 0 && poi.atr > 0 && Math.abs(ec.close - poi.near) / poi.atr > cfg.maxChaseAtr) {
+				cursor = entryIdx + 1
+				armed = false
+				continue
+			}
+			// v0.3 тренд-фильтр (правило пользователя bos-bos-choch, регион на баре подтверждения)
+			if (cfg.trendFilter !== 'off') {
+				const reg = regimeAt(regimeTl, ec.timestamp)
+				const against = long ? reg === 'down' : reg === 'up'
+				const withTrend = long ? reg === 'up' : reg === 'down'
+				if (cfg.trendFilter === 'notAgainst' ? against : !withTrend) {
+					cursor = entryIdx + 1
+					armed = false
+					continue
+				}
+			}
 			const stop = cfg.stopMode === 'far'
 				? (long ? lo - cfg.stopFarBufferAtr * poi.atr : hi + cfg.stopFarBufferAtr * poi.atr)
 				: (long ? ec.close * (1 - cfg.stopPct) : ec.close * (1 + cfg.stopPct))
+			// v0.3: цели в долях риска приводятся к долям хода по фактическому риску сделки
+			const riskPct = Math.abs(ec.close - stop) / ec.close
+			const partialMovePct = cfg.targetMode === 'r' ? cfg.partialAtR * riskPct : cfg.partialAtMovePct
+			const fullMovePct = cfg.targetMode === 'r' ? cfg.fullAtR * riskPct : cfg.fullAtMovePct
 			const entry: SimplifiedEntry = {
 				entryAt: ec.timestamp, entry: ec.close, stop, stopMode: cfg.stopMode,
-				partialPrice: long ? ec.close * (1 + cfg.partialAtMovePct) : ec.close * (1 - cfg.partialAtMovePct),
-				fullPrice: long ? ec.close * (1 + cfg.fullAtMovePct) : ec.close * (1 - cfg.fullAtMovePct),
+				partialPrice: long ? ec.close * (1 + partialMovePct) : ec.close * (1 - partialMovePct),
+				fullPrice: long ? ec.close * (1 + fullMovePct) : ec.close * (1 - fullMovePct),
 				events: [], outcome: 'open', grossMovePct: null, grossR: null,
 			}
 			// риск-санити: вход ниже стопа (лонг) невозможен по построению обоих режимов
-			const exitIdx = playPosition(ltf, entryIdx + 1, long, entry.entry, stop, entry.partialPrice, entry.fullPrice, cfg, entry)
+			const exitIdx = playPosition(ltf, entryIdx + 1, long, entry.entry, stop, entry.partialPrice, entry.fullPrice, cfg, entry, partialMovePct, fullMovePct)
 			result.entries.push(entry)
 			cursor = Math.max(exitIdx + 1, entryIdx + 1)
 			armed = false
