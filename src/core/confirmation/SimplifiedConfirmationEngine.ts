@@ -1,6 +1,7 @@
 import type { Candle } from '../../models/price/Candle.js'
 import type { LiquidityPoiCandidate } from './LiquidityPoiCalibration.js'
 import type { StructureEvent } from '../../models/events/StructureEvent.js'
+import { detectGgiSignals, type GgiZoneParams } from '../signals/GgiZoneEngine.js'
 
 // §16.24: УПРОЩЁННОЕ подтверждение (метод пользователя, ответы 27.07.2026). Лестница §14.1,
 // первый ТФ пары: 1D-зона → 4h-свеча, 4h → 1h, 1h → 15m. Цикл: касание зоны (взведение как в
@@ -20,7 +21,7 @@ import type { StructureEvent } from '../../models/events/StructureEvent.js'
 // монетах и всех ступенях лестницы. Плюс два фильтра входа флагами (по умолчанию ВЫКЛ):
 // «без погони» (вход не дальше maxChaseAtr от края зоны) и тренд-фильтр (bos-bos-choch).
 // Дефолты = поведение v0.1 бит-в-бит; новое включается конфигом или пресетом.
-export const SIMPLIFIED_CONFIRMATION_VERSION = 'simplified-confirmation-0.3-r-targets'
+export const SIMPLIFIED_CONFIRMATION_VERSION = 'simplified-confirmation-0.4-ggi-exclusion'
 
 export interface SimplifiedConfirmationConfig {
 	/** Полный отход от зоны для (пере)взведения касания, в ATR упрощённого ТФ (как в уточнённом). */
@@ -59,6 +60,18 @@ export interface SimplifiedConfirmationConfig {
 	trendFilter: 'off' | 'notAgainst' | 'onlyWith'
 	/** v0.3: сколько BOS одного направления после последнего CHoCH считается трендом. */
 	trendMinBos: number
+	/**
+	 * v0.4 (§16.29): ИНВЕРТИРОВАННЫЙ фильтр по сигналу полос перекупленности/перепроданности.
+	 * Вход отбрасывается, если сигнал GGI того же направления был не старше N баров ТФ
+	 * подтверждения. Смысл: сигнал означает «цена растянута к экстремуму», а полка
+	 * ликвидности в свежем сильном движении — топливо продолжения, а не разворот
+	 * (группа C разбора стопов §16.18). 0 = фильтр выключен.
+	 * Проверено на 8 монетах, связка 1h→15m: вин рейт вырос на ВСЕХ монетах,
+	 * экспектация train +0.073 → +0.137R, test +0.090 → +0.177R, 11 из 12 полугодий в плюсе.
+	 */
+	ggiExcludeBars: number
+	/** v0.4: параметры полос (по умолчанию — фактические параметры вендора). */
+	ggiParams?: Partial<GgiZoneParams>
 }
 
 /** Стартовые значения (метод пользователя); сравнение вариантов — train/test-сеткой, не канон. */
@@ -78,6 +91,7 @@ export const SIMPLIFIED_CONFIRMATION_CONFIG: SimplifiedConfirmationConfig = {
 	maxChaseAtr: 0,
 	trendFilter: 'off',
 	trendMinBos: 2,
+	ggiExcludeBars: 0,
 }
 
 /**
@@ -94,6 +108,18 @@ export const SIMPLIFIED_HIGH_WR_PRESET: Partial<SimplifiedConfirmationConfig> = 
 	maxChaseAtr: 1.0,
 	stopMode: 'far',
 	reentry: 'rearm',
+}
+
+/**
+ * §16.29: пресет v0.4 — тот же профиль выхода плюс ИНВЕРТИРОВАННЫЙ GGI-фильтр.
+ * Окно 200 баров ТФ подтверждения выбрано ТОЛЬКО по train (train E: +0.137R — максимум
+ * при выборке ≥3000 сделок), затем один взгляд на test: WR 75.5%, экспектация +0.177R,
+ * Σ +278R на 1575 сделках; вин рейт вырос на всех 8 монетах, полугодия 11/12 в плюсе
+ * с вин рейтом 70.2–78.4% (весь коридор пользователя целиком).
+ */
+export const SIMPLIFIED_HIGH_WR_PRESET_V4: Partial<SimplifiedConfirmationConfig> = {
+	...SIMPLIFIED_HIGH_WR_PRESET,
+	ggiExcludeBars: 200,
 }
 
 export interface SimplifiedEntry {
@@ -230,6 +256,24 @@ export function detectSimplifiedConfirmation(
 ): SimplifiedConfirmationResult[] {
 	const cfg: SimplifiedConfirmationConfig = { ...SIMPLIFIED_CONFIRMATION_CONFIG, ...config }
 	const regimeTl = cfg.trendFilter === 'off' ? [] : buildRegimeTimeline(context.events ?? [], cfg.trendMinBos)
+	// v0.4: моменты сигналов полос на ТФ подтверждения (для инвертированного фильтра)
+	const ggiAt: { long: number[]; short: number[] } = { long: [], short: [] }
+	let ltfStepMs = 0
+	if (cfg.ggiExcludeBars > 0 && ltf.length > 1) {
+		ltfStepMs = ltf[1]!.timestamp - ltf[0]!.timestamp
+		for (const s of detectGgiSignals(ltf, cfg.ggiParams)) ggiAt[s.direction].push(s.at)
+	}
+	/** Был ли сигнал того же направления не старше ggiExcludeBars баров до ts. */
+	const ggiRecent = (long: boolean, ts: number): boolean => {
+		if (cfg.ggiExcludeBars <= 0 || ltfStepMs <= 0) return false
+		const list = long ? ggiAt.long : ggiAt.short
+		let lo = 0, hi = list.length - 1, best = -1
+		while (lo <= hi) {
+			const mid = (lo + hi) >> 1
+			if (list[mid]! <= ts) { best = list[mid]!; lo = mid + 1 } else hi = mid - 1
+		}
+		return best >= 0 && (ts - best) / ltfStepMs <= cfg.ggiExcludeBars
+	}
 	const out: SimplifiedConfirmationResult[] = []
 	for (const poi of pois) {
 		if (poi.boundarySource !== 'liquidity-cluster' || poi.duplicateOf != null) continue
@@ -280,6 +324,12 @@ export function detectSimplifiedConfirmation(
 					armed = false
 					continue
 				}
+			}
+			// v0.4: инвертированный GGI-фильтр — вход у растянутой цены пропускается
+			if (ggiRecent(long, ec.timestamp)) {
+				cursor = entryIdx + 1
+				armed = false
+				continue
 			}
 			const stop = cfg.stopMode === 'far'
 				? (long ? lo - cfg.stopFarBufferAtr * poi.atr : hi + cfg.stopFarBufferAtr * poi.atr)

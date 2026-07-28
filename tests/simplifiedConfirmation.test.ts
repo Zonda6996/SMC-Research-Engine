@@ -5,7 +5,7 @@ import type { LiquidityPoiCandidate } from '../src/core/confirmation/LiquidityPo
 import type { StructureEvent } from '../src/models/events/StructureEvent.js'
 import {
 	detectSimplifiedConfirmation, SIMPLIFIED_CONFIRMATION_VERSION, SIMPLIFIED_HIGH_WR_PRESET,
-	buildRegimeTimeline, regimeAt, SIMPLIFIED_CONFIRMATION_CONFIG,
+	buildRegimeTimeline, regimeAt, SIMPLIFIED_CONFIRMATION_CONFIG, SIMPLIFIED_HIGH_WR_PRESET_V4,
 } from '../src/core/confirmation/SimplifiedConfirmationEngine.js'
 
 function makePoi(overrides: Partial<LiquidityPoiCandidate> = {}): LiquidityPoiCandidate {
@@ -26,7 +26,7 @@ const bar = (ts: number, o: number, h: number, l: number, c: number): Candle => 
 const away = (n: number, start: number) => Array.from({ length: n }, (_, k) => bar(start + k, 110, 111, 109, 110)) // выше зоны → взводит
 
 it('simplified v0.1: касание → первая направленная свеча → вход; частичка → БУ → фулл', () => {
-	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.3-r-targets')
+	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.4-ggi-exclusion')
 	const ltf: Candle[] = [
 		...away(7, 0),
 		bar(7, 105, 106, 95, 94),        // заход в зону, МЕДВЕЖЬЯ — не триггер
@@ -198,4 +198,13 @@ it('v0.3: пресет высокого вин рейта не трогает к
 	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.trendFilter, 'off')
 	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.partialAtMovePct, 0.075)
 	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.fullAtMovePct, 0.175)
+})
+
+it('v0.4: инвертированный GGI-фильтр выключен по умолчанию и виден в пресете v4', () => {
+	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.ggiExcludeBars, 0)
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.ggiExcludeBars, 200)
+	// пресет v4 наследует профиль выхода v3
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.partialAtR, 0.40)
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.fullAtR, 12)
+	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.maxChaseAtr, 1.0)
 })
