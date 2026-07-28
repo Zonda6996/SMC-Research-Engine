@@ -123,7 +123,15 @@ function renderSimplified() {
 	mark(e.entry, C.blue, `ВХОД ${fmtP(e.entry)}`)
 	mark(e.stop, C.red, `СТОП ${fmtP(e.stop)}`)
 	mark(e.partialPrice, C.amber, `ЧАСТИЧКА 25% ${fmtP(e.partialPrice)}`)
-	mark(e.fullPrice, C.green, `ФУЛЛ ${fmtP(e.fullPrice)}`)
+	// Цель задана в стопах, поэтому при широком стопе уезжает на десятки процентов от цены.
+	// Рисуем линию только если она рядом (≤12% хода), иначе — подпись у входа: линия через
+	// весь экран за пределами видимых цен только мешает.
+	const fullAwayPct = Math.abs(e.fullPrice - e.entry) / e.entry
+	if (fullAwayPct <= 0.12) mark(e.fullPrice, C.green, `ФУЛЛ ${fmtP(e.fullPrice)}`)
+	else {
+		const s1 = line([{ time: time(e.entryAt), value: e.entry }], { color: 'rgba(0,0,0,0)' })
+		seriesMarkers(s1, [{ time: time(e.entryAt), position: 'aboveBar', color: C.green, shape: 'circle', size: 0, text: `ФУЛЛ ${fmtP(e.fullPrice)} — за экраном, ${(fullAwayPct * 100).toFixed(0)}% хода` }])
+	}
 	drawGgi(src, from, to)
 	const RU = { PARTIAL: 'частичка взята, стоп в безубыток', BE: 'выбило в безубыток', FULL: 'полный тейк', STOP: 'стоп' }
 	setMarkers((e.events || []).map((x) => ({
