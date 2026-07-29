@@ -1,6 +1,7 @@
 {
-  "task": "gate",
+  "task": "research",
   "needsPlaywright": false,
+  "script": "ci/research/applyApexRename.ts",
   "runnerVersion": "v1",
-  "runLabel": "apex-reversal-325"
+  "runLabel": "apply-apex-reversal-split"
 }
