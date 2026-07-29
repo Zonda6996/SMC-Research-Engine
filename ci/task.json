@@ -1,0 +1,11 @@
+{
+  "task": "gate",
+  "needsPlaywright": false,
+  "script": null,
+  "_notes": [
+    "This file decides what CI does. The workflow never needs editing.",
+    "task: gate | geo-probe | viz-shots | research",
+    "needsPlaywright: true installs Chromium (only needed for viz-shots)",
+    "script: for task=research, path to a tsx entry point, e.g. ci/research/heatmapOi.ts"
+  ]
+}
