@@ -1593,3 +1593,20 @@ ADA 45m risk (единственный минусовой пример, кото
 | `tmp/diag/ggiZone2.ts`, `tmp/diag/ggiSystem.ts` | `tmp/diag/apex.ts`, `tmp/diag/reversal.ts` |
 
 Версии движков после переименования бампаются: `apex-1.0-vendor-params`, `reversal-1.0-outer-edge`. В `SimplifiedConfirmationEngine` версия становится `simplified-confirmation-0.6-apex-veto`, пресеты — `SIMPLIFIED_APEX_VETO_PRESET` (бывший `..._V4`, вето по заходу в зону) и `SIMPLIFIED_REVERSAL_VETO_PRESET` (бывший `..._VENDOR_SIGNAL_PRESET`, вето по сигналу).
+
+
+## 16.33 Zonda Apex и Zonda Reversal — разделение движков и калиброванные полосы (29.07.2026)
+
+Приватное имя удалено из исполняемого кода и интерфейса. Полосы называются **Zonda Apex**, сигналы — **Zonda Reversal**; это два независимо включаемых слоя и два отдельных блока payload.
+
+### Apex: apex-1.0-calibrated-log-alma
+
+По 14 историческим якорям Binance Spot BTC 5m/15m/4h и ETH 1h установлено: mean = ALMA(hlc3, 200, 0.85, 6); границы логарифмические: mean × exp(±k×s), где k=5.6/9.6. Средняя переносится на внешние BTC 15m / ETH 1h с ошибкой 0.024% / 0.269%. Закрытая мера ширины восстановлена устойчивой аппроксимацией s = ALMA(TR/close, 122, 0.625, 3.5); максимальная наблюдаемая cross-symbol ошибка ширины около 4%, поэтому это не объявляется точной формулой вендора.
+
+### Reversal: reversal-1.0-directional-candle
+
+Reversal больше не равен касанию полосы. Край Apex взводит ожидание, после чего BUY разрешён только на бычьей свече (close>open), SELL — только на медвежьей (close<open). После сигнала сторона перевзводится возвратом к средней. Это минимальная модель по наблюдениям пользователя; дополнительные фильтры не вводились без данных. Результаты §16.29–16.30 подлежат повторной проверке, потому что прежняя реализация ставила метку непосредственно по касанию края.
+
+### Совместимость
+
+Временный GgiZoneEngine.ts удалён после перевода потребителей. SimplifiedConfirmationEngine получил поля apexVetoBars/apexParams, версию simplified-confirmation-0.6-apex-veto и пресеты SIMPLIFIED_APEX_VETO_PRESET / SIMPLIFIED_REVERSAL_VETO_PRESET. Дефолт вето остаётся выключенным; дефолты POI, heatmap и подтверждений не менялись.
