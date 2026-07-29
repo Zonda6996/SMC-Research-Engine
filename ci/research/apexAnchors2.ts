@@ -1,23 +1,13 @@
-// apexAnchors2.ts — калибровка Zonda Apex по структуре, подтверждённой настройками вендора.
+// apexAnchors2.ts — калибровка Zonda Apex по структуре из окна настроек вендора.
 //
-// ЧТО ИЗВЕСТНО ТОЧНО (со скринов окна настроек):
-//   Источник цены = (МАКС+МИН+ЗАКР)/3, то есть hlc3.
-//   Lookback Period = 200. Inner Multiplier = 5.6. Outer Amplitude = 9.6.
-//   Плоты: Mean, Upper Zone Upper Line, Upper Zone Lower Line,
-//          Lower Zone Upper Line, Lower Zone Lower Line + две заливки.
+// Из настроек точно известно: источник (МАКС+МИН+ЗАКР)/3 = hlc3, Lookback 200,
+// Inner Multiplier 5.6, Outer Amplitude 9.6, и пять линий: Mean + по две границы
+// у верхней и нижней зоны. Пять чисел в строке статуса — это они.
 //
-// Пять чисел в строке статуса — это ровно эти пять линий. Сигнальных плотов в
-// этом индикаторе нет вообще.
-//
-// КЛЮЧЕВОЕ: четыре линии зон дают отклонение ОДНОЗНАЧНО, без догадок о том,
-// какой множитель виден на скрине. Арифметика на живых замерах показала, что полосы
-// симметричны НЕ по разности (mean ± k*d), а по отношению:
-//     верх = mean * exp(+k*s),  низ = mean * exp(-k*s)
-// где s — ОТНОСИТЕЛЬНАЯ (безразмерная) мера разброса. Это объясняет асимметрию
-// 5.83% на 4h из прошлого прогона: в лог-шкале она ровно нуль.
-//
-// Скрипт ничего из этого не принимает на веру: раздел 1 выводит четыре НЕЗАВИСИМЫХ
-// оценки s из каждого замера и их разброс. Если модель неверна, разброс будет большим.
+// Модель: верх = mean*exp(+k*s), низ = mean*exp(-k*s), s безразмерное.
+// Четыре границы дают четыре независимые оценки s из одного замера, поэтому
+// множитель больше не является догадкой. Раздел 1 печатает эти оценки и их
+// разброс — если модель неверна, разброс будет большим.
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 
@@ -26,14 +16,14 @@ const OUT = process.env.OUT_DIR ?? 'ci-results'
 const K_IN = 5.6
 const K_OUT = 9.6
 
-/** Зафиксировано ДО прогона. */
+/** Зафиксировано в коде ДО прогона. */
 const RULE: string[] = [
-	'1. Подбор идёт ТОЛЬКО на якорях 20.07 (split=fit). Замеры 28.07 (split=test) в подборе НЕ участвуют.',
+	'1. Подбор идёт ТОЛЬКО на якорях 20.07 (fit). Замеры 28.07 (test) в подборе не участвуют.',
 	'2. Критерий — минимум МАКСИМАЛЬНОЙ абсолютной ошибки по якорям fit, а не средней.',
-	'3. Пороги приёмки: средняя линия — max|err| <= 0.2%; отклонение — max|err| <= 3% на fit И <= 3% на test.',
-	'4. Параметры из окна настроек считаются истиной: источник hlc3, период 200, множители 5.6 и 9.6.',
-	'   Полный перебор периодов всё равно делается — как проверка, что 200 и есть оптимум, а не совпадение.',
-	'5. При разнице в пределах 0.5% предпочитается канонический вариант: период 200 и простейшая мера.',
+	'3. Пороги приёмки: средняя линия max|err| <= 0.2%; отклонение max|err| <= 3% на fit И <= 3% на test.',
+	'4. Параметры из окна настроек считаются истиной: hlc3, период 200, множители 5.6 и 9.6.',
+	'   Полный перебор периодов делается как проверка, что 200 и есть оптимум, а не совпадение.',
+	'5. При разнице в пределах 0.5% предпочитается период 200 и более простая мера.',
 	'6. Граница train/test 01.01.2025 здесь не применяется: это обратная разработка формулы. Роль test играют замеры с другой даты.',
 ]
 
@@ -60,17 +50,15 @@ type Anchor = {
 	tMs: number
 	split: 'fit' | 'test'
 	lines: Lines
-	ohlc?: [number, number, number, number]
+	ohlc: [number, number, number, number]
 }
 
-// Все значения — со строки статуса вендора при наведении на бар (то есть положение
-// линий ИМЕННО на этом баре, а не на текущем). Время — открытие бара в UTC.
-// Скрины подписаны в часовом поясе пользователя UTC+5, поэтому 21:00 местных = 16:00 UTC.
+// Значения сняты со строки статуса при наведении на бар, то есть это положение
+// линий ИМЕННО на этом баре. Время — открытие бара в UTC; скрины подписаны в
+// часовом поясе пользователя UTC+5, поэтому 21:00 местных = 16:00 UTC.
 const ANCHORS: Anchor[] = [
-	// --- fit: 20.07.2026 12:00 UTC (17:00 местных), старые скрины.
-	// Видна была только одна пара линий; лог-симметрия опознала её как внутреннюю (5.6).
 	{
-		id: '5m@20.07 12:00',
+		id: '5m@20.07-12',
 		tf: '5m',
 		tMs: Date.UTC(2026, 6, 20, 12, 0),
 		split: 'fit',
@@ -78,7 +66,7 @@ const ANCHORS: Anchor[] = [
 		ohlc: [65002.0, 65002.83, 64716.57, 64803.99],
 	},
 	{
-		id: '15m@20.07 12:00',
+		id: '15m@20.07-12',
 		tf: '15m',
 		tMs: Date.UTC(2026, 6, 20, 12, 0),
 		split: 'fit',
@@ -86,7 +74,7 @@ const ANCHORS: Anchor[] = [
 		ohlc: [65002.0, 65002.83, 64716.57, 64750.0],
 	},
 	{
-		id: '1h@20.07 12:00',
+		id: '1h@20.07-12',
 		tf: '1h',
 		tMs: Date.UTC(2026, 6, 20, 12, 0),
 		split: 'fit',
@@ -94,16 +82,15 @@ const ANCHORS: Anchor[] = [
 		ohlc: [65002.0, 65002.83, 64599.89, 64640.0],
 	},
 	{
-		id: '4h@20.07 12:00',
+		id: '4h@20.07-12',
 		tf: '4h',
 		tMs: Date.UTC(2026, 6, 20, 12, 0),
 		split: 'fit',
 		lines: { mean: 63533.87, inUp: 67351.71, inDn: 59932.45 },
 		ohlc: [65002.0, 65666.8, 64077.76, 65598.75],
 	},
-	// --- test: 28.07.2026, новые скрины, все пять линий.
 	{
-		id: '5m@28.07 08:00',
+		id: '5m@28.07-08',
 		tf: '5m',
 		tMs: Date.UTC(2026, 6, 28, 8, 0),
 		split: 'test',
@@ -111,7 +98,7 @@ const ANCHORS: Anchor[] = [
 		ohlc: [63506.0, 63530.87, 63468.35, 63525.62],
 	},
 	{
-		id: '4h@28.07 08:00',
+		id: '4h@28.07-08',
 		tf: '4h',
 		tMs: Date.UTC(2026, 6, 28, 8, 0),
 		split: 'test',
@@ -119,7 +106,7 @@ const ANCHORS: Anchor[] = [
 		ohlc: [63506.0, 63593.0, 63294.0, 63450.0],
 	},
 	{
-		id: '5m@28.07 16:00',
+		id: '5m@28.07-16',
 		tf: '5m',
 		tMs: Date.UTC(2026, 6, 28, 16, 0),
 		split: 'test',
@@ -127,7 +114,7 @@ const ANCHORS: Anchor[] = [
 		ohlc: [63928.46, 63936.0, 63886.0, 63886.01],
 	},
 	{
-		id: '4h@28.07 16:00',
+		id: '4h@28.07-16',
 		tf: '4h',
 		tMs: Date.UTC(2026, 6, 28, 16, 0),
 		split: 'test',
@@ -136,7 +123,6 @@ const ANCHORS: Anchor[] = [
 	},
 ]
 
-// ------------------------------------------------------------------ загрузка
 const BASE = 'https://data.binance.vision/data/spot'
 const MONTHS: string[] = []
 for (const m of [9, 10, 11, 12]) MONTHS.push(`2025-${String(m).padStart(2, '0')}`)
@@ -192,9 +178,14 @@ async function load(tf: Tf): Promise<Cndl[]> {
 	return uniq
 }
 
-// -------------------------------------------------------------------- меры
 const srcAt = (c: Cndl, k: SrcKind): number =>
-	k === 'hlc3' ? (c.h + c.l + c.c) / 3 : k === 'close' ? c.c : k === 'hl2' ? (c.h + c.l) / 2 : (c.o + c.h + c.l + c.c) / 4
+	k === 'hlc3'
+		? (c.h + c.l + c.c) / 3
+		: k === 'close'
+			? c.c
+			: k === 'hl2'
+				? (c.h + c.l) / 2
+				: (c.o + c.h + c.l + c.c) / 4
 
 function meanAt(x: number[], i: number, n: number, kind: MeanKind): number {
 	if (i + 1 < n) return NaN
@@ -219,6 +210,12 @@ function meanAt(x: number[], i: number, n: number, kind: MeanKind): number {
 	return v
 }
 
+function winMean(x: number[], i: number, n: number): number {
+	let s = 0
+	for (let k = 0; k < n; k++) s += x[i - k]!
+	return s / n
+}
+
 function winStdev(x: number[], i: number, n: number): number {
 	let s = 0
 	let q = 0
@@ -232,9 +229,7 @@ function winStdev(x: number[], i: number, n: number): number {
 }
 
 function winMad(x: number[], i: number, n: number): number {
-	let s = 0
-	for (let k = 0; k < n; k++) s += x[i - k]!
-	const m = s / n
+	const m = winMean(x, i, n)
 	let d = 0
 	for (let k = 0; k < n; k++) d += Math.abs(x[i - k]! - m)
 	return d / n
@@ -244,12 +239,6 @@ function winRms(x: number[], i: number, n: number): number {
 	let q = 0
 	for (let k = 0; k < n; k++) q += x[i - k]! * x[i - k]!
 	return Math.sqrt(q / n)
-}
-
-function winMean(x: number[], i: number, n: number): number {
-	let s = 0
-	for (let k = 0; k < n; k++) s += x[i - k]!
-	return s / n
 }
 
 type Series = {
@@ -262,10 +251,10 @@ type Series = {
 	hl: number[]
 }
 
-/** Значение относительной меры разброса на баре i, окно n. Безразмерная. */
+/** Безразмерная мера разброса на баре i, окно n. */
 function sigAt(s: Series, i: number, n: number, kind: SigKind): number {
 	if (i + 1 < n || i < 1) return NaN
-	const px = srcAt(s.candles[i]!, 'hlc3')
+	const px = s.src.hlc3[i]!
 	switch (kind) {
 		case 'stdevLogRet':
 			return winStdev(s.logRet, i, n)
@@ -317,23 +306,33 @@ const f2 = (x: number): string => (Number.isFinite(x) ? x.toFixed(2) : 'н/д')
 const f3 = (x: number): string => (Number.isFinite(x) ? x.toFixed(3) : 'н/д')
 const f6 = (x: number): string => (Number.isFinite(x) ? x.toFixed(6) : 'н/д')
 
-/** Четыре независимые оценки s из линий замера. Разброс = проверка модели. */
-function sigmaFromLines(l: Lines): { parts: Array<{ tag: string; s: number }>; s: number; spreadPct: number } {
-	const parts: Array<{ tag: string; s: number }> = []
-	if (l.inUp !== undefined) parts.push({ tag: 'внутр.верх', s: Math.log(l.inUp / l.mean) / K_IN })
-	if (l.inDn !== undefined) parts.push({ tag: 'внутр.низ', s: Math.log(l.mean / l.inDn) / K_IN })
-	if (l.outUp !== undefined) parts.push({ tag: 'внешн.верх', s: Math.log(l.outUp / l.mean) / K_OUT })
-	if (l.outDn !== undefined) parts.push({ tag: 'внешн.низ', s: Math.log(l.mean / l.outDn) / K_OUT })
-	const vals = parts.map((p) => p.s)
-	const s = vals.reduce((a, b) => a + b, 0) / (vals.length || 1)
+function sigmaFromLines(l: Lines): { tags: Map<string, number>; s: number; spreadPct: number } {
+	const tags = new Map<string, number>()
+	if (l.inUp !== undefined) tags.set('вн.верх', Math.log(l.inUp / l.mean) / K_IN)
+	if (l.inDn !== undefined) tags.set('вн.низ', Math.log(l.mean / l.inDn) / K_IN)
+	if (l.outUp !== undefined) tags.set('внеш.верх', Math.log(l.outUp / l.mean) / K_OUT)
+	if (l.outDn !== undefined) tags.set('внеш.низ', Math.log(l.mean / l.outDn) / K_OUT)
+	const vals = [...tags.values()]
+	const s = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : NaN
 	const spreadPct = vals.length > 1 ? ((Math.max(...vals) - Math.min(...vals)) / s) * 100 : 0
-	return { parts, s, spreadPct }
+	return { tags, s, spreadPct }
+}
+
+function devFromLines(l: Lines): { tags: Map<string, number>; spreadPct: number } {
+	const tags = new Map<string, number>()
+	if (l.inUp !== undefined) tags.set('вн.верх', (l.inUp - l.mean) / K_IN)
+	if (l.inDn !== undefined) tags.set('вн.низ', (l.mean - l.inDn) / K_IN)
+	if (l.outUp !== undefined) tags.set('внеш.верх', (l.outUp - l.mean) / K_OUT)
+	if (l.outDn !== undefined) tags.set('внеш.низ', (l.mean - l.outDn) / K_OUT)
+	const vals = [...tags.values()]
+	const m = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : NaN
+	const spreadPct = vals.length > 1 ? ((Math.max(...vals) - Math.min(...vals)) / m) * 100 : 0
+	return { tags, spreadPct }
 }
 
 async function main(): Promise<void> {
 	mkdirSync(CACHE, { recursive: true })
 	mkdirSync(OUT, { recursive: true })
-
 	const rep: string[] = []
 	const push = (s = ''): void => {
 		rep.push(s)
@@ -343,67 +342,46 @@ async function main(): Promise<void> {
 	push()
 	push(`- прогон ${process.env.GITHUB_RUN_ID ?? 'local'}, коммит ${process.env.GITHUB_SHA ?? 'local'}, ${new Date().toISOString()}`)
 	push('- из настроек: источник hlc3, Lookback 200, Inner 5.6, Outer 9.6')
-	push('- модель: верх = mean*exp(+k*s), низ = mean*exp(-k*s), s безразмерное')
+	push('- модель: верх = mean*exp(+k*s), низ = mean*exp(-k*s)')
 	push()
 	push('## Правило отбора (зафиксировано в коде до прогона)')
 	push()
 	for (const r of RULE) push(r)
 	push()
 
-	// ------------------------------------------- 1. проверка лог-симметрии
-	push('## 1. Проверка модели: четыре независимые оценки s из одного замера')
+	const TAGS = ['вн.верх', 'вн.низ', 'внеш.верх', 'внеш.низ']
+	push('## 1. Проверка модели: независимые оценки из линий одного замера')
 	push()
-	push('Если модель верна, все оценки одного замера совпадут. Разброс — мера ошибки модели.')
+	push('Логарифмическая модель, оценки s:')
 	push()
-	push('| замер | split | внутр.верх | внутр.низ | внешн.верх | внешн.низ | s итог | разброс % |')
-	push('| --- | --- | --- | --- | --- | --- | --- | --- |')
+	push(`| замер | split | ${TAGS.join(' | ')} | s итог | разброс % |`)
+	push(`| ${Array.from({ length: 7 }, () => '---').join(' | ')} |`)
 	const sigma = new Map<string, number>()
 	for (const a of ANCHORS) {
-		const { parts, s, spreadPct } = sigmaFromLines(a.lines)
-		if (parts.length === 0) {
+		const { tags, s, spreadPct } = sigmaFromLines(a.lines)
+		if (tags.size === 0) {
 			push(`| ${a.id} | ${a.split} | — | — | — | — | только средняя | — |`)
 			continue
 		}
 		sigma.set(a.id, s)
-		const get = (tag: string): string => {
-			const p = parts.find((x) => x.tag === tag)
-			return p ? f6(p.s) : '—'
-		}
-		push(
-			`| ${a.id} | ${a.split} | ${get('внутр.верх')} | ${get('внутр.низ')} | ${get('внешн.верх')} | ` +
-				`${get('внешн.низ')} | ${f6(s)} | ${f3(spreadPct)} |`,
-		)
+		const cells = TAGS.map((t) => (tags.has(t) ? f6(tags.get(t)!) : '—'))
+		push(`| ${a.id} | ${a.split} | ${cells.join(' | ')} | ${f6(s)} | ${f3(spreadPct)} |`)
 	}
 	push()
-	push('Для сравнения: та же проверка в РАЗНОСТНОЙ модели (mean ± k*d), где d в цене:')
+	push('Разностная модель (mean ± k*d), d в цене — для сравнения:')
 	push()
-	push('| замер | d внутр.верх | d внутр.низ | d внешн.верх | d внешн.низ | разброс % |')
-	push('| --- | --- | --- | --- | --- | --- |')
+	push(`| замер | ${TAGS.join(' | ')} | разброс % |`)
+	push(`| ${Array.from({ length: 6 }, () => '---').join(' | ')} |`)
 	for (const a of ANCHORS) {
-		const l = a.lines
-		const ds: number[] = []
-		const cell: string[] = []
-		for (const [v, k] of [
-			[l.inUp, K_IN],
-			[l.inDn, K_IN],
-			[l.outUp, K_OUT],
-			[l.outDn, K_OUT],
-		] as Array<[number | undefined, number]>) {
-			if (v === undefined) {
-				cell.push('—')
-				continue
-			}
-			const d = Math.abs(v - l.mean) / k
-			ds.push(d)
-			cell.push(f2(d))
-		}
-		if (ds.length === 0) continue
-		const spread = ((Math.max(...ds) - Math.min(...ds)) / (ds.reduce((x, y) => x + y, 0) / ds.length)) * 100
-		push(`| ${a.id} | ${cell.join(' | ')} | ${f3(spread)} |`)
+		const { tags, spreadPct } = devFromLines(a.lines)
+		if (tags.size === 0) continue
+		const cells = TAGS.map((t) => (tags.has(t) ? f2(tags.get(t)!) : '—'))
+		push(`| ${a.id} | ${cells.join(' | ')} | ${f3(spreadPct)} |`)
 	}
+	push()
+	push('Какая модель верна — видно по колонке разброса: у верной он близок к нулю.')
 	push()
 
-	// ---------------------------------------------------- загрузка и сверка
 	const series = new Map<Tf, Series>()
 	for (const tf of TFS) {
 		const candles = await load(tf)
@@ -413,18 +391,24 @@ async function main(): Promise<void> {
 			hl2: candles.map((x) => srcAt(x, 'hl2')),
 			ohlc4: candles.map((x) => srcAt(x, 'ohlc4')),
 		} satisfies Record<SrcKind, number[]>
-		const logRet = candles.map((c, i) => (i === 0 ? 0 : Math.log(c.c / candles[i - 1]!.c)))
-		const logSrc = src.hlc3.map((v) => Math.log(v))
-		const tr = candles.map((x, i) =>
-			i === 0 ? x.h - x.l : Math.max(x.h - x.l, Math.abs(x.h - candles[i - 1]!.c), Math.abs(x.l - candles[i - 1]!.c)),
-		)
-		const hl = candles.map((x) => x.h - x.l)
-		series.set(tf, { tf, candles, src, logRet, logSrc, tr, hl })
+		series.set(tf, {
+			tf,
+			candles,
+			src,
+			logRet: candles.map((c, i) => (i === 0 ? 0 : Math.log(c.c / candles[i - 1]!.c))),
+			logSrc: src.hlc3.map((v) => Math.log(v)),
+			tr: candles.map((x, i) =>
+				i === 0
+					? x.h - x.l
+					: Math.max(x.h - x.l, Math.abs(x.h - candles[i - 1]!.c), Math.abs(x.l - candles[i - 1]!.c)),
+			),
+			hl: candles.map((x) => x.h - x.l),
+		})
 		console.log(`${tf}: ${candles.length} баров`)
 	}
 
 	const idx = new Map<string, number>()
-	push('## 2. Сверка баров со скринами (проверка источника данных)')
+	push('## 2. Сверка баров с архивом (проверка источника данных)')
 	push()
 	push('| замер | индекс | O | H | L | C | совпало |')
 	push('| --- | --- | --- | --- | --- | --- | --- |')
@@ -432,24 +416,21 @@ async function main(): Promise<void> {
 		const s = series.get(a.tf)!
 		const i = s.candles.findIndex((c) => c.t === a.tMs)
 		if (i < 0) {
-			push(`| ${a.id} | бар НЕ НАЙДЕН | | | | | НЕТ |`)
+			push(`| ${a.id} | БАР НЕ НАЙДЕН | | | | | НЕТ |`)
 			continue
 		}
 		idx.set(a.id, i)
 		const c = s.candles[i]!
-		const o = a.ohlc
 		const ok =
-			o === undefined
-				? false
-				: Math.abs(c.o - o[0]) < 0.011 &&
-					Math.abs(c.h - o[1]) < 0.011 &&
-					Math.abs(c.l - o[2]) < 0.011 &&
-					Math.abs(c.c - o[3]) < 0.011
+			Math.abs(c.o - a.ohlc[0]) < 0.011 &&
+			Math.abs(c.h - a.ohlc[1]) < 0.011 &&
+			Math.abs(c.l - a.ohlc[2]) < 0.011 &&
+			Math.abs(c.c - a.ohlc[3]) < 0.011
 		push(`| ${a.id} | ${i} | ${f2(c.o)} | ${f2(c.h)} | ${f2(c.l)} | ${f2(c.c)} | ${ok ? 'да' : 'НЕТ'} |`)
 	}
 	push()
 
-	// ------------------------------------------------------ 3. средняя линия
+	const ids = ANCHORS.filter((a) => idx.has(a.id)).map((a) => a.id)
 	type MC = { src: SrcKind; kind: MeanKind; n: number; fitMax: number; testMax: number; errs: Map<string, number> }
 	const mcs: MC[] = []
 	for (const sk of SRCS)
@@ -476,43 +457,36 @@ async function main(): Promise<void> {
 			}
 	mcs.sort((x, y) => x.fitMax - y.fitMax)
 
-	const anchorIds = ANCHORS.map((a) => a.id)
-	const headRow = `| # | источник | тип | период | fit max % | test max % | ${anchorIds.join(' | ')} |`
-	const sepRow = `| ${Array.from({ length: 6 + anchorIds.length }, () => '---').join(' | ')} |`
+	const mHead = `| # | источник | тип | период | fit max % | test max % | ${ids.join(' | ')} |`
+	const mSep = `| ${Array.from({ length: 6 + ids.length }, () => '---').join(' | ')} |`
+	const mRow = (c: MC, k: number): string =>
+		`| ${k + 1} | ${c.src} | ${c.kind} | ${c.n} | ${f3(c.fitMax)} | ${f3(c.testMax)} | ` +
+		`${ids.map((id) => f3(c.errs.get(id) ?? NaN)).join(' | ')} |`
 
 	push('## 3. Средняя линия: подбор на fit, проверка на test')
 	push()
-	push(headRow)
-	push(sepRow)
-	mcs.slice(0, 15).forEach((c, k) => {
-		const cells = anchorIds.map((id) => f3(c.errs.get(id) ?? NaN))
-		push(`| ${k + 1} | ${c.src} | ${c.kind} | ${c.n} | ${f3(c.fitMax)} | ${f3(c.testMax)} | ${cells.join(' | ')} |`)
-	})
+	push(mHead)
+	push(mSep)
+	mcs.slice(0, 15).forEach((c, k) => push(mRow(c, k)))
 	push()
-	push('### 3.1. Только период 200 и источник hlc3 — то есть ровно настройки вендора')
+	push('### 3.1. Ровно настройки вендора: hlc3, период 200')
 	push()
-	push(headRow)
-	push(sepRow)
-	mcs
-		.filter((c) => c.n === 200 && c.src === 'hlc3')
-		.forEach((c, k) => {
-			const cells = anchorIds.map((id) => f3(c.errs.get(id) ?? NaN))
-			push(`| ${k + 1} | ${c.src} | ${c.kind} | ${c.n} | ${f3(c.fitMax)} | ${f3(c.testMax)} | ${cells.join(' | ')} |`)
-		})
+	push(mHead)
+	push(mSep)
+	mcs.filter((c) => c.n === 200 && c.src === 'hlc3').forEach((c, k) => push(mRow(c, k)))
 	push()
-	push('### 3.2. Лучший период для каждого типа средней на hlc3 (проверка, что 200 — оптимум)')
+	push('### 3.2. Лучший период каждого типа на hlc3 — проверка, что 200 это оптимум')
 	push()
-	push('| тип | лучший период по fit | fit max % | там же test max % |')
+	push('| тип | лучший период | fit max % | test max % |')
 	push('| --- | --- | --- | --- |')
 	for (const mk of MEAN_KINDS) {
-		const best = mcs.filter((c) => c.kind === mk && c.src === 'hlc3')[0]
-		if (best) push(`| ${mk} | ${best.n} | ${f3(best.fitMax)} | ${f3(best.testMax)} |`)
+		const b = mcs.find((c) => c.kind === mk && c.src === 'hlc3')
+		if (b) push(`| ${mk} | ${b.n} | ${f3(b.fitMax)} | ${f3(b.testMax)} |`)
 	}
 	push()
 
-	// ------------------------------------------------------- 4. отклонение
 	const sigAnchors = ANCHORS.filter((a) => sigma.has(a.id) && idx.has(a.id))
-	const sigIds = sigAnchors.map((a) => a.id)
+	const sIds = sigAnchors.map((a) => a.id)
 	type SC = { kind: SigKind; n: number; fitMax: number; testMax: number; errs: Map<string, number> }
 	const scs: SC[] = []
 	for (const sg of SIG_KINDS)
@@ -536,9 +510,69 @@ async function main(): Promise<void> {
 		}
 	scs.sort((x, y) => x.fitMax - y.fitMax)
 
-	const sHead = `| # | мера | период | fit max % | test max % | ${sigIds.join(' | ')} |`
-	const sSep = `| ${Array.from({ length: 5 + sigIds.length }, () => '---').join(' | ')} |`
+	const sHead = `| # | мера | период | fit max % | test max % | ${sIds.join(' | ')} |`
+	const sSep = `| ${Array.from({ length: 5 + sIds.length }, () => '---').join(' | ')} |`
+	const sRow = (c: SC, k: number): string =>
+		`| ${k + 1} | ${c.kind} | ${c.n} | ${f3(c.fitMax)} | ${f3(c.testMax)} | ` +
+		`${sIds.map((id) => f3(c.errs.get(id) ?? NaN)).join(' | ')} |`
 
 	push('## 4. Отклонение s: подбор на fit, проверка на test')
 	push()
-	push('Целевые s взяты из раздела 1, то есть из сам
+	push('Целевые s — из раздела 1, то есть выведены из самих линий. Все меры безразмерные.')
+	push()
+	push('| замер | целевое s | s в процентах цены |')
+	push('| --- | --- | --- |')
+	for (const a of sigAnchors) push(`| ${a.id} | ${f6(sigma.get(a.id)!)} | ${f3(sigma.get(a.id)! * 100)} |`)
+	push()
+	push(sHead)
+	push(sSep)
+	scs.slice(0, 20).forEach((c, k) => push(sRow(c, k)))
+	push()
+	push('### 4.1. Ровно период 200 из настроек')
+	push()
+	push(sHead)
+	push(sSep)
+	scs.filter((c) => c.n === 200).forEach((c, k) => push(sRow(c, k)))
+	push()
+	push('### 4.2. Лучший период каждой меры — проверка, что 200 это оптимум')
+	push()
+	push('| мера | лучший период | fit max % | test max % |')
+	push('| --- | --- | --- | --- |')
+	for (const sg of SIG_KINDS) {
+		const b = scs.find((c) => c.kind === sg)
+		if (b) push(`| ${sg} | ${b.n} | ${f3(b.fitMax)} | ${f3(b.testMax)} |`)
+	}
+	push()
+	push('## 5. Вердикт по правилу отбора')
+	push()
+	const bestMean = mcs.find((c) => c.src === 'hlc3' && c.n === 200)
+	const bestMeanAny = mcs[0]
+	const bestSig200 = scs.filter((c) => c.n === 200)[0]
+	const bestSigAny = scs[0]
+	const verdict = (label: string, fit: number, test: number, lim: number): string =>
+		`- ${label}: fit ${f3(fit)}%, test ${f3(test)}%, порог ${lim}% — ${fit <= lim && test <= lim ? 'ПРИНЯТО' : 'НЕ ПРИНЯТО'}`
+	if (bestMean) push(verdict(`средняя hlc3/${bestMean.kind}/200`, bestMean.fitMax, bestMean.testMax, 0.2))
+	if (bestMeanAny)
+		push(verdict(`средняя лучшая ${bestMeanAny.src}/${bestMeanAny.kind}/${bestMeanAny.n}`, bestMeanAny.fitMax, bestMeanAny.testMax, 0.2))
+	if (bestSig200) push(verdict(`отклонение ${bestSig200.kind}/200`, bestSig200.fitMax, bestSig200.testMax, 3))
+	if (bestSigAny)
+		push(verdict(`отклонение лучшее ${bestSigAny.kind}/${bestSigAny.n}`, bestSigAny.fitMax, bestSigAny.testMax, 3))
+	push()
+
+	writeFileSync(`${OUT}/apex-anchors2.md`, rep.join('\n'))
+	writeFileSync(
+		`${OUT}/apex-anchors2.json`,
+		JSON.stringify(
+			{
+				sigma: [...sigma.entries()],
+				meanTop: mcs.slice(0, 30).map((c) => ({ ...c, errs: [...c.errs.entries()] })),
+				sigTop: scs.slice(0, 30).map((c) => ({ ...c, errs: [...c.errs.entries()] })),
+			},
+			null,
+			1,
+		),
+	)
+	console.log(`готово: ${OUT}/apex-anchors2.md`)
+}
+
+await main()
