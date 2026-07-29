@@ -1,1 +1,5 @@
-{"task":"research","needsPlaywright":false,"script":"ci/research/apexCrossCheck.ts","runnerVersion":"v1"}
+{
+  "task": "gate",
+  "needsPlaywright": false,
+  "runnerVersion": "v1"
+}
