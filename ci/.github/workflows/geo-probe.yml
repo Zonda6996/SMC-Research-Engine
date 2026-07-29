@@ -1,0 +1,44 @@
+# INSTALL: copy this file to .github/workflows/geo-probe.yml and commit.
+# It could not be committed there directly because the Notion AI GitHub
+# connection has no "workflow" write scope.
+#
+# After installing, re-run it any time from the Actions tab (workflow_dispatch),
+# or by pushing a change to ci/geo-probe.sh.
+# It writes ci-results/geo-probe.md back into this branch.
+
+name: geo-probe
+
+on:
+  push:
+    branches: [ci-research-v1]
+    paths:
+      - 'ci/geo-probe.sh'
+      - '.github/workflows/geo-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Run probe
+        run: bash ci/geo-probe.sh
+
+      - name: Commit probe results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f ci-results/geo-probe.md
+          git commit -m "ci: geo-probe results [skip ci]" || echo "nothing to commit"
+          git pull --rebase --autostash origin ci-research-v1 || true
+          git push origin HEAD:ci-research-v1
