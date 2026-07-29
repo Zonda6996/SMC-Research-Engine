@@ -129,8 +129,9 @@
 							<select class="input" id="confStatus"><option value="all">Все попытки</option><option value="entered">Entered</option><option value="rejected">Rejected</option></select>
 							<select class="input" id="confOutcome"><option value="all">Любой исход</option><option value="tp">TP2</option><option value="stop">Stop</option><option value="open">Open</option></select>
 							<select class="input" id="confReason"><option value="all">Все причины</option></select>
-							<select class="input" id="confEngine" title="Уточнённое подтверждение (пересвип + защита) или УПРОЩЁННОЕ с пресетом v0.4: касание зоны → первая направленная свеча, частичка 0.40R (25%) → безубыток → фулл 12R, вход дальше 1 ATR от края зоны не берётся, входы с недавним сигналом полос GGI отбрасываются (§16.29)"><option value="refined" selected>Уточнённое</option><option value="simplified">Упрощённое v0.4</option></select>
-							<label class="check" id="ggiChkWrap" title="§16.28: полосы перекупленности/перепроданности по фактическим параметрам индикатора (hlc3, окно 200, внутренний край 5.6·ATR, внешний 9.6·ATR) и его сигналы на ТФ подтверждения. Сигнал = касание внутреннего края, повтор только после возврата к средней"><input type="checkbox" id="ggiChk" checked /> полосы GGI</label>
+							<select class="input" id="confEngine" title="Уточнённое подтверждение (пересвип + защита) или УПРОЩЁННОЕ с пресетом v0.4: касание зоны → первая направленная свеча, частичка 0.40R (25%) → безубыток → фулл 12R, вход дальше 1 ATR от края зоны не берётся, входы с недавним сигналом полос Apex отбрасываются (§16.29)"><option value="refined" selected>Уточнённое</option><option value="simplified">Упрощённое v0.4</option></select>
+							<label class="check" id="apexChkWrap" title="Полосы перекупленности/перепроданности: ALMA(hlc3, 200), внутренние и внешние края"><input type="checkbox" id="apexChk" checked /> Zonda Apex</label>
+							<label class="check" id="reversalChkWrap" title="Отдельный слой сигналов: BUY только на бычьей свече, SELL только на медвежьей"><input type="checkbox" id="reversalChk" checked /> Zonda Reversal</label>
 						</div>
 						<div class="status" id="confStatusText">—</div>
 						<div class="btn-row">

@@ -58,7 +58,7 @@ function currentConfirmation() {
 }
 
 /**
- * §16.28–16.30: полосы GGI и сигналы вендора на ТФ подтверждения.
+ * §16.28–16.30: полосы Apex и сигналы вендора на ТФ подтверждения.
  * Пунктирные линии — ВНУТРЕННИЕ края зон (mean ∓ 5.6·dev), сплошная синяя — средняя.
  * Метки BUY/SELL ставятся по КАНОНУ ВЕНДОРА: касание ВНЕШНЕГО края (mean ∓ 9.6·dev) —
  * редкое событие у самого экстремума; у пользователя внешние линии в «Стиле» отключены,
@@ -66,24 +66,30 @@ function currentConfirmation() {
  * ВНИМАНИЕ: в НАШЕЙ системе близость к зоне экстремума — признак ХУДШЕГО входа (§16.29),
  * поэтому метка рядом со входом это предупреждение, а не подтверждение.
  */
-function drawGgi(src, from, to) {
-	if (!$('ggiChk')?.checked) return
-	const g = S.data?.ggi
+function drawApexReversal(src, from, to) {
+	const showApex = Boolean($('apexChk')?.checked)
+	const showReversal = Boolean($('reversalChk')?.checked)
+	if (!showApex && !showReversal) return
+	const g = S.data?.apex
 	if (!g?.bands?.length) return
 	const inRange = (t) => t >= from && t <= to
 	const pick = (key) => g.bands.filter((b) => b && inRange(time(b.t))).map((b) => ({ time: time(b.t), value: b[key] }))
 	const mean = pick('mean')
 	if (mean.length < 2) return
-	line(mean, { color: '#6f8cff', lineWidth: 2 })
-	line(pick('redLo'), { color: '#e2607a', lineWidth: 1, lineStyle: lineStyle().Dotted })
-	line(pick('greenHi'), { color: '#3fb98a', lineWidth: 1, lineStyle: lineStyle().Dotted })
-	const sig = (g.signals || []).filter((x) => inRange(time(x.at)))
+	if (showApex) {
+		line(mean, { color: '#6f8cff', lineWidth: 2 })
+		line(pick('redLo'), { color: '#e2607a', lineWidth: 1, lineStyle: lineStyle().Dotted })
+		line(pick('redHi'), { color: '#e2607a', lineWidth: 1 })
+		line(pick('greenHi'), { color: '#3fb98a', lineWidth: 1, lineStyle: lineStyle().Dotted })
+		line(pick('greenLo'), { color: '#3fb98a', lineWidth: 1 })
+	}
+	const sig = showReversal ? (S.data?.reversal?.signals || []).filter((x) => inRange(time(x.at))) : []
 	if (sig.length) {
 		const s0 = line(sig.map((x) => ({ time: time(x.at), value: x.edge })), { color: 'rgba(0,0,0,0)', lineWidth: 1 })
 		seriesMarkers(s0, sig.map((x) => ({
 			time: time(x.at), position: x.direction === 'long' ? 'belowBar' : 'aboveBar',
 			color: '#c9a227', shape: 'circle', size: 1,
-			text: x.direction === 'long' ? 'GGI BUY' : 'GGI SELL',
+			text: x.direction === 'long' ? 'BUY' : 'SELL',
 		})).sort((a, b) => a.time - b.time))
 	}
 }
@@ -132,7 +138,7 @@ function renderSimplified() {
 		const s1 = line([{ time: time(e.entryAt), value: e.entry }], { color: 'rgba(0,0,0,0)' })
 		seriesMarkers(s1, [{ time: time(e.entryAt), position: 'aboveBar', color: C.green, shape: 'circle', size: 0, text: `ФУЛЛ ${fmtP(e.fullPrice)} — за экраном, ${(fullAwayPct * 100).toFixed(0)}% хода` }])
 	}
-	drawGgi(src, from, to)
+	drawApexReversal(src, from, to)
 	const RU = { PARTIAL: 'частичка взята, стоп в безубыток', BE: 'выбило в безубыток', FULL: 'полный тейк', STOP: 'стоп' }
 	setMarkers((e.events || []).map((x) => ({
 		time: time(x.at), position: x.state === 'STOP' ? 'belowBar' : 'aboveBar',
@@ -149,7 +155,7 @@ function renderSimplified() {
 		<div class="kv"><span>Частичка 25%</span><b class="mono">${fmtP(e.partialPrice)} · 0.40R · +${(Math.abs(e.partialPrice - e.entry) / e.entry * 100).toFixed(2)}% цены</b></div>
 		<div class="kv"><span>Фулл</span><b class="mono">${fmtP(e.fullPrice)} · 12R · +${(Math.abs(e.fullPrice - e.entry) / e.entry * 100).toFixed(2)}% цены</b></div>
 		<div class="kv"><span>Попытка зоны</span><b>${e.idx + 1}</b></div>
-		<div class="kv"><span>Полосы GGI</span><b>метки BUY/SELL — касание ВНЕШНЕГО края (канон вендора). В пресете v0.4 вето работает по ЗАХОДУ в зону (внутренний край), окно 200 баров: такие входы отброшены как «цена растянута»</b></div>
+		<div class="kv"><span>Zonda Apex</span><b>Zonda Reversal: BUY/SELL — касание ВНЕШНЕГО края (канон вендора). В пресете v0.4 вето работает по ЗАХОДУ в зону (внутренний край), окно 200 баров: такие входы отброшены как «цена растянута»</b></div>
 		<div class="trace">${(e.events || []).map((x) => `<div class="trace-row"><b>${esc(x.state)}</b><span class="muted">${RU[x.state] || ''}</span><span class="mono">${dt(x.at)} · ${fmtP(x.price)}</span></div>`).join('') || '<div class="trace-row muted">событий нет — стоп без частички</div>'}</div>`
 	setVisibleRange(e.entryAt - 24 * 3600000, lastAt + 24 * 3600000)
 }
@@ -204,7 +210,7 @@ export function renderConfirmation() {
 		color: colors[x.state] || C.dim, shape: x.state === 'ENTRY' ? 'arrowUp' : 'circle', size: 1, text: x.state,
 	})).filter((x) => src.some((s0) => time(s0.timestamp) === x.time))
 	setMarkers(marks.sort((a, b) => a.time - b.time))
-	drawGgi(src, from, to)
+	drawApexReversal(src, from, to)
 	// Полосы heatmap на 15m-свечи не рисуем (см. renderHeatmap): шкалы времени 4h и 15m несовместимы.
 	S.hmShownBands = []
 	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.rejectionReason === 'data-end' ? 'ЖИВАЯ У КРАЯ ДАННЫХ' : c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason === 'data-end' ? 'ждёт продолжения' : (c.rejectionReason || fmtR(c.grossR))}${c.duplicateEntryOf ? ' · ДУБЛЬ ВХОДА' : ''}${c.againstImpulse ? ' · ПРОТИВ ИМПУЛЬСА' : ''}`
@@ -314,6 +320,7 @@ export function wireConfirmationPanel(activate, deactivate) {
 	for (const id of ['confStatus', 'confOutcome', 'confReason', 'confLayer', 'confEngine']) {
 		$(id).onchange = () => { S.confIndex = 0; renderConfirmation() }
 	}
-	// полосы GGI — только перерисовка, индекс сделки сохраняется
-	$('ggiChk').onchange = () => renderConfirmation()
+	// полосы Apex — только перерисовка, индекс сделки сохраняется
+	$('apexChk').onchange = () => renderConfirmation()
+	$('reversalChk').onchange = () => renderConfirmation()
 }
