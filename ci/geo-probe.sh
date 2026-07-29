@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # CI probe: is data.binance.vision reachable from a GitHub runner, and can the
 # project gate (npm ci / tests / tsc / node --check) run there?
+# Section 10 probes the OI metrics archives needed by the OI-hybrid heatmap,
+# whose current source (ccxt fetchOpenInterestHistory) is geo-blocked on runners.
 # Writes a Markdown report to ci-results/geo-probe.md and never fails the job.
 set +e
 
@@ -72,7 +74,7 @@ LOG=ci-results/geo-probe.md
   echo '```'
   npx tsx --test tests/*.test.ts > /tmp/tests.log 2>&1; rc=$?
   echo "exit=$rc"
-  grep -E '^# (tests|pass|fail|cancelled|skipped|todo|duration_ms)' /tmp/tests.log || tail -30 /tmp/tests.log
+  grep -E '^. (tests|suites|pass|fail|cancelled|skipped|todo|duration_ms)' /tmp/tests.log || tail -30 /tmp/tests.log
   echo '```'
   echo
 
@@ -92,6 +94,30 @@ LOG=ci-results/geo-probe.md
     node --check "$f" 2>&1 || { echo "FAIL $f"; fails=$((fails+1)); }
   done
   echo "failed files: $fails"
+  echo '```'
+  echo
+
+  echo "## 10. OI metrics archives (OI-hybrid heatmap without the API)"
+  echo "Current source is ccxt fetchOpenInterestHistory (API, geo-blocked, ~30 days of history)."
+  echo "If these daily metrics archives are reachable, OI history becomes multi-year."
+  echo '```'
+  for D in 2021-06-01 2022-06-01 2023-01-03 2024-01-03 2025-06-02 2026-07-20 2026-07-27; do
+    printf '%s -> ' "$D"
+    curl -s --max-time 60 -o "/tmp/oi-$D.zip" -w "http=%{http_code} size=%{size_download}\n" \
+      "https://data.binance.vision/data/futures/um/daily/metrics/BTCUSDT/BTCUSDT-metrics-$D.zip"
+  done
+  echo
+  echo "-- columns + first rows of 2026-07-20 (vendor anchor date) --"
+  unzip -p "/tmp/oi-2026-07-20.zip" 2>&1 | head -4
+  echo "-- row count (expect 288 for 5m sampling) --"
+  unzip -p "/tmp/oi-2026-07-20.zip" 2>/dev/null | wc -l
+  echo
+  echo "-- ETH/SOL same date, sanity check across coins --"
+  for C in ETHUSDT SOLUSDT; do
+    printf '%s -> ' "$C"
+    curl -s --max-time 60 -o /tmp/oi-coin.zip -w "http=%{http_code} size=%{size_download}\n" \
+      "https://data.binance.vision/data/futures/um/daily/metrics/$C/$C-metrics-2026-07-20.zip"
+  done
   echo '```'
 } > "$LOG" 2>&1
 
