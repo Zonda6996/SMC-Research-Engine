@@ -2,5 +2,5 @@
   "task": "gate",
   "needsPlaywright": false,
   "runnerVersion": "v1",
-  "runLabel": "apex-reversal-325-rearm-fixed"
+  "runLabel": "apex-reversal-325-deterministic"
 }
