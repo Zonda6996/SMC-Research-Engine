@@ -10,8 +10,9 @@ const bar = (ts: number, o: number, h: number, l: number, c: number): Candle =>
 	({ timestamp: ts, open: o, high: h, low: l, close: c, volume: 10 })
 
 it('Apex: калиброванные параметры зафиксированы', () => {
-	assert.equal(APEX_VERSION, 'apex-1.0-calibrated-log-alma')
+	assert.equal(APEX_VERSION, 'apex-1.1-tv-settings')
 	assert.equal(REVERSAL_VERSION, 'reversal-1.0-directional-candle')
+	assert.equal(APEX_PARAMS.source, 'hlc3')
 	assert.equal(APEX_PARAMS.lookback, 200)
 	assert.equal(APEX_PARAMS.kInner, 5.6)
 	assert.equal(APEX_PARAMS.kOuter, 9.6)

@@ -9,10 +9,12 @@
 // устойчивая аппроксимация с максимальной наблюдавшейся ошибкой около 4%.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const APEX_VERSION = 'apex-1.0-calibrated-log-alma'
+export const APEX_VERSION = 'apex-1.1-tv-settings'
 export const REVERSAL_VERSION = 'reversal-1.0-directional-candle'
 
 export interface ApexParams {
+	/** Источник средней как в TradingView; канон калибровки — hlc3. */
+	source: 'hlc3' | 'close' | 'hl2' | 'ohlc4'
 	lookback: number
 	kInner: number
 	kOuter: number
@@ -28,6 +30,7 @@ export interface ApexParams {
 
 /** Числа зафиксированы измерениями; не менять без новой cross-symbol проверки. */
 export const APEX_PARAMS: ApexParams = {
+	source: 'hlc3',
 	lookback: 200,
 	kInner: 5.6,
 	kOuter: 9.6,
@@ -57,7 +60,12 @@ export interface ReversalSignal {
 	edge: number
 }
 
-const hlc3 = (c: Candle): number => (c.high + c.low + c.close) / 3
+const sourceValue = (c: Candle, source: ApexParams['source']): number => {
+	if (source === 'close') return c.close
+	if (source === 'hl2') return (c.high + c.low) / 2
+	if (source === 'ohlc4') return (c.open + c.high + c.low + c.close) / 4
+	return (c.high + c.low + c.close) / 3
+}
 
 function alma(values: number[], n: number, offset: number, sigma: number): number[] {
 	const out = new Array<number>(values.length).fill(NaN)
@@ -82,7 +90,7 @@ function alma(values: number[], n: number, offset: number, sigma: number): numbe
 /** Каузальные полосы: бар i использует только свечи с индексами <= i. */
 export function computeApexBands(candles: Candle[], paramsArg: Partial<ApexParams> = {}): ApexBand[] {
 	const p: ApexParams = { ...APEX_PARAMS, ...paramsArg }
-	const mean = alma(candles.map(hlc3), p.lookback, p.meanOffset, p.meanSigma)
+	const mean = alma(candles.map((c) => sourceValue(c, p.source)), p.lookback, p.meanOffset, p.meanSigma)
 	const trRelative = candles.map((c, i) => {
 		const tr = i === 0
 			? c.high - c.low
