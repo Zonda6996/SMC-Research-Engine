@@ -1,7 +1,7 @@
 {
   "task": "research",
-  "needsPlaywright": true,
-  "script": "ci/research/vizIndicatorQa.ts",
+  "needsPlaywright": false,
+  "script": "ci/research/applyGlobalIndicatorPanel.ts",
   "runnerVersion": "v1",
-  "runLabel": "viz-indicator-and-bug1-qa"
+  "runLabel": "global-indicator-panel-design-system"
 }
