@@ -246,3 +246,20 @@ it('§16.12/§16.14: novelty ≥ 0.5 перерождает зону; нетро
 	assert.equal(single[0]!.stackShare, 1) // §16.14: сила стека сильнейшей активной полки стороны = 1
 	assert.equal(single[0]!.stackNotional, 5)
 })
+
+it('§16.31: зона выставляет наружу время последнего вклада в полку', () => {
+	// две плиты в одном ценовом районе с РАЗНЫМ временем последнего вклада:
+	// зона обязана отдать максимум — визуализатор рисует слой с этого момента
+	const c = flat(60)
+	const base = { side: 'sell-side', status: 'active', spanBins: 1, contributions: 3, weight: 1, volumeAccumulated: 100 }
+	const pools = [
+		{ ...base, id: 'p1', extremePrice: 108, bandLow: 107.5, bandHigh: 108.5, startIndex: 5, startAt: 5, lastContributionIndex: 10, lastContributionAt: 10, sweptIndex: null, sweptAt: null, notional: 900, remainingNotional: 900, endAt: null, version: 'v' },
+		{ ...base, id: 'p2', extremePrice: 108.2, bandLow: 107.6, bandHigh: 108.6, startIndex: 20, startAt: 20, lastContributionIndex: 44, lastContributionAt: 44, sweptIndex: null, sweptAt: null, notional: 800, remainingNotional: 800, endAt: null, version: 'v' },
+	]
+	const out = detectLiquidityPoi(c, [], { heatmapPools: pools as never })
+	assert.ok(out.length > 0, 'зона должна родиться')
+	const z = out.find((x) => x.boundarySource === 'liquidity-cluster')
+	assert.ok(z, 'нужна зона от кластера ликвидности')
+	assert.equal(typeof z.lastContributionAt, 'number')
+	assert.ok(z.lastContributionAt >= 10, 'должно быть не раньше первого вклада')
+})

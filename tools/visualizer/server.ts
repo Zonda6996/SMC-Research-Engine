@@ -23,6 +23,8 @@ import { dirname, join, extname, resolve } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { detectLiquidityPoi, LIQUIDITY_POI_CONFIG, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
 import { detectLiquidityHeatmap, heatmapConfigForTf, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
+import { computeGgiBands, detectGgiSignals, GGI_ZONE_ENGINE_VERSION, GGI_ZONE_PARAMS } from '../../src/core/signals/GgiZoneEngine.js'
+import { detectSimplifiedConfirmation, SIMPLIFIED_CONFIRMATION_VERSION, SIMPLIFIED_HIGH_WR_PRESET_V4 } from '../../src/core/confirmation/SimplifiedConfirmationEngine.js'
 import { detectPoiConfirmation, POI_CONFIRMATION_CONFIG, POI_CONFIRMATION_VERSION } from '../../src/core/confirmation/PoiConfirmationEngine.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
@@ -452,6 +454,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				: []
 			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём бара захода ТФ зоны / SMA20).
 			const poiConfirmations = confTf != null ? detectPoiConfirmation(poiCandidates, ltfConf, snapshot.candles, confOverrides) : []
+			// §16.28–16.29: полосы перекупленности/перепроданности и их сигналы на ТФ подтверждения
+			// + упрощённый режим с пресетом v0.4 (инвертированный GGI-фильтр).
+			const ggiBands = ltfConf.length ? computeGgiBands(ltfConf) : []
+			const ggiSignals = ltfConf.length ? detectGgiSignals(ltfConf) : []
+			const simplified = ltfConf.length
+				? detectSimplifiedConfirmation(poiCandidates, ltfConf, SIMPLIFIED_HIGH_WR_PRESET_V4, { events: snapshot.events })
+				: []
 
 			// §16.20/§16.23: свинговые и локальные зоны — СЛОИ ОДНОЙ КАРТЫ (§12.2). Слои строятся на
 			// ЛЮБОМ виде лестницы (1h/4h/1d) как остальные её ступени, каждый на своём КАНОНИЧЕСКОМ
@@ -516,6 +525,20 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
+				ggi: {
+					version: GGI_ZONE_ENGINE_VERSION,
+					params: GGI_ZONE_PARAMS,
+					// ряд выровнен по ltfConf: null там, где полоса ещё не посчитана
+					bands: ggiBands.map((b, i) => (Number.isFinite(b.mean)
+						? { t: ltfConf[i]!.timestamp, mean: b.mean, redLo: b.redLo, greenHi: b.greenHi }
+						: null)),
+					signals: ggiSignals,
+				},
+				simplifiedConfirmation: {
+					version: SIMPLIFIED_CONFIRMATION_VERSION,
+					preset: SIMPLIFIED_HIGH_WR_PRESET_V4,
+					results: simplified,
+				},
 				// §16.20: слои карты (свинг 1D→1h, локальный 1h→5m) на рабочем виде 4h.
 				mtfLayers,
 				reactionCandidates: buildReactionCandidates(snapshot, ltf5m, ltf5m?.length ? aggregateCandles(ltf5m, '5m', '15m') : [], htfMs, `${symbol}|${timeframe}`, minLtfLeftBars),

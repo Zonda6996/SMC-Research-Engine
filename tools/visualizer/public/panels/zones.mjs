@@ -102,14 +102,21 @@ export function renderZones() {
 	const last = S.data.candles[S.data.candles.length - 1].timestamp
 	const focusId = S.poiFocusId
 	const zid = (c) => (c.__layer ? `${c.__layer}:${c.id}` : c.id)
-	// §16.22: слоёные зоны рисуются с ПОСЛЕДНЕГО ВКЛАДА в полку (max startAt пулов) — «правая треть
-	// окна данных» из §16.21 на зуме в последние недели всё равно оставалась слева экрана.
-	// Семантика: зона тянется с последней ре-аккумуляции; фокус-зона — полной длиной.
+	// §16.31: слоёные зоны рисуются с ПОСЛЕДНЕГО ВКЛАДА В ПОЛКУ (lastContributionAt — максимум
+	// по пулам стека, поле движка). Раньше здесь брался максимум pivotTimes: пивоты бывают
+	// старыми, поэтому прямоугольник всё равно тянулся от левого края экрана — баг §16.22
+	// не был вылечен. Фокус-зона по-прежнему рисуется полной длиной от рождения.
+	const drawFrom = (c) => {
+		const born = Math.max(c.knownAt, c.geometryKnownAt || 0)
+		if (!c.__layer || zid(c) === focusId) return born
+		const feed = c.lastContributionAt || 0
+		// подстраховка для старых ответов сервера без поля: прежнее поведение по пивотам
+		const fallback = c.pivotTimes?.length ? Math.max(...c.pivotTimes) : 0
+		return Math.max(born, feed || fallback)
+	}
 	const rects = xs.map((c) => ({
 		id: zid(c),
-		t1: time(c.__layer && zid(c) !== focusId
-			? Math.max(c.knownAt, c.geometryKnownAt || 0, ...(c.pivotTimes?.length ? [Math.max(...c.pivotTimes)] : []))
-			: Math.max(c.knownAt, c.geometryKnownAt || 0)),
+		t1: time(drawFrom(c)),
 		t2: time(c.endAt || last),
 		p1: c.near, p2: c.far, side: c.direction,
 		focused: zid(c) === focusId, dim: !!focusId && zid(c) !== focusId,

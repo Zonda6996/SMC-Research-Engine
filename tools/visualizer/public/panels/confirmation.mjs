@@ -57,8 +57,111 @@ function currentConfirmation() {
 	return xs[S.confIndex]
 }
 
+/**
+ * §16.28–16.30: полосы GGI и сигналы вендора на ТФ подтверждения.
+ * Пунктирные линии — ВНУТРЕННИЕ края зон (mean ∓ 5.6·dev), сплошная синяя — средняя.
+ * Метки BUY/SELL ставятся по КАНОНУ ВЕНДОРА: касание ВНЕШНЕГО края (mean ∓ 9.6·dev) —
+ * редкое событие у самого экстремума; у пользователя внешние линии в «Стиле» отключены,
+ * поэтому на его графике внешний край виден только по заливке.
+ * ВНИМАНИЕ: в НАШЕЙ системе близость к зоне экстремума — признак ХУДШЕГО входа (§16.29),
+ * поэтому метка рядом со входом это предупреждение, а не подтверждение.
+ */
+function drawGgi(src, from, to) {
+	if (!$('ggiChk')?.checked) return
+	const g = S.data?.ggi
+	if (!g?.bands?.length) return
+	const inRange = (t) => t >= from && t <= to
+	const pick = (key) => g.bands.filter((b) => b && inRange(time(b.t))).map((b) => ({ time: time(b.t), value: b[key] }))
+	const mean = pick('mean')
+	if (mean.length < 2) return
+	line(mean, { color: '#6f8cff', lineWidth: 2 })
+	line(pick('redLo'), { color: '#e2607a', lineWidth: 1, lineStyle: lineStyle().Dotted })
+	line(pick('greenHi'), { color: '#3fb98a', lineWidth: 1, lineStyle: lineStyle().Dotted })
+	const sig = (g.signals || []).filter((x) => inRange(time(x.at)))
+	if (sig.length) {
+		const s0 = line(sig.map((x) => ({ time: time(x.at), value: x.edge })), { color: 'rgba(0,0,0,0)', lineWidth: 1 })
+		seriesMarkers(s0, sig.map((x) => ({
+			time: time(x.at), position: x.direction === 'long' ? 'belowBar' : 'aboveBar',
+			color: '#c9a227', shape: 'circle', size: 1,
+			text: x.direction === 'long' ? 'GGI BUY' : 'GGI SELL',
+		})).sort((a, b) => a.time - b.time))
+	}
+}
+
+/** Плоский список сделок упрощённого режима (пресет v0.4). */
+export function simplifiedEntries() {
+	const out = []
+	for (const r of S.data?.simplifiedConfirmation?.results || []) {
+		for (let i = 0; i < (r.entries || []).length; i++) out.push({ ...r.entries[i], poiId: r.poiId, direction: r.direction, near: r.near, far: r.far, knownAt: r.knownAt, endAt: r.endAt, idx: i })
+	}
+	return out.sort((a, b) => a.entryAt - b.entryAt)
+}
+
+function renderSimplified() {
+	const xs = simplifiedEntries()
+	const src = confLayerData().src || []
+	if (!xs.length || !src.length) {
+		$('confStatusText').textContent = xs.length ? 'нет ряда подтверждения' : 'упрощённый режим: сделок нет на текущем окне'
+		$('confTrace').innerHTML = ''
+		return
+	}
+	S.confIndex = Math.max(0, Math.min(S.confIndex, xs.length - 1))
+	const e = xs[S.confIndex]
+	setCandles(src)
+	const srcTfMs = src.length > 1 ? src[1].timestamp - src[0].timestamp : 900000
+	const lastAt = e.events?.length ? e.events[e.events.length - 1].at : e.entryAt
+	const from = time(Math.max(src[0].timestamp, e.entryAt - 40 * srcTfMs))
+	const to = time(Math.min(src[src.length - 1].timestamp, lastAt + 40 * srcTfMs))
+	zonesPrim.setRects([{
+		id: e.poiId, t1: from, t2: to, p1: e.near, p2: e.far, side: e.direction,
+		alpha: 1, focused: true, label: `${e.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(e.near)} → ${fmtP(e.far)}`,
+	}], { min: Math.min(e.near, e.far), max: Math.max(e.near, e.far) })
+	const mark = (price, color, text) => {
+		const s0 = line([{ time: time(e.entryAt), value: price }, { time: to, value: price }], { color, lineWidth: 3 })
+		seriesMarkers(s0, [{ time: time(e.entryAt), position: 'inBar', color, shape: 'circle', size: 0, text }])
+	}
+	mark(e.entry, C.blue, `ВХОД ${fmtP(e.entry)}`)
+	mark(e.stop, C.red, `СТОП ${fmtP(e.stop)}`)
+	mark(e.partialPrice, C.amber, `ЧАСТИЧКА 25% ${fmtP(e.partialPrice)}`)
+	// Цель задана в стопах, поэтому при широком стопе уезжает на десятки процентов от цены.
+	// Рисуем линию только если она рядом (≤12% хода), иначе — подпись у входа: линия через
+	// весь экран за пределами видимых цен только мешает.
+	const fullAwayPct = Math.abs(e.fullPrice - e.entry) / e.entry
+	if (fullAwayPct <= 0.12) mark(e.fullPrice, C.green, `ФУЛЛ ${fmtP(e.fullPrice)}`)
+	else {
+		const s1 = line([{ time: time(e.entryAt), value: e.entry }], { color: 'rgba(0,0,0,0)' })
+		seriesMarkers(s1, [{ time: time(e.entryAt), position: 'aboveBar', color: C.green, shape: 'circle', size: 0, text: `ФУЛЛ ${fmtP(e.fullPrice)} — за экраном, ${(fullAwayPct * 100).toFixed(0)}% хода` }])
+	}
+	drawGgi(src, from, to)
+	const RU = { PARTIAL: 'частичка взята, стоп в безубыток', BE: 'выбило в безубыток', FULL: 'полный тейк', STOP: 'стоп' }
+	setMarkers((e.events || []).map((x) => ({
+		time: time(x.at), position: x.state === 'STOP' ? 'belowBar' : 'aboveBar',
+		color: x.state === 'FULL' ? C.green : x.state === 'STOP' ? C.red : C.amber,
+		shape: 'circle', size: 1, text: x.state,
+	})).filter((x) => src.some((s0) => time(s0.timestamp) === x.time)).sort((a, b) => a.time - b.time))
+	S.hmShownBands = []
+	const OUT = { full: 'ФУЛЛ', be: 'БЕЗУБЫТОК после частички', stop: 'СТОП', open: 'ОТКРЫТА (край данных)' }
+	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${e.direction.toUpperCase()} · ${OUT[e.outcome] || e.outcome} · ${fmtR(e.grossR)} · ход ${(e.grossMovePct != null ? (e.grossMovePct * 100).toFixed(2) + '%' : '—')}`
+	const risk = Math.abs(e.entry - e.stop)
+	$('confTrace').innerHTML = `<div class="kv"><span>Зона</span><b class="mono">${fmtP(Math.min(e.near, e.far))} – ${fmtP(Math.max(e.near, e.far))}</b></div>
+		<div class="kv"><span>Вход</span><b class="mono">${fmtP(e.entry)} · ${dt(e.entryAt)}</b></div>
+		<div class="kv"><span>Стоп</span><b class="mono">${fmtP(e.stop)} · ${(risk / e.entry * 100).toFixed(2)}% цены · режим ${esc(e.stopMode)}</b></div>
+		<div class="kv"><span>Частичка 25%</span><b class="mono">${fmtP(e.partialPrice)} · 0.40R · +${(Math.abs(e.partialPrice - e.entry) / e.entry * 100).toFixed(2)}% цены</b></div>
+		<div class="kv"><span>Фулл</span><b class="mono">${fmtP(e.fullPrice)} · 12R · +${(Math.abs(e.fullPrice - e.entry) / e.entry * 100).toFixed(2)}% цены</b></div>
+		<div class="kv"><span>Попытка зоны</span><b>${e.idx + 1}</b></div>
+		<div class="kv"><span>Полосы GGI</span><b>метки BUY/SELL — касание ВНЕШНЕГО края (канон вендора). В пресете v0.4 вето работает по ЗАХОДУ в зону (внутренний край), окно 200 баров: такие входы отброшены как «цена растянута»</b></div>
+		<div class="trace">${(e.events || []).map((x) => `<div class="trace-row"><b>${esc(x.state)}</b><span class="muted">${RU[x.state] || ''}</span><span class="mono">${dt(x.at)} · ${fmtP(x.price)}</span></div>`).join('') || '<div class="trace-row muted">событий нет — стоп без частички</div>'}</div>`
+	setVisibleRange(e.entryAt - 24 * 3600000, lastAt + 24 * 3600000)
+}
+
 export function renderConfirmation() {
 	if (!S.data || S.mode !== 'conf') return
+	if ($('confEngine')?.value === 'simplified') {
+		if (S.confZonesMode) { S.confZonesMode = false; $('confZonesBtn').textContent = `Зоны на ${confLayerData().zoneTf ?? '4h'}` }
+		clearOverlays(); setMarkers([])
+		renderSimplified()
+		return
+	}
 	if (S.confZonesMode) { S.confZonesMode = false; $('confZonesBtn').textContent = `Зоны на ${confLayerData().zoneTf ?? '4h'}` }
 	clearOverlays()
 	setMarkers([])
@@ -101,6 +204,7 @@ export function renderConfirmation() {
 		color: colors[x.state] || C.dim, shape: x.state === 'ENTRY' ? 'arrowUp' : 'circle', size: 1, text: x.state,
 	})).filter((x) => src.some((s0) => time(s0.timestamp) === x.time))
 	setMarkers(marks.sort((a, b) => a.time - b.time))
+	drawGgi(src, from, to)
 	// Полосы heatmap на 15m-свечи не рисуем (см. renderHeatmap): шкалы времени 4h и 15m несовместимы.
 	S.hmShownBands = []
 	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.rejectionReason === 'data-end' ? 'ЖИВАЯ У КРАЯ ДАННЫХ' : c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason === 'data-end' ? 'ждёт продолжения' : (c.rejectionReason || fmtR(c.grossR))}${c.duplicateEntryOf ? ' · ДУБЛЬ ВХОДА' : ''}${c.againstImpulse ? ' · ПРОТИВ ИМПУЛЬСА' : ''}`
@@ -168,6 +272,13 @@ export function renderConfZones() {
 }
 
 export function moveConfirmation(n) {
+	if ($('confEngine')?.value === 'simplified') {
+		const xs = simplifiedEntries()
+		if (!xs.length) return
+		S.confIndex = (S.confIndex + n + xs.length) % xs.length
+		renderConfirmation()
+		return
+	}
 	const xs = confirmationCandidates()
 	if (!xs.length) return
 	S.confIndex = (S.confIndex + n + xs.length) % xs.length
@@ -200,5 +311,9 @@ export function wireConfirmationPanel(activate, deactivate) {
 		if (S.confZonesMode) { $('confZonesBtn').textContent = `Назад к ${confLayerData().confTf ?? 'LTF'}`; renderConfZones() }
 		else renderConfirmation()
 	}
-	for (const id of ['confStatus', 'confOutcome', 'confReason', 'confLayer']) $(id).onchange = () => { S.confIndex = 0; renderConfirmation() }
+	for (const id of ['confStatus', 'confOutcome', 'confReason', 'confLayer', 'confEngine']) {
+		$(id).onchange = () => { S.confIndex = 0; renderConfirmation() }
+	}
+	// полосы GGI — только перерисовка, индекс сделки сохраняется
+	$('ggiChk').onchange = () => renderConfirmation()
 }

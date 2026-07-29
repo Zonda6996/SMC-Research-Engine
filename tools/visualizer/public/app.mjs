@@ -23,11 +23,22 @@ let savedMainRange = null
 function activateMode(mode) {
 	// Уходим с основного набора свечей — запоминаем зум, чтобы не «дёргать» график при возврате.
 	if ((mode === 'conf' || mode === 'lab') && S.mainShown) savedMainRange = getLogicalRange()
+	// Возврат на основной ряд (боевой вид и зоны рисуются по нему): если предыдущий режим
+	// подменил свечи на ряд подтверждения, их надо вернуть ДО отрисовки, иначе прямоугольники
+	// зон лягут на чужую шкалу времени и график будет выглядеть пустым.
+	if ((mode === 'trades' || mode === 'zones') && !S.mainShown) {
+		restoreMainCandles()
+		if (savedMainRange) { setLogicalRange(savedMainRange); savedMainRange = null } else fitContent()
+	}
 	for (const [m, prefix] of Object.entries(MODE_PANELS)) {
 		const on = m === mode
 		$(`${prefix}Controls`).classList.toggle('hidden', !on)
 		$(`${prefix}Toggle`).textContent = on ? 'Закрыть' : 'Открыть'
 		$(`${prefix}Toggle`).classList.toggle('on', on)
+		// Секции других режимов сворачиваем: одновременно активен ровно один режим,
+		// а раскрытые панели остальных только путают (жалоба на неудобство 28.07).
+		const sec = $(`${prefix}Controls`)?.closest('.section')
+		if (sec) sec.classList.toggle('collapsed', !on)
 	}
 	if (mode !== 'lab') exitLabVisuals()
 	if (mode === 'zones') S.poiFocusId = null
@@ -48,6 +59,11 @@ function deactivateMode() {
 	// Возврат без прыжка: восстанавливаем сохранённый зум; fitContent — только если восстанавливать нечего.
 	if (!wasMain && savedMainRange) { setLogicalRange(savedMainRange); savedMainRange = null }
 	else if (!wasMain) fitContent()
+	// Страховка от «пропавшего графика»: если после возврата видимый диапазон оказался вне
+	// данных (пустой экран), просто показываем всё окно целиком.
+	const r = getLogicalRange()
+	const n = S.data?.candles?.length ?? 0
+	if (!r || !n || r.to <= 0 || r.from >= n) fitContent()
 }
 
 export function redraw() {

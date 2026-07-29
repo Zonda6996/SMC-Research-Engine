@@ -121,8 +121,19 @@ export function initChart(onCrosshair, onClick, onPan) {
 	return chart
 }
 
+/**
+ * Линия-наложение. ВАЖНО: autoscaleInfoProvider возвращает null — наложение НЕ участвует
+ * в автомасштабе шкалы цены. Без этого далёкий уровень (например цель 12 стопов на 47%
+ * хода) растягивал шкалу, и свечи сплющивались в полоску — визуально «график пропадал».
+ * Нужна линия, влияющая на масштаб? Передай autoscale: true.
+ */
 export function line(points, opts = {}) {
-	const s = chart.addSeries(LWC().LineSeries, { lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false, ...opts })
+	const { autoscale = false, ...rest } = opts
+	const s = chart.addSeries(LWC().LineSeries, {
+		lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false,
+		...(autoscale ? {} : { autoscaleInfoProvider: () => null }),
+		...rest,
+	})
 	s.setData(points)
 	overlays.push(s)
 	return s

@@ -164,6 +164,13 @@ export interface LiquidityPoiCandidate {
 	spentReason: 'swept-through' | 'stack-consumed' | null
 	/** §16.9: near-дубль старшей зоны — подавлена, не торгуется и не показывается; геометрия не мутирует. */
 	duplicateOf: string | null
+	/**
+	 * §16.31: время ПОСЛЕДНЕГО вклада в полку (максимум по пулам стека). Диагностическое
+	 * поле: визуализатор рисует слоёные зоны с этого момента («с последней ре-аккумуляции»),
+	 * иначе прямоугольник тянется от старых пивотов и прилипает к левому краю экрана.
+	 * 0 = нет данных о пулах. На логику зон НЕ влияет.
+	 */
+	lastContributionAt: number
 	/** §16.14: суммарный notional стека зоны (пулы полки на момент рождения). */
 	stackNotional: number
 	/** §16.14: доля стека от сильнейшего АКТИВНОГО стека той же стороны на конец истории (0..1+,
@@ -492,7 +499,8 @@ function consolidate(raw: AreaCandidate[], c: Candle[], cfg: LiquidityPoiConfig)
 		const priority: ZonePriority = x === nearestLong || x === nearestShort ? 'nearest' : 'secondary'
 		const sn = stackTotal(x)
 		// §16.12: «важные» = ближайшая пара + все свежие непод авленные зоны значимых полок.
-		return { ...x, priority, active: x.valid && x.duplicateOf == null, stackNotional: sn, stackShare: maxStack[x.direction] > 0 ? sn / maxStack[x.direction] : 1 }
+		const lastFeedAt = (x.shelfPools ?? []).reduce((m, p) => Math.max(m, p.lastContributionAt), 0)
+		return { ...x, priority, active: x.valid && x.duplicateOf == null, lastContributionAt: lastFeedAt, stackNotional: sn, stackShare: maxStack[x.direction] > 0 ? sn / maxStack[x.direction] : 1 }
 	})
 }
 
@@ -588,7 +596,7 @@ export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], 
 					lifecycleState: 'forming', valid: false, active: false, priority: 'secondary',
 					interaction: 'untouched', touchCount: 0, armedAt: null, firstTouchAt: null,
 					consumedAt: null, failedAt: null, retiredAt: null, spentAt: null, spentReason: null,
-					duplicateOf: null, stackNotional: 0, stackShare: 1,
+					duplicateOf: null, lastContributionAt: 0, stackNotional: 0, stackShare: 1,
 					lineageSupersededAt: null, supersededAt: null, invalidatedAt: null,
 					endAt: c.at(-1)!.timestamp, mergedCount: 0, suppressedCount: 0,
 					shelfPools: shelf.pools.map(p => ({ notional: p.notional, sweptAt: p.sweptAt, lastContributionAt: p.lastContributionAt })),
