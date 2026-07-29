@@ -1,24 +1,21 @@
 # Gate
 
-- run: 30461888684 attempt 1
-- commit: cd9faef8c13c425cbcf01520c8c475a666944767
-- date UTC: 2026-07-29T14:38:52Z
+- run: 30462205104 attempt 1
+- commit: 2d4a29495a519185771bf68d8b857f0774c64f77
+- date UTC: 2026-07-29T14:42:43Z
 - node: v24.18.0, npm: 11.16.0
 
 ## tests (tsx --test tests/*.test.ts)
 ```
-exit=1
+exit=0
 ℹ tests 325
 ℹ suites 22
-ℹ pass 324
-ℹ fail 1
+ℹ pass 325
+ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 2636.531683
-✖ failing tests:
--- failures --
-  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+ℹ duration_ms 3741.978784
 ```
 
 ## tsc --noEmit
@@ -32,4 +29,4 @@ failed files: 0
 ```
 
 ## verdict
-GATE FAIL
+GATE PASS
