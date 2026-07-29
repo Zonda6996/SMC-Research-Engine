@@ -3,5 +3,5 @@
   "needsPlaywright": false,
   "script": "ci/research/applyGlobalIndicatorPanel.ts",
   "runnerVersion": "v1",
-  "runLabel": "global-indicator-panel-design-system"
+  "runLabel": "global-indicator-panel-design-system-retry-1"
 }
