@@ -1,11 +1,3 @@
-
-added 2 packages in 648ms
-npm warn allow-scripts 3 packages have install scripts not yet covered by allowScripts:
-npm warn allow-scripts   bufferutil@4.1.0 (install: node-gyp rebuild)
-npm warn allow-scripts   ccxt@4.5.62 (install: (install scripts present))
-npm warn allow-scripts   esbuild@0.28.1 (install: (install scripts present))
-npm warn allow-scripts
-npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
 # Visualizer QA — Apex/Reversal + Б1
 
 - duplicate DOM ids: 0
@@ -26,5 +18,4 @@ Call log:
        - element is not visible
      - retrying click action
        - waiting 500ms
-
 
