@@ -1570,9 +1570,26 @@ ADA 45m risk (единственный минусовой пример, кото
 
 ### Решения по терминологии
 
-Первый набор названий («Растяжка», «Разворот») пользователь отверг как слишком официальный и невнятный. Принят набор по метафоре натянутой резинки — цена растянулась от своей середины и хочет щёлкнуть назад:
+Названия выбрал пользователь (29.07). Первые два набора от ассистента отклонены («Растяжка»/«Разворот» — слишком официальные; «Резинка»/«Щелчок» — не подошли). Принято окончательно:
 
-- полосы перекупленности/перепроданности → **«Резинка»** (в коде `RubberBand`);
-- сигнальный индикатор → **«Щелчок»** (в коде `Snap`) — момент, когда резинка щёлкает обратно.
+- **Zonda Apex** — индикатор экстремумов (перекупленность/перепроданность), то что раньше называлось полосами. Короткое имя в коде и файлах: **`Apex`**.
+- **Zonda Reversal** — индикатор Buy/Sell сигналов. Короткое имя: **`Reversal`**.
 
-Альтернативные пары, если и это не подойдёт: «Пружина» + «Спуск»; «Перегрев» + «Разворотник».
+Все упоминания «GGI» из кода, интерфейса и полей ответа сервера удаляются — это приватный индикатор пользователя, наши модули носят свои имена. Схема переименования (делать механически, одним проходом):
+
+| Было | Стало |
+|---|---|
+| `src/core/signals/GgiZoneEngine.ts` | `src/core/signals/ApexEngine.ts` |
+| `GGI_ZONE_ENGINE_VERSION` = `ggi-zone-2.2-outer-edge-signal` | `APEX_VERSION` = `apex-1.0-vendor-params` |
+| `GgiZoneParams`, `GGI_ZONE_PARAMS` | `ApexParams`, `APEX_PARAMS` |
+| `GgiBand`, `computeGgiBands` | `ApexBand`, `computeApexBands` |
+| `GgiSignal`, `detectGgiSignals`, `ggiStateAt` | `ReversalSignal`, `detectReversals`, `apexStateAt` |
+| поле конфига `ggiExcludeBars` | `apexVetoBars` |
+| поле конфига `ggiParams` | `apexParams` |
+| блок ответа сервера `ggi` | `apex` (полосы) и `reversal` (сигналы) — разнести на два, они станут отдельными слоями |
+| метки на графике `GGI BUY` / `GGI SELL` | `BUY` / `SELL` (панель подписывается «Zonda Reversal») |
+| чекбокс «полосы GGI» | «Zonda Apex» |
+| `tools/shared/ggiZone.ts` (устаревшая аппроксимация) | удалить, структурно опровергнута §16.28 |
+| `tmp/diag/ggiZone2.ts`, `tmp/diag/ggiSystem.ts` | `tmp/diag/apex.ts`, `tmp/diag/reversal.ts` |
+
+Версии движков после переименования бампаются: `apex-1.0-vendor-params`, `reversal-1.0-outer-edge`. В `SimplifiedConfirmationEngine` версия становится `simplified-confirmation-0.6-apex-veto`, пресеты — `SIMPLIFIED_APEX_VETO_PRESET` (бывший `..._V4`, вето по заходу в зону) и `SIMPLIFIED_REVERSAL_VETO_PRESET` (бывший `..._VENDOR_SIGNAL_PRESET`, вето по сигналу).
