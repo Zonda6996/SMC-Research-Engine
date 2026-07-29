@@ -1,22 +1,22 @@
 # CI probe: data.binance.vision
 
-- run: 30445971784 attempt 1
-- commit: ecc7fc72c5b5ca8e800ee232aaa80ad166f653f8
-- date UTC: 2026-07-29T11:02:03Z
+- run: 30447295656 attempt 1
+- commit: be67a48cf63d98318fcaddcd5ad41e13904f52a7
+- date UTC: 2026-07-29T11:22:21Z
 - runner: Linux 6.17.0-1020-azure x86_64
 - node: v24.18.0, npm: 11.16.0
 
 ## 1. Runner geo
 ```
 {
-  "ip": "52.173.219.147",
-  "city": "Des Moines",
-  "region": "Iowa",
+  "ip": "48.214.54.49",
+  "city": "Boydton",
+  "region": "Virginia",
   "country": "US",
-  "loc": "41.6005,-93.6091",
+  "loc": "36.6676,-78.3875",
   "org": "AS8075 Microsoft Corporation",
-  "postal": "50309",
-  "timezone": "America/Chicago",
+  "postal": "23917",
+  "timezone": "America/New_York",
   "readme": "https://ipinfo.io/missingauth"
 }
 ```
@@ -26,23 +26,23 @@
 HTTP/2 200 
 content-type: application/zip
 content-length: 43482
-date: Wed, 29 Jul 2026 11:02:04 GMT
+date: Wed, 29 Jul 2026 11:22:23 GMT
 last-modified: Mon, 05 Feb 2024 12:06:34 GMT
 etag: "efcd0b4716abb9d950262a26fcb6ba43"
 x-amz-server-side-encryption: AES256
 accept-ranges: bytes
 server: AmazonS3
 x-cache: Miss from cloudfront
-via: 1.1 be2c4206e13042a954840d2c2aee86ac.cloudfront.net (CloudFront)
-x-amz-cf-pop: ORD58-P10
-x-amz-cf-id: WAITSWOpNKvqd3QP8yUkFs5v72pnjQMX1TqM0Fkjx3fUegX3drMytg==
+via: 1.1 d125bf8405e840aa51a88ae3d8d91fb2.cloudfront.net (CloudFront)
+x-amz-cf-pop: IAD12-P1
+x-amz-cf-id: YEz7FmuaPCxPl8Ouy6I7s444rx2O89ifThCWnvKDa2rh2YZL4z7N7Q==
 
 ```
 
 ## 3. USDT-M futures 1h archive (full download)
 ```
-http=200 size=38890 time=0.600901
--rw-r--r-- 1 runner runner 38890 Jul 29 11:02 /tmp/um1h.zip
+http=200 size=38890 time=0.657506
+-rw-r--r-- 1 runner runner 38890 Jul 29 11:22 /tmp/um1h.zip
 bf673f3d10804a951e8bac56dd2473486f113025971d43ebe5258ec40f9bfeb3  /tmp/um1h.zip
 -- first 3 rows --
 open_time,open,high,low,close,volume,close_time,quote_volume,count,taker_buy_volume,taker_buy_quote_volume,ignore
@@ -54,8 +54,8 @@ open_time,open,high,low,close,volume,close_time,quote_volume,count,taker_buy_vol
 
 ## 4. USDT-M futures 5m archive (heaviest case)
 ```
-http=200 size=408813 time=0.481012
--rw-r--r-- 1 runner runner 408813 Jul 29 11:02 /tmp/um5m.zip
+http=200 size=408813 time=1.139211
+-rw-r--r-- 1 runner runner 408813 Jul 29 11:22 /tmp/um5m.zip
 8929
 ```
 
@@ -72,7 +72,7 @@ http=451
 ```
 exit=0
 
-added 19 packages in 3s
+added 19 packages in 4s
 npm warn allow-scripts 3 packages have install scripts not yet covered by allowScripts:
 npm warn allow-scripts   bufferutil@4.1.0 (install: node-gyp-build)
 npm warn allow-scripts   ccxt@4.5.62 (postinstall: node postinstall.js)
@@ -84,28 +84,6 @@ npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to revi
 ## 7. tests (tsx --test tests/*.test.ts)
 ```
 exit=0
-✔ полная лестница t100-141-241 без возврата к входу (0.432942ms)
-✔ BE после первой фиксации: тейк 100, возврат к входу закрывает остаток (0.274295ms)
-✔ конфликт стоп/тейк до первой фиксации = стоп (0.188756ms)
-✔ BE взведён ранее: бар с тейком и касанием входа = BE остатка (консервативно) (0.247522ms)
-✔ шорт: зеркальная механика (0.291273ms)
-✔ ступень не в сторону профита отбрасывается, доли перенормируются (0.258529ms)
-✔ нет валидных ступеней: null (0.442127ms)
-✔ данные кончились с открытым остатком: null (0.422465ms)
-✔ не вошедшая сделка: null (0.175475ms)
-✔ canon-лестница существует и повторяет канонический менеджмент (141+241) (0.96207ms)
-✔ tradeMetrics: победа считается по ЧИСТОМУ результату после комиссий (1.213437ms)
-✔ tradeMetrics: перевод хода в R идёт от начального риска; комиссия вычитается один раз (0.202238ms)
-✔ tradeMetrics: безубыточный вин рейт — детектор красивой, но убыточной настройки (0.263728ms)
-✔ tradeMetrics: незакрытые сделки не считаются, просадка и профит-фактор считаются (0.511519ms)
-✔ tradeMetrics: разрезы по ключу и календарные ключи (10.325014ms)
-✔ tradeMetrics: контроль каузальности ряда свечей (0.720488ms)
-✔ Decision Lab falls back to HTF when LTF history starts after setup (1.26743ms)
-✔ Decision Lab excludes a grid expired by an opposite confirmed structure before touch (0.246277ms)
-✔ Decision Lab excludes an old same-direction grid superseded before its touch (0.46256ms)
-✔ Decision Lab reaction id is stable when candle-window candidate ids change (0.288981ms)
-✔ Decision Lab exact candidate requires the requested left replay history (0.287358ms)
-✔ Decision Lab excludes a level already touched before the grid became known (0.170935ms)
 ℹ tests 325
 ℹ suites 22
 ℹ pass 325
@@ -113,7 +91,7 @@ exit=0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 3577.489459
+ℹ duration_ms 3804.627258
 ```
 
 ## 8. tsc --noEmit
@@ -124,4 +102,29 @@ exit=0
 ## 9. node --check frontend modules
 ```
 failed files: 0
+```
+
+## 10. OI metrics archives (OI-hybrid heatmap without the API)
+Current source is ccxt fetchOpenInterestHistory (API, geo-blocked, ~30 days of history).
+If these daily metrics archives are reachable, OI history becomes multi-year.
+```
+2021-06-01 -> http=200 size=11875
+2022-06-01 -> http=200 size=14738
+2023-01-03 -> http=200 size=14477
+2024-01-03 -> http=200 size=11608
+2025-06-02 -> http=200 size=11233
+2026-07-20 -> http=200 size=11210
+2026-07-27 -> http=200 size=11128
+
+-- columns + first rows of 2026-07-20 (vendor anchor date) --
+create_time,symbol,sum_open_interest,sum_open_interest_value,count_toptrader_long_short_ratio,sum_toptrader_long_short_ratio,count_long_short_ratio,sum_taker_long_short_vol_ratio
+2026-07-20 00:00:00,BTCUSDT,102397.9520000000000000,6616155263.1900450000000000,1.54973923,1.47833900,1.39157631,1.29907400
+2026-07-20 00:05:00,BTCUSDT,102371.7860000000000000,6632881754.7971380000000000,1.54469309,1.47791600,1.38972062,2.26413400
+2026-07-20 00:10:00,BTCUSDT,101864.4060000000000000,6621823117.8285380000000000,1.54569800,1.47960600,1.39744030,2.25607400
+-- row count (expect 288 for 5m sampling) --
+289
+
+-- ETH/SOL same date, sanity check across coins --
+ETHUSDT -> http=200 size=11527
+SOLUSDT -> http=200 size=11282
 ```
