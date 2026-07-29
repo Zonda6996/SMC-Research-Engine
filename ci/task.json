@@ -1,13 +1,13 @@
 {
-  "task": "gate",
+  "task": "research",
   "needsPlaywright": false,
-  "script": null,
+  "script": "ci/research/apexAnchors.ts",
   "runnerVersion": "v1",
   "_notes": [
     "This file decides what CI does. The workflow never needs editing.",
     "task: gate | geo-probe | viz-shots | research",
     "needsPlaywright: true installs Chromium (only needed for viz-shots)",
-    "script: for task=research, path to a tsx entry point, e.g. ci/research/heatmapOi.ts",
+    "script: for task=research, path to a tsx entry point",
     "NOTE: the workflow triggers on pushes to ci/** only, so editing the workflow",
     "file itself does not start a run — touch a file under ci/ (or use Run workflow)."
   ]
