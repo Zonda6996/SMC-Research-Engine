@@ -1,8 +1,8 @@
 # Gate
 
-- run: 30461659984 attempt 1
-- commit: 715253be4b5fef2e7e6af6a82ae04f3ab7183709
-- date UTC: 2026-07-29T14:36:11Z
+- run: 30461888684 attempt 1
+- commit: cd9faef8c13c425cbcf01520c8c475a666944767
+- date UTC: 2026-07-29T14:38:52Z
 - node: v24.18.0, npm: 11.16.0
 
 ## tests (tsx --test tests/*.test.ts)
@@ -15,7 +15,7 @@ exit=1
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 3968.650825
+ℹ duration_ms 2636.531683
 ✖ failing tests:
 -- failures --
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
