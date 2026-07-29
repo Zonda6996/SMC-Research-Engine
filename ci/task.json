@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": false,
-  "script": "ci/research/applyGlobalIndicatorPanel.ts",
+  "script": "ci/research/fixLayerZoneTimeline.ts",
   "runnerVersion": "v1",
-  "runLabel": "global-indicator-panel-design-system-retry-1"
+  "runLabel": "layer-zone-timeline-snap-b2"
 }
