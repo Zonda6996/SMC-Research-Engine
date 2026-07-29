@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": false,
-  "script": "ci/research/applyIndicatorSettings.ts",
+  "script": "ci/research/fixIndicatorIds.ts",
   "runnerVersion": "v1",
-  "runLabel": "apply-indicator-tv-settings"
+  "runLabel": "fix-apex-setting-ids"
 }
