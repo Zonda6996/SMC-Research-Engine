@@ -1,6 +1,1 @@
-{
-  "task": "research",
-  "needsPlaywright": false,
-  "script": "ci/research/apexAnchors7.ts",
-  "runnerVersion": "v1"
-}
+{"task":"research","needsPlaywright":false,"script":"ci/research/apexCrossCheck.ts","runnerVersion":"v1"}
