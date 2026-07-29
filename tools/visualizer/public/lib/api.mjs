@@ -2,6 +2,7 @@
 
 import { $ } from './format.mjs'
 import { engineOverrides } from '../panels/config.mjs'
+import { indicatorServerConfig } from '../panels/indicators.mjs'
 
 export async function fetchAnalyze() {
 	const symbol = $('symbol').value.trim() || 'BTC/USDT'
@@ -19,6 +20,7 @@ export async function fetchAnalyze() {
 	if (Object.keys(ov.poi).length) q.set('poiConfig', JSON.stringify(ov.poi))
 	if (Object.keys(ov.hm).length) q.set('hmConfig', JSON.stringify(ov.hm))
 	if (Object.keys(ov.conf).length) q.set('confConfig', JSON.stringify(ov.conf))
+	q.set('apexConfig', JSON.stringify(indicatorServerConfig()))
 	const r = await fetch(`/api/analyze?${q}`)
 	const json = await r.json()
 	if (json.error) throw new Error(json.error)

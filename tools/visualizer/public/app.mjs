@@ -12,6 +12,7 @@ import { renderZones, wireZonesPanel, moveZoneFocus, zoneHoverHtml } from './pan
 import { renderConfirmation, wireConfirmationPanel, moveConfirmation } from './panels/confirmation.mjs'
 import { renderLab, wireLabPanel, moveLab, exitLabVisuals } from './panels/lab.mjs'
 import { renderConfigPanel, setEngineDefaults, wireConfigPanel } from './panels/config.mjs'
+import { wireIndicatorSettings } from './panels/indicators.mjs'
 import { wirePalette, openPalette, closePalette, paletteOpen, setPaletteSymbols } from './lib/palette.mjs'
 
 // ---- Режимы ----
@@ -305,6 +306,7 @@ function init() {
 	wireConfirmationPanel(activateMode, deactivateMode)
 	wireLabPanel(activateMode, deactivateMode)
 	wireConfigPanel()
+	wireIndicatorSettings(redraw)
 	wirePalette()
 	wireSections()
 	wireHotkeys()

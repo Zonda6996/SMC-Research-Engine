@@ -3,8 +3,9 @@
 // прямоугольником, вход/стоп/тейк — линиями, якорь — жёлтым пунктиром) и обзор «Зоны на 4h».
 
 import { S } from '../lib/state.mjs'
+import { indicatorStyle } from './indicators.mjs'
 import { $, esc, fmtP, fmtR, time, dt, C, REASON_RU, SPENT_RU, TRACE_RU } from '../lib/format.mjs'
-import { zonesPrim, line, seriesMarkers, setMarkers, clearOverlays, restoreMainCandles, setCandles, lineStyle, fitContent, setVisibleRange } from '../lib/chart.mjs'
+import { zonesPrim, apexPrim, line, seriesMarkers, setMarkers, clearOverlays, restoreMainCandles, setCandles, lineStyle, fitContent, setVisibleRange } from '../lib/chart.mjs'
 
 /** Чем именно закончилось окно зоны (джойн с POI-кандидатом): «zone-ended» без контекста бесил на QA. */
 function zoneEndInfo(poiId) {
@@ -67,6 +68,7 @@ function currentConfirmation() {
  * поэтому метка рядом со входом это предупреждение, а не подтверждение.
  */
 function drawApexReversal(src, from, to) {
+	const style = indicatorStyle()
 	const showApex = Boolean($('apexChk')?.checked)
 	const showReversal = Boolean($('reversalChk')?.checked)
 	if (!showApex && !showReversal) return
@@ -76,19 +78,22 @@ function drawApexReversal(src, from, to) {
 	const pick = (key) => g.bands.filter((b) => b && inRange(time(b.t))).map((b) => ({ time: time(b.t), value: b[key] }))
 	const mean = pick('mean')
 	if (mean.length < 2) return
+	const visibleBands = g.bands.filter((b) => b && inRange(time(b.t))).map((b) => ({ ...b, t: time(b.t) }))
+	apexPrim.setBands(showApex ? visibleBands : [], { upperOn: style.upperFillOn, upperColor: style.upperFillColor, lowerOn: style.lowerFillOn, lowerColor: style.lowerFillColor })
+	const labels = Boolean(style.priceLabels)
 	if (showApex) {
-		line(mean, { color: '#6f8cff', lineWidth: 2 })
-		line(pick('redLo'), { color: '#e2607a', lineWidth: 1, lineStyle: lineStyle().Dotted })
-		line(pick('redHi'), { color: '#e2607a', lineWidth: 1 })
-		line(pick('greenHi'), { color: '#3fb98a', lineWidth: 1, lineStyle: lineStyle().Dotted })
-		line(pick('greenLo'), { color: '#3fb98a', lineWidth: 1 })
+		if (style.meanOn) line(mean, { color: style.meanColor, lineWidth: 2, lastValueVisible: labels })
+		if (style.redLoOn) line(pick('redLo'), { color: style.redLoColor, lineWidth: 1, lineStyle: lineStyle().Dotted, lastValueVisible: labels })
+		if (style.redHiOn) line(pick('redHi'), { color: style.redHiColor, lineWidth: 1, lastValueVisible: labels })
+		if (style.greenHiOn) line(pick('greenHi'), { color: style.greenHiColor, lineWidth: 1, lineStyle: lineStyle().Dotted, lastValueVisible: labels })
+		if (style.greenLoOn) line(pick('greenLo'), { color: style.greenLoColor, lineWidth: 1, lastValueVisible: labels })
 	}
-	const sig = showReversal ? (S.data?.reversal?.signals || []).filter((x) => inRange(time(x.at))) : []
+	const sig = showReversal ? (S.data?.reversal?.signals || []).filter((x) => inRange(time(x.at)) && (x.direction === 'long' ? style.buyOn : style.sellOn)) : []
 	if (sig.length) {
 		const s0 = line(sig.map((x) => ({ time: time(x.at), value: x.edge })), { color: 'rgba(0,0,0,0)', lineWidth: 1 })
 		seriesMarkers(s0, sig.map((x) => ({
 			time: time(x.at), position: x.direction === 'long' ? 'belowBar' : 'aboveBar',
-			color: '#c9a227', shape: 'circle', size: 1,
+			color: x.direction === 'long' ? style.buyColor : style.sellColor, shape: 'circle', size: 1,
 			text: x.direction === 'long' ? 'BUY' : 'SELL',
 		})).sort((a, b) => a.time - b.time))
 	}

@@ -13,6 +13,7 @@ export let candlesSeries = null
 let markersPlugin = null
 let overlays = []
 export const zonesPrim = makeZonesPrimitive()
+export const apexPrim = makeApexPrimitive()
 
 /** Прямоугольники зон: [{t1,t2,p1,p2,side,focused,dim,alpha,label,id,manual}] (t в секундах). */
 function makeZonesPrimitive() {
@@ -85,6 +86,11 @@ function makeZonesPrimitive() {
 	return prim
 }
 
+function makeApexPrimitive() {
+	const p={_bands:[],_opts:{},_ctx:null,attached(x){p._ctx=x},detached(){p._ctx=null},setBands(x,o={}){p._bands=x;p._opts=o;p._ctx?.requestUpdate?.()},paneViews(){return p._views}}
+	const renderer={draw(target){const a=p._ctx;if(!a||p._bands.length<2)return;const ts=a.chart.timeScale();target.useBitmapCoordinateSpace(({context:c,horizontalPixelRatio:h,verticalPixelRatio:v})=>{const zone=(hi,lo,color,on)=>{if(!on)return;c.beginPath();let started=false;for(const b of p._bands){const x=ts.timeToCoordinate(b.t),y=a.series.priceToCoordinate(b[hi]);if(x==null||y==null)continue;c[!started?'moveTo':'lineTo'](x*h,y*v);started=true}for(let i=p._bands.length-1;i>=0;i--){const b=p._bands[i],x=ts.timeToCoordinate(b.t),y=a.series.priceToCoordinate(b[lo]);if(x!=null&&y!=null)c.lineTo(x*h,y*v)}if(started){c.closePath();c.fillStyle=color;c.globalAlpha=.11;c.fill();c.globalAlpha=1}};zone('redHi','redLo',p._opts.upperColor,p._opts.upperOn);zone('greenHi','greenLo',p._opts.lowerColor,p._opts.lowerOn)}})};p._views=[{renderer:()=>renderer}];return p
+}
+
 /** Зона под курсором (для hover-карточки и клика-фокуса). */
 export function rectAt(t, price) {
 	const hits = zonesPrim._rects.filter((r) => !r.manual && t >= r.t1 && t <= r.t2
@@ -112,6 +118,7 @@ export function initChart(onCrosshair, onClick, onPan) {
 		wickUpColor: C.green, wickDownColor: C.red,
 	})
 	candlesSeries.attachPrimitive(zonesPrim)
+	candlesSeries.attachPrimitive(apexPrim)
 	markersPlugin = LWC().createSeriesMarkers(candlesSeries, [])
 	S.mainShown = false
 	if (onCrosshair) chart.subscribeCrosshairMove(onCrosshair)
@@ -145,6 +152,7 @@ export function clearOverlays() {
 	for (const s of overlays) { try { chart.removeSeries(s) } catch { /* series уже снят */ } }
 	overlays = []
 	zonesPrim.setRects([])
+	apexPrim.setBands([])
 }
 
 export function setCandles(list, isMain = false) {

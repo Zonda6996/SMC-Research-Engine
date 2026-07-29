@@ -73,6 +73,7 @@ interface AnalyzeQuery {
 	poiConfig?: string | undefined
 	hmConfig?: string | undefined
 	confConfig?: string | undefined
+	apexConfig?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -90,6 +91,7 @@ function parseQuery(qs: string): AnalyzeQuery {
 		poiConfig: params.get('poiConfig') ?? undefined,
 		hmConfig: params.get('hmConfig') ?? undefined,
 		confConfig: params.get('confConfig') ?? undefined,
+		apexConfig: params.get('apexConfig') ?? undefined,
 	}
 }
 
@@ -109,6 +111,20 @@ function pickNumericOverrides<T extends object>(defaults: T, rawJson: string | u
 			&& typeof v === 'number' && Number.isFinite(v)) out[k] = v
 	}
 	return out as Partial<T>
+}
+
+function pickApexOverrides(rawJson: string | undefined): Partial<typeof APEX_PARAMS> {
+	if (!rawJson) return {}
+	let x: unknown
+	try { x = JSON.parse(rawJson) } catch { return {} }
+	if (x == null || typeof x !== 'object') return {}
+	const r = x as Record<string, unknown>, out: Record<string, unknown> = {}
+	if (['hlc3', 'close', 'hl2', 'ohlc4'].includes(String(r.source))) out.source = r.source
+	for (const k of ['lookback', 'kInner', 'kOuter']) {
+		const v = r[k]
+		if (typeof v === 'number' && Number.isFinite(v) && v > 0) out[k] = v
+	}
+	return out as Partial<typeof APEX_PARAMS>
 }
 
 const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
@@ -445,6 +461,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const hmOverrides = pickNumericOverrides(hmBase, q.hmConfig)
 			const poiOverrides = pickNumericOverrides(LIQUIDITY_POI_CONFIG, q.poiConfig)
 			const confOverrides = pickNumericOverrides(POI_CONFIRMATION_CONFIG, q.confConfig)
+			const apexOverrides = pickApexOverrides(q.apexConfig)
+			const apexParams = { ...APEX_PARAMS, ...apexOverrides }
 			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, { ...hmBase, ...hmOverrides }, heatmapAux ?? undefined)
 			// §14.1/§16.19: зоны и подтверждение — для всех ТФ лестницы (1d→1h, 4h→15m, 1h→5m).
 			// §16.21: per-TF профиль зон (иерархия слоёв пользователя) под UI-overrides; 4h = дефолты.
@@ -456,8 +474,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const poiConfirmations = confTf != null ? detectPoiConfirmation(poiCandidates, ltfConf, snapshot.candles, confOverrides) : []
 			// §16.28–16.29: полосы перекупленности/перепроданности и их сигналы на ТФ подтверждения
 			// + упрощённый режим с пресетом v0.4 (инвертированный Apex-фильтр).
-			const apexBands = ltfConf.length ? computeApexBands(ltfConf) : []
-			const reversalSignals = ltfConf.length ? detectReversals(ltfConf) : []
+			const apexBands = ltfConf.length ? computeApexBands(ltfConf, apexParams) : []
+			const reversalSignals = ltfConf.length ? detectReversals(ltfConf, apexParams) : []
 			const simplified = ltfConf.length
 				? detectSimplifiedConfirmation(poiCandidates, ltfConf, SIMPLIFIED_APEX_VETO_PRESET, { events: snapshot.events })
 				: []
@@ -527,7 +545,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
 				apex: {
 					version: APEX_VERSION,
-					params: APEX_PARAMS,
+					params: apexParams,
 					bands: apexBands.map((b, i) => (Number.isFinite(b.mean)
 						? { t: ltfConf[i]!.timestamp, mean: b.mean, redLo: b.redLo, redHi: b.redHi, greenHi: b.greenHi, greenLo: b.greenLo }
 						: null)),
