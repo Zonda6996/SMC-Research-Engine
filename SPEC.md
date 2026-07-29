@@ -1610,3 +1610,8 @@ Reversal больше не равен касанию полосы. Край Apex
 ### Совместимость
 
 Временный GgiZoneEngine.ts удалён после перевода потребителей. SimplifiedConfirmationEngine получил поля apexVetoBars/apexParams, версию simplified-confirmation-0.6-apex-veto и пресеты SIMPLIFIED_APEX_VETO_PRESET / SIMPLIFIED_REVERSAL_VETO_PRESET. Дефолт вето остаётся выключенным; дефолты POI, heatmap и подтверждений не менялись.
+
+
+## 16.34 TV-настройки Zonda Apex / Reversal (29.07.2026)
+
+Apex и Reversal имеют независимые слои. Apex получает реальные server-side входы source/lookback/kInner/kOuter; канон остаётся hlc3/200/5.6/9.6. Стиль каждой из пяти линий, двух заливок и меток ценовой шкалы меняется без пересчёта и хранится локально. Reversal отдельно управляет BUY/SELL и режимом Safe/Standard/Risk; режим пока не меняет триггер до отдельной калибровки. Боковая панель 420 px, при узком desktop не меньше 400 px.
