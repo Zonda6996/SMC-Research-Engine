@@ -1,4 +1,14 @@
-5m: 95464 баров
-4h: 1990 баров
-кандидатов: 170422
-готово: ci-results/apex-anchors6.md
+BTCUSDT:5m 95328
+BTCUSDT:4h 1986
+BTCUSDT:15m 31776
+ETHUSDT:1h 7944
+/home/runner/work/SMC-Research-Engine/SMC-Research-Engine/ci/research/apexAnchors7.ts:37
+const ix=new Map<string,number>();for(const a of A){const i=ss.get(`${a.symbol}:${a.tf}`)!.c.findIndex(x=>x.t===a.t);if(i<0)throw new Error(`нет бара ${a.id} ${new Date(a.t).toISOString()}`);ix.set(a.id,i)}
+                                                                                                                                  ^
+
+Error: нет бара BTC5-29a 2026-07-29T06:40:00.000Z
+    at main (/home/runner/work/SMC-Research-Engine/SMC-Research-Engine/ci/research/apexAnchors7.ts:37:131)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (/home/runner/work/SMC-Research-Engine/SMC-Research-Engine/ci/research/apexAnchors7.ts:41:1)
+
+Node.js v24.18.0
