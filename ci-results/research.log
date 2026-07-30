@@ -1,15 +1,146 @@
-node:internal/fs/promises:640
-  return new FileHandle(await PromisePrototypeThen(
-                        ^
+[full-take] fetch BTC/USDT
+[full-take] BTC/USDT: 1h=53256 15m=213024
+[full-take] BTC/USDT 2021: build h=13080 l=87360
+[full-take] BTC/USDT 2021: pools=15801 pois=1599 entries=138
+[full-take] BTC/USDT 2022: build h=13080 l=87360
+[full-take] BTC/USDT 2022: pools=15254 pois=1380 entries=97
+[full-take] BTC/USDT 2023: build h=13080 l=87360
+[full-take] BTC/USDT 2023: pools=12711 pois=1122 entries=64
+[full-take] BTC/USDT 2024: build h=13104 l=87456
+[full-take] BTC/USDT 2024: pools=13192 pois=1132 entries=93
+[full-take] BTC/USDT 2025: build h=13080 l=72384
+[full-take] BTC/USDT 2025: pools=12984 pois=1018 entries=48
+[full-take] BTC/USDT 2026: build h=9336 l=37344
+[full-take] BTC/USDT 2026: pools=8949 pois=698 entries=50
+[full-take] fetch ETH/USDT
+[full-take] ETH/USDT: 1h=53256 15m=213024
+[full-take] ETH/USDT 2021: build h=13080 l=87360
+[full-take] ETH/USDT 2021: pools=17307 pois=1913 entries=140
+[full-take] ETH/USDT 2022: build h=13080 l=87360
+[full-take] ETH/USDT 2022: pools=17008 pois=1708 entries=117
+[full-take] ETH/USDT 2023: build h=13080 l=87360
+[full-take] ETH/USDT 2023: pools=14061 pois=1293 entries=62
+[full-take] ETH/USDT 2024: build h=13104 l=87456
+[full-take] ETH/USDT 2024: pools=14128 pois=1292 entries=97
+[full-take] ETH/USDT 2025: build h=13080 l=72384
+[full-take] ETH/USDT 2025: pools=15719 pois=1487 entries=110
+[full-take] ETH/USDT 2026: build h=9336 l=37344
+[full-take] ETH/USDT 2026: pools=10802 pois=1025 entries=47
+[full-take] fetch SOL/USDT
+[full-take] SOL/USDT: 1h=51329 15m=205316
+[full-take] SOL/USDT 2021: build h=11369 l=80036
+[full-take] SOL/USDT 2021: pools=15706 pois=2188 entries=149
+[full-take] SOL/USDT 2022: build h=12960 l=86880
+[full-take] SOL/USDT 2022: pools=17657 pois=2107 entries=156
+[full-take] SOL/USDT 2023: build h=13080 l=87360
+[full-take] SOL/USDT 2023: pools=17033 pois=1862 entries=108
+[full-take] SOL/USDT 2024: build h=13104 l=87456
+[full-take] SOL/USDT 2024: pools=17086 pois=1823 entries=173
+[full-take] SOL/USDT 2025: build h=13080 l=72384
+[full-take] SOL/USDT 2025: pools=16946 pois=1666 entries=124
+[full-take] SOL/USDT 2026: build h=9336 l=37344
+[full-take] SOL/USDT 2026: pools=11490 pois=1037 entries=58
+[full-take] fetch XRP/USDT
+[full-take] XRP/USDT: 1h=53136 15m=212544
+[full-take] XRP/USDT 2021: build h=13080 l=86880
+[full-take] XRP/USDT 2021: pools=16315 pois=2041 entries=125
+[full-take] XRP/USDT 2022: build h=12960 l=86880
+[full-take] XRP/USDT 2022: pools=16173 pois=1714 entries=137
+[full-take] XRP/USDT 2023: build h=13080 l=87360
+[full-take] XRP/USDT 2023: pools=14488 pois=1435 entries=73
+[full-take] XRP/USDT 2024: build h=13104 l=87456
+[full-take] XRP/USDT 2024: pools=14000 pois=1503 entries=131
+[full-take] XRP/USDT 2025: build h=13080 l=72384
+[full-take] XRP/USDT 2025: pools=15581 pois=1651 entries=146
+[full-take] XRP/USDT 2026: build h=9336 l=37344
+[full-take] XRP/USDT 2026: pools=10854 pois=953 entries=62
+[full-take] fetch BNB/USDT
+[full-take] BNB/USDT: 1h=53256 15m=213024
+[full-take] BNB/USDT 2021: build h=13080 l=87360
+[full-take] BNB/USDT 2021: pools=17052 pois=1888 entries=150
+[full-take] BNB/USDT 2022: build h=13080 l=87360
+[full-take] BNB/USDT 2022: pools=16250 pois=1531 entries=126
+[full-take] BNB/USDT 2023: build h=13080 l=87360
+[full-take] BNB/USDT 2023: pools=13086 pois=1191 entries=66
+[full-take] BNB/USDT 2024: build h=13104 l=87456
+[full-take] BNB/USDT 2024: pools=13275 pois=1262 entries=93
+[full-take] BNB/USDT 2025: build h=13080 l=72384
+[full-take] BNB/USDT 2025: pools=13875 pois=1212 entries=100
+[full-take] BNB/USDT 2026: build h=9336 l=37344
+[full-take] BNB/USDT 2026: pools=9597 pois=808 entries=48
+[full-take] fetch DOGE/USDT
+[full-take] DOGE/USDT: 1h=53031 15m=212124
+[full-take] DOGE/USDT 2021: build h=12951 l=86844
+[full-take] DOGE/USDT 2021: pools=14848 pois=1834 entries=111
+[full-take] DOGE/USDT 2022: build h=13080 l=87360
+[full-take] DOGE/USDT 2022: pools=16483 pois=1905 entries=135
+[full-take] DOGE/USDT 2023: build h=13080 l=87360
+[full-take] DOGE/USDT 2023: pools=14843 pois=1565 entries=81
+[full-take] DOGE/USDT 2024: build h=13104 l=87456
+[full-take] DOGE/USDT 2024: pools=15764 pois=1783 entries=139
+[full-take] DOGE/USDT 2025: build h=13080 l=72384
+[full-take] DOGE/USDT 2025: pools=17197 pois=1902 entries=133
+[full-take] DOGE/USDT 2026: build h=9336 l=37344
+[full-take] DOGE/USDT 2026: pools=11422 pois=1165 entries=58
+[full-take] fetch ADA/USDT
+[full-take] ADA/USDT: 1h=53256 15m=213024
+[full-take] ADA/USDT 2021: build h=13080 l=87360
+[full-take] ADA/USDT 2021: pools=17229 pois=2115 entries=133
+[full-take] ADA/USDT 2022: build h=13080 l=87360
+[full-take] ADA/USDT 2022: pools=17179 pois=1749 entries=137
+[full-take] ADA/USDT 2023: build h=13080 l=87360
+[full-take] ADA/USDT 2023: pools=15423 pois=1404 entries=110
+[full-take] ADA/USDT 2024: build h=13104 l=87456
+[full-take] ADA/USDT 2024: pools=15516 pois=1581 entries=147
+[full-take] ADA/USDT 2025: build h=13080 l=72384
+[full-take] ADA/USDT 2025: pools=16807 pois=1739 entries=155
+[full-take] ADA/USDT 2026: build h=9336 l=37344
+[full-take] ADA/USDT 2026: pools=11810 pois=1173 entries=88
+[full-take] fetch LINK/USDT
+[full-take] LINK/USDT: 1h=53256 15m=213024
+[full-take] LINK/USDT 2021: build h=13080 l=87360
+[full-take] LINK/USDT 2021: pools=18301 pois=2299 entries=156
+[full-take] LINK/USDT 2022: build h=13080 l=87360
+[full-take] LINK/USDT 2022: pools=18093 pois=1958 entries=149
+[full-take] LINK/USDT 2023: build h=13080 l=87360
+[full-take] LINK/USDT 2023: pools=16279 pois=1608 entries=101
+[full-take] LINK/USDT 2024: build h=13104 l=87456
+[full-take] LINK/USDT 2024: pools=16281 pois=1741 entries=162
+[full-take] LINK/USDT 2025: build h=13080 l=72384
+[full-take] LINK/USDT 2025: pools=17126 pois=1796 entries=162
+[full-take] LINK/USDT 2026: build h=9336 l=37344
+[full-take] LINK/USDT 2026: pools=11449 pois=1075 entries=60
+# Simplified full-take replay
 
-Error: ENOENT: no such file or directory, open 'ci/research/fullTakeExitResearch.ts'
-    at async open (node:internal/fs/promises:640:25)
-    at async readFile (node:internal/fs/promises:1290:14)
-    at async <anonymous> (/home/runner/work/SMC-Research-Engine/SMC-Research-Engine/ci/research/fullTakeTimeSweep.ts:11:16) {
-  errno: -2,
-  code: 'ENOENT',
-  syscall: 'open',
-  path: 'ci/research/fullTakeExitResearch.ts'
-}
+- Identical entries/stops across variants; only post-entry exit changes.
+- Train `< 2025-01-01`; test `>= 2025-01-01`.
+- Net cost: 0.10% of entry price per trade.
+- Selection: highest train mean after removing the best 1% trades; test was not used.
 
-Node.js v24.18.0
+| variant | family | train n | train E | train E ex-top1% | test n | test E | test ex-top1% | test PF | test DD |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| baseline-12R | baseline | 3856 | 0.076R | -0.016R | 1449 | 0.104R | 0.010R | 1.457 | 49.410R |
+| trail-2atr | trail | 3856 | 0.034R | 0.010R | 1449 | 0.075R | 0.051R | 1.328 | 12.098R |
+| trail-4atr | trail | 3856 | 0.048R | 0.011R | 1449 | 0.089R | 0.046R | 1.391 | 13.274R |
+| trail-6atr | trail | 3856 | 0.056R | 0.010R | 1449 | 0.092R | 0.044R | 1.406 | 13.325R |
+| time-64 | time | 3856 | 0.046R | 0.011R | 1449 | 0.083R | 0.042R | 1.362 | 12.996R |
+| time-80 | time | 3856 | 0.049R | 0.012R | 1449 | 0.082R | 0.042R | 1.362 | 13.825R |
+| time-96 | time | 3856 | 0.059R | 0.016R | 1449 | 0.093R | 0.049R | 1.408 | 13.362R |
+| time-112 | time | 3856 | 0.057R | 0.012R | 1449 | 0.092R | 0.045R | 1.404 | 14.473R |
+| time-128 | time | 3856 | 0.056R | 0.010R | 1449 | 0.087R | 0.038R | 1.381 | 14.330R |
+| time-160 | time | 3856 | 0.057R | 0.004R | 1449 | 0.084R | 0.034R | 1.368 | 16.234R |
+| partial2-2R | partial2 | 3856 | 0.071R | 0.005R | 1449 | 0.101R | 0.034R | 1.445 | 33.421R |
+| partial2-4R | partial2 | 3856 | 0.076R | 0.004R | 1449 | 0.108R | 0.035R | 1.472 | 36.921R |
+| partial2-6R | partial2 | 3856 | 0.075R | -0.002R | 1449 | 0.100R | 0.022R | 1.439 | 40.410R |
+| opposite-zone | opposite-zone | 3856 | 0.041R | 0.012R | 1449 | 0.084R | 0.057R | 1.369 | 11.440R |
+| opposite-choch | structure | 3856 | 0.089R | -0.003R | 1449 | 0.075R | -0.010R | 1.328 | 28.062R |
+
+## Train-selected family winners
+
+- baseline: **baseline-12R** — train -0.016R ex-top1%; test 0.104R, ex-top1% 0.010R.
+- trail: **trail-4atr** — train 0.011R ex-top1%; test 0.089R, ex-top1% 0.046R.
+- time: **time-96** — train 0.016R ex-top1%; test 0.093R, ex-top1% 0.049R.
+- partial2: **partial2-2R** — train 0.005R ex-top1%; test 0.101R, ex-top1% 0.034R.
+- opposite-zone: **opposite-zone** — train 0.012R ex-top1%; test 0.084R, ex-top1% 0.057R.
+- structure: **opposite-choch** — train -0.003R ex-top1%; test 0.075R, ex-top1% -0.010R.
+
