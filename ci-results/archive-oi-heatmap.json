@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "from": 1777593600000,
+    "until": 1785369600000,
+    "tf": "15m"
+  },
+  "rows": [
+    {
+      "symbol": "BTC/USDT",
+      "candles": 8544,
+      "metricPoints": 25630,
+      "covered": 8543,
+      "coverage": 0.9998829588014981,
+      "firstMetric": 1777593900000,
+      "lastMetric": 1785282900000,
+      "fallbackPools": 4897,
+      "hybridPools": 5093,
+      "fallbackActive": 2542,
+      "hybridActive": 2526,
+      "fallbackNotional": 475531016750.4075,
+      "hybridNotional": 401487253382.26666
+    },
+    {
+      "symbol": "ETH/USDT",
+      "candles": 8544,
+      "metricPoints": 25630,
+      "covered": 8543,
+      "coverage": 0.9998829588014981,
+      "firstMetric": 1777593900000,
+      "lastMetric": 1785282900000,
+      "fallbackPools": 5747,
+      "hybridPools": 5511,
+      "fallbackActive": 2457,
+      "hybridActive": 2254,
+      "fallbackNotional": 277775475573.64294,
+      "hybridNotional": 222179535743.62958
+    },
+    {
+      "symbol": "SOL/USDT",
+      "candles": 8544,
+      "metricPoints": 25630,
+      "covered": 8543,
+      "coverage": 0.9998829588014981,
+      "firstMetric": 1777593900000,
+      "lastMetric": 1785282900000,
+      "fallbackPools": 6207,
+      "hybridPools": 5688,
+      "fallbackActive": 2616,
+      "hybridActive": 2321,
+      "fallbackNotional": 50282018776.87819,
+      "hybridNotional": 37323225441.687546
+    },
+    {
+      "symbol": "XRP/USDT",
+      "candles": 8544,
+      "metricPoints": 25631,
+      "covered": 8543,
+      "coverage": 0.9998829588014981,
+      "firstMetric": 1777593900000,
+      "lastMetric": 1785282900000,
+      "fallbackPools": 5734,
+      "hybridPools": 5550,
+      "fallbackActive": 2589,
+      "hybridActive": 2385,
+      "fallbackNotional": 18388124718.008247,
+      "hybridNotional": 14373962685.578564
+    }
+  ]
+}
