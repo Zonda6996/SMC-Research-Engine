@@ -5,7 +5,7 @@
 import { S } from '../lib/state.mjs'
 import { sortZoneTrades, withZoneRank } from '../lib/zoneTradeSort.mjs'
 import { drawIndicatorLayers } from './indicators.mjs'
-import { $, esc, fmtP, fmtR, time, dt, C, REASON_RU, SPENT_RU, TRACE_RU } from '../lib/format.mjs'
+import { $, esc, fmtP, fmtR, fmtTf, time, dt, C, REASON_RU, SPENT_RU, TRACE_RU } from '../lib/format.mjs'
 import { zonesPrim, line, seriesMarkers, setMarkers, clearOverlays, restoreMainCandles, setCandles, lineStyle, fitContent, setVisibleRange } from '../lib/chart.mjs'
 
 /** Чем именно закончилось окно зоны (джойн с POI-кандидатом): «zone-ended» без контекста бесил на QA. */
@@ -91,6 +91,7 @@ function renderSimplified() {
 	}
 	S.confIndex = Math.max(0, Math.min(S.confIndex, xs.length - 1))
 	const e = xs[S.confIndex]
+	const tf = { zone: fmtTf(confLayerData().zoneTf), conf: fmtTf(confLayerData().confTf) }
 	setCandles(src)
 	const srcTfMs = src.length > 1 ? src[1].timestamp - src[0].timestamp : 900000
 	const lastAt = e.events?.length ? e.events[e.events.length - 1].at : e.entryAt
@@ -98,7 +99,7 @@ function renderSimplified() {
 	const to = time(Math.min(src[src.length - 1].timestamp, lastAt + 40 * srcTfMs))
 	zonesPrim.setRects([{
 		id: e.poiId, t1: from, t2: to, p1: e.near, p2: e.far, side: e.direction,
-		alpha: 1, focused: true, label: `${e.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(e.near)} → ${fmtP(e.far)}`,
+		alpha: 1, focused: true, label: `${tf.zone} ${e.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(e.near)} → ${fmtP(e.far)}`, 
 	}], { min: Math.min(e.near, e.far), max: Math.max(e.near, e.far) })
 	const mark = (price, color, text) => {
 		const s0 = line([{ time: time(e.entryAt), value: price }, { time: to, value: price }], { color, lineWidth: 3 })
@@ -125,9 +126,10 @@ function renderSimplified() {
 	})).filter((x) => src.some((s0) => time(s0.timestamp) === x.time)).sort((a, b) => a.time - b.time))
 	S.hmShownBands = []
 	const OUT = { full: 'ФУЛЛ', be: 'БЕЗУБЫТОК после частички', stop: 'СТОП', open: 'ОТКРЫТА (край данных)' }
-	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${e.direction.toUpperCase()} · ${OUT[e.outcome] || e.outcome} · ${fmtR(e.grossR)} · ход ${(e.grossMovePct != null ? (e.grossMovePct * 100).toFixed(2) + '%' : '—')}`
+	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${tf.zone}→${tf.conf} · ${e.direction.toUpperCase()} · ${OUT[e.outcome] || e.outcome} · ${fmtR(e.grossR)} · ход ${(e.grossMovePct != null ? (e.grossMovePct * 100).toFixed(2) + '%' : '—')}`
 	const risk = Math.abs(e.entry - e.stop)
-	$('confTrace').innerHTML = `<div class="kv"><span>Зона</span><b class="mono">${fmtP(Math.min(e.near, e.far))} – ${fmtP(Math.max(e.near, e.far))}</b></div>
+	$('confTrace').innerHTML = `<div class="kv"><span>ТФ зоны / подтверждения</span><b>${tf.zone} → ${tf.conf}</b></div>
+		<div class="kv"><span>Зона ${tf.zone}</span><b class="mono">${fmtP(Math.min(e.near, e.far))} – ${fmtP(Math.max(e.near, e.far))}</b></div>
 		<div class="kv"><span>Вход</span><b class="mono">${fmtP(e.entry)} · ${dt(e.entryAt)}</b></div>
 		<div class="kv"><span>Стоп</span><b class="mono">${fmtP(e.stop)} · ${(risk / e.entry * 100).toFixed(2)}% цены · режим ${esc(e.stopMode)}</b></div>
 		<div class="kv"><span>Частичка 25%</span><b class="mono">${fmtP(e.partialPrice)} · 0.40R · +${(Math.abs(e.partialPrice - e.entry) / e.entry * 100).toFixed(2)}% цены</b></div>
@@ -157,6 +159,7 @@ export function renderConfirmation() {
 	}
 	const src = confLayerData().src || []
 	if (!src.length) return
+	const tf = { zone: fmtTf(confLayerData().zoneTf), conf: fmtTf(confLayerData().confTf) }
 	setCandles(src)
 	const times = c.trace.map((x) => x.at)
 	const lo = Math.min(c.knownAt, ...times), hi = Math.max(c.endAt || lo, ...times)
@@ -166,7 +169,7 @@ export function renderConfirmation() {
 	// Зона — прямоугольником на всю ширину окна попытки.
 	zonesPrim.setRects([{
 		id: c.poiId, t1: from, t2: to, p1: c.near, p2: c.far, side: c.direction,
-		alpha: 1, focused: true, label: `${c.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(c.near)} → ${fmtP(c.far)}`,
+		alpha: 1, focused: true, label: `${tf.zone} ${c.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(c.near)} → ${fmtP(c.far)}`, 
 	}], { min: Math.min(c.near, c.far), max: Math.max(c.near, c.far) })
 	if (c.entry != null && c.stop != null && c.tp2 != null) {
 		const mark = (price, color, text) => {
@@ -191,7 +194,7 @@ export function renderConfirmation() {
 	drawIndicatorLayers(src, from, to, confLayerData().indicators)
 	// Полосы heatmap на 15m-свечи не рисуем (см. renderHeatmap): шкалы времени 4h и 15m несовместимы.
 	S.hmShownBands = []
-	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.rejectionReason === 'data-end' ? 'ЖИВАЯ У КРАЯ ДАННЫХ' : c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason === 'data-end' ? 'ждёт продолжения' : (c.rejectionReason || fmtR(c.grossR))}${c.duplicateEntryOf ? ' · ДУБЛЬ ВХОДА' : ''}${c.againstImpulse ? ' · ПРОТИВ ИМПУЛЬСА' : ''}`
+	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${tf.zone}→${tf.conf} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.rejectionReason === 'data-end' ? 'ЖИВАЯ У КРАЯ ДАННЫХ' : c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason === 'data-end' ? 'ждёт продолжения' : (c.rejectionReason || fmtR(c.grossR))}${c.duplicateEntryOf ? ' · ДУБЛЬ ВХОДА' : ''}${c.againstImpulse ? ' · ПРОТИВ ИМПУЛЬСА' : ''}`
 	const traceRows = []
 	{
 		let run = []
@@ -209,7 +212,8 @@ export function renderConfirmation() {
 		}
 		flush()
 	}
-	$('confTrace').innerHTML = `<div class="kv"><span>Зона</span><b class="mono">${fmtP(Math.min(c.near, c.far))} – ${fmtP(Math.max(c.near, c.far))}</b></div>
+	$('confTrace').innerHTML = `<div class="kv"><span>ТФ зоны / подтверждения</span><b>${tf.zone} → ${tf.conf}</b></div>
+		<div class="kv"><span>Зона ${tf.zone}</span><b class="mono">${fmtP(Math.min(c.near, c.far))} – ${fmtP(Math.max(c.near, c.far))}</b></div>
 		<div class="kv"><span>Известна</span><b>${dt(c.knownAt)}</b></div>
 		${c.rejectionReason === 'data-end' ? `<div class="kv"><span>Статус</span><b>попытка ЖИВАЯ — данные закончились на середине цикла (это не отказ; после пересвипа §16.10 доигрывается, обнови данные позже)</b></div>` : c.rejectionReason ? `<div class="kv"><span>Отказ</span><b>${esc(c.rejectionReason)} — ${REASON_RU[c.rejectionReason] || ''}</b></div>` : ''}
 		${c.rejectionReason === 'zone-ended' ? `<div class="kv"><span>Чем кончилась зона</span><b>${zoneEndInfo(c.poiId)}</b></div>` : ''}
@@ -231,6 +235,7 @@ export function renderConfZones() {
 	setMarkers([])
 	restoreMainCandles()
 	const rs = confLayerData().results || []
+	const tf = { zone: fmtTf(confLayerData().zoneTf), conf: fmtTf(confLayerData().confTf) }
 	const src = S.data.candles || []
 	if (!src.length) return
 	const first = src[0].timestamp, last = src[src.length - 1].timestamp
@@ -247,11 +252,11 @@ export function renderConfZones() {
 		rects.push({
 			id: r.poiId, t1: time(fromTs), t2: time(toTs), p1: r.near, p2: r.far, side: r.direction,
 			alpha: dead ? 0.15 : 1, dim: dead, focused: entered,
-			label: dead ? `нет ${confLayerData().confTf ?? ''} данных` : `${r.attempts.length} поп.${entered ? ' · ВХОД' : ''}${r.spentReason === 'tp-hit' ? ' · тейк' : ''}${r.ltfCoverage === 'partial' ? ` · ${confLayerData().confTf ?? 'LTF'} частично` : ''}`,
+			label: dead ? `${tf.zone}: нет ${tf.conf} данных` : `${tf.zone} · ${r.attempts.length} поп.${entered ? ' · ВХОД' : ''}${r.spentReason === 'tp-hit' ? ' · тейк' : ''}${r.ltfCoverage === 'partial' ? ` · ${confLayerData().confTf ?? 'LTF'} частично` : ''}`,
 		})
 	}
 	zonesPrim.setRects(rects)
-	$('confStatusText').textContent = `Зоны подтверждения (${confLayerData().zoneTf ?? ''}→${confLayerData().confTf ?? ''}): ${n} шт (${noData} тусклых — окно раньше истории ТФ подтверждения: нет данных, не логики) · рамка near сплошная, far пунктир`
+	$('confStatusText').textContent = `Зоны подтверждения (${tf.zone}→${tf.conf}): ${n} шт (${noData} тусклых — окно раньше истории ТФ подтверждения: нет данных, не логики) · рамка near сплошная, far пунктир`
 	fitContent()
 }
 
