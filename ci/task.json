@@ -1,7 +1,7 @@
 {
   "task": "research",
-  "needsPlaywright": false,
-  "script": "ci/research/heatmapMagnetValidation.ts",
+  "needsPlaywright": true,
+  "script": "ci/research/zonePanQa.ts",
   "runnerVersion": "v1",
-  "runLabel": "heatmap-magnet-validation"
+  "runLabel": "zone-pan-qa"
 }
