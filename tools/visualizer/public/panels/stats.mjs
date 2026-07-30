@@ -90,7 +90,7 @@ export function renderEvents() {
 }
 
 export function renderProtected() {
-	if (!$('showProtected').checked) return
+	if (!$('showProtected')?.checked) return
 	for (const x of S.data.protectedSegments) {
 		const a = candleAt(x.startIndex), b = candleAt(x.endIndex)
 		if (a && b) line([{ time: time(a.timestamp), value: x.price }, { time: time(b.timestamp), value: x.price }], { color: C.amber, lineWidth: 1, lineStyle: lineStyle().SparseDotted })
@@ -99,8 +99,8 @@ export function renderProtected() {
 
 export function renderTradeMarkers() {
 	const m = []
-	const showDeep = $('showDeep')?.checked ?? true
-	const showOte = $('showOte')?.checked ?? true
+	const showDeep = $('showDeep')?.checked ?? false
+	const showOte = $('showOte')?.checked ?? false
 	for (const t of S.filtered) {
 		if (t.stream === 'deep' && !showDeep) continue
 		if (t.stream === 'ote' && !showOte) continue
@@ -224,8 +224,10 @@ export function renderTradesMode() {
 }
 
 export function wireStatsPanel() {
-	for (const id of ['fStream', 'fDirection', 'fResult', 'fTrigger', 'bigbarOnly', 'showSkipped', 'showEvents', 'showProtected', 'showDeep', 'showOte', 'showBosChoch'])
-		$(id).onchange = () => { S.selectedId = null; document.dispatchEvent(new CustomEvent('viz:redraw')) }
+	for (const id of ['fStream', 'fDirection', 'fResult', 'fTrigger', 'bigbarOnly', 'showSkipped', 'showProtected', 'showDeep', 'showOte', 'showBosChoch']) {
+		const el = $(id)
+		if (el) el.onchange = () => { S.selectedId = null; document.dispatchEvent(new CustomEvent('viz:redraw')) }
+	}
 	$('prevBtn').onclick = () => navigateTrades(-1)
 	$('nextBtn').onclick = () => navigateTrades(1)
 }

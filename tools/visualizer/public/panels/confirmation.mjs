@@ -118,14 +118,14 @@ function renderSimplified() {
 		seriesMarkers(s1, [{ time: time(e.entryAt), position: 'aboveBar', color: C.green, shape: 'circle', size: 0, text: `ФУЛЛ ${fmtP(e.fullPrice)} — за экраном, ${(fullAwayPct * 100).toFixed(0)}% хода` }])
 	}
 	drawIndicatorLayers(src, from, to, confLayerData().indicators)
-	const RU = { PARTIAL: 'частичка взята, стоп в безубыток', BE: 'выбило в безубыток', FULL: 'полный тейк', STOP: 'стоп' }
+	const RU = { PARTIAL: 'частичка взята, стоп в безубыток', BE: 'выбило в безубыток', FULL: 'полный тейк', TIME: 'тайм-стоп: остаток закрыт по времени', STOP: 'стоп' }
 	setMarkers((e.events || []).map((x) => ({
 		time: time(x.at), position: x.state === 'STOP' ? 'belowBar' : 'aboveBar',
-		color: x.state === 'FULL' ? C.green : x.state === 'STOP' ? C.red : C.amber,
+		color: x.state === 'FULL' ? C.green : x.state === 'STOP' ? C.red : x.state === 'TIME' ? C.purple : C.amber,
 		shape: 'circle', size: 1, text: x.state,
 	})).filter((x) => src.some((s0) => time(s0.timestamp) === x.time)).sort((a, b) => a.time - b.time))
 	S.hmShownBands = []
-	const OUT = { full: 'ФУЛЛ', be: 'БЕЗУБЫТОК после частички', stop: 'СТОП', open: 'ОТКРЫТА (край данных)' }
+	const OUT = { full: 'ФУЛЛ', be: 'БЕЗУБЫТОК после частички', stop: 'СТОП', time: 'ТАЙМ-СТОП', open: 'ОТКРЫТА (край данных)' }
 	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${tf.zone}→${tf.conf} · ${e.direction.toUpperCase()} · ${OUT[e.outcome] || e.outcome} · ${fmtR(e.grossR)} · ход ${(e.grossMovePct != null ? (e.grossMovePct * 100).toFixed(2) + '%' : '—')}`
 	const risk = Math.abs(e.entry - e.stop)
 	$('confTrace').innerHTML = `<div class="kv"><span>ТФ зоны / подтверждения</span><b>${tf.zone} → ${tf.conf}</b></div>

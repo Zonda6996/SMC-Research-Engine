@@ -56,25 +56,6 @@
 				</div>
 			</section>
 
-			<!-- Фильтры канона -->
-			<section class="section collapsed" id="filtersPanel">
-				<div class="section-head"><h2>Фильтры сделок</h2><span class="chevron"></span></div>
-				<div class="section-body">
-					<div class="grid2">
-						<select class="input" id="fStream"><option value="all">Deep + OTE</option><option value="deep">Deep</option><option value="ote">OTE</option></select>
-						<select class="input" id="fDirection"><option value="all">Long + Short</option><option value="long">Long</option><option value="short">Short</option></select>
-						<select class="input" id="fResult"><option value="all">Все исходы</option><option value="tp">Только TP</option><option value="stop">Только Stop</option><option value="timestop">Time-stop</option><option value="open">Открытые</option><option value="first5-skip">First-5 skip</option><option value="cost-skip">Cost skip</option></select>
-						<select class="input" id="fTrigger"><option value="all">BOS + CHoCH</option><option value="bos">BOS</option><option value="choch">CHoCH</option></select>
-					</div>
-					<div class="check-row">
-						<label class="check"><input type="checkbox" id="bigbarOnly" /> только bigbar</label>
-						<label class="check"><input type="checkbox" id="showSkipped" /> показывать skip</label>
-						<label class="check"><input type="checkbox" id="showEvents" checked /> BOS/CHoCH</label>
-						<label class="check"><input type="checkbox" id="showProtected" /> protected</label>
-					</div>
-				</div>
-			</section>
-
 			<!-- Зоны ликвидности -->
 			<section class="section mode" id="zonesPanel">
 				<div class="section-head" data-toggle="poiZoneToggle"><h2>Зоны ликвидности <span class="ver">POI 2.4</span></h2><button class="btn btn-outline sm" id="poiZoneToggle">Открыть</button></div>
@@ -260,7 +241,26 @@
 					<button class="btn btn-ghost sm icon" id="nextBtn" title="Следующая (↓)">↓</button>
 					<span class="chevron"></span>
 				</div>
-				<div class="section-body"><div class="list list-tall" id="tradeList"></div></div>
+				<div class="section-body">
+					<div class="grid2">
+						<select class="input" id="fStream"><option value="all">Deep + OTE</option><option value="deep">Deep</option><option value="ote">OTE</option></select>
+						<select class="input" id="fDirection"><option value="all">Long + Short</option><option value="long">Long</option><option value="short">Short</option></select>
+						<select class="input" id="fResult"><option value="all">Все исходы</option><option value="tp">Только TP</option><option value="stop">Только Stop</option><option value="timestop">Time-stop</option><option value="open">Открытые</option><option value="first5-skip">First-5 skip</option><option value="cost-skip">Cost skip</option></select>
+						<select class="input" id="fTrigger"><option value="all">BOS + CHoCH</option><option value="bos">BOS</option><option value="choch">CHoCH</option></select>
+					</div>
+					<div class="check-row">
+						<label class="check"><input type="checkbox" id="bigbarOnly" /> только bigbar</label>
+						<label class="check"><input type="checkbox" id="showSkipped" /> показывать skip</label>
+					</div>
+					<div class="subhead">Маркеры на главном графике</div>
+					<div class="check-row">
+						<label class="check"><input type="checkbox" id="showDeep" /> Deep</label>
+						<label class="check"><input type="checkbox" id="showOte" /> OTE</label>
+						<label class="check"><input type="checkbox" id="showBosChoch" checked /> BOS/CHoCH</label>
+						<label class="check"><input type="checkbox" id="showProtected" /> protected</label>
+					</div>
+					<div class="list list-tall" id="tradeList"></div>
+				</div>
 			</section>
 
 			<!-- Выбранная сделка -->
