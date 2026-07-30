@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": true,
-  "script": "ci/research/zonePanQa.ts",
+  "script": "ci/research/runZonePanQaWithFixture.ts",
   "runnerVersion": "v1",
-  "runLabel": "zone-pan-qa"
+  "runLabel": "zone-pan-qa-fixture"
 }
