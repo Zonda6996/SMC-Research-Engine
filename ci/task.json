@@ -1,7 +1,6 @@
 {
-  "task": "research",
+  "script": "ci/research/fullTakeTimeSweep.ts",
+  "args": [],
   "needsPlaywright": false,
-  "script": "ci/research/simplifiedFullTakeReplay.ts",
-  "runnerVersion": "v1",
-  "runLabel": "simplified-full-take-replay-v1"
+  "runLabel": "simplified-full-take-time-plateau-v1"
 }
