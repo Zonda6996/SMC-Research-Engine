@@ -1,7 +1,7 @@
 {
-  "task": "research",
-  "script": "ci/research/finishRedesign.ts",
+  "task": "gate",
+  "script": "",
   "args": [],
-  "needsPlaywright": true,
-  "runLabel": "finish-redesign-v1"
+  "needsPlaywright": false,
+  "runLabel": ""
 }
