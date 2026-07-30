@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": false,
-  "script": "ci/research/fixIndicatorTimeframes.ts",
+  "script": "ci/research/runIndicatorTimeframes.ts",
   "runnerVersion": "v1",
-  "runLabel": "timeframe-correct-indicators"
+  "runLabel": "timeframe-correct-indicators-strict-fix"
 }
