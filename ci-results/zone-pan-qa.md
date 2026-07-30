@@ -1,5 +1,11 @@
 # Zone pan QA — Б2
 
-- fatal: Error: page.evaluate: ReferenceError: __name is not defined
-    at eval (eval at evaluate (:311:30), <anonymous>:1:260)
-    at async <anonymous>:337:30
+- rects before → after: 14 → 14
+- local rects: 3
+- local candidates: 3; in-play 1; above 1; below 1
+- all prior rect IDs preserved: PASS
+- nearest-local IDs stable after pan: PASS
+- nearest-local semantics: PASS
+- local x moves with viewport / exits right: PASS
+- unexpected errors: 0
+- screenshots: zone-pan-before.png, zone-pan-after.png
