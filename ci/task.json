@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": false,
-  "script": "ci/research/labelZoneTimeframes.ts",
+  "script": "ci/research/reversalBaseline.ts",
   "runnerVersion": "v1",
-  "runLabel": "zone-timeframe-labels"
+  "runLabel": "reversal-trigger-baseline"
 }
