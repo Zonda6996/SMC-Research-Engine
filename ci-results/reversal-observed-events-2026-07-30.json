@@ -1,0 +1,91 @@
+{
+  "status": "manual-observation-dataset-v0.1",
+  "source": "User TradingView screenshots, BINANCE BTCUSDT; exact dates/times transcribed where legible",
+  "warning": "This records visible labels/plans. It does not prove the hidden vendor signal formula.",
+  "events": [
+    {
+      "shot": 12,
+      "timeframe": "15m",
+      "direction": "sell",
+      "signalPriceApprox": 64581.28,
+      "visiblePlanLevels": [64461.77, 64213.82, 64025.50, 63993.50],
+      "mode": "unknown",
+      "notes": "SELL label visible; plan lines are visible but semantic mapping is not fully legible. Do not infer entry/add/stop ordering from OCR alone."
+    },
+    {
+      "shot": 13,
+      "timeframe": "15m",
+      "direction": "buy",
+      "signalPriceApprox": 64731.58,
+      "visibleOutcome": "partial fix",
+      "mode": "unknown",
+      "notes": "BUY and partial-fix label visible. Screenshot demonstrates that a live signal may only reach partial."
+    },
+    {
+      "shot": 14,
+      "timeframe": "1h",
+      "direction": "buy",
+      "signalPriceApprox": 64029.50,
+      "mode": "unknown",
+      "notes": "BUY label visible. Companion screenshots 15–18 show subsequent lifecycle/mode comparison."
+    },
+    {
+      "shot": 15,
+      "timeframe": "1h",
+      "direction": "sell",
+      "signalPriceApprox": 65019.15,
+      "mode": "unknown",
+      "notes": "SELL label visible on another historical segment."
+    },
+    {
+      "shot": 16,
+      "timeframe": "1h",
+      "direction": "buy",
+      "signalPriceApprox": 57800.19,
+      "mode": "unknown",
+      "notes": "BUY at a deep decline; useful positive event for matched no-signal selection around similar Apex oversold touches."
+    },
+    {
+      "shot": 17,
+      "timeframe": "1h",
+      "direction": "buy",
+      "signalPriceApprox": 62742.47,
+      "mode": "safe",
+      "visiblePlan": {
+        "entryApprox": 62252.55,
+        "addApprox": 61710.36,
+        "stopApprox": 60021.26,
+        "fullFixApprox": 66039.19
+      },
+      "notes": "User identified this as Safe mode. Dynamic partial/full semantics come from the author guide; screenshot visibly includes full-fix and stop labels."
+    },
+    {
+      "shot": 18,
+      "timeframe": "1h",
+      "direction": "buy",
+      "signalPriceApprox": 62742.47,
+      "mode": "risk",
+      "visiblePlan": {
+        "entryApprox": 62262.72,
+        "addApprox": 62252.45,
+        "stopApprox": 61021.20,
+        "fullFixApprox": 66039.19
+      },
+      "notes": "User identified this as Risk mode. Compared with Safe, add/stop are visibly closer. OCR of entry/add may be approximate."
+    },
+    {
+      "shot": "same-location-standard",
+      "timeframe": "1h",
+      "direction": null,
+      "mode": "standard",
+      "signalPresent": false,
+      "notes": "User reports no Standard signal at the same location. This is evidence that mode may affect signal eligibility, contrary to the current UI assumption that mode only changes management. Needs exact timestamp/OHLC before coding."
+    }
+  ],
+  "confirmedCrossScreenshotFacts": [
+    "Safe and Risk can show different add/stop geometry for the same BUY context.",
+    "Standard can have no signal where Safe/Risk do, according to user observation.",
+    "Partial-only outcome exists.",
+    "BUY events occur on bullish directional candles and SELL on bearish candles in supplied examples, consistent with existing minimum rule but not sufficient to identify the full trigger."
+  ]
+}
