@@ -26,7 +26,7 @@ const bar = (ts: number, o: number, h: number, l: number, c: number): Candle => 
 const away = (n: number, start: number) => Array.from({ length: n }, (_, k) => bar(start + k, 110, 111, 109, 110)) // выше зоны → взводит
 
 it('simplified v0.1: касание → первая направленная свеча → вход; частичка → БУ → фулл', () => {
-	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.7-post-partial-time-stop')
+	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.8-time-stop-preset')
 	const ltf: Candle[] = [
 		...away(7, 0),
 		bar(7, 105, 106, 95, 94),        // заход в зону, МЕДВЕЖЬЯ — не триггер
@@ -274,8 +274,8 @@ it('v0.7: на граничном баре сохраняется консерв
   assert.deepEqual(r!.entries[0]!.events.map(x => x.state), ['PARTIAL', 'FULL'])
 })
 
-it('v0.7: time-stop выключен в базовом конфиге и существующих пресетах', () => {
+it('v0.8: базовый конфиг совместим, Apex-пресет включает проверенный time-stop', () => {
   assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.postPartialTimeStopBars, 0)
   assert.equal(SIMPLIFIED_HIGH_WR_PRESET.postPartialTimeStopBars, undefined)
-  assert.equal(SIMPLIFIED_APEX_VETO_PRESET.postPartialTimeStopBars, undefined)
+  assert.equal(SIMPLIFIED_APEX_VETO_PRESET.postPartialTimeStopBars, 80)
 })

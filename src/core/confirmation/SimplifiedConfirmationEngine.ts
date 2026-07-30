@@ -21,7 +21,7 @@ import { detectReversals, type ApexParams } from '../signals/ApexEngine.js'
 // монетах и всех ступенях лестницы. Плюс два фильтра входа флагами (по умолчанию ВЫКЛ):
 // «без погони» (вход не дальше maxChaseAtr от края зоны) и тренд-фильтр (bos-bos-choch).
 // Дефолты = поведение v0.1 бит-в-бит; новое включается конфигом или пресетом.
-export const SIMPLIFIED_CONFIRMATION_VERSION = 'simplified-confirmation-0.7-post-partial-time-stop'
+export const SIMPLIFIED_CONFIRMATION_VERSION = 'simplified-confirmation-0.8-time-stop-preset'
 
 export interface SimplifiedConfirmationConfig {
 	/** Полный отход от зоны для (пере)взведения касания, в ATR упрощённого ТФ (как в уточнённом). */
@@ -130,6 +130,8 @@ export const SIMPLIFIED_HIGH_WR_PRESET: Partial<SimplifiedConfirmationConfig> = 
 export const SIMPLIFIED_APEX_VETO_PRESET: Partial<SimplifiedConfirmationConfig> = {
 	...SIMPLIFIED_HIGH_WR_PRESET,
 	apexVetoBars: 200,
+	// 80 × 15m = 20h после PARTIAL; train-selected, затем подтверждён exit-only и end-to-end OOS.
+	postPartialTimeStopBars: 80,
 	// 'inner' закреплён явно: дефолт движка полос — 'outer' (канон вендора для метки BUY/SELL),
 	// а проверенное вето работает по ЗАХОДУ в зону, то есть по внутреннему краю.
 	apexParams: { signalMode: 'inner' },
