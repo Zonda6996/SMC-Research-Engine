@@ -73,7 +73,7 @@ export function renderFunnel() {
 }
 
 export function renderEvents() {
-	if (!$('showEvents').checked) return
+	if (!$('showBosChoch')?.checked) return
 	for (const e of S.data.events) {
 		const a = candleAt(e.levelIndex), b = candleAt(e.confirmIndex)
 		if (!a || !b || e.levelIndex >= e.confirmIndex) continue
@@ -99,7 +99,11 @@ export function renderProtected() {
 
 export function renderTradeMarkers() {
 	const m = []
+	const showDeep = $('showDeep')?.checked ?? true
+	const showOte = $('showOte')?.checked ?? true
 	for (const t of S.filtered) {
+		if (t.stream === 'deep' && !showDeep) continue
+		if (t.stream === 'ote' && !showOte) continue
 		const en = candleAt(t.entryIndex), ex = t.exitIndex != null ? candleAt(t.exitIndex) : null
 		if (en) {
 			const skipped = t.first5Skipped || t.executionCostSkipped
@@ -220,7 +224,7 @@ export function renderTradesMode() {
 }
 
 export function wireStatsPanel() {
-	for (const id of ['fStream', 'fDirection', 'fResult', 'fTrigger', 'bigbarOnly', 'showSkipped', 'showEvents', 'showProtected'])
+	for (const id of ['fStream', 'fDirection', 'fResult', 'fTrigger', 'bigbarOnly', 'showSkipped', 'showEvents', 'showProtected', 'showDeep', 'showOte', 'showBosChoch'])
 		$(id).onchange = () => { S.selectedId = null; document.dispatchEvent(new CustomEvent('viz:redraw')) }
 	$('prevBtn').onclick = () => navigateTrades(-1)
 	$('nextBtn').onclick = () => navigateTrades(1)
