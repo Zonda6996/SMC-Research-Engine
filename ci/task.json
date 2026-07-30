@@ -1,4 +1,5 @@
 {
+  "task": "research",
   "script": "ci/research/fullTakeTimeSweep.ts",
   "args": [],
   "needsPlaywright": false,
