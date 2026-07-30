@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": false,
-  "script": "ci/research/reversalBaseline.ts",
+  "script": "ci/research/archiveOiHeatmap.ts",
   "runnerVersion": "v1",
-  "runLabel": "reversal-trigger-baseline"
+  "runLabel": "archive-oi-heatmap"
 }
