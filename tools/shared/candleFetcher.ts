@@ -32,14 +32,24 @@ export const TF_MS: Record<string, number> = {
 
 export type MarketKind = 'spot' | 'futures'
 
-/**
- * §14.1 (решение пользователя, 25.07.2026): лестница «ТФ зоны → ТФ уточнённого подтверждения».
- * Включены связки 1D→1h, 4h→15m (исходная), 1h→5m; 1W→4h отложена (недельных баров ~360 за всю
- * историю — shelfFreshBars=300 теряет смысл, N зон мизерный). Константы движков остаются В БАРАХ
- * своего ТФ без пер-ТФ скейлинга: фазы метода — структурная работа, а не время; соотношение
- * conf-баров на бар зоны почти константно по лестнице (24:1 / 16:1 / 12:1).
- */
-export const CONFIRMATION_TF: Record<string, string> = { '1d': '1h', '4h': '15m', '1h': '5m' }
+/** §14.1: первый TF после `/` — упрощённое подтверждение. */
+export const SIMPLIFIED_CONFIRMATION_TF: Readonly<Record<string, string>> = {
+	'1w': '1d',
+	'1d': '4h',
+	'4h': '1h',
+	'1h': '15m',
+}
+
+/** §14.1: второй TF после `/` — уточнённое подтверждение. */
+export const REFINED_CONFIRMATION_TF: Readonly<Record<string, string>> = {
+	'1w': '4h',
+	'1d': '1h',
+	'4h': '15m',
+	'1h': '5m',
+}
+
+/** @deprecated Использовать REFINED_CONFIRMATION_TF с явным названием режима. */
+export const CONFIRMATION_TF = REFINED_CONFIRMATION_TF
 
 /**
  * Постраничная загрузка: Binance отдаёт максимум 1000 свечей за запрос,

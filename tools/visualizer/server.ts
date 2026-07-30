@@ -29,7 +29,7 @@ import { detectPoiConfirmation, POI_CONFIRMATION_CONFIG, POI_CONFIRMATION_VERSIO
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
 import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/strategy/battleConfig.js'
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
-import { aggregateCandles, CONFIRMATION_TF, fetchCandlesPaginated, fetchHeatmapAux, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
+import { aggregateCandles, fetchCandlesPaginated, fetchHeatmapAux, MAX_CANDLES_LTF, REFINED_CONFIRMATION_TF, SIMPLIFIED_CONFIRMATION_TF, TF_MS } from '../shared/candleFetcher.js'
 import { fetchArchiveKlines, mergeCandleSeries } from '../shared/archiveKlines.js'
 import { alignArchiveMetrics, fetchArchiveMetrics } from '../shared/archiveMetrics.js'
 import { liquidityPoiProfileForTf } from '../shared/poiProfiles.js'
@@ -54,8 +54,9 @@ const dataCache = new Map<string, {
 	candles: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 	ltf5m: Awaited<ReturnType<typeof fetchCandlesPaginated>> | null
 	heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
-	/** §16.19: итоговый ряд ТФ подтверждения (архивы + API-хвост) — «Пересчитать» архивы не перечитывает. */
-	ltfConf: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+	/** §14.1: раздельные ряды refined/simplified (архивы + API-хвост). */
+	ltfRefined: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+	ltfSimplified: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 }>()
 const DATA_TTL_LIVE = 90_000
 const DATA_TTL_HIST = 60 * 60 * 1000
@@ -422,10 +423,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			if (q.until && !Number.isFinite(parsedUntil)) throw new Error(`Invalid until date: ${q.until}`)
 			const untilMs = parsedUntil == null ? null : Math.min(parsedUntil, Date.now())
 
-			// §16.19: полная история ТФ подтверждения из архивов (дефолт ВКЛ, fullLtf=0 выключает).
+			// §16.19: полная история TF подтверждения из архивов (дефолт ВКЛ, fullLtf=0 выключает).
 			const fullLtf = q.fullLtf !== '0'
-			// §16.19/§14.1: ТФ уточнённого подтверждения по лестнице (1d→1h, 4h→15m, 1h→5m); null — зон нет.
-			const confTf = CONFIRMATION_TF[timeframe] ?? null
+			// §14.1: simplified берёт первый TF после `/`, refined — второй.
+			const simplifiedTf = SIMPLIFIED_CONFIRMATION_TF[timeframe] ?? null
+			const refinedTf = REFINED_CONFIRMATION_TF[timeframe] ?? null
 			const useFixture = q.source !== 'fresh'
 			const htfMs = TF_MS[timeframe]
 			if (!htfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
@@ -439,7 +441,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const minLtfLeftBars = Math.ceil(historyBars * contextMs / TF_MS['5m']!)
 			// Ещё 5000×5m оставляем справа от минимального контекста, чтобы в
 			// окне было достаточно candidate touches и будущего для outcome.
-			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(confTf != null ? 30_000 : 10_000, minLtfLeftBars + 5_000))
+			const ltfNeed = Math.min(MAX_CANDLES_LTF, Math.max(refinedTf != null || simplifiedTf != null ? 30_000 : 10_000, minLtfLeftBars + 5_000))
 			// §16.17: кэш данных — «Пересчитать» с новыми конфигами движков не должен заново качать
 			// свечи с биржи (сеть = почти всё время загрузки). Ключ — параметры ДАННЫХ (не конфиги);
 			// живые данные устаревают за DATA_TTL_LIVE, исторические (until) — за DATA_TTL_HIST.
@@ -449,10 +451,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			let candles: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 			let ltf5m: Awaited<ReturnType<typeof fetchCandlesPaginated>> | null
 			let heatmapAux: Awaited<ReturnType<typeof fetchHeatmapAux>> | null
-			let ltfConf: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+			let ltfRefined: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+			let ltfSimplified: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 			let snapshot: ReturnType<typeof runAnalysis>
 			if (cachedData && Date.now() - cachedData.at < ttl) {
-				({ candles, ltf5m, heatmapAux, ltfConf } = cachedData)
+				({ candles, ltf5m, heatmapAux, ltfRefined, ltfSimplified } = cachedData)
 				snapshot = runAnalysis(candles)
 			} else {
 				candles = useFixture ? loadFixtureCandles() : await fetchCandlesPaginated(symbol, timeframe, limit, market, untilMs)
@@ -465,23 +468,30 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				if (!useFixture && fullLtf && market === 'futures' && heatmapAux) {
 					heatmapAux = await withArchiveHeatmapAux(symbol, snapshot.candles, heatmapAux, untilMs)
 				}
-				// §14.1/§16.19: ряд ТФ подтверждения. Хвост — из уже скачанных 5m (агрегация или сами 5m,
-				// новых API-путей нет); глубокая часть — архивы data.binance.vision от ПЕРВОГО бара
-				// загруженного окна зон (глубина автоматическая, констант нет). Fail-soft: сеть/парсер
-				// упали — работаем на API-глубине, как раньше.
-				ltfConf = ltf5m?.length && confTf ? (confTf === '5m' ? ltf5m : aggregateCandles(ltf5m, '5m', confTf)) : []
-				if (fullLtf && !useFixture && confTf && candles.length) {
+				// §14.1/§16.19: два независимых ряда confirmation. Хвост строим из уже загруженных 5m,
+				// глубокую часть добираем из data.binance.vision. Ошибка одного TF не ломает второй.
+				const fromFive = (tf: string | null) => ltf5m?.length && tf ? (tf === '5m' ? ltf5m : aggregateCandles(ltf5m, '5m', tf)) : []
+				ltfRefined = fromFive(refinedTf)
+				ltfSimplified = fromFive(simplifiedTf)
+				const withArchive = async (tf: string | null, tail: typeof ltfRefined, mode: string) => {
+					if (!fullLtf || useFixture || !tf || !candles.length) return tail
 					try {
 						const t0 = Date.now()
-						const archive = await fetchArchiveKlines(symbol, confTf, market, candles[0]!.timestamp, untilMs)
-						ltfConf = mergeCandleSeries(archive, ltfConf)
-						console.log(`[archiveConf] ${symbol}: ${archive.length}×${confTf} из архивов за ${((Date.now() - t0) / 1000).toFixed(1)}с, итог ${ltfConf.length}`)
+						const archive = await fetchArchiveKlines(symbol, tf, market, candles[0]!.timestamp, untilMs)
+						const merged = mergeCandleSeries(archive, tail)
+						console.log(`[archiveConf:${mode}] ${symbol}: ${archive.length}×${tf} за ${((Date.now() - t0) / 1000).toFixed(1)}с, итог ${merged.length}`)
+						return merged
 					} catch (err) {
-						console.error('[archiveConf] fail-soft, работаем на API-глубине:', err instanceof Error ? err.message : err)
+						console.error(`[archiveConf:${mode}] fail-soft:`, err instanceof Error ? err.message : err)
+						return tail
 					}
 				}
+				;[ltfRefined, ltfSimplified] = await Promise.all([
+					withArchive(refinedTf, ltfRefined, 'refined'),
+					withArchive(simplifiedTf, ltfSimplified, 'simplified'),
+				])
 				if (!useFixture) {
-					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltfConf })
+					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltfRefined, ltfSimplified })
 					// Потолок кэша: держим последние 8 наборов (каждый — десятки МБ 5m-свечей).
 					while (dataCache.size > 8) dataCache.delete(dataCache.keys().next().value as string)
 				}
@@ -495,20 +505,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const apexOverrides = pickApexOverrides(q.apexConfig)
 			const apexParams = { ...APEX_PARAMS, ...apexOverrides }
 			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, { ...hmBase, ...hmOverrides }, heatmapAux ?? undefined)
-			// §14.1/§16.19: зоны и подтверждение — для всех ТФ лестницы (1d→1h, 4h→15m, 1h→5m).
+			// §14.1/§16.19: зоны общие, но каждый confirmation engine получает свой TF.
 			// §16.21: per-TF профиль зон (иерархия слоёв пользователя) под UI-overrides; 4h = дефолты.
 			const poiProfile = liquidityPoiProfileForTf(htfMs)
-			const poiCandidates = confTf != null
+			const poiCandidates = refinedTf != null || simplifiedTf != null
 				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools, config: { ...poiProfile, ...poiOverrides } })
 				: []
 			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём бара захода ТФ зоны / SMA20).
-			const poiConfirmations = confTf != null ? detectPoiConfirmation(poiCandidates, ltfConf, snapshot.candles, confOverrides) : []
-			// §16.28–16.29: полосы перекупленности/перепроданности и их сигналы на ТФ подтверждения
-			// + упрощённый режим с пресетом v0.4 (инвертированный Apex-фильтр).
-			const confirmationIndicators = buildIndicatorPayload(ltfConf, apexParams)
+			const poiConfirmations = refinedTf != null ? detectPoiConfirmation(poiCandidates, ltfRefined, snapshot.candles, confOverrides) : []
+			const refinedIndicators = buildIndicatorPayload(ltfRefined, apexParams)
+			const simplifiedIndicators = buildIndicatorPayload(ltfSimplified, apexParams)
 			const mainIndicators = buildIndicatorPayload(snapshot.candles, apexParams)
-			const simplified = ltfConf.length
-				? detectSimplifiedConfirmation(poiCandidates, ltfConf, SIMPLIFIED_APEX_VETO_PRESET, { events: snapshot.events })
+			const simplified = ltfSimplified.length
+				? detectSimplifiedConfirmation(poiCandidates, ltfSimplified, SIMPLIFIED_APEX_VETO_PRESET, { events: snapshot.events })
 				: []
 
 			// §16.20/§16.23: свинговые и локальные зоны — СЛОИ ОДНОЙ КАРТЫ (§12.2). Слои строятся на
@@ -517,8 +526,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			// с какого ТФ ни смотри. Данные слоя: архивы (fullLtf, дисковый кэш) + деривация из уже
 			// загруженного (агрегация вверх из candles/5m). Движки те же, per-TF профили §16.21,
 			// overrides пользователя поверх.
-			const mtfLayers: Array<{ contextTf: string; confTf: string; role: 'swing' | 'mid' | 'local'; candles: number; candidates: unknown[]; results: unknown[]; ltfConf: unknown[] | null; indicators: ReturnType<typeof buildIndicatorPayload> }> = []
-			if (confTf != null && candles.length) {
+			const mtfLayers: Array<{ contextTf: string; confTf: string; simplifiedTf: string; role: 'swing' | 'mid' | 'local'; candles: number; candidates: unknown[]; results: unknown[]; simplifiedResults: unknown[]; ltfConf: unknown[] | null; ltfSimplified: unknown[] | null; indicators: ReturnType<typeof buildIndicatorPayload>; simplifiedIndicators: ReturnType<typeof buildIndicatorPayload> }> = []
+			if ((refinedTf != null || simplifiedTf != null) && candles.length) {
 				const ROLE: Record<string, 'swing' | 'mid' | 'local'> = { '1d': 'swing', '4h': 'mid', '1h': 'local' }
 				// Деривация ряда из загруженного: старше текущего ТФ — из candles, младше — из 5m.
 				const derived = (tf: string): typeof candles => {
@@ -543,14 +552,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					if (ctxTf === timeframe) continue
 					const ctxCandles = (await layerSeries(ctxTf, ctxTf === '1d' ? Date.UTC(2019, 8, 1) : null)).slice(-5000)
 					if (!ctxCandles.length) continue
-					const lConfTf = CONFIRMATION_TF[ctxTf]!
-					const confSeries = await layerSeries(lConfTf, ctxCandles[0]!.timestamp)
+					const lRefinedTf = REFINED_CONFIRMATION_TF[ctxTf]!
+					const lSimplifiedTf = SIMPLIFIED_CONFIRMATION_TF[ctxTf]!
+					const [refinedSeries, simplifiedSeries] = await Promise.all([
+						layerSeries(lRefinedTf, ctxCandles[0]!.timestamp),
+						layerSeries(lSimplifiedTf, ctxCandles[0]!.timestamp),
+					])
 					const pools = detectLiquidityHeatmap(ctxCandles, { ...heatmapConfigForTf(TF_MS[ctxTf]!), ...pickNumericOverrides(heatmapConfigForTf(TF_MS[ctxTf]!), q.hmConfig) }, undefined)
 					const zones = detectLiquidityPoi(ctxCandles, [], { heatmapPools: pools, config: { ...liquidityPoiProfileForTf(TF_MS[ctxTf]!), ...poiOverrides } })
-					const confs = detectPoiConfirmation(zones, confSeries, ctxCandles, confOverrides)
-					const layerIndicators = buildIndicatorPayload(confSeries, apexParams)
-					// 5m-ряд не дублируем, если он ровно ltf5m; остальные conf-ряды слоёв едут в payload.
-					mtfLayers.push({ contextTf: ctxTf, confTf: lConfTf, role: ROLE[ctxTf]!, candles: ctxCandles.length, candidates: zones, results: confs, ltfConf: confSeries === ltf5m ? null : confSeries, indicators: layerIndicators })
+					const confs = detectPoiConfirmation(zones, refinedSeries, ctxCandles, confOverrides)
+					const simplifiedConfs = detectSimplifiedConfirmation(zones, simplifiedSeries, SIMPLIFIED_APEX_VETO_PRESET)
+					const layerIndicators = buildIndicatorPayload(refinedSeries, apexParams)
+					const layerSimplifiedIndicators = buildIndicatorPayload(simplifiedSeries, apexParams)
+					mtfLayers.push({ contextTf: ctxTf, confTf: lRefinedTf, simplifiedTf: lSimplifiedTf, role: ROLE[ctxTf]!, candles: ctxCandles.length, candidates: zones, results: confs, simplifiedResults: simplifiedConfs, ltfConf: refinedSeries === ltf5m ? null : refinedSeries, ltfSimplified: simplifiedSeries === ltf5m ? null : simplifiedSeries, indicators: layerIndicators, simplifiedIndicators: layerSimplifiedIndicators })
 				}
 			}
 
@@ -563,7 +577,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					executionCostGate: BATTLE_CONFIG.executionCostGate,
 					mirror: 'removed',
 				},
-				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, confTf, ltfConfCount: ltfConf.length, ltfConfFrom: ltfConf[0]?.timestamp ?? null, fullLtf, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
+				dataset: { symbol, timeframe, limit, candleCount: candles.length, ltfCandleCount: ltf5m?.length ?? 0, confTf: refinedTf, refinedTf, simplifiedTf, ltfConfCount: ltfRefined.length, ltfConfFrom: ltfRefined[0]?.timestamp ?? null, ltfSimplifiedCount: ltfSimplified.length, ltfSimplifiedFrom: ltfSimplified[0]?.timestamp ?? null, fullLtf, contextTf, historyBars, source: useFixture ? 'fixture' : 'fresh', until: untilMs == null ? null : new Date(untilMs).toISOString() },
 				// §16.15: дефолты и применённые переопределения — для панели «Настройки движков».
 				engineDefaults: { poi: LIQUIDITY_POI_CONFIG, heatmap: hmBase, confirmation: POI_CONFIRMATION_CONFIG },
 				appliedOverrides: { poi: poiOverrides, hm: hmOverrides, conf: confOverrides },
@@ -571,13 +585,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				poiProfile,
 				candles: snapshot.candles,
 				ltf5m: ltf5m ?? [],
-				ltfConf,
+				ltfConf: ltfRefined,
+				ltfSimplified,
 				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
-				apex: confirmationIndicators.apex,
-				reversal: confirmationIndicators.reversal,
-				indicators: { main: mainIndicators, confirmation: confirmationIndicators },
+				apex: refinedIndicators.apex,
+				reversal: refinedIndicators.reversal,
+				indicators: { main: mainIndicators, confirmation: refinedIndicators, simplified: simplifiedIndicators },
 				simplifiedConfirmation: {
 					version: SIMPLIFIED_CONFIRMATION_VERSION,
 					preset: SIMPLIFIED_APEX_VETO_PRESET,
