@@ -101,3 +101,12 @@ POI TF → упрощённое подтверждение / уточнённо�
 - Б1 формализован и снят на fixture + синтетическом LTF/TIME payload в `ci-results/confirmation-close-qa/`. На этих данных range восстановился; баг на реальных данных не объявлять исправленным.
 - Контрольный старый 1h→15m E2E повторён до 30.07.2026: train 3887, +0.049R; test 1466, +0.082R; ex-top1% +0.041R; PF 1.359; DD 14.748R. Это не переносится на другие строки лестницы: 80 баров там имеют другую длительность.
 - Следующее по indicators: не менять Apex defaults. Нужны точные TV status-line точки минимум BTC spot/futures на одинаковом timestamp для 5m/15m/1h/4h и отдельные Reversal events со свечой до/сигнальной/после, Risk Mode и состоянием Apex. Текущая формула остаётся approximation; §16.41 остаётся отрицательным baseline.
+
+## 9. Дополнение 30.07.2026: пользовательский Б1, лаги и новый indicator dataset
+
+- Пользователь подтвердил marker toggles и TF routing, затем воспроизвёл Б1 на реальных данных: после Heatmap→Confirmation→закрыть Heatmap→закрыть Confirmation свечи становились аномально тонкими.
+- Причина установлена: visualizer сохранял `visibleLogicalRange` (индексы баров), подменял candle series на другой TF и применял старые индексы к main series. `91e9775` сохраняет/восстанавливает timestamp `visibleRange`; synthetic 500 main / 2000 LTF browser QA дал drift 0.
+- Источник периодических ~10 FPS: Heatmap создавал до 400 отдельных `LineSeries` при каждом redraw. `91e9775` заменил их одним canvas primitive. Fixture QA: 38 bands, overlay count не вырос (14→14), 62 rAF frames за секунду; это устранение O(N series), не обещание FPS на любом железе.
+- Пользователь передал точные BTC Spot TV status-line точки на 27.07.2026 01:00 Казахстан (26.07 20:00 UTC) для 4h/1h/15m/5m. Spot-to-spot сравнение текущего Apex: mean error −0.205% / +0.058% / +0.002% / +0.017%; width error +1.45% / +5.53% / +7.98% / −0.95%. Defaults не менялись: один timestamp ещё не OOS.
+- Полностью разобран гайд автора Reversal. Safe/Risk: dynamic partial на mean, затем BE, dynamic full на противоположной Apex zone; Risk имеет ближе add/stop. Standard: fixed entry/add/stop/take, без dynamic targets; ориентиры автора после add около 1:2, без add около 1:1.25. Это trade management, не раскрытая signal formula.
+- Следующий research gate: оцифровать предоставленные BUY/SELL/no-signal скриншоты в event dataset и отдельно восстановить signal detector; не смешивать его с trade manager и не менять defaults по таблице вендора.
