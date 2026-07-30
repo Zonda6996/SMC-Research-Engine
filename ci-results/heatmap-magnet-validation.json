@@ -1,0 +1,303 @@
+{
+  "meta": {
+    "from": 1777593600000,
+    "until": 1785369600000,
+    "split": 1781481600000,
+    "tf": "15m",
+    "horizonBars": 96,
+    "stepBars": 192,
+    "warmupBars": 1920
+  },
+  "aggregate": [
+    {
+      "key": "volume|train",
+      "n": 312,
+      "strong": 0.12179487179487179,
+      "weakMatched": 0.10576923076923077,
+      "permuted": 0.06663461538461539,
+      "permutationP": 0.009900990099009901
+    },
+    {
+      "key": "oi|train",
+      "n": 312,
+      "strong": 0.10897435897435898,
+      "weakMatched": 0.10256410256410256,
+      "permuted": 0.04955128205128205,
+      "permutationP": 0.019801980198019802
+    },
+    {
+      "key": "volume|test",
+      "n": 504,
+      "strong": 0.047619047619047616,
+      "weakMatched": 0.02976190476190476,
+      "permuted": 0.025615079365079323,
+      "permutationP": 0.009900990099009901
+    },
+    {
+      "key": "oi|test",
+      "n": 504,
+      "strong": 0.021825396825396824,
+      "weakMatched": 0.017857142857142856,
+      "permuted": 0.020456349206349173,
+      "permutationP": 0.45544554455445546
+    }
+  ],
+  "slices": [
+    {
+      "key": "volume|train|BTC/USDT|sell-side",
+      "n": 39,
+      "strong": 0,
+      "weakMatched": 0,
+      "permuted": 0.0020242914979757085,
+      "permutationP": 1
+    },
+    {
+      "key": "volume|train|BTC/USDT|buy-side",
+      "n": 39,
+      "strong": 0.1794871794871795,
+      "weakMatched": 0.10256410256410256,
+      "permuted": 0.11066126855600537,
+      "permutationP": 0.20512820512820512
+    },
+    {
+      "key": "oi|train|BTC/USDT|sell-side",
+      "n": 39,
+      "strong": 0,
+      "weakMatched": 0,
+      "permuted": 0.004048582995951416,
+      "permutationP": 1
+    },
+    {
+      "key": "oi|train|BTC/USDT|buy-side",
+      "n": 39,
+      "strong": 0.1282051282051282,
+      "weakMatched": 0.1282051282051282,
+      "permuted": 0.07287449392712553,
+      "permutationP": 0.15384615384615385
+    },
+    {
+      "key": "volume|test|BTC/USDT|sell-side",
+      "n": 63,
+      "strong": 0.015873015873015872,
+      "weakMatched": 0,
+      "permuted": 0.006912442396313364,
+      "permutationP": 0.42857142857142855
+    },
+    {
+      "key": "volume|test|BTC/USDT|buy-side",
+      "n": 63,
+      "strong": 0.07936507936507936,
+      "weakMatched": 0.031746031746031744,
+      "permuted": 0.029441884280593918,
+      "permutationP": 0.015873015873015872
+    },
+    {
+      "key": "oi|test|BTC/USDT|sell-side",
+      "n": 63,
+      "strong": 0.015873015873015872,
+      "weakMatched": 0.015873015873015872,
+      "permuted": 0.002048131080389145,
+      "permutationP": 0.14285714285714285
+    },
+    {
+      "key": "oi|test|BTC/USDT|buy-side",
+      "n": 63,
+      "strong": 0.015873015873015872,
+      "weakMatched": 0.015873015873015872,
+      "permuted": 0.016897081413210432,
+      "permutationP": 0.6507936507936508
+    },
+    {
+      "key": "volume|train|ETH/USDT|sell-side",
+      "n": 39,
+      "strong": 0.02564102564102564,
+      "weakMatched": 0,
+      "permuted": 0.012145748987854251,
+      "permutationP": 0.4358974358974359
+    },
+    {
+      "key": "volume|train|ETH/USDT|buy-side",
+      "n": 39,
+      "strong": 0.23076923076923078,
+      "weakMatched": 0.23076923076923078,
+      "permuted": 0.19298245614035087,
+      "permutationP": 0.23076923076923078
+    },
+    {
+      "key": "oi|train|ETH/USDT|sell-side",
+      "n": 39,
+      "strong": 0,
+      "weakMatched": 0,
+      "permuted": 0,
+      "permutationP": 1
+    },
+    {
+      "key": "oi|train|ETH/USDT|buy-side",
+      "n": 39,
+      "strong": 0.23076923076923078,
+      "weakMatched": 0.23076923076923078,
+      "permuted": 0.14912280701754388,
+      "permutationP": 0.07692307692307693
+    },
+    {
+      "key": "volume|test|ETH/USDT|sell-side",
+      "n": 63,
+      "strong": 0.06349206349206349,
+      "weakMatched": 0.015873015873015872,
+      "permuted": 0.026625704045058846,
+      "permutationP": 0.015873015873015872
+    },
+    {
+      "key": "volume|test|ETH/USDT|buy-side",
+      "n": 63,
+      "strong": 0.07936507936507936,
+      "weakMatched": 0.06349206349206349,
+      "permuted": 0.039682539682539625,
+      "permutationP": 0.1111111111111111
+    },
+    {
+      "key": "oi|test|ETH/USDT|sell-side",
+      "n": 63,
+      "strong": 0,
+      "weakMatched": 0,
+      "permuted": 0,
+      "permutationP": 1
+    },
+    {
+      "key": "oi|test|ETH/USDT|buy-side",
+      "n": 63,
+      "strong": 0.031746031746031744,
+      "weakMatched": 0.031746031746031744,
+      "permuted": 0.024065540194572417,
+      "permutationP": 0.49206349206349204
+    },
+    {
+      "key": "volume|train|SOL/USDT|sell-side",
+      "n": 39,
+      "strong": 0,
+      "weakMatched": 0,
+      "permuted": 0.0020242914979757085,
+      "permutationP": 1
+    },
+    {
+      "key": "volume|train|SOL/USDT|buy-side",
+      "n": 39,
+      "strong": 0.28205128205128205,
+      "weakMatched": 0.28205128205128205,
+      "permuted": 0.20917678812415652,
+      "permutationP": 0.1794871794871795
+    },
+    {
+      "key": "oi|train|SOL/USDT|sell-side",
+      "n": 39,
+      "strong": 0,
+      "weakMatched": 0,
+      "permuted": 0,
+      "permutationP": 1
+    },
+    {
+      "key": "oi|train|SOL/USDT|buy-side",
+      "n": 39,
+      "strong": 0.2564102564102564,
+      "weakMatched": 0.2564102564102564,
+      "permuted": 0.19568151147098511,
+      "permutationP": 0.23076923076923078
+    },
+    {
+      "key": "volume|test|SOL/USDT|sell-side",
+      "n": 63,
+      "strong": 0,
+      "weakMatched": 0,
+      "permuted": 0.0007680491551459293,
+      "permutationP": 1
+    },
+    {
+      "key": "volume|test|SOL/USDT|buy-side",
+      "n": 63,
+      "strong": 0.06349206349206349,
+      "weakMatched": 0.06349206349206349,
+      "permuted": 0.04941116231438808,
+      "permutationP": 0.36507936507936506
+    },
+    {
+      "key": "oi|test|SOL/USDT|sell-side",
+      "n": 63,
+      "strong": 0.015873015873015872,
+      "weakMatched": 0.015873015873015872,
+      "permuted": 0.012032770097286212,
+      "permutationP": 0.5873015873015873
+    },
+    {
+      "key": "oi|test|SOL/USDT|buy-side",
+      "n": 63,
+      "strong": 0.06349206349206349,
+      "weakMatched": 0.031746031746031744,
+      "permuted": 0.062211981566820215,
+      "permutationP": 0.6349206349206349
+    },
+    {
+      "key": "volume|train|XRP/USDT|sell-side",
+      "n": 39,
+      "strong": 0.02564102564102564,
+      "weakMatched": 0,
+      "permuted": 0.03036437246963563,
+      "permutationP": 0.7692307692307693
+    },
+    {
+      "key": "volume|train|XRP/USDT|buy-side",
+      "n": 39,
+      "strong": 0.23076923076923078,
+      "weakMatched": 0.23076923076923078,
+      "permuted": 0.14574898785425103,
+      "permutationP": 0.07692307692307693
+    },
+    {
+      "key": "oi|train|XRP/USDT|sell-side",
+      "n": 39,
+      "strong": 0.02564102564102564,
+      "weakMatched": 0,
+      "permuted": 0.011470985155195684,
+      "permutationP": 0.38461538461538464
+    },
+    {
+      "key": "oi|train|XRP/USDT|buy-side",
+      "n": 39,
+      "strong": 0.23076923076923078,
+      "weakMatched": 0.20512820512820512,
+      "permuted": 0.15519568151147092,
+      "permutationP": 0.02564102564102564
+    },
+    {
+      "key": "volume|test|XRP/USDT|sell-side",
+      "n": 63,
+      "strong": 0,
+      "weakMatched": 0,
+      "permuted": 0,
+      "permutationP": 1
+    },
+    {
+      "key": "volume|test|XRP/USDT|buy-side",
+      "n": 63,
+      "strong": 0.07936507936507936,
+      "weakMatched": 0.06349206349206349,
+      "permuted": 0.05325140809011769,
+      "permutationP": 0.1746031746031746
+    },
+    {
+      "key": "oi|test|XRP/USDT|sell-side",
+      "n": 63,
+      "strong": 0,
+      "weakMatched": 0,
+      "permuted": 0.005376344086021505,
+      "permutationP": 1
+    },
+    {
+      "key": "oi|test|XRP/USDT|buy-side",
+      "n": 63,
+      "strong": 0.031746031746031744,
+      "weakMatched": 0.031746031746031744,
+      "permuted": 0.032770097286226305,
+      "permutationP": 0.6190476190476191
+    }
+  ]
+}
