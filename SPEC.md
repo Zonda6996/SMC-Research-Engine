@@ -1681,3 +1681,12 @@ Apex/Reversal вынесены из Подтверждения в самосто
 - Против baseline 12R raw test mean и PF ниже (+0.104R, PF 1.457), но tail-robust test mean выше (+0.041R против +0.010R), а DD ниже в 3.35 раза (14.748R против 49.410R). Train ex-top1% меняет знак с −0.016R на +0.013R.
 - SIMPLIFIED_APEX_VETO_PRESET включает 80 баров. Для канонической связки 1h→15m это 20 часов после PARTIAL. SIMPLIFIED_CONFIRMATION_CONFIG остаётся с 0, а SIMPLIFIED_HIGH_WR_PRESET не изменён.
 - Версия: simplified-confirmation-0.8-time-stop-preset.
+
+## 16.44 Раздельный routing simplified/refined по §14.1 (30.07.2026)
+
+- Исправлена архитектурная ошибка: один `CONFIRMATION_TF` использовался одновременно для обоих движков. Теперь `SIMPLIFIED_CONFIRMATION_TF` содержит первый TF после `/`, `REFINED_CONFIRMATION_TF` — второй: 1W→1D/4h, 1D→4h/1h, 4h→1h/15m, 1h→15m/5m.
+- Visualizer server строит раздельные candle series, results и indicator payload для simplified/refined; панель выбирает их по `confEngine`. Тесты фиксируют все четыре строки и server/UI wiring.
+- Старый end-to-end результат 1h-зон на 15m confirmation воспроизведён только как контроль старого протокола: train n=3887, E +0.049R, ex-top1% +0.013R; test n=1466, E +0.082R, ex-top1% +0.041R, PF 1.359, DD 14.748R. Небольшое отличие test n от прежних 1463 связано с правой границей данных 30.07.2026, а не с новым TF routing.
+- Этот контроль НЕ является новым результатом corrected 1h→15m simplified ladder на общей логике проекта — он как раз соответствует этой строке. Для 4h→1h, 1D→4h и 1W→1D нужны отдельные replay; 80 баров означают соответственно 80 часов, 320 часов и 80 дней после partial. До этих replay переносить старую оценку time-stop на другие строки запрещено.
+- Browser QA: Deep/OTE markers выключены по умолчанию, BOS/CHoCH включён, protected отдельно; duplicate DOM id и JS errors отсутствуют. TIME проверен на синтетической сделке с реальной подменой ряда.
+- Баг последовательности Zones→Heatmap→Confirmation→закрыть Heatmap→закрыть Confirmation формализован. На fixture и синтетическом LTF текущая версия корректно вернула `mainShown=true` и исходный range; реальный визуальный дефект не объявлен исправленным и требует сохранённого payload, на котором проявляется.

@@ -90,3 +90,14 @@ POI TF → упрощённое подтверждение / уточнённо�
 3. Оформить воспроизводимый кейс бага закрытия Confirmation, без фикса.
 4. Провести честную калибровку Apex/Reversal по приватному TV через набор точных наблюдений; не обещать копию private logic.
 5. Только после этого — видимый редизайн, финальный QA и merge hygiene.
+
+## 8. Дополнение 30.07.2026: что сделано в `fix/confirmation-tf-routing`
+
+- `f383902` (на `apex-reversal-v1`): переключатели Deep/OTE/BOS-CHoCH/protected доведены в панели «Сделки»; Deep/OTE off, BOS/CHoCH on, protected off; безопасный DOM wiring; runtime TIME UI добавлен.
+- `995bbfd`: раздельные `SIMPLIFIED_CONFIRMATION_TF` и `REFINED_CONFIRMATION_TF` по всем четырём строкам §14.1; server routing/payload/MTF layers разделены.
+- `9b9f1b5`: confirmation panel и подписи используют TF выбранного движка.
+- `72cb6ce`: regression-тесты server/UI routing.
+- Browser QA: defaults верны, duplicate DOM id 0, JS errors 0; артефакты `ci-results/marker-tf-qa/`.
+- Б1 формализован и снят на fixture + синтетическом LTF/TIME payload в `ci-results/confirmation-close-qa/`. На этих данных range восстановился; баг на реальных данных не объявлять исправленным.
+- Контрольный старый 1h→15m E2E повторён до 30.07.2026: train 3887, +0.049R; test 1466, +0.082R; ex-top1% +0.041R; PF 1.359; DD 14.748R. Это не переносится на другие строки лестницы: 80 баров там имеют другую длительность.
+- Следующее по indicators: не менять Apex defaults. Нужны точные TV status-line точки минимум BTC spot/futures на одинаковом timestamp для 5m/15m/1h/4h и отдельные Reversal events со свечой до/сигнальной/после, Risk Mode и состоянием Apex. Текущая формула остаётся approximation; §16.41 остаётся отрицательным baseline.
