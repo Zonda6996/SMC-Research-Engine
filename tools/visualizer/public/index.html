@@ -122,11 +122,11 @@
 
 			<!-- Подтверждение -->
 			<section class="section mode" id="confPanel">
-				<div class="section-head" data-toggle="confToggle"><h2>Подтверждение <span class="ver">1D→1h · 4h→15m · 1h→5m</span></h2><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
+				<div class="section-head" data-toggle="confToggle"><h2>Подтверждение <span class="ver">simplified / refined по §14.1</span></h2><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="confControls">
 						<div class="grid2">
-							<select class="input" id="confLayer" title="§16.20/§16.23: связка «ТФ зоны → ТФ подтверждения» — график или слой"><option value="ctx" selected>Связка графика</option><option value="1d">1D→1h</option><option value="4h">4h→15m</option><option value="1h">1h→5m</option></select>
+							<select class="input" id="confLayer" title="§14.1: TF зависит от выбранного движка — simplified использует первый после `/`, refined второй"><option value="ctx" selected>Связка графика</option><option value="1d">1D: 4h / 1h</option><option value="4h">4h: 1h / 15m</option><option value="1h">1h: 15m / 5m</option></select>
 							<select class="input" id="confStatus"><option value="all">Все попытки</option><option value="entered">Entered</option><option value="rejected">Rejected</option></select>
 							<select class="input" id="confOutcome"><option value="all">Любой исход</option><option value="tp">TP2</option><option value="stop">Stop</option><option value="open">Open</option></select>
 							<select class="input" id="confReason"><option value="all">Все причины</option></select>
@@ -141,7 +141,7 @@
 							<button class="btn btn-ghost sm" id="confBack">Обычный график</button>
 						</div>
 						<div class="detail" id="confTrace"></div>
-						<details class="help"><summary>Справка по подтверждению</summary><p>Последовательность: заход → остановка (направленное закрытие после 4 тихих баров) → отскок (6 баров) → пересвип невыметенного якоря → защита → тест слабости (объём возобновления выше отката) → вход; стоп за экстремумом свипа, тейк 2R. Попытка умирает: 96 баров бездействия · пробой закрытиями · конец окна зоны (со состоявшимся свипом — доигрывается). Вход отменяется при риске &gt; 1.5 ATR15. Уточнённое подтверждение по лестнице ТФ: 1D-зоны → 1h, 4h → 15m, 1h → 5m; константы движка — в барах ТФ подтверждения (время масштабируется с ТФ контекста). Пометка «против импульса» калибрована на связке 4h→15m. Тусклые зоны — окно раньше истории ТФ подтверждения: нет данных, не логики.</p></details>
+						<details class="help"><summary>Справка по подтверждению</summary><p>Лестница §14.1: POI 1W → simplified 1D / refined 4h; 1D → 4h / 1h; 4h → 1h / 15m; 1h → 15m / 5m. Уточнённая последовательность: заход → остановка → отскок → пересвип → защита → тест слабости → вход. Упрощённая: касание зоны → первая направленная свеча своего TF. Константы движков считаются в барах выбранного TF, поэтому 80 баров time-stop означают разное реальное время на разных строках лестницы.</p></details>
 					</div>
 				</div>
 			</section>

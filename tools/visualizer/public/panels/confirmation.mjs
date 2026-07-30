@@ -20,19 +20,25 @@ function zoneEndInfo(poiId) {
 }
 
 /** §16.20: активная связка панели — контекстная (ТФ графика) или слой (свинг 1D→1h / локальный 1h→5m). */
-export function confLayerData() {
+export function confLayerData(engine = $('confEngine')?.value ?? 'refined') {
+	const simplified = engine === 'simplified'
 	const sel = $('confLayer')?.value ?? 'ctx'
 	const L = (S.data?.mtfLayers || []).find((x) => x.contextTf === sel)
 	if (sel !== 'ctx' && L) {
+		const confTf = simplified ? L.simplifiedTf : L.confTf
 		return {
-			results: L.results, candidates: L.candidates,
-			src: L.ltfConf ?? (L.confTf === '5m' ? S.data?.ltf5m : null) ?? [],
-			confTf: L.confTf, zoneTf: L.contextTf, indicators: L.indicators,
+			results: simplified ? (L.simplifiedResults || []) : L.results, candidates: L.candidates,
+			src: (simplified ? L.ltfSimplified : L.ltfConf) ?? (confTf === '5m' ? S.data?.ltf5m : null) ?? [],
+			confTf, zoneTf: L.contextTf, indicators: simplified ? L.simplifiedIndicators : L.indicators,
 		}
 	}
 	return {
-		results: S.data?.poiConfirmation?.results || [], candidates: S.data?.liquidityPoi?.candidates || [],
-		src: S.data?.ltfConf || [], confTf: S.data?.dataset?.confTf, zoneTf: S.data?.dataset?.timeframe, indicators: S.data?.indicators?.confirmation,
+		results: simplified ? (S.data?.simplifiedConfirmation?.results || []) : (S.data?.poiConfirmation?.results || []),
+		candidates: S.data?.liquidityPoi?.candidates || [],
+		src: simplified ? (S.data?.ltfSimplified || []) : (S.data?.ltfConf || []),
+		confTf: simplified ? S.data?.dataset?.simplifiedTf : (S.data?.dataset?.refinedTf ?? S.data?.dataset?.confTf),
+		zoneTf: S.data?.dataset?.timeframe,
+		indicators: simplified ? S.data?.indicators?.simplified : S.data?.indicators?.confirmation,
 	}
 }
 
@@ -72,9 +78,10 @@ function currentConfirmation() {
  */
 /** Плоский список сделок упрощённого режима (пресет v0.4). */
 export function simplifiedEntries() {
-	const zones = new Map((S.data?.liquidityPoi?.candidates || []).map((z) => [z.id, z]))
+	const layer = confLayerData('simplified')
+	const zones = new Map((layer.candidates || []).map((z) => [z.id, z]))
 	const out = []
-	for (const r of S.data?.simplifiedConfirmation?.results || []) {
+	for (const r of layer.results || []) {
 		for (let i = 0; i < (r.entries || []).length; i++) out.push(withZoneRank({ ...r.entries[i], poiId: r.poiId, direction: r.direction, near: r.near, far: r.far, knownAt: r.knownAt, endAt: r.endAt, idx: i }, zones.get(r.poiId)))
 	}
 	const last = S.data?.candles?.at(-1)

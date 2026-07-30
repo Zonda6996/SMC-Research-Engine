@@ -143,7 +143,7 @@ async function load() {
 		initChart(onCrosshair, onChartClick, drawHmProfile)
 		setCandles(S.data.candles, true)
 		$('version').textContent = `${json.liquidityPoi?.version || ''} · ${json.strategy.version}`
-		$('dataset').textContent = `${json.dataset.symbol} · ${json.dataset.timeframe} · ${json.dataset.candleCount} свечей${json.dataset.ltfConfCount ? ` · ${json.dataset.confTf}: ${json.dataset.ltfConfCount}${json.dataset.fullLtf ? ' (архивы' + (json.dataset.ltfConfFrom ? ' с ' + new Date(json.dataset.ltfConfFrom).toISOString().slice(0, 10) : '') + ')' : ''}` : ''}${json.dataset.until ? ` · до ${json.dataset.until.slice(0, 10)}` : ''} · ${json.finalTrend}`
+		$('dataset').textContent = `${json.dataset.symbol} · ${json.dataset.timeframe} · ${json.dataset.candleCount} свечей${json.dataset.ltfSimplifiedCount ? ` · simplified ${json.dataset.simplifiedTf}: ${json.dataset.ltfSimplifiedCount}` : ''}${json.dataset.ltfConfCount ? ` · refined ${json.dataset.refinedTf ?? json.dataset.confTf}: ${json.dataset.ltfConfCount}${json.dataset.fullLtf ? ' (архивы' + (json.dataset.ltfConfFrom ? ' с ' + new Date(json.dataset.ltfConfFrom).toISOString().slice(0, 10) : '') + ')' : ''}` : ''}${json.dataset.until ? ` · до ${json.dataset.until.slice(0, 10)}` : ''} · ${json.finalTrend}`
 		setEngineDefaults(json.engineDefaults)
 		renderFunnel()
 		redraw()
