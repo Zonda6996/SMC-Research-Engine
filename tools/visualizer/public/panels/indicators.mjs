@@ -26,6 +26,7 @@ function markChanged(){for(const id of serverIds){const el=elFor(id);el?.closest
 export function wireIndicatorSettings(redraw){put(read());markChanged();for(const id of ids){const el=elFor(id);if(!el)continue;el.onchange=()=>{save(indicatorStyle());markChanged();if(!serverIds.has(id))redraw()}}
  $('indicatorApply').onclick=()=>{save(indicatorStyle());document.dispatchEvent(new CustomEvent('viz:reload'))}
  $('indicatorReset').onclick=()=>{save({...DEF});put(DEF);markChanged();document.dispatchEvent(new CustomEvent('viz:reload'))}
+ for(const id of ['apexChk','reversalChk'])$(id).onchange=redraw
 }
 
 export function drawIndicatorLayers(from=null,to=null){
