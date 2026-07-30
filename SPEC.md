@@ -1647,3 +1647,19 @@ Apex/Reversal вынесены из Подтверждения в самосто
 - Каждая движковая зона показывает ТФ зоны в списке, подписи прямоугольника и карточке деталей, включая контекстные зоны текущего графика.
 - Уточнённое и упрощённое подтверждение показывают пару «ТФ зоны → ТФ подтверждения» в статусе, прямоугольнике и деталях сделки.
 - Формат TF единый и заметный: 1D, 4H, 1H, 15M, 5M; геометрия и логика движков не меняются.
+
+
+## 16.40 Archive OI: полная история heatmap без Binance API (30.07.2026)
+
+- Binance USD-M `daily/metrics` доступен через `data.binance.vision`; `monthly/metrics` отсутствует (404).
+- Добавлен `tools/shared/archiveMetrics.ts`: parser по именам колонок, дневной дисковый кэш, retry/fail-soft и каузальное выравнивание последней точки `<=` времени свечи. Нативный шаг metrics — 5m; перенос протухает после двух шагов.
+- CI на 2026-05-01..2026-07-29, 15m: BTC/ETH/SOL/XRP получили 99.99% покрытия (8543/8544 свечи каждый). OI-hybrid изменил число полос относительно volume fallback на всех активах.
+- В visualizer свежий API-ряд имеет приоритет на перекрытии, архив заполняет остальную историю; ошибка архива сохраняет API/volume fallback. Формула и дефолты `liquidity-heatmap-2.0-oi-hybrid` пока не менялись.
+- Это доказательство data path, не predictive edge. До bump 2.1 нужен magnet hit-rate против distance-matched control.
+
+## 16.41 Zonda Reversal baseline: edge не подтверждён (30.07.2026)
+
+- Архивы Futures 2023-01-01..2026-07-29; BTC/ETH/SOL/XRP; 5m/15m/1h; split 2025-01-01; round-trip cost 0.10%.
+- Проверены 14 комбинаций inner/outer edge, touch/directional/reclaim confirmation и mean/inner re-arm. Отбор только по train.
+- Все 14 комбинаций отрицательны net уже на train и остаются отрицательными на untouched test. Текущий `outer/directional/mean`, horizon 12: train −0.105% (n=2991), test −0.199% (n=2151).
+- Лучший train-вариант `outer/touch/inner`: train −0.051%, test −0.211%. Safe/Standard/Risk не маппить и production defaults не менять: точная vendor-формула неизвестна, исследовательский edge отсутствует.
