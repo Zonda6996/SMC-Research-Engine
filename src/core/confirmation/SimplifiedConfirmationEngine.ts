@@ -21,7 +21,7 @@ import { detectReversals, type ApexParams } from '../signals/ApexEngine.js'
 // монетах и всех ступенях лестницы. Плюс два фильтра входа флагами (по умолчанию ВЫКЛ):
 // «без погони» (вход не дальше maxChaseAtr от края зоны) и тренд-фильтр (bos-bos-choch).
 // Дефолты = поведение v0.1 бит-в-бит; новое включается конфигом или пресетом.
-export const SIMPLIFIED_CONFIRMATION_VERSION = 'simplified-confirmation-0.6-apex-veto'
+export const SIMPLIFIED_CONFIRMATION_VERSION = 'simplified-confirmation-0.7-post-partial-time-stop'
 
 export interface SimplifiedConfirmationConfig {
 	/** Полный отход от зоны для (пере)взведения касания, в ATR упрощённого ТФ (как в уточнённом). */
@@ -46,6 +46,8 @@ export interface SimplifiedConfirmationConfig {
 	partialAtR: number
 	/** v0.3: полный тейк в R (используется при targetMode='r'). */
 	fullAtR: number
+	/** v0.7: закрыть остаток по close после N полных баров с момента partial; 0 = выключено. */
+	postPartialTimeStopBars: number
 	/**
 	 * v0.3: фильтр «без погони» — максимальное расстояние входа от БЛИЖНЕЙ границы зоны,
 	 * в ATR зоны. 0 = выключен. Смысл структурный: вход далеко от зоны при стопе за её
@@ -95,6 +97,7 @@ export const SIMPLIFIED_CONFIRMATION_CONFIG: SimplifiedConfirmationConfig = {
 	targetMode: 'pct',
 	partialAtR: 0.40,
 	fullAtR: 12,
+	postPartialTimeStopBars: 0,
 	maxChaseAtr: 0,
 	trendFilter: 'off',
 	trendMinBos: 2,
@@ -150,10 +153,10 @@ export interface SimplifiedEntry {
 	stopMode: 'far' | 'pct'
 	partialPrice: number
 	fullPrice: number
-	/** Хронология: PARTIAL (частичка + стоп в БУ), BE (выбило в БУ), FULL, STOP. */
-	events: Array<{ state: 'PARTIAL' | 'BE' | 'FULL' | 'STOP'; at: number; price: number }>
-	/** stop — до частички; be — частичка взята, остаток в БУ; full — обе цели; open — край данных. */
-	outcome: 'stop' | 'be' | 'full' | 'open'
+	/** Хронология: PARTIAL, BE, FULL, TIME (time-stop остатка), STOP. */
+	events: Array<{ state: 'PARTIAL' | 'BE' | 'FULL' | 'TIME' | 'STOP'; at: number; price: number }>
+	/** stop — до частички; be — остаток в БУ; full — обе цели; time — time-stop после partial; open — край данных. */
+	outcome: 'stop' | 'be' | 'full' | 'time' | 'open'
 	/** Взвешенный результат в долях ЧИСТОГО ХОДА цены (комиссии не вычтены). */
 	grossMovePct: number | null
 	/** То же в R от НАЧАЛЬНОГО риска (вход→стоп) — для сравнения со связкой уточнённого режима. */
@@ -230,13 +233,16 @@ function playPosition(
 ): number {
 	let stop = stop0
 	let partialTaken = false
+	let partialTakenAtIndex = -1
 	const risk = Math.abs(entry - stop0)
-	const done = (outcome: SimplifiedEntry['outcome'], k: number): number => {
+	const done = (outcome: SimplifiedEntry['outcome'], k: number, exitPrice?: number): number => {
 		out.outcome = outcome
 		const partMove = partialMovePct * cfg.partialFraction
 		const restShare = 1 - cfg.partialFraction
+		const timeMove = exitPrice == null ? 0 : (long ? exitPrice - entry : entry - exitPrice) / entry
 		out.grossMovePct = outcome === 'full' ? partMove + fullMovePct * restShare
 			: outcome === 'be' ? partMove
+			: outcome === 'time' ? partMove + timeMove * restShare
 			: -(Math.abs(entry - stop0) / entry) // полный стоп всей позицией
 		out.grossR = risk > 0 ? (out.grossMovePct * entry) / risk : null
 		return k
@@ -253,6 +259,7 @@ function playPosition(
 		}
 		if (hitPartial) {
 			partialTaken = true
+			partialTakenAtIndex = k
 			stop = entry // БУ после частички (метод пользователя)
 			out.events.push({ state: 'PARTIAL', at: c.timestamp, price: partialPrice })
 			// фулл в том же баре после частички не засчитываем (порядок внутри бара неизвестен)
@@ -261,6 +268,11 @@ function playPosition(
 		if (hitFull) {
 			out.events.push({ state: 'FULL', at: c.timestamp, price: fullPrice })
 			return done('full', k)
+		}
+		if (partialTaken && cfg.postPartialTimeStopBars > 0 && partialTakenAtIndex >= 0
+			&& k - partialTakenAtIndex >= cfg.postPartialTimeStopBars) {
+			out.events.push({ state: 'TIME', at: c.timestamp, price: c.close })
+			return done('time', k, c.close)
 		}
 	}
 	out.outcome = 'open'
