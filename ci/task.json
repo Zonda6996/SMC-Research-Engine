@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": false,
-  "script": "ci/research/runIndicatorTimeframes.ts",
+  "script": "ci/research/sortCurrentZoneTrades.ts",
   "runnerVersion": "v1",
-  "runLabel": "timeframe-correct-indicators-strict-fix"
+  "runLabel": "current-zone-trade-order"
 }
