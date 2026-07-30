@@ -4,7 +4,7 @@
 
 import { S, setMode } from './lib/state.mjs'
 import { $, esc, time } from './lib/format.mjs'
-import { initChart, restoreMainCandles, setCandles, fitContent, priceAt, rectAt, getLogicalRange, setLogicalRange } from './lib/chart.mjs'
+import { initChart, restoreMainCandles, setCandles, fitContent, priceAt, rectAt, getLogicalRange, getTimeRange, setTimeRange } from './lib/chart.mjs'
 import { fetchAnalyze, fetchSymbols } from './lib/api.mjs'
 import { renderTradesMode, wireStatsPanel, navigateTrades, tradeTooltip, renderFunnel } from './panels/stats.mjs'
 import { hmBandTooltip, wireHeatmapPanel, hmApplyTfDefaults, drawHmProfile } from './panels/heatmap.mjs'
@@ -18,18 +18,18 @@ import { wirePalette, openPalette, closePalette, paletteOpen, setPaletteSymbols 
 // ---- Режимы ----
 
 const MODE_PANELS = { zones: 'poiZone', conf: 'conf', lab: 'lab' }
-/** Зум-позиция основного графика: сохраняется при уходе на 15m/5m (conf/lab) и возвращается. */
+/** Временной диапазон основного графика: не зависит от числа баров подменённого confirmation-ряда. */
 let savedMainRange = null
 
 function activateMode(mode) {
-	// Уходим с основного набора свечей — запоминаем зум, чтобы не «дёргать» график при возврате.
-	if ((mode === 'conf' || mode === 'lab') && S.mainShown) savedMainRange = getLogicalRange()
+	// Logical range — индексы баров и ломается при setData на другой TF. Сохраняем реальные timestamps.
+	if ((mode === 'conf' || mode === 'lab') && S.mainShown) savedMainRange = getTimeRange()
 	// Возврат на основной ряд (боевой вид и зоны рисуются по нему): если предыдущий режим
 	// подменил свечи на ряд подтверждения, их надо вернуть ДО отрисовки, иначе прямоугольники
 	// зон лягут на чужую шкалу времени и график будет выглядеть пустым.
 	if ((mode === 'trades' || mode === 'zones') && !S.mainShown) {
 		restoreMainCandles()
-		if (savedMainRange) { setLogicalRange(savedMainRange); savedMainRange = null } else fitContent()
+		if (savedMainRange) { setTimeRange(savedMainRange); savedMainRange = null } else fitContent()
 	}
 	for (const [m, prefix] of Object.entries(MODE_PANELS)) {
 		const on = m === mode
@@ -58,7 +58,7 @@ function deactivateMode() {
 	restoreMainCandles()
 	redraw()
 	// Возврат без прыжка: восстанавливаем сохранённый зум; fitContent — только если восстанавливать нечего.
-	if (!wasMain && savedMainRange) { setLogicalRange(savedMainRange); savedMainRange = null }
+	if (!wasMain && savedMainRange) { setTimeRange(savedMainRange); savedMainRange = null }
 	else if (!wasMain) fitContent()
 	// Страховка от «пропавшего графика»: если после возврата видимый диапазон оказался вне
 	// данных (пустой экран), просто показываем всё окно целиком.

@@ -14,6 +14,7 @@ let markersPlugin = null
 let overlays = []
 export const zonesPrim = makeZonesPrimitive()
 export const apexPrim = makeApexPrimitive()
+export const heatmapPrim = makeHeatmapPrimitive()
 
 /** Прямоугольники зон: [{t1,t2,p1,p2,side,focused,dim,alpha,label,id,manual}] (t в секундах). */
 function makeZonesPrimitive() {
@@ -86,6 +87,47 @@ function makeZonesPrimitive() {
 	return prim
 }
 
+function makeHeatmapPrimitive() {
+	const p = {
+		_bands: [], _ctx: null,
+		attached(x) { p._ctx = x },
+		detached() { p._ctx = null },
+		setBands(x) { p._bands = x; p._ctx?.requestUpdate?.() },
+		paneViews() { return p._views },
+	}
+	const renderer = {
+		draw(target) {
+			const a = p._ctx
+			if (!a || !p._bands.length) return
+			const ts = a.chart.timeScale()
+			const vr = ts.getVisibleRange()
+			if (!vr) return
+			target.useBitmapCoordinateSpace(({ context: c, horizontalPixelRatio: h, verticalPixelRatio: v, mediaSize }) => {
+				c.save()
+				for (const x of p._bands) {
+					const b = x.p
+					if (x.t2 < vr.from || x.t1 > vr.to) continue
+					const x1 = x.t1 <= vr.from ? 0 : ts.timeToCoordinate(x.t1)
+					const x2 = x.t2 >= vr.to ? mediaSize.width : ts.timeToCoordinate(x.t2)
+					const y = a.series.priceToCoordinate(b.extremePrice)
+					if (x1 == null || x2 == null || y == null) continue
+					const alpha = 0.08 + 0.8 * x.w * x.w
+					const width = Math.max(2, Math.min(10, 2 + Math.round(8 * Math.pow(x.w, 1.5))))
+					c.strokeStyle = `rgba(${b.side === 'sell-side' ? '244,80,106' : '47,208,140'},${alpha.toFixed(3)})`
+					c.lineWidth = width * v
+					c.beginPath()
+					c.moveTo(x1 * h, y * v)
+					c.lineTo(x2 * h, y * v)
+					c.stroke()
+				}
+				c.restore()
+			})
+		},
+	}
+	p._views = [{ renderer: () => renderer }]
+	return p
+}
+
 function makeApexPrimitive() {
 	const p = {
 		_bands: [], _opts: {}, _ctx: null,
@@ -154,6 +196,7 @@ export function initChart(onCrosshair, onClick, onPan) {
 	})
 	candlesSeries.attachPrimitive(zonesPrim)
 	candlesSeries.attachPrimitive(apexPrim)
+	candlesSeries.attachPrimitive(heatmapPrim)
 	markersPlugin = LWC().createSeriesMarkers(candlesSeries, [])
 	S.mainShown = false
 	if (onCrosshair) chart.subscribeCrosshairMove(onCrosshair)
@@ -188,6 +231,7 @@ export function clearOverlays() {
 	overlays = []
 	zonesPrim.setRects([])
 	apexPrim.setBands([])
+	heatmapPrim.setBands([])
 }
 
 export function setCandles(list, isMain = false) {
@@ -202,6 +246,10 @@ export const lineStyle = () => LWC().LineStyle
 export const fitContent = () => chart.timeScale().fitContent()
 export const setVisibleRange = (fromMs, toMs) => chart.timeScale().setVisibleRange({ from: time(fromMs), to: time(toMs) })
 export const priceAt = (y) => candlesSeries.coordinateToPrice(y)
-/** Сохранение/восстановление зума-позиции (логический диапазон — по индексам баров). */
+/** Видимый временной диапазон устойчив к подмене candle series с другим количеством баров. */
+export const getTimeRange = () => chart?.timeScale().getVisibleRange() ?? null
+export const setTimeRange = (r) => { if (r) chart.timeScale().setVisibleRange(r) }
+/** Logical range зависит от индексов текущего ряда; использовать только внутри одного candle series. */
 export const getLogicalRange = () => chart?.timeScale().getVisibleLogicalRange() ?? null
 export const setLogicalRange = (r) => { if (r) chart.timeScale().setVisibleLogicalRange(r) }
+export const overlayCount = () => overlays.length
