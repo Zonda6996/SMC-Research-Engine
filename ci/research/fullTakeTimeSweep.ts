@@ -1,11 +1,11 @@
 import { readFile, writeFile, unlink } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
 
-const sourcePath = 'ci/research/fullTakeExitResearch.ts'
+const sourcePath = 'ci/research/simplifiedFullTakeReplay.ts'
 const generatedPath = 'ci/research/.fullTakeTimeSweep.generated.ts'
-const needle = "  { name: 'time-96', family: 'time', timeBars: 96 },\n  { name: 'time-192', family: 'time', timeBars: 192 },\n  { name: 'time-384', family: 'time', timeBars: 384 },"
+const needle = "  { id: 'time-96', family: 'time', timeBars: 96 },\n  { id: 'time-192', family: 'time', timeBars: 192 },\n  { id: 'time-384', family: 'time', timeBars: 384 },"
 const replacement = [64, 80, 96, 112, 128, 160]
-  .map((timeBars) => `  { name: 'time-${timeBars}', family: 'time', timeBars: ${timeBars} },`)
+  .map((timeBars) => `  { id: 'time-${timeBars}', family: 'time', timeBars: ${timeBars} },`)
   .join('\n')
 
 const source = await readFile(sourcePath, 'utf8')
