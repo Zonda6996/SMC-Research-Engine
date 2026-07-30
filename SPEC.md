@@ -1672,3 +1672,12 @@ Apex/Reversal вынесены из Подтверждения в самосто
 - После исправления семантики таймер считается от бара PARTIAL. Train выбрал 80 полных 15m-баров: train +0.063R, ex-top1% +0.020R; untouched test +0.089R, ex-top1% +0.046R, PF 1.389, DD 13.424R. Диапазон 64–128 остаётся положительным, поэтому результат не является одиночным пиком.
 - Движок v0.7 поддерживает postPartialTimeStopBars и outcome/event TIME. 0 выключает механику; существующие дефолты и пресеты не изменены.
 - Включение в SIMPLIFIED_APEX_VETO_PRESET отложено: exit-only replay замораживал входы, а более ранний выход при reentry может породить дополнительные входы. Сначала нужен отдельный end-to-end replay с реальным жизненным циклом зоны.
+
+
+## 16.43 Post-partial time-stop включён в Apex-пресет после end-to-end проверки (30.07.2026)
+
+- End-to-end replay включил postPartialTimeStopBars=80 непосредственно в SimplifiedConfirmationEngine, поэтому раннее освобождение позиции могло создавать дополнительные re-entry. Число сделок изменилось с 3856/1449 до 3887/1463 (train/test).
+- Результат с реальным lifecycle: train E +0.049R, ex-top1% +0.013R; untouched test E +0.082R, ex-top1% +0.041R, PF 1.358, DD 14.748R.
+- Против baseline 12R raw test mean и PF ниже (+0.104R, PF 1.457), но tail-robust test mean выше (+0.041R против +0.010R), а DD ниже в 3.35 раза (14.748R против 49.410R). Train ex-top1% меняет знак с −0.016R на +0.013R.
+- SIMPLIFIED_APEX_VETO_PRESET включает 80 баров. Для канонической связки 1h→15m это 20 часов после PARTIAL. SIMPLIFIED_CONFIRMATION_CONFIG остаётся с 0, а SIMPLIFIED_HIGH_WR_PRESET не изменён.
+- Версия: simplified-confirmation-0.8-time-stop-preset.
