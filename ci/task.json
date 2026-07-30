@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": false,
-  "script": "ci/research/fixArchiveOiWiringTs.ts",
+  "script": "ci/research/finalizeArchiveOiWiring.ts",
   "runnerVersion": "v1",
-  "runLabel": "archive-oi-wiring-ts-fix"
+  "runLabel": "archive-oi-wiring-final"
 }
