@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": false,
-  "script": "ci/research/applyDesignAndZoneFix.ts",
+  "script": "ci/research/fixApexPrimitiveThenApply.ts",
   "runnerVersion": "v1",
-  "runLabel": "atomic-design-and-b2-fix"
+  "runLabel": "apex-primitive-design-b2-gate"
 }
