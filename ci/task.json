@@ -1,7 +1,7 @@
 {
   "task": "research",
-  "script": "ci/research/fullTakeTimeSweep.ts",
+  "script": "ci/research/applySimplifiedTimeStop.ts",
   "args": [],
   "needsPlaywright": false,
-  "runLabel": "simplified-full-take-time-plateau-v1"
+  "runLabel": "apply-simplified-post-partial-time-stop-v1"
 }
