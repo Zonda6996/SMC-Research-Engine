@@ -1,7 +1,7 @@
 {
   "task": "research",
-  "script": "ci/research/enableSimplifiedTimeStopPreset.ts",
+  "script": "ci/research/finishRedesign.ts",
   "args": [],
-  "needsPlaywright": false,
-  "runLabel": "enable-simplified-time-stop-preset-v1"
+  "needsPlaywright": true,
+  "runLabel": "finish-redesign-v1"
 }
