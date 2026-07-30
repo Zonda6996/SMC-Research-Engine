@@ -1,7 +1,7 @@
 {
   "task": "research",
-  "script": "ci/research/applySimplifiedTimeStop.ts",
+  "script": "ci/research/fixAndApplySimplifiedTimeStop.ts",
   "args": [],
   "needsPlaywright": false,
-  "runLabel": "apply-simplified-post-partial-time-stop-v1"
+  "runLabel": "apply-simplified-post-partial-time-stop-v2"
 }
