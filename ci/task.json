@@ -1,7 +1,7 @@
 {
   "task": "research",
   "needsPlaywright": false,
-  "script": "ci/research/archiveOiHeatmap.ts",
+  "script": "ci/research/wireArchiveOiHeatmap.ts",
   "runnerVersion": "v1",
-  "runLabel": "archive-oi-heatmap"
+  "runLabel": "archive-oi-wiring"
 }
