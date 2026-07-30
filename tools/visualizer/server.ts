@@ -31,6 +31,7 @@ import { BATTLE_CONFIG, canonRiskMultiplier, gridLevelPrice } from '../../src/st
 import { buildCausalMedianByCandidate, firstLtfTouch, FORWARD_VERSION, replayTrade } from '../forward/forwardRunner.js'
 import { aggregateCandles, CONFIRMATION_TF, fetchCandlesPaginated, fetchHeatmapAux, MAX_CANDLES_LTF, TF_MS } from '../shared/candleFetcher.js'
 import { fetchArchiveKlines, mergeCandleSeries } from '../shared/archiveKlines.js'
+import { alignArchiveMetrics, fetchArchiveMetrics } from '../shared/archiveMetrics.js'
 import { liquidityPoiProfileForTf } from '../shared/poiProfiles.js'
 import { plannedFullStop } from '../shared/executionCostGate.js'
 
@@ -58,6 +59,25 @@ const dataCache = new Map<string, {
 }>()
 const DATA_TTL_LIVE = 90_000
 const DATA_TTL_HIST = 60 * 60 * 1000
+
+/** Archive OI fills history unavailable through the ~29-day API window; live API wins on overlap. */
+async function withArchiveHeatmapAux(symbol: string, candles: import('../../src/models/price/Candle.js').Candle[], live: Awaited<ReturnType<typeof fetchHeatmapAux>>, untilMs: number | null): Promise<Awaited<ReturnType<typeof fetchHeatmapAux>>> {
+	if (!candles.length) return live
+	try {
+		const step = candles.length > 1 ? candles[1]!.timestamp - candles[0]!.timestamp : 300_000
+		const end = Math.min(untilMs ?? Date.now(), candles[candles.length - 1]!.timestamp + step)
+		const metrics = await fetchArchiveMetrics(symbol, candles[0]!.timestamp, end, { cacheDir: process.env.CACHE_DIR ?? '.cache/binance', parallel: 8 })
+		if (!metrics.length) return live
+		const archive = alignArchiveMetrics(metrics, candles)
+		const oi = archive.oi.map((v, i) => live.oi[i] ?? v)
+		const takerBuyRatio = archive.takerBuyRatio.map((v, i) => live.takerBuyRatio[i] ?? v)
+		console.log(`[archiveOI] ${symbol}: ${metrics.length} points, ${oi.filter(v => v != null).length}/${candles.length} bars`)
+		return { oi, takerBuyRatio, oiBars: oi.filter(v => v != null).length, takerBars: takerBuyRatio.filter(v => v != null).length }
+	} catch (err) {
+		console.error('[archiveOI] fail-soft, keep API/volume fallback:', err instanceof Error ? err.message : err)
+		return live
+	}
+}
 
 interface AnalyzeQuery {
 	symbol?: string | undefined
@@ -442,6 +462,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					fetchCandlesPaginated(symbol, '5m', ltfNeed, market, untilMs, MAX_CANDLES_LTF),
 					fetchHeatmapAux(symbol, timeframe, snapshot.candles, market),
 				])
+				if (!useFixture && fullLtf && market === 'futures' && heatmapAux) {
+					heatmapAux = await withArchiveHeatmapAux(symbol, snapshot.candles, heatmapAux, untilMs)
+				}
 				// §14.1/§16.19: ряд ТФ подтверждения. Хвост — из уже скачанных 5m (агрегация или сами 5m,
 				// новых API-путей нет); глубокая часть — архивы data.binance.vision от ПЕРВОГО бара
 				// загруженного окна зон (глубина автоматическая, констант нет). Fail-soft: сеть/парсер
