@@ -1,7 +1,7 @@
 {
   "task": "research",
-  "script": "ci/research/fullTakeTimeStopE2e.ts",
+  "script": "ci/research/enableSimplifiedTimeStopPreset.ts",
   "args": [],
   "needsPlaywright": false,
-  "runLabel": "simplified-post-partial-time-stop-e2e-v1"
+  "runLabel": "enable-simplified-time-stop-preset-v1"
 }
