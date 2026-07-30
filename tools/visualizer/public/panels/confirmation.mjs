@@ -3,6 +3,7 @@
 // прямоугольником, вход/стоп/тейк — линиями, якорь — жёлтым пунктиром) и обзор «Зоны на 4h».
 
 import { S } from '../lib/state.mjs'
+import { sortZoneTrades, withZoneRank } from '../lib/zoneTradeSort.mjs'
 import { drawIndicatorLayers } from './indicators.mjs'
 import { $, esc, fmtP, fmtR, time, dt, C, REASON_RU, SPENT_RU, TRACE_RU } from '../lib/format.mjs'
 import { zonesPrim, line, seriesMarkers, setMarkers, clearOverlays, restoreMainCandles, setCandles, lineStyle, fitContent, setVisibleRange } from '../lib/chart.mjs'
@@ -36,11 +37,13 @@ export function confLayerData() {
 }
 
 export function confirmationAttempts() {
+	const layer = confLayerData(), zones = new Map((layer.candidates || []).map((z) => [z.id, z]))
 	const out = []
-	for (const r of (confLayerData().results || []))
+	for (const r of (layer.results || []))
 		for (const a of r.attempts)
-			out.push({ ...a, poiId: r.poiId, direction: r.direction, zoneClass: r.zoneClass, near: r.near, far: r.far, knownAt: r.knownAt, endAt: r.endAt, spentReason: r.spentReason, ltfCoverage: r.ltfCoverage })
-	return out
+			out.push(withZoneRank({ ...a, poiId: r.poiId, direction: r.direction, zoneClass: r.zoneClass, near: r.near, far: r.far, knownAt: r.knownAt, endAt: r.endAt, spentReason: r.spentReason, ltfCoverage: r.ltfCoverage }, zones.get(r.poiId)))
+	const last = S.data?.candles?.at(-1)
+	return sortZoneTrades(out, last?.close, last?.timestamp)
 }
 export function confirmationCandidates() {
 	const st = $('confStatus').value, outcome = $('confOutcome').value, reason = $('confReason').value
@@ -69,11 +72,13 @@ function currentConfirmation() {
  */
 /** Плоский список сделок упрощённого режима (пресет v0.4). */
 export function simplifiedEntries() {
+	const zones = new Map((S.data?.liquidityPoi?.candidates || []).map((z) => [z.id, z]))
 	const out = []
 	for (const r of S.data?.simplifiedConfirmation?.results || []) {
-		for (let i = 0; i < (r.entries || []).length; i++) out.push({ ...r.entries[i], poiId: r.poiId, direction: r.direction, near: r.near, far: r.far, knownAt: r.knownAt, endAt: r.endAt, idx: i })
+		for (let i = 0; i < (r.entries || []).length; i++) out.push(withZoneRank({ ...r.entries[i], poiId: r.poiId, direction: r.direction, near: r.near, far: r.far, knownAt: r.knownAt, endAt: r.endAt, idx: i }, zones.get(r.poiId)))
 	}
-	return out.sort((a, b) => a.entryAt - b.entryAt)
+	const last = S.data?.candles?.at(-1)
+	return sortZoneTrades(out, last?.close, last?.timestamp)
 }
 
 function renderSimplified() {
