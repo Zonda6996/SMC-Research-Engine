@@ -10,6 +10,17 @@ import { renderHeatmap } from './heatmap.mjs'
 const MY_KEY = 'smc-my-zones-v1'
 const TF4H = 14_400_000
 
+/** Snap MTF visual bounds to timestamps that exist in the displayed candle series. */
+export function snapZoneTime(ms, candles, edge = 'start') {
+	if (!candles?.length) return time(ms)
+	let lo = 0, hi = candles.length
+	while (lo < hi) { const mid = (lo + hi) >> 1; if (candles[mid].timestamp < ms) lo = mid + 1; else hi = mid }
+	const i = edge === 'end'
+		? Math.max(0, Math.min(candles.length - 1, candles[lo]?.timestamp === ms ? lo : lo - 1))
+		: Math.max(0, Math.min(candles.length - 1, lo))
+	return time(candles[i].timestamp)
+}
+
 /** §16.23: чип слоя (1d/4h/1h) включён? Чип текущего ТФ управляет контекстными зонами. */
 export function layerChipOn(tf) {
 	const b = document.querySelector(`#layerChips [data-layer="${tf}"]`)
@@ -116,8 +127,9 @@ export function renderZones() {
 	}
 	const rects = xs.map((c) => ({
 		id: zid(c),
-		t1: time(drawFrom(c)),
-		t2: time(c.endAt || last),
+		// MTF values may fall between bars of the displayed series; snap only visual bounds.
+		t1: c.__layer ? snapZoneTime(drawFrom(c), S.data.candles, 'start') : time(drawFrom(c)),
+		t2: c.__layer ? snapZoneTime(c.endAt || last, S.data.candles, 'end') : time(c.endAt || last),
 		p1: c.near, p2: c.far, side: c.direction,
 		focused: zid(c) === focusId, dim: !!focusId && zid(c) !== focusId,
 		alpha: Math.min(1, (c.stackShare ?? 1) * (c.__role === 'local' ? 0.7 : 1)),

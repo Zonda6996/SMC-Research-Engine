@@ -3,9 +3,9 @@
 // прямоугольником, вход/стоп/тейк — линиями, якорь — жёлтым пунктиром) и обзор «Зоны на 4h».
 
 import { S } from '../lib/state.mjs'
-import { indicatorStyle } from './indicators.mjs'
+import { drawIndicatorLayers } from './indicators.mjs'
 import { $, esc, fmtP, fmtR, time, dt, C, REASON_RU, SPENT_RU, TRACE_RU } from '../lib/format.mjs'
-import { zonesPrim, apexPrim, line, seriesMarkers, setMarkers, clearOverlays, restoreMainCandles, setCandles, lineStyle, fitContent, setVisibleRange } from '../lib/chart.mjs'
+import { zonesPrim, line, seriesMarkers, setMarkers, clearOverlays, restoreMainCandles, setCandles, lineStyle, fitContent, setVisibleRange } from '../lib/chart.mjs'
 
 /** Чем именно закончилось окно зоны (джойн с POI-кандидатом): «zone-ended» без контекста бесил на QA. */
 function zoneEndInfo(poiId) {
@@ -67,38 +67,6 @@ function currentConfirmation() {
  * ВНИМАНИЕ: в НАШЕЙ системе близость к зоне экстремума — признак ХУДШЕГО входа (§16.29),
  * поэтому метка рядом со входом это предупреждение, а не подтверждение.
  */
-function drawApexReversal(src, from, to) {
-	const style = indicatorStyle()
-	const showApex = Boolean($('apexChk')?.checked)
-	const showReversal = Boolean($('reversalChk')?.checked)
-	if (!showApex && !showReversal) return
-	const g = S.data?.apex
-	if (!g?.bands?.length) return
-	const inRange = (t) => t >= from && t <= to
-	const pick = (key) => g.bands.filter((b) => b && inRange(time(b.t))).map((b) => ({ time: time(b.t), value: b[key] }))
-	const mean = pick('mean')
-	if (mean.length < 2) return
-	const visibleBands = g.bands.filter((b) => b && inRange(time(b.t))).map((b) => ({ ...b, t: time(b.t) }))
-	apexPrim.setBands(showApex ? visibleBands : [], { upperOn: style.upperFillOn, upperColor: style.upperFillColor, lowerOn: style.lowerFillOn, lowerColor: style.lowerFillColor })
-	const labels = Boolean(style.priceLabels)
-	if (showApex) {
-		if (style.meanOn) line(mean, { color: style.meanColor, lineWidth: 2, lastValueVisible: labels })
-		if (style.redLoOn) line(pick('redLo'), { color: style.redLoColor, lineWidth: 1, lineStyle: lineStyle().Dotted, lastValueVisible: labels })
-		if (style.redHiOn) line(pick('redHi'), { color: style.redHiColor, lineWidth: 1, lastValueVisible: labels })
-		if (style.greenHiOn) line(pick('greenHi'), { color: style.greenHiColor, lineWidth: 1, lineStyle: lineStyle().Dotted, lastValueVisible: labels })
-		if (style.greenLoOn) line(pick('greenLo'), { color: style.greenLoColor, lineWidth: 1, lastValueVisible: labels })
-	}
-	const sig = showReversal ? (S.data?.reversal?.signals || []).filter((x) => inRange(time(x.at)) && (x.direction === 'long' ? style.buyOn : style.sellOn)) : []
-	if (sig.length) {
-		const s0 = line(sig.map((x) => ({ time: time(x.at), value: x.edge })), { color: 'rgba(0,0,0,0)', lineWidth: 1 })
-		seriesMarkers(s0, sig.map((x) => ({
-			time: time(x.at), position: x.direction === 'long' ? 'belowBar' : 'aboveBar',
-			color: x.direction === 'long' ? style.buyColor : style.sellColor, shape: 'circle', size: 1,
-			text: x.direction === 'long' ? 'BUY' : 'SELL',
-		})).sort((a, b) => a.time - b.time))
-	}
-}
-
 /** Плоский список сделок упрощённого режима (пресет v0.4). */
 export function simplifiedEntries() {
 	const out = []
@@ -143,7 +111,7 @@ function renderSimplified() {
 		const s1 = line([{ time: time(e.entryAt), value: e.entry }], { color: 'rgba(0,0,0,0)' })
 		seriesMarkers(s1, [{ time: time(e.entryAt), position: 'aboveBar', color: C.green, shape: 'circle', size: 0, text: `ФУЛЛ ${fmtP(e.fullPrice)} — за экраном, ${(fullAwayPct * 100).toFixed(0)}% хода` }])
 	}
-	drawApexReversal(src, from, to)
+	drawIndicatorLayers(src, from, to)
 	const RU = { PARTIAL: 'частичка взята, стоп в безубыток', BE: 'выбило в безубыток', FULL: 'полный тейк', STOP: 'стоп' }
 	setMarkers((e.events || []).map((x) => ({
 		time: time(x.at), position: x.state === 'STOP' ? 'belowBar' : 'aboveBar',
@@ -215,7 +183,7 @@ export function renderConfirmation() {
 		color: colors[x.state] || C.dim, shape: x.state === 'ENTRY' ? 'arrowUp' : 'circle', size: 1, text: x.state,
 	})).filter((x) => src.some((s0) => time(s0.timestamp) === x.time))
 	setMarkers(marks.sort((a, b) => a.time - b.time))
-	drawApexReversal(src, from, to)
+	drawIndicatorLayers(src, from, to)
 	// Полосы heatmap на 15m-свечи не рисуем (см. renderHeatmap): шкалы времени 4h и 15m несовместимы.
 	S.hmShownBands = []
 	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.rejectionReason === 'data-end' ? 'ЖИВАЯ У КРАЯ ДАННЫХ' : c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason === 'data-end' ? 'ждёт продолжения' : (c.rejectionReason || fmtR(c.grossR))}${c.duplicateEntryOf ? ' · ДУБЛЬ ВХОДА' : ''}${c.againstImpulse ? ' · ПРОТИВ ИМПУЛЬСА' : ''}`
@@ -325,7 +293,4 @@ export function wireConfirmationPanel(activate, deactivate) {
 	for (const id of ['confStatus', 'confOutcome', 'confReason', 'confLayer', 'confEngine']) {
 		$(id).onchange = () => { S.confIndex = 0; renderConfirmation() }
 	}
-	// полосы Apex — только перерисовка, индекс сделки сохраняется
-	$('apexChk').onchange = () => renderConfirmation()
-	$('reversalChk').onchange = () => renderConfirmation()
 }

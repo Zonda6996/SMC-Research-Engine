@@ -12,7 +12,7 @@ import { renderZones, wireZonesPanel, moveZoneFocus, zoneHoverHtml } from './pan
 import { renderConfirmation, wireConfirmationPanel, moveConfirmation } from './panels/confirmation.mjs'
 import { renderLab, wireLabPanel, moveLab, exitLabVisuals } from './panels/lab.mjs'
 import { renderConfigPanel, setEngineDefaults, wireConfigPanel } from './panels/config.mjs'
-import { wireIndicatorSettings } from './panels/indicators.mjs'
+import { drawIndicatorLayers, wireIndicatorSettings } from './panels/indicators.mjs'
 import { wirePalette, openPalette, closePalette, paletteOpen, setPaletteSymbols } from './lib/palette.mjs'
 
 // ---- Режимы ----
@@ -70,10 +70,12 @@ function deactivateMode() {
 export function redraw() {
 	if (!S.data) return
 	const safe = (f) => { try { f() } catch (e) { console.error('render step failed:', e) } }
-	if (S.mode === 'zones') { safe(renderZones); return }
-	if (S.mode === 'conf') { safe(renderConfirmation); return }
-	if (S.mode === 'lab') { safe(renderLab); return }
-	safe(renderTradesMode)
+	if (S.mode === 'zones') safe(renderZones)
+	else if (S.mode === 'conf') { safe(renderConfirmation); return }
+	else if (S.mode === 'lab') { safe(renderLab); return }
+	else safe(renderTradesMode)
+	const cs = S.data.candles || []
+	if (cs.length) safe(() => drawIndicatorLayers(time(cs[0].timestamp), time(cs[cs.length - 1].timestamp)))
 }
 
 // ---- Тултипы и hover-карточки ----
