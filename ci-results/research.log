@@ -1,127 +1,400 @@
-[full-take] fetch BTC/USDT
-[full-take] BTC/USDT: 1h=53256 15m=213024
-[full-take] BTC/USDT 2021: build h=13080 l=87360
-[full-take] BTC/USDT 2021: pools=15801 pois=1599 entries=138
-[full-take] BTC/USDT 2022: build h=13080 l=87360
-[full-take] BTC/USDT 2022: pools=15254 pois=1380 entries=98
-[full-take] BTC/USDT 2023: build h=13080 l=87360
-[full-take] BTC/USDT 2023: pools=12711 pois=1122 entries=65
-[full-take] BTC/USDT 2024: build h=13104 l=87456
-[full-take] BTC/USDT 2024: pools=13192 pois=1132 entries=93
-[full-take] BTC/USDT 2025: build h=13080 l=72384
-[full-take] BTC/USDT 2025: pools=12984 pois=1018 entries=49
-[full-take] BTC/USDT 2026: build h=9336 l=37344
-[full-take] BTC/USDT 2026: pools=8949 pois=698 entries=50
-[full-take] fetch ETH/USDT
-[full-take] ETH/USDT: 1h=53256 15m=213024
-[full-take] ETH/USDT 2021: build h=13080 l=87360
-[full-take] ETH/USDT 2021: pools=17307 pois=1913 entries=141
-[full-take] ETH/USDT 2022: build h=13080 l=87360
-[full-take] ETH/USDT 2022: pools=17008 pois=1708 entries=117
-[full-take] ETH/USDT 2023: build h=13080 l=87360
-[full-take] ETH/USDT 2023: pools=14061 pois=1293 entries=62
-[full-take] ETH/USDT 2024: build h=13104 l=87456
-[full-take] ETH/USDT 2024: pools=14128 pois=1292 entries=98
-[full-take] ETH/USDT 2025: build h=13080 l=72384
-[full-take] ETH/USDT 2025: pools=15719 pois=1487 entries=111
-[full-take] ETH/USDT 2026: build h=9336 l=37344
-[full-take] ETH/USDT 2026: pools=10802 pois=1025 entries=47
-[full-take] fetch SOL/USDT
-[full-take] SOL/USDT: 1h=51329 15m=205316
-[full-take] SOL/USDT 2021: build h=11369 l=80036
-[full-take] SOL/USDT 2021: pools=15706 pois=2188 entries=149
-[full-take] SOL/USDT 2022: build h=12960 l=86880
-[full-take] SOL/USDT 2022: pools=17657 pois=2107 entries=161
-[full-take] SOL/USDT 2023: build h=13080 l=87360
-[full-take] SOL/USDT 2023: pools=17033 pois=1862 entries=108
-[full-take] SOL/USDT 2024: build h=13104 l=87456
-[full-take] SOL/USDT 2024: pools=17086 pois=1823 entries=176
-[full-take] SOL/USDT 2025: build h=13080 l=72384
-[full-take] SOL/USDT 2025: pools=16946 pois=1666 entries=126
-[full-take] SOL/USDT 2026: build h=9336 l=37344
-[full-take] SOL/USDT 2026: pools=11490 pois=1037 entries=59
-[full-take] fetch XRP/USDT
-[full-take] XRP/USDT: 1h=53136 15m=212544
-[full-take] XRP/USDT 2021: build h=13080 l=86880
-[full-take] XRP/USDT 2021: pools=16315 pois=2041 entries=127
-[full-take] XRP/USDT 2022: build h=12960 l=86880
-[full-take] XRP/USDT 2022: pools=16173 pois=1714 entries=139
-[full-take] XRP/USDT 2023: build h=13080 l=87360
-[full-take] XRP/USDT 2023: pools=14488 pois=1435 entries=74
-[full-take] XRP/USDT 2024: build h=13104 l=87456
-[full-take] XRP/USDT 2024: pools=14000 pois=1503 entries=132
-[full-take] XRP/USDT 2025: build h=13080 l=72384
-[full-take] XRP/USDT 2025: pools=15581 pois=1651 entries=147
-[full-take] XRP/USDT 2026: build h=9336 l=37344
-[full-take] XRP/USDT 2026: pools=10854 pois=953 entries=63
-[full-take] fetch BNB/USDT
-[full-take] BNB/USDT: 1h=53256 15m=213024
-[full-take] BNB/USDT 2021: build h=13080 l=87360
-[full-take] BNB/USDT 2021: pools=17052 pois=1888 entries=152
-[full-take] BNB/USDT 2022: build h=13080 l=87360
-[full-take] BNB/USDT 2022: pools=16250 pois=1531 entries=127
-[full-take] BNB/USDT 2023: build h=13080 l=87360
-[full-take] BNB/USDT 2023: pools=13086 pois=1191 entries=67
-[full-take] BNB/USDT 2024: build h=13104 l=87456
-[full-take] BNB/USDT 2024: pools=13275 pois=1262 entries=93
-[full-take] BNB/USDT 2025: build h=13080 l=72384
-[full-take] BNB/USDT 2025: pools=13875 pois=1212 entries=100
-[full-take] BNB/USDT 2026: build h=9336 l=37344
-[full-take] BNB/USDT 2026: pools=9597 pois=808 entries=48
-[full-take] fetch DOGE/USDT
-[full-take] DOGE/USDT: 1h=53031 15m=212124
-[full-take] DOGE/USDT 2021: build h=12951 l=86844
-[full-take] DOGE/USDT 2021: pools=14848 pois=1834 entries=111
-[full-take] DOGE/USDT 2022: build h=13080 l=87360
-[full-take] DOGE/USDT 2022: pools=16483 pois=1905 entries=136
-[full-take] DOGE/USDT 2023: build h=13080 l=87360
-[full-take] DOGE/USDT 2023: pools=14843 pois=1565 entries=81
-[full-take] DOGE/USDT 2024: build h=13104 l=87456
-[full-take] DOGE/USDT 2024: pools=15764 pois=1783 entries=141
-[full-take] DOGE/USDT 2025: build h=13080 l=72384
-[full-take] DOGE/USDT 2025: pools=17197 pois=1902 entries=133
-[full-take] DOGE/USDT 2026: build h=9336 l=37344
-[full-take] DOGE/USDT 2026: pools=11422 pois=1165 entries=58
-[full-take] fetch ADA/USDT
-[full-take] ADA/USDT: 1h=53256 15m=213024
-[full-take] ADA/USDT 2021: build h=13080 l=87360
-[full-take] ADA/USDT 2021: pools=17229 pois=2115 entries=134
-[full-take] ADA/USDT 2022: build h=13080 l=87360
-[full-take] ADA/USDT 2022: pools=17179 pois=1749 entries=138
-[full-take] ADA/USDT 2023: build h=13080 l=87360
-[full-take] ADA/USDT 2023: pools=15423 pois=1404 entries=110
-[full-take] ADA/USDT 2024: build h=13104 l=87456
-[full-take] ADA/USDT 2024: pools=15516 pois=1581 entries=147
-[full-take] ADA/USDT 2025: build h=13080 l=72384
-[full-take] ADA/USDT 2025: pools=16807 pois=1739 entries=156
-[full-take] ADA/USDT 2026: build h=9336 l=37344
-[full-take] ADA/USDT 2026: pools=11810 pois=1173 entries=88
-[full-take] fetch LINK/USDT
-[full-take] LINK/USDT: 1h=53256 15m=213024
-[full-take] LINK/USDT 2021: build h=13080 l=87360
-[full-take] LINK/USDT 2021: pools=18301 pois=2299 entries=157
-[full-take] LINK/USDT 2022: build h=13080 l=87360
-[full-take] LINK/USDT 2022: pools=18093 pois=1958 entries=150
-[full-take] LINK/USDT 2023: build h=13080 l=87360
-[full-take] LINK/USDT 2023: pools=16279 pois=1608 entries=103
-[full-take] LINK/USDT 2024: build h=13104 l=87456
-[full-take] LINK/USDT 2024: pools=16281 pois=1741 entries=162
-[full-take] LINK/USDT 2025: build h=13080 l=72384
-[full-take] LINK/USDT 2025: pools=17126 pois=1796 entries=166
-[full-take] LINK/USDT 2026: build h=9336 l=37344
-[full-take] LINK/USDT 2026: pools=11449 pois=1075 entries=62
-# Simplified full-take end-to-end time-stop
-
-- Identical entries/stops across variants; only post-entry exit changes.
-- Train `< 2025-01-01`; test `>= 2025-01-01`.
-- Net cost: 0.10% of entry price per trade.
-- Selection: highest train mean after removing the best 1% trades; test was not used.
-
-| variant | family | train n | train E | train E ex-top1% | test n | test E | test ex-top1% | test PF | test DD |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| time-80-e2e | time | 3887 | 0.049R | 0.013R | 1463 | 0.082R | 0.041R | 1.358 | 14.748R |
-
-## Train-selected family winners
-
-- time: **time-80-e2e** — train 0.013R ex-top1%; test 0.082R, ex-top1% 0.041R.
-
+✔ Apex: калиброванные параметры зафиксированы (0.701316ms)
+✔ Apex: источник средней — hlc3, средняя ALMA сохраняет константу (0.785112ms)
+✔ Apex: полосы логарифмически симметричны (0.582849ms)
+✔ Reversal: BUY не может появиться на медвежьей свече (0.54261ms)
+✔ Reversal: SELL не может появиться на бычьей свече (0.36827ms)
+✔ Apex: состояние определяется по внутренним краям (0.171045ms)
+✔ Apex: внешний край дальше внутреннего на любой положительной ширине (2.942711ms)
+✔ Reversal: без касания края направленная свеча не создаёт сигнал (0.570602ms)
+✔ archive: unzipCsv распаковывает stored и deflate записи (4.090053ms)
+✔ archive: parseKlinesCsv — заголовок пропускается, микросекунды нормализуются в мс (1.11904ms)
+✔ archive: mergeCandleSeries — приоритет свежего хвоста на перекрытии, сортировка (0.237375ms)
+✔ archive: planPeriods — целые месяцы + дни хвостового месяца до последнего ПОЛНОГО дня (0.334589ms)
+✔ archive: fetchArchiveKlines — символ нормализуется, 404 пропускается, дисковый кэш работает (22.084455ms)
+[archiveKlines] пропускаю ETHUSDT-1d-2026-06: 502 после ретраев
+✔ archive: транзиентный 5xx ретраится, стойкий — пропускается без падения (fail-soft периода) (904.572711ms)
+✔ archive metrics parses OI and converts taker buy/sell ratio to share (0.876238ms)
+✔ archive metrics plans UTC daily files without a nonexistent monthly path (0.625343ms)
+✔ archive metrics alignment is causal and expires stale points (0.226888ms)
+✔ visualizer enriches heatmap with causal archive OI and keeps fail-soft fallback (0.838471ms)
+▶ BATTLE_CONFIG geometry
+  ✔ canon: stop below entry below take (trend direction, ratio space) (0.563031ms)
+  ✔ executable cells, first-5 and cost gate match SPEC 7.53 (0.785312ms)
+✔ BATTLE_CONFIG geometry (2.071451ms)
+▶ canonRiskMultiplier (SPEC 7.35)
+  ✔ best cell: fresh x compact = 2.8 (0.226338ms)
+  ✔ worst cell: stale x wide = 0.35 (0.137355ms)
+  ✔ missing swing data skips the layer (neutral 1.0) (0.133699ms)
+  ✔ session layer disabled by default (0.121421ms)
+✔ canonRiskMultiplier (SPEC 7.35) (0.892292ms)
+▶ gridLevelPrice
+  ✔ maps ratio to price for long grid (0.251565ms)
+  ✔ maps ratio to price for short grid (p0 above p100) (0.108622ms)
+✔ gridLevelPrice (1.352478ms)
+▶ BosChochEngine — пул активных уровней (two-candle)
+  ✔ пробой уровня: закрытие за уровнем + подтверждение = событие (1.720257ms)
+  ✔ защита уровня: вторая свеча закрылась обратно — события нет, снятие зафиксировано (0.217835ms)
+  ✔ look-ahead-free: уровень не проверяется до confirmedAt = index + window (0.19457ms)
+  ✔ уровень не вытесняется свежими: старый уровень пула ломается независимо (0.283883ms)
+✔ BosChochEngine — пул активных уровней (two-candle) (3.760782ms)
+▶ BosChochEngine — фильтры изолированно
+  ✔ hhllOnly: событие от HL/LH/UNKNOWN отсекается, HH/LL остаётся (0.400298ms)
+  ✔ minLevelAge: молодой уровень не даёт события (0.224224ms)
+  ✔ collapseCascades: одна свеча сносит два уровня → одно событие по дальнему (0.250153ms)
+  ✔ dedup: два события одного направления с уровнями ближе K×ATR → остаётся первое (0.44216ms)
+  ✔ dedup: смена направления сбрасывает цепочку (0.284815ms)
+  ✔ skipSwept: глубокое снятие ликвидности отрабатывает уровень, мелкий укол — нет (0.337623ms)
+✔ BosChochEngine — фильтры изолированно (2.302215ms)
+▶ BosChochEngine — классификация и порядок фильтров
+  ✔ sequential: первый=unlabeled, по направлению=BOS, против=CHoCH (1.502692ms)
+  ✔ классификация применяется ПОСЛЕ фильтров: отсечённое событие не влияет на направление (0.171076ms)
+  ✔ дефолтный конфиг = принятый протоколом набор (0.175562ms)
+✔ BosChochEngine — классификация и порядок фильтров (1.999584ms)
+✔ §14.1: лестница «ТФ зоны → ТФ уточнённого подтверждения» — 1d→1h, 4h→15m, 1h→5m; прочие ТФ зон не строят (0.907334ms)
+✔ cooldown: сетапы, созданные во время открытой сделки, отброшены (0.875937ms)
+✔ one-position: блок по входу, а не по созданию (0.558984ms)
+✔ latest-only: новая сетка отменяет невошедшую старую (0.122643ms)
+✔ latest-only: вошедшая сделка доводится до конца (0.149162ms)
+✔ направления и сценарии не пересекаются (0.161081ms)
+✔ невошедшие сетапы всегда сохраняются (0.107981ms)
+✔ open-сделка блокирует до конца данных (0.143634ms)
+✔ maxConcurrentTrades считает пересечения внутри группы (0.215402ms)
+✔ touch: чистый вин — вход maker, тейк на 100-м уровне (1.087372ms)
+✔ touch: same-bar вход+стоп = мгновенный лосс (консервативно) (0.137795ms)
+✔ closeConfirm: same-bar пробой стопа = missed-stop (спасённый лосс) (0.108322ms)
+✔ closeConfirm: вход по закрытию свечи касания, риск от фактической цены (0.146789ms)
+✔ closeConfirm: стоп проверяется только со следующего бара после входа (0.166959ms)
+✔ candleConfirm: свеча касания бычья — подтверждает сама себя (0.125567ms)
+✔ candleConfirm: медвежьи свечи пропускаются, вход по первой бычьей (0.15377ms)
+✔ candleConfirm: тейк дошли без нас = missed-tp (упущенный вин) (0.169714ms)
+✔ candleConfirm: закрытие за стопом до подтверждения = missed-stop (0.186458ms)
+✔ candleConfirm: нет подтверждения за CONFIRM_MAX_BARS = missed-expired (0.26831ms)
+✔ шорт: подтверждающая свеча — медвежья (0.128131ms)
+✔ bigbar: тело перекрыло зону — true, тени не считаются (0.114611ms)
+✔ bigbar: бар касания не включается (toIndexExclusive) (0.092979ms)
+✔ execution cost gate reproduces the BTC $20 stop catastrophe (1.044979ms)
+✔ execution cost gate is scale-invariant for equal percentage stops (0.174921ms)
+▶ fibCosts
+  ✔ netFullR: win = rTp1 минус вход (fee+slip) и лимитный TP1-выход (fee) (0.827685ms)
+  ✔ netFullR: loss = −1 минус вход и стоп (оба fee+slip) (0.11377ms)
+  ✔ netBeR: TP2 — половина на TP1, половина на TP2, лимитные выходы без слиппеджа (0.145167ms)
+  ✔ netBeR: раннер закрыт BE-стопом (fee+slip по цене входа) (0.098437ms)
+  ✔ netBeR: BE имеет приоритет над ошибочно сохранённым поздним TP2 (0.091927ms)
+  ✔ netBeR: loss без TP1 = −1 минус издержки входа и стопа (0.140309ms)
+  ✔ time-stop до TP1 закрывает всю позицию по close с рыночными издержками (0.154921ms)
+  ✔ null для неразрешённых сделок (нет входа, открыта без TP1) (0.156534ms)
+  ✔ short: цены целей восстанавливаются зеркально (0.235842ms)
+✔ fibCosts (2.96856ms)
+▶ FibGridEngine — уровни
+  ✔ вычисляет одинаковые ratios для long и short с правильным знаком (0.778632ms)
+✔ FibGridEngine — уровни (1.717483ms)
+▶ FibGridEngine — экстремальные якоря
+  ✔ local: 0% = минимальный low между формированием уровня и пробоем (0.738492ms)
+  ✔ global: 0% = абсолютный экстремум от последнего противоположного события (0.21447ms)
+  ✔ global-окно начинается после противоположного события (0.257755ms)
+  ✔ short: 0% = максимальный high в окне (0.216893ms)
+  ✔ legAtrRatio = размер ноги в единицах ATR на момент пробоя (0.203373ms)
+  ✔ без ATR legAtrRatio = null, кандидат не отбрасывается (0.196063ms)
+  ✔ unlabeled не строит сетку и оставляет диагностический skip (0.212808ms)
+  ✔ экстремум по неправильную сторону уровня даёт невалидный вариант (0.185327ms)
+✔ FibGridEngine — экстремальные якоря (2.734761ms)
+▶ FibLifecycleEngine
+  ✔ OTE: вход на 78.6, TP1 и TP2 достигнуты (3.570829ms)
+  ✔ OTE: вход и затем стоп за 0% — state stopped (0.434419ms)
+  ✔ вход и стоп в одной свече — консервативно лосс (0.237134ms)
+  ✔ deep: вход на 38.2 при глубоком откате (0.838371ms)
+  ✔ breaker: 141 раньше OTE → вход на ретесте 100% (0.487147ms)
+  ✔ breaker не создаётся, если OTE была раньше 141 (0.268741ms)
+  ✔ breaker161: уход за 161 до ретеста отменяет сетап (обычный breaker жив) (0.452616ms)
+  ✔ breaker200: отменяется на 200, пока обычный breaker ждёт ретест (1.010468ms)
+  ✔ breaker161: без ухода за 161 входит как обычный breaker (0.696089ms)
+  ✔ breaker161: бар касания 141 сам прошил 161 — сетап не эмитится (0.564642ms)
+  ✔ breaker78: вход на 78.6 (178.6) после предусловия 141 (0.266067ms)
+  ✔ breakerScale: добор на 78.6, R-мультипликаторы от средневзвешенного входа (0.271976ms)
+  ✔ oteScale: добор не сработал — прибыль половиной позиции (exposure 0.5) (0.29501ms)
+  ✔ deepScale: стоп после добора — лосс ровно −1R планового риска (0.199127ms)
+  ✔ scale: конфликт добора и TP1 в одном баре — консервативно TP без добора (0.211596ms)
+  ✔ обычные сценарии: rStop = −1 при стопе, exposure = 1 (0.181331ms)
+  ✔ breaker tight: стоп за 23.6 (123.6) выбивается там, где zero выживает (0.269983ms)
+  ✔ экспирация: противоположное событие до входа отменяет сетап (0.210073ms)
+  ✔ no-entry: данные закончились без ретрейса (0.171166ms)
+  ✔ OTE tight: стоп за 23.6, срабатывает раньше стопа за 0% (0.195281ms)
+  ✔ rTp1/rTp2 считаются от входа и риска (0.232577ms)
+  ✔ beAfterTp1: возврат к входу после TP1 фиксируется (0.197354ms)
+  ✔ beAfterTp1 = false, если TP2 достигнут без возврата к входу (0.287469ms)
+  ✔ wide05 переживает шейкаут, который выбивает zero (0.239898ms)
+  ✔ tpAfterStop: стоп выбит, затем TP1 всё же достигнут (0.212658ms)
+  ✔ tpAfterStop = false, если после стопа TP1 не достигнут (0.195622ms)
+  ✔ tpAfterStop = null для не-stopped исходов (0.215401ms)
+  ✔ maxExtensionRatio продолжает расти после TP2 и фиксируется при касании стопа (0.218636ms)
+  ✔ fade141: касание 141 → шорт против лонг-сетки, цели 100% и 78.6 (0.258656ms)
+  ✔ fade241: вход от 241, стоп за 261 (0.195902ms)
+  ✔ без legAtrRatio ATR-зависимые режимы не эмитятся (0.353437ms)
+  ✔ fade141 far: стоп за 200 + 0.5 ATR переживает прошив 161 (0.179778ms)
+  ✔ fade241n: вход от 241, ближние цели 141 → 100 (0.180699ms)
+  ✔ fade200: вход по касанию 200, стоп за 241 (+0.5 ATR), цель 100% (0.228111ms)
+  ✔ zero200: TP2 = 200 закрывается раньше, чем zero дошёл бы до 241 (0.438645ms)
+  ✔ fade141c: вход только после свечи, закрывшейся ниже 141 (2.453892ms)
+  ✔ fade141c: прошив стопа до подтверждения — invalidated (нож отфильтрован) (0.240379ms)
+  ✔ fade241nc: подтверждение может прийти в самой свече касания (0.189052ms)
+  ✔ entry expiry: сетка без входа истекает по числу баров (0.211215ms)
+  ✔ trade time-stop: закрывает по close и сохраняет gross R (0.304755ms)
+  ✔ reach: min/max ratio замеряются от создания до конца данных (0.22121ms)
+  ✔ reach: окно обрезается подтверждением противоположного события (0.206268ms)
+  ✔ reach: fade-reach after141/after241 замеряются после первого касания (0.206778ms)
+  ✔ reach: after141 = null, если 141 не был достигнут (0.173018ms)
+  ✔ полный runAnalysis возвращает fibLifecycle (68.231734ms)
+✔ FibLifecycleEngine (89.92722ms)
+▶ forward runner v4
+  ✔ causal median uses each candidate once and excludes current candidate (0.984654ms)
+  ✔ report separates honest forward from catch-up by fill eligibility, not outcome time (1.151899ms)
+  ✔ same stateless replay is idempotent and state has no mutable swingPool (75.621992ms)
+  ✔ version change starts a clean state without deleting the journal (0.172388ms)
+  ✔ first-5 gate identifies only the first LTF touch as skipped (0.272446ms)
+✔ forward runner v4 (79.427296ms)
+✔ тренд не известен до закрытия подтверждающей HTF-свечи (1.450024ms)
+✔ запись, подтверждающаяся за пределами данных, не известна никогда (0.158176ms)
+✔ берётся последняя известная запись тренда, а не первая (0.210584ms)
+✔ trendAligned: long по bullish = true, short по bullish = false (0.200649ms)
+✔ trendAligned: range и none дают null, а не false (0.169323ms)
+✔ P/D: цена ниже equilibrium = discount, выше = premium (0.250013ms)
+✔ P/D: диапазон не известен, пока не подтверждены ОБА свинга (0.177165ms)
+✔ P/D: новый подтверждённый свинг обновляет диапазон (0.203143ms)
+✔ P/D: вырожденный диапазон (high <= low) пропускается (0.216183ms)
+✔ pdAligned: long+discount = true, long+premium = false, none = null (0.273488ms)
+✔ indicator payload timestamps belong to the exact displayed series (5.435872ms)
+▶ lastSwingBreachProbe — two-candle confirmation для swing high/low
+  ✔ пробой последнего swing high: два закрытия выше = слом (0.860234ms)
+  ✔ защита уровня: 2-я свеча закрылась обратно — слома нет (0.14079ms)
+  ✔ уровень ещё не подтверждён (index+window не достигнут) — пробой не считается (0.138216ms)
+  ✔ сброс pending при переназначении swing (новый экстремум того же типа) (0.169683ms)
+  ✔ пробой swing low симметричен (два закрытия ниже) (0.129773ms)
+✔ lastSwingBreachProbe — two-candle confirmation для swing high/low (2.299762ms)
+▶ LegContextEngine — enclosingLegs / insideLegs
+  ✔ базовая вложенность: ближняя и внешняя обе доступны (0.765282ms)
+  ✔ пробой внешней ноги выкидывает её из enclosingLegs (0.220188ms)
+  ✔ insideLegs — обратная карта: кто кого объемлет (0.171766ms)
+  ✔ insideLegs не включает ноги, пробившие protected (0.155842ms)
+  ✔ касание protected (строгое сравнение) — не пробой (0.102643ms)
+  ✔ previous/next/isLast/index остаются корректными (0.186699ms)
+✔ LegContextEngine — enclosingLegs / insideLegs (2.415574ms)
+✔ places liquidation density on both sides of entries, causally (2.515144ms)
+✔ volume drives brightness (coinglass-style density) (0.359257ms)
+✔ price sweeping a bin consumes it and re-accumulates later (0.505895ms)
+✔ insignificant volume is ignored (0.362501ms)
+✔ short-lived swept segments are filtered as noise near price (0.343292ms)
+✔ adjacent bins alive together merge into one cluster band (0.56274ms)
+✔ small fresh clusters stay visible next to giant accumulations (2.266978ms)
+✔ freshness tracks last accumulation, not cluster birth (0.340178ms)
+✔ a long gap in accumulation opens a new band instead of stretching the old one (0.576721ms)
+✔ weights form a strength gradient instead of clamping to the ceiling (0.513987ms)
+✔ tf profiles: all tfs group into wide bands, daily+ widest (0.176624ms)
+✔ v2.0: maintenance margin придвигает уровни ликвидаций к входу (3.011154ms)
+✔ v2.0: taker buy ratio = 1 рождает только buy-side ликвидность (0.659515ms)
+✔ v2.0: плоский OI гасит новые позиции (вклады только с непокрытого бара 0) (0.597782ms)
+✔ v2.0: remainingNotional присутствует и не превышает notional (1.053783ms)
+✔ версия v2.4 заморожена; без пулов зон нет (liquidity-first) (2.723143ms)
+✔ §16.12: полка рождает зону — far = конец стека, near = край полки (без экстремума рядом) (2.08377ms)
+✔ §16.12/§12.1: near = точный wick невыметенного экстремума перед полкой, если он в пределах допуска (0.580827ms)
+✔ §16.12/§16.13: значимость — зоны рождают только топ-N полок с долей ≥ shelfMinShare (0.03) (0.953833ms)
+✔ §16.12: соседние пулы склеиваются в один стек — одна зона на полку (0.957429ms)
+✔ §16.10: фитиль за far = отработана насквозь (swept-through), момент = закрытие бара прохода (0.843659ms)
+✔ §14.6: close телом за far = провалена (failed) (0.905652ms)
+✔ §16.12/§16.16: стек снят по объёму (≥50% notional) → отработана на ЗАКРЫТИИ бара снятия (0.474559ms)
+✔ §16.12: ran-away ОТМЕНЁН — касание и уход цены на 5+ ATR не хоронят зону с живым стеком (1.337075ms)
+✔ §16.13: супер-цепь режется по провалу плотности — два горба через тонкий мост = две зоны (1.180882ms)
+✔ §16.13: потолок высоты — far ≤ stackMaxPct (8%) от цены ближнего края, без ATR-ноги (0.358685ms)
+✔ §16.13: свежесть 300 — полка, не кормившаяся 300 баров, гасит зону (retired) (9.792814ms)
+✔ §16.14: родство стеков — НЕТРОНУТАЯ старшая отставляется свежей геометрией (supersededAt) (5.161433ms)
+✔ §16.15: сползшее вбок окно (роняет массу старшей) — дубль, место держит старшая (8.167528ms)
+✔ §16.14: родство стеков — ТРОНУТАЯ старшая главнее (окно в работе), младшая = дубль (9.697162ms)
+✔ §16.12/§16.14: novelty ≥ 0.5 перерождает зону; нетронутое место обновляется поколением, эмиссия без обновления — одна (1.521461ms)
+✔ §16.31: зона выставляет наружу время последнего вклада в полку (1.591916ms)
+▶ MarketStructureEngine — two-candle confirmation (баг №3 v2)
+  ✔ protectedLow: одно закрытие ниже = кандидат, второе подряд = слом (1.267953ms)
+  ✔ protectedLow: 2-я свеча закрылась обратно = защита уровня, слома нет (0.2075ms)
+  ✔ только фитиль за уровнем, закрытие внутри — не кандидат (0.244555ms)
+  ✔ protectedHigh симметрично: два закрытия выше = слом (0.287559ms)
+  ✔ свеча structure-точки подтверждает кандидат из предыдущего окна (0.198727ms)
+  ✔ breached[] накапливает несколько подтверждённых сломов (0.178456ms)
+  ✔ getState() возвращает защитную копию breached[] (0.91772ms)
+✔ MarketStructureEngine — two-candle confirmation (баг №3 v2) (4.420356ms)
+▶ MarketStructureEngine — trend с гистерезисом (баг №4)
+  ✔ чистый bullish: HH+HL → bullish, trendHistory монотонный (0.272797ms)
+  ✔ чистый bearish: LH+LL → bearish (0.165317ms)
+  ✔ разворот bullish→range→bearish: LL сбрасывает в range, потом LH+LL = bearish (0.214339ms)
+  ✔ range в начале: первые UNKNOWN не дают тренда до пары подтверждений (0.142062ms)
+  ✔ симметрия: HH перед HL и HL перед HH — оба дают bullish (0.1413ms)
+  ✔ getState() возвращает защитную копию trendHistory[] (0.159668ms)
+✔ MarketStructureEngine — trend с гистерезисом (баг №4) (1.444696ms)
+▶ MultiTfEntryEngine: вход и стоп
+  ✔ CHoCH-вход: entry по close свечи подтверждения, стоп за LTF-экстремум окна (1.075666ms)
+  ✔ шорт зеркален: стоп за max high окна, цели ниже (0.249212ms)
+  ✔ конфликт в баре после входа: стоп имеет приоритет над TP (1.55504ms)
+✔ MultiTfEntryEngine: вход и стоп (3.838949ms)
+▶ MultiTfEntryEngine: перезаходы
+  ✔ после выбитого стопа — второй вход по следующему CHoCH, максимум 2 попытки (0.248221ms)
+  ✔ после успешной попытки перезахода нет (0.148342ms)
+✔ MultiTfEntryEngine: перезаходы (0.519746ms)
+▶ MultiTfEntryEngine: отмена и дедлайн
+  ✔ пересечение 0% старшей сетки до триггера — cancelled (0.173058ms)
+  ✔ пересечение 0% раньше касания зоны — cancelled без активации (0.118577ms)
+  ✔ CHoCH после дедлайна недействителен — no-trigger (0.175502ms)
+  ✔ триггера нет до конца данных — no-trigger (0.2344ms)
+  ✔ касания зоны нет — no-touch (0.264204ms)
+✔ MultiTfEntryEngine: отмена и дедлайн (1.249935ms)
+▶ MultiTfEntryEngine: look-ahead-границы
+  ✔ LTF-свечи и CHoCH до activationTimestamp не участвуют (0.397333ms)
+  ✔ стоп глубже 0% старшей сетки — попытка пропущена, ждём следующий триггер (0.20098ms)
+✔ MultiTfEntryEngine: look-ahead-границы (0.73701ms)
+▶ chochTrigger и computeLtfEvents
+  ✔ chochTrigger игнорирует BOS и события против направления (0.218466ms)
+  ✔ computeLtfEvents прогоняет мини-пайплайн без ошибок на синтетике (0.889037ms)
+✔ chochTrigger и computeLtfEvents (1.21248ms)
+✔ версия заморожена; пустой вход — пустой выход (1.611454ms)
+✔ §16.17: weaknessFailLimit подряд проваленных тестов слабости — отбраковка weakness-failed (1.493098ms)
+✔ полная LONG-последовательность: проторговка у лоя → остановка → отскок → пересвип → защита → тест слабости → вход → TP2 (0.615178ms)
+✔ SHORT-зеркало полной последовательности отрабатывает симметрично (0.36169ms)
+✔ глубокий заход без остановки не сжигает попытку — вход из одного касания (перезапуски §16.8) (0.389911ms)
+✔ после tp-hit зона отработала: повторные касания попыток не создают (решение №10) (0.633696ms)
+✔ ATR-fallback зоны и near-дубли подтверждением не торгуются (решения №6, №20) (0.229863ms)
+✔ окно [knownAt, endAt): после конца окна зоны попыток нет (0.156944ms)
+✔ 15m-история не покрывает окно зоны → ltfCoverage none, ноль попыток (данные, не логика) (0.331715ms)
+✔ §16.9: смерть попытки по БЕЗДЕЙСТВИЮ — 96 баров без событий → timeout@stopping (0.796729ms)
+✔ §16.9: якорь = НЕвыметенный экстремум зоны — переживает отбраковку и повторный заход (0.431664ms)
+✔ §16.9: после свипа якорь потрачен — новый копится с этого момента (0.573486ms)
+✔ §16.11: потеря защиты → якорь глубже (ANCHOR_DEEPENED) и подтверждение строится ЗАНОВО (проторговка + отскок) (0.562599ms)
+✔ защита (решение №12): две close ЗА дальней границей → broke-below-zone (0.280028ms)
+✔ тест слабости (решение №13): возобновление слабее последней откатной — входа нет, ждём следующее (0.6968ms)
+✔ отмена входа (решение №3): риск больше entryMaxRiskAtr×ATR — ENTRY_CANCELLED, попытка живёт (0.522069ms)
+✔ §16.10: попытка с состоявшимся пересвипом доигрывается за концом окна зоны (0.236984ms)
+✔ §16.10: попытка БЕЗ пересвипа обрезается концом окна зоны (zone-ended) (0.305666ms)
+✔ §16.10: тест слабости и отмена входа не продлевают попытку — смерть по бездействию после защиты (0.763209ms)
+✔ §16.10: стоп за историческим экстремумом окна, если тот глубже свип-экстремума в пределах 0.5 ATR (0.365075ms)
+✔ пометка «пришли на объёме»: объём HTF-бара захода против SMA20 предыдущих (диагностика, не фильтр) (0.345104ms)
+✔ §16.18: дедуп входов «один свип = одна сделка» — две зоны, один пересвип-бар: торгуется сильнейший стек (0.43555ms)
+✔ §16.18: разные пересвип-бары — дубля нет (контроль) (0.394008ms)
+✔ §16.18: пометка «против импульса» — каузальный ход за impulseBars ЗАКРЫТЫХ HTF-баров, маркер не фильтр (0.430172ms)
+✔ §16.21: per-TF профили зон — 1h локальный (этажи ≤2%), 1d свинг (консолидация), 4h = дефолты движка (1.5745ms)
+✔ capacity limit rejects fourth overlapping 1% trade at 3% (1.900797ms)
+✔ exit on same timestamp frees risk before entry (0.366848ms)
+✔ compounds equity and computes drawdown and losing streak (0.403011ms)
+✔ tie breaks are deterministic by symbol (8.74461ms)
+✔ duplicate trade ids cannot change equity twice or hold two slots (0.396552ms)
+✔ duplicates do not steal capacity from real trades (0.199738ms)
+✔ seeded Monte Carlo is reproducible (1.183797ms)
+✔ records causal protected assignment and confirmed breach (1.396915ms)
+✔ supersedes an old protected level when a newer one is assigned (0.394819ms)
+✔ reaction audit enters on first opposite candle close and resolves TP with costs (0.960964ms)
+✔ reaction audit skips when no opposite candle appears inside wait window (0.173248ms)
+✔ reaction audit rejects a candle body that burns the whole level-to-stop zone (0.282802ms)
+✔ refined POI engine has frozen mechanical research version (1.83595ms)
+✔ deep в хорошем режиме проходит (2.753559ms)
+✔ deep при сжатой волатильности блокируется (0.194049ms)
+✔ deep при пиле направлений (chochShare >= 0.5) блокируется (0.119008ms)
+✔ ote фильтруется так же, как deep (0.116694ms)
+✔ breaker НЕ фильтруется даже в худшем режиме (0.141602ms)
+✔ граница atrRatio: ровно на пороге проходит, ниже — нет (0.118147ms)
+✔ граница chochShare: ровно на пороге блокируется (>=) (0.250915ms)
+✔ null-метрики не блокируют (окно не набралось — не доказательство) (0.143013ms)
+✔ частичные метрики: блокирует любая доступная плохая (0.739794ms)
+▶ computeRegimeMetrics
+  ✔ effRatio: прямолинейный тренд даёт ~1, пила даёт ~0 (1.236145ms)
+  ✔ effRatio: null пока окно не набралось (0.240669ms)
+  ✔ atrRatio: сжатие волатильности <1, расширение >1 (0.379967ms)
+  ✔ atrRatio: null пока SMA-окно не покрыто реальными значениями ATR (0.22149ms)
+  ✔ chochShare: пила направлений даёт высокую долю, серия BOS — нулевую (0.513336ms)
+  ✔ trendStability: устойчивый тренд даёт 1, чехарда — 0.5 (0.599174ms)
+  ✔ look-ahead: значение на индексе i не зависит от данных с индексами > i (1.218718ms)
+✔ computeRegimeMetrics (5.544304ms)
+✔ Apex: widthScale=0 строго схлопывает все края в среднюю (1.953285ms)
+▶ runAnalysis pipeline
+  ✔ market-движок получает данные на реальных данных (регрессия бага №1) (29.798764ms)
+  ✔ пайплайн отрабатывает без ошибок и возвращает ожидаемые топологии (8.441597ms)
+  ✔ на реальных данных protectedLow — это LOW-точка из structure (4.631011ms)
+✔ runAnalysis pipeline (43.965375ms)
+✔ late: умеренный перелёт (0.2 ноги) проходит (1.438126ms)
+✔ late: перелёт дальше трети ноги блокируется (0.171376ms)
+✔ late: short зеркален (закрытие глубоко ПОД уровнем — блок) (0.151286ms)
+✔ late: неизвестный candidateId — консервативно проходит (0.336993ms)
+✔ align: long против доминирующего bearish блокируется (0.337744ms)
+✔ align: long по доминирующему bullish проходит (0.166459ms)
+✔ align: доминанта range — консервативно проходит (0.165527ms)
+✔ align: недобор окна — консервативно проходит (0.170794ms)
+✔ align: look-ahead-free — будущие записи не учитываются (0.209964ms)
+✔ extreme: уровень-экстремум сегмента проходит (1.41378ms)
+✔ extreme: более высокий хай в сегменте — блок (сломан внутренний пивот) (0.18093ms)
+✔ extreme: равная вершина в пределах ATR-допуска проходит (0.126018ms)
+✔ extreme: зеркально для short (более низкий лоу в сегменте — блок) (0.440758ms)
+✔ chop: хороший режим проходит (0.258115ms)
+✔ chop: низкий effRatio (пила по цене) блокируется (0.487408ms)
+✔ chop: низкий trendStability (чехарда трендов) блокируется (0.13421ms)
+✔ chop: строгий пресет применяется и к breaker (канонический сценарий портфеля) (0.109173ms)
+✔ chop-ote: плохой режим блокирует ote (0.251405ms)
+✔ chop-ote: deep и breaker проходят даже в плохом режиме (0.111767ms)
+✔ chop-ote: хороший режим пропускает ote (0.090034ms)
+✔ baseline не изменился: DEFAULT_REGIME_FILTER игнорирует effRatio/trendStability (0.082143ms)
+✔ firstFailingFilter: пустой список активных — всегда null (opt-in) (0.150975ms)
+✔ firstFailingFilter: возвращает первый сработавший в порядке списка (0.125257ms)
+✔ firstFailingFilter: сетап, прошедший все фильтры — null (0.150955ms)
+✔ дефолтный конфиг соответствует SPEC 7.20 (0.088883ms)
+✔ simplified v0.1: касание → первая направленная свеча → вход; частичка → БУ → фулл (2.863242ms)
+✔ simplified: стоп до частички = −1R всей позицией; rearm даёт новый вход, once — нет (0.310032ms)
+✔ simplified: pct-стоп от цены входа; БУ после частички возвращает 3.75% хода (0.21385ms)
+✔ simplified: консервативная внутрибарная неоднозначность — стоп раньше цели; фулл = зона отработана (0.16714ms)
+✔ simplified: SHORT зеркален; вход после endAt зоны не берётся (0.226088ms)
+✔ v0.3: дефолты сохраняют поведение v0.1 (цели в % цены), targetMode=r считает цели от риска (0.19467ms)
+✔ v0.3: фильтр «без погони» пропускает вход, убежавший от края зоны (0.250083ms)
+✔ v0.3: тренд по правилу bos-bos-choch, регион на баре подтверждения (0.284385ms)
+✔ v0.3: тренд-фильтр блокирует лонг в тренде вниз и требует тренда в режиме onlyWith (0.342071ms)
+✔ v0.3: пресет высокого вин рейта не трогает канонические дефолты (0.208381ms)
+✔ v0.4: инвертированный Apex-фильтр выключен по умолчанию и виден в пресете v4 (0.112127ms)
+✔ v0.7: time-stop начинается только после partial и закрывает LONG по close через N полных баров (0.198466ms)
+✔ v0.7: без partial time-stop не срабатывает; SHORT зеркален (0.407468ms)
+✔ v0.7: на граничном баре сохраняется консервативный порядок stop → full → time (0.202963ms)
+✔ v0.8: базовый конфиг совместим, Apex-пресет включает проверенный time-stop (0.067301ms)
+✔ стоп до любых тейков: netR ≈ -1 - издержки (1.406769ms)
+✔ t100-only: полный выход на 100-уровне (+1R минус издержки) (0.199868ms)
+✔ полная лестница t100-141-241 без возврата к входу (0.246317ms)
+✔ BE после первой фиксации: тейк 100, возврат к входу закрывает остаток (0.190934ms)
+✔ конфликт стоп/тейк до первой фиксации = стоп (0.173689ms)
+✔ BE взведён ранее: бар с тейком и касанием входа = BE остатка (консервативно) (0.196774ms)
+✔ шорт: зеркальная механика (0.23424ms)
+✔ ступень не в сторону профита отбрасывается, доли перенормируются (0.216243ms)
+✔ нет валидных ступеней: null (0.229993ms)
+✔ данные кончились с открытым остатком: null (0.249753ms)
+✔ не вошедшая сделка: null (0.170765ms)
+✔ canon-лестница существует и повторяет канонический менеджмент (141+241) (1.093081ms)
+✔ zone timeframe labels use one canonical visible format (0.697471ms)
+✔ tradeMetrics: победа считается по ЧИСТОМУ результату после комиссий (1.185029ms)
+✔ tradeMetrics: перевод хода в R идёт от начального риска; комиссия вычитается один раз (0.215742ms)
+✔ tradeMetrics: безубыточный вин рейт — детектор красивой, но убыточной настройки (0.257304ms)
+✔ tradeMetrics: незакрытые сделки не считаются, просадка и профит-фактор считаются (0.575078ms)
+✔ tradeMetrics: разрезы по ключу и календарные ключи (9.607939ms)
+✔ tradeMetrics: контроль каузальности ряда свечей (0.594407ms)
+✔ Decision Lab falls back to HTF when LTF history starts after setup (1.359518ms)
+✔ Decision Lab excludes a grid expired by an opposite confirmed structure before touch (0.180059ms)
+✔ Decision Lab excludes an old same-direction grid superseded before its touch (0.973242ms)
+✔ Decision Lab reaction id is stable when candle-window candidate ids change (0.343352ms)
+✔ Decision Lab exact candidate requires the requested left replay history (0.312526ms)
+✔ Decision Lab excludes a level already touched before the grid became known (0.188502ms)
+✔ MTF zone start snaps forward to a displayed candle (0.646705ms)
+✔ MTF zone end snaps backward and clamps to history (0.116684ms)
+✔ current zone trade sorts before ended history (0.883428ms)
+✔ nearest current zone sorts first and in-zone distance is zero (0.20076ms)
+✔ fresh contribution breaks equal-distance ties (0.131886ms)
+✔ newer event then stable poi id break remaining ties (10.764024ms)
+ℹ tests 341
+ℹ suites 22
+ℹ pass 341
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3549.910256
+[apex-reversal-v1 cd39ff4] feat(engine): enable validated time-stop preset
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+[apex-reversal-v1 ce90e7e] docs: record time-stop end-to-end gate
+ 1 file changed, 9 insertions(+)
+To https://github.com/Zonda6996/SMC-Research-Engine
+   a099319..ce90e7e  HEAD -> apex-reversal-v1
