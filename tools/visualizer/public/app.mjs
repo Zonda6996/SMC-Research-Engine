@@ -75,7 +75,7 @@ export function redraw() {
 	else if (S.mode === 'lab') { safe(renderLab); return }
 	else safe(renderTradesMode)
 	const cs = S.data.candles || []
-	if (cs.length) safe(() => drawIndicatorLayers(time(cs[0].timestamp), time(cs[cs.length - 1].timestamp)))
+	if (cs.length) safe(() => drawIndicatorLayers(cs, time(cs[0].timestamp), time(cs[cs.length - 1].timestamp), S.data?.indicators?.main))
 }
 
 // ---- Тултипы и hover-карточки ----

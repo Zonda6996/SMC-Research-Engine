@@ -127,6 +127,14 @@ function pickApexOverrides(rawJson: string | undefined): Partial<typeof APEX_PAR
 	return out as Partial<typeof APEX_PARAMS>
 }
 
+export function buildIndicatorPayload(series: import('../../src/models/price/Candle.js').Candle[], params: typeof APEX_PARAMS = APEX_PARAMS) {
+	const rawBands = computeApexBands(series, params)
+	return {
+		apex: { version: APEX_VERSION, params, bands: rawBands.map((b, i) => Number.isFinite(b.mean) ? { t: series[i]!.timestamp, mean: b.mean, redLo: b.redLo, redHi: b.redHi, greenHi: b.greenHi, greenLo: b.greenLo } : null) },
+		reversal: { version: REVERSAL_VERSION, signals: detectReversals(series, params) },
+	}
+}
+
 const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
 
 /** Фикстура читается из файла — воспроизводимость без похода на биржу. */
@@ -474,8 +482,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const poiConfirmations = confTf != null ? detectPoiConfirmation(poiCandidates, ltfConf, snapshot.candles, confOverrides) : []
 			// §16.28–16.29: полосы перекупленности/перепроданности и их сигналы на ТФ подтверждения
 			// + упрощённый режим с пресетом v0.4 (инвертированный Apex-фильтр).
-			const apexBands = ltfConf.length ? computeApexBands(ltfConf, apexParams) : []
-			const reversalSignals = ltfConf.length ? detectReversals(ltfConf, apexParams) : []
+			const confirmationIndicators = buildIndicatorPayload(ltfConf, apexParams)
+			const mainIndicators = buildIndicatorPayload(snapshot.candles, apexParams)
 			const simplified = ltfConf.length
 				? detectSimplifiedConfirmation(poiCandidates, ltfConf, SIMPLIFIED_APEX_VETO_PRESET, { events: snapshot.events })
 				: []
@@ -486,7 +494,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			// с какого ТФ ни смотри. Данные слоя: архивы (fullLtf, дисковый кэш) + деривация из уже
 			// загруженного (агрегация вверх из candles/5m). Движки те же, per-TF профили §16.21,
 			// overrides пользователя поверх.
-			const mtfLayers: Array<{ contextTf: string; confTf: string; role: 'swing' | 'mid' | 'local'; candles: number; candidates: unknown[]; results: unknown[]; ltfConf: unknown[] | null }> = []
+			const mtfLayers: Array<{ contextTf: string; confTf: string; role: 'swing' | 'mid' | 'local'; candles: number; candidates: unknown[]; results: unknown[]; ltfConf: unknown[] | null; indicators: ReturnType<typeof buildIndicatorPayload> }> = []
 			if (confTf != null && candles.length) {
 				const ROLE: Record<string, 'swing' | 'mid' | 'local'> = { '1d': 'swing', '4h': 'mid', '1h': 'local' }
 				// Деривация ряда из загруженного: старше текущего ТФ — из candles, младше — из 5m.
@@ -517,8 +525,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					const pools = detectLiquidityHeatmap(ctxCandles, { ...heatmapConfigForTf(TF_MS[ctxTf]!), ...pickNumericOverrides(heatmapConfigForTf(TF_MS[ctxTf]!), q.hmConfig) }, undefined)
 					const zones = detectLiquidityPoi(ctxCandles, [], { heatmapPools: pools, config: { ...liquidityPoiProfileForTf(TF_MS[ctxTf]!), ...poiOverrides } })
 					const confs = detectPoiConfirmation(zones, confSeries, ctxCandles, confOverrides)
+					const layerIndicators = buildIndicatorPayload(confSeries, apexParams)
 					// 5m-ряд не дублируем, если он ровно ltf5m; остальные conf-ряды слоёв едут в payload.
-					mtfLayers.push({ contextTf: ctxTf, confTf: lConfTf, role: ROLE[ctxTf]!, candles: ctxCandles.length, candidates: zones, results: confs, ltfConf: confSeries === ltf5m ? null : confSeries })
+					mtfLayers.push({ contextTf: ctxTf, confTf: lConfTf, role: ROLE[ctxTf]!, candles: ctxCandles.length, candidates: zones, results: confs, ltfConf: confSeries === ltf5m ? null : confSeries, indicators: layerIndicators })
 				}
 			}
 
@@ -543,14 +552,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
-				apex: {
-					version: APEX_VERSION,
-					params: apexParams,
-					bands: apexBands.map((b, i) => (Number.isFinite(b.mean)
-						? { t: ltfConf[i]!.timestamp, mean: b.mean, redLo: b.redLo, redHi: b.redHi, greenHi: b.greenHi, greenLo: b.greenLo }
-						: null)),
-				},
-				reversal: { version: REVERSAL_VERSION, signals: reversalSignals },
+				apex: confirmationIndicators.apex,
+				reversal: confirmationIndicators.reversal,
+				indicators: { main: mainIndicators, confirmation: confirmationIndicators },
 				simplifiedConfirmation: {
 					version: SIMPLIFIED_CONFIRMATION_VERSION,
 					preset: SIMPLIFIED_APEX_VETO_PRESET,

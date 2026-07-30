@@ -26,12 +26,12 @@ export function confLayerData() {
 		return {
 			results: L.results, candidates: L.candidates,
 			src: L.ltfConf ?? (L.confTf === '5m' ? S.data?.ltf5m : null) ?? [],
-			confTf: L.confTf, zoneTf: L.contextTf,
+			confTf: L.confTf, zoneTf: L.contextTf, indicators: L.indicators,
 		}
 	}
 	return {
 		results: S.data?.poiConfirmation?.results || [], candidates: S.data?.liquidityPoi?.candidates || [],
-		src: S.data?.ltfConf || [], confTf: S.data?.dataset?.confTf, zoneTf: S.data?.dataset?.timeframe,
+		src: S.data?.ltfConf || [], confTf: S.data?.dataset?.confTf, zoneTf: S.data?.dataset?.timeframe, indicators: S.data?.indicators?.confirmation,
 	}
 }
 
@@ -111,7 +111,7 @@ function renderSimplified() {
 		const s1 = line([{ time: time(e.entryAt), value: e.entry }], { color: 'rgba(0,0,0,0)' })
 		seriesMarkers(s1, [{ time: time(e.entryAt), position: 'aboveBar', color: C.green, shape: 'circle', size: 0, text: `ФУЛЛ ${fmtP(e.fullPrice)} — за экраном, ${(fullAwayPct * 100).toFixed(0)}% хода` }])
 	}
-	drawIndicatorLayers(src, from, to)
+	drawIndicatorLayers(src, from, to, confLayerData().indicators)
 	const RU = { PARTIAL: 'частичка взята, стоп в безубыток', BE: 'выбило в безубыток', FULL: 'полный тейк', STOP: 'стоп' }
 	setMarkers((e.events || []).map((x) => ({
 		time: time(x.at), position: x.state === 'STOP' ? 'belowBar' : 'aboveBar',
@@ -183,7 +183,7 @@ export function renderConfirmation() {
 		color: colors[x.state] || C.dim, shape: x.state === 'ENTRY' ? 'arrowUp' : 'circle', size: 1, text: x.state,
 	})).filter((x) => src.some((s0) => time(s0.timestamp) === x.time))
 	setMarkers(marks.sort((a, b) => a.time - b.time))
-	drawIndicatorLayers(src, from, to)
+	drawIndicatorLayers(src, from, to, confLayerData().indicators)
 	// Полосы heatmap на 15m-свечи не рисуем (см. renderHeatmap): шкалы времени 4h и 15m несовместимы.
 	S.hmShownBands = []
 	$('confStatusText').textContent = `${S.confIndex + 1}/${xs.length} · ${c.direction.toUpperCase()} · попытка ${c.attemptIndex} · ${c.rejectionReason === 'data-end' ? 'ЖИВАЯ У КРАЯ ДАННЫХ' : c.status.toUpperCase()}${c.outcome ? ' · ' + c.outcome.toUpperCase() : ''} · ${c.rejectionReason === 'data-end' ? 'ждёт продолжения' : (c.rejectionReason || fmtR(c.grossR))}${c.duplicateEntryOf ? ' · ДУБЛЬ ВХОДА' : ''}${c.againstImpulse ? ' · ПРОТИВ ИМПУЛЬСА' : ''}`

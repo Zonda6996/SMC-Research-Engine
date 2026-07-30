@@ -29,11 +29,11 @@ export function wireIndicatorSettings(redraw){put(read());markChanged();for(cons
  for(const id of ['apexChk','reversalChk'])$(id).onchange=redraw
 }
 
-export function drawIndicatorLayers(from=null,to=null){
+export function drawIndicatorLayers(series,from=null,to=null,payload=null){
  const showApex=Boolean($('apexChk')?.checked),showReversal=Boolean($('reversalChk')?.checked)
  if(!showApex&&!showReversal)return
- const g=S.data?.apex
- if(!g?.bands?.length)return
+ const g=payload?.apex
+ if(!series?.length||!g?.bands?.length)return
  const style=indicatorStyle()
  const inside=(t)=>{const x=time(t);return(from==null||x>=from)&&(to==null||x<=to)}
  const bands=g.bands.filter(b=>b&&inside(b.t))
@@ -48,7 +48,7 @@ export function drawIndicatorLayers(from=null,to=null){
   if(style.greenHiOn)line(pick('greenHi'),{color:style.greenHiColor,lineWidth:width(style.greenHiWidth),lineStyle:lineStyle().Dotted,lastValueVisible:labels})
   if(style.greenLoOn)line(pick('greenLo'),{color:style.greenLoColor,lineWidth:width(style.greenLoWidth),lastValueVisible:labels})
  }
- const sig=showReversal?(S.data?.reversal?.signals||[]).filter(x=>inside(x.at)&&(x.direction==='long'?style.buyOn:style.sellOn)):[]
+ const sig=showReversal?(payload?.reversal?.signals||[]).filter(x=>inside(x.at)&&(x.direction==='long'?style.buyOn:style.sellOn)):[]
  if(sig.length){
   const anchor=line(sig.map(x=>({time:time(x.at),value:x.edge})),{color:'rgba(0,0,0,0)',lineWidth:1})
   seriesMarkers(anchor,sig.map(x=>({time:time(x.at),position:x.direction==='long'?'belowBar':'aboveBar',color:x.direction==='long'?style.buyColor:style.sellColor,shape:'circle',size:1,text:x.direction==='long'?'BUY':'SELL'})).sort((a,b)=>a.time-b.time))
