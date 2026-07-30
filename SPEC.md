@@ -1663,3 +1663,12 @@ Apex/Reversal вынесены из Подтверждения в самосто
 - Проверены 14 комбинаций inner/outer edge, touch/directional/reclaim confirmation и mean/inner re-arm. Отбор только по train.
 - Все 14 комбинаций отрицательны net уже на train и остаются отрицательными на untouched test. Текущий `outer/directional/mean`, horizon 12: train −0.105% (n=2991), test −0.199% (n=2151).
 - Лучший train-вариант `outer/touch/inner`: train −0.051%, test −0.211%. Safe/Standard/Risk не маппить и production defaults не менять: точная vendor-формула неизвестна, исследовательский edge отсутствует.
+
+
+## 16.42 Post-partial time-stop: exit-only edge подтверждён, включение отложено (30.07.2026)
+
+- Протокол: BTC/ETH/SOL/XRP/BNB/DOGE/ADA/LINK; 1h зоны → 15m simplified; 2021–2024 train, 2025–2026 untouched test; 5305 одинаковых входов и стопов; cost 0.10% цены; same-bar stop раньше цели.
+- Baseline 12R зависит от хвоста: train E +0.076R, но ex-top1% −0.016R; test +0.104R, ex-top1% +0.010R; DD 49.410R.
+- После исправления семантики таймер считается от бара PARTIAL. Train выбрал 80 полных 15m-баров: train +0.063R, ex-top1% +0.020R; untouched test +0.089R, ex-top1% +0.046R, PF 1.389, DD 13.424R. Диапазон 64–128 остаётся положительным, поэтому результат не является одиночным пиком.
+- Движок v0.7 поддерживает postPartialTimeStopBars и outcome/event TIME. 0 выключает механику; существующие дефолты и пресеты не изменены.
+- Включение в SIMPLIFIED_APEX_VETO_PRESET отложено: exit-only replay замораживал входы, а более ранний выход при reentry может породить дополнительные входы. Сначала нужен отдельный end-to-end replay с реальным жизненным циклом зоны.
