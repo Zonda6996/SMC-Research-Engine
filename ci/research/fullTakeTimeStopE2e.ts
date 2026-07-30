@@ -1,5 +1,6 @@
 import { readFile, writeFile, unlink } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
+import { resolve } from 'node:path'
 
 const sourcePath = 'ci/research/simplifiedFullTakeReplay.ts'
 const generatedPath = 'ci/research/.fullTakeTimeStopE2e.generated.ts'
@@ -20,10 +21,11 @@ source = source
   .replace("let md='# Simplified full-take replay", "let md='# Simplified full-take end-to-end time-stop")
 await writeFile(generatedPath, source)
 try {
-  await new Promise<void>((resolve, reject) => {
-    const p = spawn('npx', ['tsx', generatedPath], { stdio: 'inherit' })
+  await new Promise<void>((done, reject) => {
+    const tsxCli = resolve('node_modules/tsx/dist/cli.mjs')
+    const p = spawn(process.execPath, [tsxCli, generatedPath], { stdio: 'inherit' })
     p.on('error', reject)
-    p.on('exit', code => code === 0 ? resolve() : reject(new Error(`e2e replay exited ${code}`)))
+    p.on('exit', code => code === 0 ? done() : reject(new Error(`e2e replay exited ${code}`)))
   })
 } finally {
   await unlink(generatedPath).catch(() => undefined)
