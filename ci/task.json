@@ -1,7 +1,7 @@
 {
   "task": "research",
-  "needsPlaywright": false,
-  "script": "ci/research/fixApexPrimitiveThenApply.ts",
+  "needsPlaywright": true,
+  "script": "ci/research/browserQaAndFixToggles.ts",
   "runnerVersion": "v1",
-  "runLabel": "apex-primitive-design-b2-gate"
+  "runLabel": "bounded-browser-qa-indicators-b1"
 }
