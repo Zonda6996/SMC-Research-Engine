@@ -45,4 +45,5 @@ const fixed=`function makeApexPrimitive() {
 writeFileSync(p,src.slice(0,a)+fixed+src.slice(b));
 execFileSync('node',['--check',p],{stdio:'inherit'});
 execFileSync('git',['add',p],{stdio:'inherit'});
-execFileSync('npx',['tsx','ci/research/applyDesignAndZoneFix.ts'],{stdio:'inherit'});
+const task='ci/research/applyDesignAndZoneFix.ts';let atom=readFileSync(task,'utf8');const imp="import { snapZoneTime } from '../tools/visualizer/public/panels/zones.mjs'";if(!atom.includes('@ts-expect-error Frontend .mjs')){if(!atom.includes(imp))throw Error('zone test import marker missing');atom=atom.replace(imp,"// @ts-expect-error Frontend .mjs intentionally has no TypeScript declaration\\n"+imp);writeFileSync(task,atom)}
+execFileSync('npx',['tsx',task],{stdio:'inherit'});
