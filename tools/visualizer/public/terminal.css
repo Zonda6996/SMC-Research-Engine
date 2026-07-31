@@ -207,11 +207,19 @@ body.tv { display: flex; flex-direction: column; font-size: 12px; }
 
 /* ---------- Переопределения наследованных компонентов под TV ---------- */
 body.tv .topbar { display: flex; } /* не используется, на всякий случай */
+body.tv .btn { height: 28px; font-size: 12px; padding: 0 10px; }
+body.tv .btn.icon { width: 28px; }
 body.tv .btn-primary { background: var(--accent-strong); border-color: var(--accent-strong); }
 body.tv .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+body.tv .check { font-size: 12px; }
+body.tv .input { height: 30px; font-size: 12px; }
 body.tv .chart-empty { background: radial-gradient(ellipse 60% 45% at 50% 42%, rgb(41 98 255 / 0.07), transparent 70%); }
 body.tv .loading { background: var(--surface); top: 36px; } /* ниже OHLC-легенды */
 body.tv .combo-pop { background: var(--surface); }
+body.tv .combo-pop,
+body.tv .palette-panel,
+body.tv .hover-card,
+body.tv .tv-pop { box-shadow: var(--shadow-pop); }
 body.tv .hm-profile { right: 60px; }
 body.tv .check.switch .knob { background: var(--bg); }
 body.tv .check.switch input:checked + .knob { background: rgb(41 98 255 / 0.3); border-color: var(--accent); }

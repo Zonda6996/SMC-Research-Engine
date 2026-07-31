@@ -97,7 +97,7 @@ function renderMyZoneList() {
 	box.innerHTML = xs.length
 		? xs.map((z) => `<div class="list-item my-zone"><span class="pill ${z.side}">${z.side === 'long' ? 'LONG' : 'SHORT'}</span>
 			<span class="mono">${fmtP(z.lo)} – ${fmtP(z.hi)}</span><span class="muted grow">${esc(z.note || '')}</span>
-			<button class="icon-btn" data-del="${z.id}" title="Удалить">✕</button></div>`).join('')
+			<button class="icon-btn" data-del="${z.id}" title="Удалить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>`).join('')
 		: '<div class="empty">Отметь свою зону: сторона + границы. Слой рисуется голубым пунктиром поверх движковых зон — удобно сверять карту движка со своей.</div>'
 	box.querySelectorAll('[data-del]').forEach((b) => { b.onclick = () => { removeMyZone(b.dataset.del); renderZones() } })
 }

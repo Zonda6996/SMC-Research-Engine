@@ -22,8 +22,8 @@
 			<button data-tf="15m">15m</button><button data-tf="30m">30m</button><button data-tf="1h">1h</button><button data-tf="4h" class="active">4h</button><button data-tf="1d">1d</button><button data-tf="1w">1w</button>
 		</div>
 		<input class="input input-limit" type="number" id="limit" value="5000" min="500" max="25000" step="500" title="Количество свечей" />
-		<input class="input input-date" type="date" id="historyUntil" title="История до конца выбранного дня; пусто — по сейчас" />
-		<button class="btn btn-ghost icon" id="randomPeriod" title="Случайная дата от марта 2024">🎲</button>
+		<input class="input input-date" type="text" id="historyUntil" placeholder="гггг-мм-дд" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" title="История до конца выбранного дня (гггг-мм-дд); пусто — по сейчас" />
+		<button class="btn btn-ghost icon" id="randomPeriod" title="Случайная дата от марта 2024"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h4"/><path d="M14 22h4"/><path d="m15 6 3 3"/><path d="m18 9 3 3"/></svg></button>
 		<label class="check" id="fullLtfWrap" title="Полная история ТФ подтверждения (1h для 1D-зон, 15m для 4h, 5m для 1h): глубокая часть из архивов data.binance.vision, свежий хвост из API. Первая загрузка символа дольше на несколько секунд — дальше дисковый кэш. Выключено — потолок API"><input type="checkbox" id="fullLtf" checked /> подтверждение: вся история</label>
 		<select class="input input-source" id="source" title="Источник данных">
 			<option value="fresh">Binance Futures</option>
@@ -31,8 +31,8 @@
 		</select>
 		<button class="btn btn-primary" id="loadBtn">Загрузить</button>
 		<div class="spacer"></div>
-		<a class="btn btn-ghost" href="terminal.html" title="TradingView-стиль: доки, вкладки, статусбар">Терминал&nbsp;↗</a>
-		<button class="kbd-chip" id="paletteHint" title="Командная палитра"><kbd>⌘K</kbd></button>
+		<a class="btn btn-ghost" href="terminal.html" title="TradingView-стиль: доки, вкладки, статусбар">Терминал&nbsp;<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+		<button class="kbd-chip" id="paletteHint" title="Командная палитра"><kbd><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 5v14"/></svg><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>K</kbd></button>
 	</header>
 
 	<main class="layout">
@@ -45,14 +45,14 @@
 			<div class="chart-empty" id="chartEmpty">
 				<div class="brand brand-lg">SMC<span class="brand-accent">Research</span></div>
 				<p class="chart-empty-sub">Терминал ликвидности · зоны POI, heatmap, подтверждения, Decision Lab</p>
-				<div class="chart-empty-chips"><span class="chip">Выбери символ и ТФ</span><span class="chip">«Загрузить» или Enter</span><span class="chip chip-accent">⌘K — палитра команд</span></div>
+				<div class="chart-empty-chips"><span class="chip">Выбери символ и ТФ</span><span class="chip">«Загрузить» или Enter</span><span class="chip chip-accent">Ctrl+K — палитра команд</span></div>
 			</div>
 		</section>
 
 		<aside class="sidebar">
 			<!-- Обзор -->
 			<section class="section collapsed" id="overviewPanel">
-				<div class="section-head"><h2>Обзор · canon</h2><span class="chevron"></span></div>
+				<div class="section-head"><div class="head-titles"><h2>Обзор</h2><div class="head-sub">canon · метрики прогона</div></div><span class="chevron"></span></div>
 				<div class="section-body">
 					<div class="funnel" id="funnel"></div>
 					<div class="meta-row"><span class="dataset" id="dataset">—</span></div>
@@ -64,7 +64,7 @@
 
 			<!-- Зоны ликвидности -->
 			<section class="section mode" id="zonesPanel">
-				<div class="section-head" data-toggle="poiZoneToggle"><h2>Зоны ликвидности <span class="ver">POI 2.4</span></h2><button class="btn btn-outline sm" id="poiZoneToggle">Открыть</button></div>
+				<div class="section-head" data-toggle="poiZoneToggle"><div class="head-titles"><h2>Зоны ликвидности</h2><div class="head-sub">POI 2.4 · полки ликвидности</div></div><button class="btn btn-outline sm" id="poiZoneToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="poiZoneControls">
 						<div class="grid2">
@@ -83,8 +83,8 @@
 						</div>
 						<div class="status" id="poiZoneStatus">—</div>
 						<div class="btn-row">
-							<button class="btn btn-outline sm" id="poiZonePrev">←</button>
-							<button class="btn btn-outline sm" id="poiZoneNext">→</button>
+							<button class="btn btn-outline sm" id="poiZonePrev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+							<button class="btn btn-outline sm" id="poiZoneNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
 							<button class="btn btn-outline sm" id="poiZoneExport">Экспорт JSON</button>
 							<button class="btn btn-ghost sm" id="poiZoneBack">Обычный график</button>
 						</div>
@@ -108,7 +108,7 @@
 
 			<!-- Независимые индикаторы -->
 			<section class="section" id="indicatorPanel">
-				<div class="section-head"><h2>Индикаторы <span class="ver">TV-style</span></h2><span class="chevron"></span></div>
+				<div class="section-head"><div class="head-titles"><h2>Индикаторы</h2><div class="head-sub">TV-style · независимые слои</div></div><span class="chevron"></span></div>
 				<div class="section-body indicator-settings">
 					<div class="indicator-switches"><label class="check switch" id="apexChkWrap"><input type="checkbox" id="apexChk" checked /><span class="knob"></span>Zonda Apex</label><label class="check switch" id="reversalChkWrap"><input type="checkbox" id="reversalChk" checked /><span class="knob"></span>Zonda Reversal</label></div>
 					<details open><summary>Zonda Apex · Inputs</summary><div class="indicator-body"><div class="indicator-grid">
@@ -128,7 +128,7 @@
 
 			<!-- Подтверждение -->
 			<section class="section mode" id="confPanel">
-				<div class="section-head" data-toggle="confToggle"><h2>Подтверждение <span class="ver">simplified / refined по §14.1</span></h2><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
+				<div class="section-head" data-toggle="confToggle"><div class="head-titles"><h2>Подтверждение</h2><div class="head-sub">simplified / refined · лестница §14.1</div></div><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="confControls">
 						<div class="grid2">
@@ -140,8 +140,8 @@
 						</div>
 <div class="status" id="confStatusText">—</div>
 						<div class="btn-row">
-							<button class="btn btn-outline sm" id="confPrev">←</button>
-							<button class="btn btn-outline sm" id="confNext">→</button>
+							<button class="btn btn-outline sm" id="confPrev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+							<button class="btn btn-outline sm" id="confNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
 							<button class="btn btn-outline sm" id="confZonesBtn">Зоны на 4h</button>
 							<button class="btn btn-outline sm" id="confExport">Экспорт JSON</button>
 							<button class="btn btn-ghost sm" id="confBack">Обычный график</button>
@@ -154,7 +154,7 @@
 
 			<!-- Heatmap -->
 			<section class="section mode" id="hmPanel">
-				<div class="section-head" data-toggle="hmToggle"><h2>Heatmap ликвидаций <span class="ver">2.0 · OI</span></h2><button class="btn btn-outline sm" id="hmToggle">Показать</button></div>
+				<div class="section-head" data-toggle="hmToggle"><div class="head-titles"><h2>Heatmap ликвидаций</h2><div class="head-sub">2.0 · OI · бины ликвидаций</div></div><button class="btn btn-outline sm" id="hmToggle">Показать</button></div>
 				<div class="section-body">
 					<div class="hidden" id="hmControls">
 						<div class="grid2">
@@ -175,7 +175,7 @@
 
 			<!-- Decision Lab -->
 			<section class="section mode" id="labPanel">
-				<div class="section-head" data-toggle="labToggle"><h2>Decision Lab <span class="ver">141/200/241</span></h2><button class="btn btn-outline sm" id="labToggle">Открыть</button></div>
+				<div class="section-head" data-toggle="labToggle"><div class="head-titles"><h2>Decision Lab</h2><div class="head-sub">141/200/241 · ручная разметка решений</div></div><button class="btn btn-outline sm" id="labToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="labControls">
 						<div class="grid2">
@@ -197,9 +197,9 @@
 						<div class="lab-outcome hidden" id="labOutcome"></div>
 						<div class="status" id="labAnalytics"></div>
 						<div class="btn-row">
-							<button class="btn btn-outline sm" id="labShuffle">↻</button>
-							<button class="btn btn-outline sm" id="labPrev">←</button>
-							<button class="btn btn-outline sm" id="labNext">→</button>
+							<button class="btn btn-outline sm" id="labShuffle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg></button>
+							<button class="btn btn-outline sm" id="labPrev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+							<button class="btn btn-outline sm" id="labNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
 							<button class="btn btn-outline sm" id="labStep">+1 свеча</button>
 							<button class="btn btn-outline sm" id="labWait">WAIT</button>
 							<button class="btn btn-take sm" id="labTake">TAKE</button>
@@ -226,7 +226,7 @@
 
 			<!-- Настройки движков -->
 			<section class="section collapsed" id="configPanel">
-				<div class="section-head"><h2>Настройки движков</h2><span class="badge accent" id="cfgBadge"></span><span class="chevron"></span></div>
+				<div class="section-head"><div class="head-titles"><h2>Настройки движков</h2><div class="head-sub">применяются по «Пересчитать»</div></div><span class="badge accent" id="cfgBadge"></span><span class="chevron"></span></div>
 				<div class="section-body">
 					<div class="btn-row">
 						<button class="btn btn-primary sm" id="cfgApply">Пересчитать</button>
@@ -241,10 +241,10 @@
 
 			<!-- Сделки -->
 			<section class="section collapsed" id="tradesPanel">
-				<div class="section-head"><h2>Сделки</h2>
+				<div class="section-head"><div class="head-titles"><h2>Сделки</h2><div class="head-sub">Deep + OTE · канон</div></div>
 					<span class="badge" id="count"></span>
-					<button class="btn btn-ghost sm icon" id="prevBtn" title="Предыдущая (↑)">↑</button>
-					<button class="btn btn-ghost sm icon" id="nextBtn" title="Следующая (↓)">↓</button>
+					<button class="btn btn-ghost sm icon" id="prevBtn" title="Предыдущая сделка"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></button>
+					<button class="btn btn-ghost sm icon" id="nextBtn" title="Следующая сделка"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></button>
 					<span class="chevron"></span>
 				</div>
 				<div class="section-body">
@@ -271,7 +271,7 @@
 
 			<!-- Выбранная сделка -->
 			<section class="section collapsed" id="detailPanel">
-				<div class="section-head"><h2>Выбранная сделка</h2><span class="chevron"></span></div>
+				<div class="section-head"><div class="head-titles"><h2>Выбранная сделка</h2><div class="head-sub">метрики и трейс решения</div></div><span class="chevron"></span></div>
 				<div class="section-body"><div class="detail" id="detail"><div class="empty">Выберите сделку из списка</div></div></div>
 			</section>
 		</aside>
@@ -283,7 +283,7 @@
 		<div class="palette-panel">
 			<input class="palette-input" id="paletteInput" placeholder="Команда, символ, панель…" spellcheck="false" />
 			<div class="palette-list" id="paletteList"></div>
-			<div class="palette-foot"><kbd>↑↓</kbd> навигация · <kbd>Enter</kbd> выполнить · <kbd>Esc</kbd> закрыть</div>
+			<div class="palette-foot"><kbd>стрелки</kbd> навигация · <kbd>Enter</kbd> выполнить · <kbd>Esc</kbd> закрыть</div>
 		</div>
 	</div>
 
