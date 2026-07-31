@@ -1,0 +1,229 @@
+/* terminal.css — скин «TradingView-терминал» (terminal.html).
+   Компоненты унаследованы от дизайн-системы (styles.css) через @import: кнопки, инпуты,
+   списки, карточки, палитра — те же классы и DOM id. Здесь: токены TV-палитры + каркас
+   (рэйл слева, док справа, нижняя панель, статусбар) и локальные переопределения. */
+@import url('styles.css');
+
+/* ---------- Токены (палитра TradingView) ---------- */
+:root {
+	--bg: #131722;
+	--surface: #1e222d;
+	--card: #1a1f2b;
+	--elev: #262b38;
+	--border: #2a2e39;
+	--border-strong: #3a4054;
+	--fg: #d1d4dc;
+	--fg-soft: #e0e3eb;
+	--muted: #868993;
+	--dim: #5d616e;
+	--accent: #2962ff;
+	--accent-strong: #1e53e5;
+	--green: #26a69a;
+	--red: #ef5350;
+	--amber: #f0a941;
+	--purple: #9a7bff;
+	--cyan: #38bdf8;
+	--r-lg: 6px;
+	--r: 4px;
+	--r-sm: 3px;
+	--font: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, "Segoe UI", sans-serif;
+	--mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+	--tv-dock-w: 380px;
+	--tv-bottom-h: 250px;
+}
+
+body.tv { display: flex; flex-direction: column; font-size: 12px; }
+
+/* ---------- Верхний тулбар ---------- */
+.tv-topbar {
+	height: 46px;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	padding: 0 10px;
+	background: var(--surface);
+	border-bottom: 1px solid var(--border);
+	position: relative;
+	z-index: 30;
+	flex: none;
+}
+.tv-topbar .brand { font-size: 13px; margin-right: 2px; }
+.tv-topbar .input, .tv-topbar select.input, .tv-topbar .combo-input { height: 30px; background: var(--bg); }
+.tv-pop-wrap { position: relative; }
+.tv-pop {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	z-index: 60;
+	width: 250px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	background: var(--surface);
+	border: 1px solid var(--border-strong);
+	border-radius: var(--r-lg);
+	box-shadow: var(--shadow-pop);
+	padding: 12px;
+}
+.tv-pop-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 11.5px; }
+.tv-pop-row .input { width: 130px; }
+.tv-pop-row .input-source { width: 148px; }
+
+/* ---------- Каркас ---------- */
+.tv-main { flex: 1; display: flex; min-height: 0; }
+
+/* Левый рэйл быстрых слоёв (позиция — как панель инструментов TV). */
+.tv-rail {
+	width: 46px;
+	flex: none;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 3px;
+	padding: 7px 0;
+	background: var(--surface);
+	border-right: 1px solid var(--border);
+}
+.rail-btn {
+	width: 34px;
+	height: 34px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: 0;
+	border-radius: var(--r);
+	color: var(--muted);
+	cursor: pointer;
+	transition: background 0.12s, color 0.12s;
+}
+.rail-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.rail-btn:hover { color: var(--fg); background: var(--elev); }
+.rail-btn.active { color: var(--accent); background: rgb(41 98 255 / 0.14); }
+.rail-sep { width: 22px; height: 1px; background: var(--border); margin: 4px 0; flex: none; }
+.rail-spacer { flex: 1; }
+
+/* Центр: график + нижняя панель. */
+.tv-center { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.tv-center .chart-wrap { flex: 1; min-height: 0; background: var(--bg); }
+
+/* Разделители-ручки. */
+.tv-split-h { height: 5px; flex: none; cursor: row-resize; border-top: 1px solid var(--border); background: var(--surface); transition: background 0.12s; }
+.tv-split-v { width: 5px; flex: none; cursor: col-resize; background: var(--surface); border-left: 1px solid var(--border); transition: background 0.12s; }
+.tv-split-h:hover, .tv-split-v:hover, .tv-split-h.drag, .tv-split-v.drag { background: var(--accent); }
+
+/* Нижняя панель (сделки / сделка / обзор) — аналог bottom-tabs TV. */
+.tv-bottom { height: var(--tv-bottom-h); min-height: 34px; flex: none; display: flex; flex-direction: column; background: var(--surface); }
+.tv-bottom-tabs { display: flex; align-items: stretch; gap: 2px; padding: 0 8px; height: 33px; flex: none; border-bottom: 1px solid var(--border); }
+.tv-bottom-tabs > button[data-btab] {
+	background: none;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	color: var(--muted);
+	font: 600 11px var(--font);
+	padding: 0 11px;
+	cursor: pointer;
+	transition: color 0.12s;
+}
+.tv-bottom-tabs > button[data-btab]:hover { color: var(--fg-soft); }
+.tv-bottom-tabs > button[data-btab].active { color: var(--fg); border-bottom-color: var(--accent); }
+.tv-mini-btn { align-self: center; background: none; border: 0; color: var(--dim); cursor: pointer; border-radius: var(--r-sm); padding: 3px 8px; font-size: 11px; }
+.tv-mini-btn:hover { color: var(--fg); background: var(--elev); }
+.tv-bottom-body { flex: 1; overflow-y: auto; padding: 10px 12px; min-height: 0; }
+.tv-bottom.collapsed .tv-bottom-body { display: none; }
+.tv-bottom.collapsed { height: 34px; }
+.tv-bottom-body .section { display: none; background: transparent; border: 0; border-radius: 0; }
+.tv-bottom-body .section:hover { border-color: transparent; }
+.tv-bottom-body .section.tv-active { display: block; }
+.tv-bottom-body .section-head { padding: 4px 0 8px; min-height: 0; }
+.tv-bottom-body .section-body { padding: 0 0 6px; }
+.tv-bottom .grid2 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.tv-bottom .list, .tv-bottom .list-tall { max-height: none; }
+.tv-bottom .cards { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.tv-bottom .detail-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Правый док с вкладками (позиция — как панель виджетов TV). */
+.tv-dock { width: var(--tv-dock-w); min-width: 300px; max-width: 640px; flex: none; display: flex; flex-direction: column; background: var(--surface); }
+.tv-dock.collapsed { display: none; }
+.tv-dock-tabs { display: flex; align-items: stretch; gap: 1px; padding: 0 6px; height: 35px; flex: none; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tv-dock-tabs > button[data-tab] {
+	background: none;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	color: var(--muted);
+	font: 600 11px var(--font);
+	padding: 0 9px;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: color 0.12s;
+}
+.tv-dock-tabs > button[data-tab]:hover { color: var(--fg-soft); }
+.tv-dock-tabs > button[data-tab].active { color: var(--fg); border-bottom-color: var(--accent); }
+.tv-dock-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 10px; min-height: 0; }
+.tv-dock-body .section { display: none; background: transparent; border: 0; border-radius: 0; }
+.tv-dock-body .section:hover { border-color: transparent; }
+.tv-dock-body .section.tv-active { display: block; }
+.tv-dock-body .section.mode:has(.btn-outline.on) { box-shadow: none; }
+.tv-dock-body .section-head { padding: 4px 0 10px; min-height: 0; }
+.tv-dock-body .section-body { padding: 0 0 8px; }
+
+/* ---------- Легенда графика (как строка OHLC в TV) ---------- */
+.tv-legend {
+	position: absolute;
+	left: 10px;
+	top: 8px;
+	z-index: 4;
+	display: flex;
+	align-items: baseline;
+	gap: 9px;
+	font: 11px var(--mono);
+	color: var(--muted);
+	pointer-events: none;
+	white-space: nowrap;
+}
+.tv-legend b { color: var(--fg); font-weight: 600; }
+.tv-legend .up { color: var(--green); }
+.tv-legend .down { color: var(--red); }
+
+/* ---------- Статусбар ---------- */
+.tv-statusbar {
+	height: 26px;
+	flex: none;
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	padding: 0 10px;
+	background: var(--surface);
+	border-top: 1px solid var(--border);
+	font-size: 11px;
+	color: var(--muted);
+	overflow: hidden;
+	white-space: nowrap;
+}
+.tv-status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); flex: none; }
+.tv-status-dot.live { background: var(--green); }
+.tv-status-sep { width: 1px; height: 12px; background: var(--border); flex: none; }
+.tv-status-item { overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- Переопределения наследованных компонентов под TV ---------- */
+body.tv .topbar { display: flex; } /* не используется, на всякий случай */
+body.tv .btn-primary { background: var(--accent-strong); border-color: var(--accent-strong); }
+body.tv .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+body.tv .chart-empty { background: radial-gradient(ellipse 60% 45% at 50% 42%, rgb(41 98 255 / 0.07), transparent 70%); }
+body.tv .loading { background: var(--surface); top: 36px; } /* ниже OHLC-легенды */
+body.tv .combo-pop { background: var(--surface); }
+body.tv .hm-profile { right: 60px; }
+body.tv .check.switch .knob { background: var(--bg); }
+body.tv .check.switch input:checked + .knob { background: rgb(41 98 255 / 0.3); border-color: var(--accent); }
+body.tv .check.switch input:checked + .knob::after { background: var(--accent); }
+body.tv .section.mode:has(.btn-outline.on) { border-color: transparent; }
+
+/* Адаптив: док поверх графика на узких экранах. */
+@media (max-width: 1200px) {
+	:root { --tv-dock-w: 340px; }
+}
+@media (max-width: 900px) {
+	.tv-dock { position: absolute; right: 0; top: 46px; bottom: 26px; z-index: 25; box-shadow: var(--shadow-pop); border-left: 1px solid var(--border); }
+	.tv-split-v { display: none; }
+	.tv-statusbar .muted { display: none; }
+}

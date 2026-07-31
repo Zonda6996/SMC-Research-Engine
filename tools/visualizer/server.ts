@@ -37,7 +37,8 @@ import { plannedFullStop } from '../shared/executionCostGate.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PUBLIC_DIR = join(__dirname, 'public')
-const PORT = 7788
+// VIZ_PORT — параллельный запуск второго экземпляра (например редизайн-ветка рядом с основной).
+const PORT = Number(process.env.VIZ_PORT ?? 7788)
 
 const MIME: Record<string, string> = {
 	'.html': 'text/html; charset=utf-8',

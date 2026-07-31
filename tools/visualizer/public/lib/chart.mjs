@@ -178,21 +178,24 @@ export function rectAt(t, price) {
 export function initChart(onCrosshair, onClick, onPan) {
 	if (chart) chart.remove()
 	const el = document.getElementById('chart')
+	// Тема графика для альтернативных скинов: terminal.html выставляет window.__VIZ_CHART_THEME__
+	// ДО исполнения app.mjs. Классический UI глобаль не ставит — цвета прежние (правило 1 DESIGN-SYSTEM).
+	const t = window.__VIZ_CHART_THEME__ ?? {}
 	chart = LWC().createChart(el, {
 		width: el.clientWidth, height: el.clientHeight,
 		layout: {
-			background: { color: '#0a0a0b' }, textColor: C.text,
+			background: { color: t.bg ?? '#0a0a0b' }, textColor: t.text ?? C.text,
 			fontFamily: '"Geist", ui-sans-serif, system-ui, sans-serif', fontSize: 11,
 			attributionLogo: false,
 		},
-		grid: { vertLines: { color: C.grid }, horzLines: { color: C.grid } },
+		grid: { vertLines: { color: t.grid ?? C.grid }, horzLines: { color: t.grid ?? C.grid } },
 		crosshair: { mode: LWC().CrosshairMode.Normal },
-		timeScale: { timeVisible: true, secondsVisible: false, borderColor: '#232329' },
-		rightPriceScale: { borderColor: '#232329', scaleMargins: { top: 0.08, bottom: 0.08 } },
+		timeScale: { timeVisible: true, secondsVisible: false, borderColor: t.border ?? '#232329' },
+		rightPriceScale: { borderColor: t.border ?? '#232329', scaleMargins: { top: 0.08, bottom: 0.08 } },
 	})
 	candlesSeries = chart.addSeries(LWC().CandlestickSeries, {
-		upColor: C.green, downColor: C.red, borderUpColor: C.green, borderDownColor: C.red,
-		wickUpColor: C.green, wickDownColor: C.red,
+		upColor: t.up ?? C.green, downColor: t.down ?? C.red, borderUpColor: t.up ?? C.green, borderDownColor: t.down ?? C.red,
+		wickUpColor: t.up ?? C.green, wickDownColor: t.down ?? C.red,
 	})
 	candlesSeries.attachPrimitive(zonesPrim)
 	candlesSeries.attachPrimitive(apexPrim)

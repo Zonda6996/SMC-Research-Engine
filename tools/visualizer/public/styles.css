@@ -137,6 +137,15 @@ textarea.input { height: auto; min-height: 54px; padding: 8px 10px; resize: vert
 .check input:checked { background: var(--accent-strong); border-color: var(--accent-strong); }
 .check input:checked::after { content: ""; position: absolute; left: 4.5px; top: 1.5px; width: 4px; height: 8px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 
+/* Переключатель-switch (мастер-тумблеры индикаторов) поверх базового чекбокса. */
+.check.switch { gap: 8px; color: var(--fg-soft); font-size: 12px; font-weight: 500; }
+.check.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.check.switch .knob { width: 28px; height: 16px; border-radius: 99px; background: var(--elev); border: 1px solid var(--border-strong); position: relative; flex: none; transition: background 0.18s, border-color 0.18s; }
+.check.switch .knob::after { content: ""; position: absolute; left: 2px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--muted); transition: left 0.18s, background 0.18s; }
+.check.switch input:checked + .knob { background: rgb(79 131 255 / 0.28); border-color: var(--accent); }
+.check.switch input:checked + .knob::after { left: 14px; background: var(--accent); }
+.check.switch input:focus-visible + .knob { box-shadow: 0 0 0 3px rgb(79 131 255 / 0.18); }
+
 .badge { font: 500 10.5px var(--mono); color: var(--muted); border: 1px solid var(--border); border-radius: 99px; padding: 2px 8px; white-space: nowrap; }
 .badge.accent { color: var(--accent); border-color: rgb(79 131 255 / 0.4); }
 .pill { font: 700 9.5px var(--font); letter-spacing: 0.4px; border-radius: 4px; padding: 2px 6px; }
@@ -195,6 +204,9 @@ textarea.input { height: auto; min-height: 54px; padding: 8px 10px; resize: vert
 	left: 16px;
 	top: 16px;
 	z-index: 6;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	background: var(--card);
 	border: 1px solid var(--border);
 	border-radius: var(--r);
@@ -202,8 +214,27 @@ textarea.input { height: auto; min-height: 54px; padding: 8px 10px; resize: vert
 	color: var(--muted);
 	box-shadow: var(--shadow);
 }
+.loading::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
 body.is-loading .loading { animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: 0.55; } }
+
+/* ---------- Пустой стейт графика (до первой загрузки) ---------- */
+.chart-empty {
+	position: absolute;
+	inset: 0;
+	z-index: 5;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	text-align: center;
+	pointer-events: none;
+	background: radial-gradient(ellipse 60% 45% at 50% 42%, rgb(79 131 255 / 0.05), transparent 70%);
+}
+.brand-lg { font-size: 26px; letter-spacing: -0.5px; }
+.chart-empty-sub { margin: 0; color: var(--muted); font-size: 12.5px; }
+.chart-empty-chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
 
 /* ---------- Hover-карточки / тултипы ---------- */
 .hover-card {
@@ -228,6 +259,8 @@ body.is-loading .loading { animation: pulse 1.2s ease-in-out infinite; }
 .sidebar { border-left: 1px solid var(--border); background: var(--bg); overflow-y: auto; overflow-x: hidden; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
 .section { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; transition: border-color 0.15s; flex-shrink: 0; }
 .section:hover { border-color: var(--border-strong); }
+.section.mode { transition: border-color 0.15s, box-shadow 0.2s; }
+.section.mode:has(.btn-outline.on) { border-color: rgb(79 131 255 / 0.4); box-shadow: 0 0 0 1px rgb(79 131 255 / 0.12); }
 .section-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; cursor: pointer; user-select: none; min-height: 44px; }
 .section-head:hover h2 { color: var(--fg-soft); }
 .section-head h2 { margin: 0; font: 700 10.5px var(--font); letter-spacing: 0.9px; text-transform: uppercase; color: var(--muted); flex: 1; display: flex; align-items: center; gap: 8px; transition: color 0.15s; }
@@ -257,8 +290,8 @@ body.is-loading .loading { animation: pulse 1.2s ease-in-out infinite; }
 
 /* ---------- Карточки статистики ---------- */
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 9px 11px; transition: border-color 0.15s; }
-.stat-card:hover { border-color: var(--border-strong); }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 9px 11px; transition: border-color 0.15s, transform 0.12s, box-shadow 0.15s; }
+.stat-card:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: 0 4px 14px rgb(0 0 0 / 0.25); }
 .stat-name { color: var(--dim); font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.7px; }
 .stat-value { font: 700 17px var(--mono); margin-top: 3px; }
 .stat-sub { font-size: 10px; color: var(--dim); margin-top: 2px; font-family: var(--mono); }

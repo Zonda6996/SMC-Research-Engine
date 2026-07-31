@@ -149,6 +149,8 @@ async function load() {
 		redraw()
 		fitContent()
 		status('')
+		// Пустой стейт графика живёт до первой успешной загрузки (оба скина: classic и terminal).
+		$('chartEmpty')?.classList.add('hidden')
 	} catch (e) {
 		status(`Ошибка: ${e.message}`)
 	} finally {
