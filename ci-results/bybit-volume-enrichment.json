@@ -1,0 +1,52 @@
+{
+  "reports": [
+    {
+      "datasetId": "btc-perp-15m",
+      "rows": 14683,
+      "covered": 14683,
+      "coverage": 1,
+      "meanCloseAbsPct": 0.000004620876154452459,
+      "maxClosePct": 0.044480941627322856
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "rows": 9764,
+      "covered": 9764,
+      "coverage": 1,
+      "meanCloseAbsPct": 0.000001269731636963491,
+      "maxClosePct": 0.012397659703311525
+    },
+    {
+      "datasetId": "eth-perp-15m",
+      "rows": 16990,
+      "covered": 16990,
+      "coverage": 1,
+      "meanCloseAbsPct": 0.000004092744633783067,
+      "maxClosePct": 0.059091812560763124
+    },
+    {
+      "datasetId": "sol-spot-15m",
+      "rows": 17865,
+      "covered": 17865,
+      "coverage": 1,
+      "meanCloseAbsPct": 0.000006119534217272125,
+      "maxClosePct": 0.06865302759850866
+    },
+    {
+      "datasetId": "btc-perp-5m",
+      "rows": 19428,
+      "covered": 19428,
+      "coverage": 1,
+      "meanCloseAbsPct": 0.0000022895275698642605,
+      "maxClosePct": 0.044480941627322856
+    },
+    {
+      "datasetId": "btc-perp-4h",
+      "rows": 7690,
+      "covered": 7690,
+      "coverage": 1,
+      "meanCloseAbsPct": 0.000006732005516006279,
+      "maxClosePct": 0.05176912241808829
+    }
+  ]
+}

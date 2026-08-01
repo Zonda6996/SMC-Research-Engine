@@ -1,112 +1,33 @@
-# Хэндофф — SMC Research Engine
+# Handoff — SMC Research Engine
 
-**Дата:** 2026-07-30  
-**Активная ветка:** `apex-reversal-v1`  
-**Статус:** research + visualizer QA; не выдавать проект за готовую торговую систему.
+**Обновлено:** 2026-08-01
 
-Этот файл — актуальное дополнение к `docs/CONTEXT.md` и `SPEC.md` для нового чата. При расхождении действующий код и новые секции SPEC имеют приоритет.
+**Статус:** research platform; production claims require explicit gates.
 
-## 1. Правила работы
+This file is the general entry point. Use the specialized documents instead of treating this as a second specification:
 
-1. Общаться по-русски, прямо, без выдуманных результатов.
-2. Перед работой прочитать `SPEC.md` (особенно §14.1 и §16.33–§16.43), `docs/CONTEXT.md`, этот файл, последние коммиты и связанные исходники.
-3. Не менять дефолты движков и не подгонять параметры по одному скрину/одной монете.
-4. Любую гипотезу: сначала каузальная реализация, затем train/test по времени, комиссии, multi-asset и проверка устойчивости к лучшему 1% сделок.
-5. Визуальный QA — до заявлений о совпадении с приватным TradingView-индикатором.
-6. Коммиты движка, визуализатора и документации — отдельные. Перед «готово»: `npx tsx --test tests/*.test.ts`, `npx tsc --noEmit`, `node --check tools/visualizer/public/*.mjs tools/visualizer/public/{lib,panels}/*.mjs`.
-7. Не трогать `docs/CONTEXT.md` без прямого запроса. Этот запрос получен; если нельзя безопасно заменить большой файл целиком, обновлять этот handoff и явно сообщать об ограничении.
+- `docs/CONTEXT.md` — current repository map and working protocol.
+- `SPEC.md` — active mechanical system, confirmed research and negative knowledge.
+- `docs/INDICATOR-RESEARCH-HANDOFF.md` — full Zonda Apex/Reversal reconstruction handoff.
+- `ci-results/README.md` — canonical research artifact index.
+- `docs/V0-CLAUDE-PROMPT.md` — ready-to-paste prompt for Claude Fable 5 in v0.app.
+- `docs/DESIGN-SYSTEM.md` — canonical visualizer UI contract.
 
-## 2. Источник данных и ограничения
+## Current priorities
 
-- Исследования: Binance USDT-M futures и архивы `data.binance.vision`.
-- В песочнице Binance API гео-блокирован; архивы и CI используются как основной data path.
-- Пользователь не может передать Pine-исходники приватных индикаторов. Apex/Reversal надо калибровать по наблюдаемому поведению, точным числам из TV и скриншотам, как heatmap; не заявлять точное воспроизведение формулы.
+1. Preserve a clean `main` with the accepted shadcn/Vercel/Geist visualizer.
+2. Keep indicator reconstruction isolated in a `research/*` branch with exact exports, tests and machine-readable reports.
+3. Do not promote any V1–V6 Reversal research detector; the strict critic rejects all of them.
+4. Keep Apex `apex-1.2-cross-oos-sigma-4` protected by exact OOS regression.
+5. Treat the open real-data chart restore bug as open until user QA confirms a fix.
 
-## 3. Таймфреймы POI и подтверждений — НОРМА
+## Completion gate
 
-SPEC §14.1 задаёт две разные лестницы. Формат:
-
-```text
-POI TF → упрощённое подтверждение / уточнённое подтверждение
-1W     → 1D / 4h
-1D     → 4h / 1h
-4h     → 1h / 15m
-1h     → 15m / 5m
+```bash
+npm test
+npx tsc --noEmit
+node --check tools/visualizer/public/*.mjs tools/visualizer/public/{lib,panels}/*.mjs
+npm run research:integrity
 ```
 
-Текущий UI ошибочно показывает одну общую связку для обоих режимов и в simplified использует не ту ветку. Это не просто подпись: проверить серверный routing и `SimplifiedConfirmationEngine`, чтобы simplified брал первый TF после `/`, refined — второй. Покрыть тестами все четыре строки. Не считать текущие результаты high-WR пресета автоматически валидными для новой лестницы: после исправления прогнать отдельный replay.
-
-## 4. Текущие подсистемы
-
-### Zonda Apex
-
-- Версия: `apex-1.0-calibrated-log-alma`.
-- Реализованная аппроксимация: ALMA(`hlc3`, 200, 0.85, 6), логарифмические границы, ширина через ALMA(TR/close, 122, 0.625, 3.5).
-- Оценка прошлой cross-symbol ошибки ширины около 4%, но пользователь в ручном QA видит расхождение BTC: примерно $20–100 на TF ниже 4h и $100–250 на 4h+.
-- Это не доказательство, что наша формула хуже или лучше вендора: точная private formula неизвестна. Калибровать по измеримым точкам TV на 5m/15m/1h/4h, отделяя spot/futures basis от ошибки ширины. Не подбирать один параметр под один скрин.
-
-### Zonda Reversal
-
-- Версия: `reversal-1.0-directional-candle`.
-- Сейчас это минимальная модель: край Apex взводит сторону; BUY разрешён только на бычьей, SELL только на медвежьей; re-arm у средней.
-- Пользователь подтвердил: оригинал использует упрощённую формулу «страха и жадности», но НЕ только её и НЕ только полосы. Следовательно, текущий Reversal — приближение, не копия.
-- Baseline из 14 семей trigger-гипотез не подтвердил net edge после costs. Не маппить Safe/Standard/Risk в боевые правила и не менять defaults без новой измеримой гипотезы.
-
-### Heatmap и POI
-
-- Heatmap `liquidity-heatmap-2.0-oi-hybrid`: архивный OI path подтверждён, coverage 99.99% на 90-дневной проверке BTC/ETH/SOL/XRP.
-- Predictive magnet edge пока не доказан; не бампить версию и не подключать как торговый фильтр.
-- POI/Refined — research-only, не battle/forward.
-
-### Simplified + time-stop
-
-- `simplified-confirmation-0.8-time-stop-preset`.
-- Time-stop: остаток после PARTIAL закрывается через 80 полных баров confirmation TF; в текущем старом 1h→15m контексте это 20 часов.
-- End-to-end результат старой лестницы: train E +0.049R, ex-top1% +0.013R; test E +0.082R, ex-top1% +0.041R, PF 1.358, DD 14.748R.
-- После исправления §14.1 повторить E2E: число часов изменится с TF, поэтому 80 баров нельзя молча считать одинаковым риском на всех строках.
-
-## 5. Последний пользовательский QA: открытые задачи
-
-1. **Метки canon на основном графике.** OTE/Deep и подобный шум должны быть выключены по умолчанию и жить в панели «Сделки». BOS/CHoCH по умолчанию включены, но нужен переключатель скрытия там же.
-   - Уже создан коммит `189a813b`: логика `showDeep`, `showOte`, `showBosChoch` добавлена в `stats.mjs`.
-   - UI-чекбоксы в `index.html` ещё не добавлены. До их добавления `wireStatsPanel()` может обращаться к отсутствующим элементам — исправить первым.
-2. **Баг графика при закрытии Confirmation.** Пользователь просит пока НЕ фиксить, только зафиксировать. Симптом: после закрытия подтверждения ряд/график остаётся кривым. Смотреть `activateMode`, `deactivateMode`, `restoreMainCandles`, range и overlays. Нужен воспроизводимый сценарий и регресс-тест/скриншот QA до исправления.
-3. **TIME в UI.** Движок поддерживает outcome/event `TIME`, но патч отображения в `confirmation.mjs` не закоммичен. Нужны русская подпись, фиолетовая метка и outcome `ТАЙМ-СТОП`. Предыдущий CI QA снял responsive screenshots без JS ошибок, но fixture дал 0 simplified trades, поэтому не подтвердил TIME.
-4. **Дизайн.** Пользователь не увидел визуального редизайна; не говорить, что задача закрыта только потому, что есть `styles.css`/`DESIGN-SYSTEM.md`. Нужен явный, видимый diff от пользовательского скрина, затем screenshot QA и пользовательская приёмка.
-5. **Ветви.** Цель — оставить 3–4 ветки. До удаления проверить ancestry, затем merge order `simplified-mode-v1 → apex-reversal-v1 → main`, финальный gate. Не удалять без доказанного merge.
-
-## 6. Текущее техническое состояние
-
-- Последний успешно подтверждённый gate: 341/341, `tsc` и `node --check` clean (до незавершённой UI-правки).
-- `ci/task.json` сброшен в обычный `gate` коммитом `80f6ca8`.
-- `docs/DESIGN-SYSTEM.md` существует.
-- Последний ручной код-коммит: `189a813b` (частичная реализация переключателей, требует доведения UI).
-- `.cache/` корректно добавлен пользователем в `.gitignore`; это кэш архивных данных, не удалять из механики без замены кэша.
-
-## 7. Приоритет следующего ИИ
-
-1. Исправить незавершённые переключатели маркеров одним маленьким visualizer-коммитом: добавить UI в «Сделки», безопасно обработать элементы, дефолт Deep/OTE off, BOS/CHoCH on; проверить в браузере.
-2. Исправить маршрутизацию двух лестниц §14.1 и покрыть тестами; затем перепроверить time-stop и результаты simplified.
-3. Оформить воспроизводимый кейс бага закрытия Confirmation, без фикса.
-4. Провести честную калибровку Apex/Reversal по приватному TV через набор точных наблюдений; не обещать копию private logic.
-5. Только после этого — видимый редизайн, финальный QA и merge hygiene.
-
-## 8. Дополнение 30.07.2026: что сделано в `fix/confirmation-tf-routing`
-
-- `f383902` (на `apex-reversal-v1`): переключатели Deep/OTE/BOS-CHoCH/protected доведены в панели «Сделки»; Deep/OTE off, BOS/CHoCH on, protected off; безопасный DOM wiring; runtime TIME UI добавлен.
-- `995bbfd`: раздельные `SIMPLIFIED_CONFIRMATION_TF` и `REFINED_CONFIRMATION_TF` по всем четырём строкам §14.1; server routing/payload/MTF layers разделены.
-- `9b9f1b5`: confirmation panel и подписи используют TF выбранного движка.
-- `72cb6ce`: regression-тесты server/UI routing.
-- Browser QA: defaults верны, duplicate DOM id 0, JS errors 0; артефакты `ci-results/marker-tf-qa/`.
-- Б1 формализован и снят на fixture + синтетическом LTF/TIME payload в `ci-results/confirmation-close-qa/`. На этих данных range восстановился; баг на реальных данных не объявлять исправленным.
-- Контрольный старый 1h→15m E2E повторён до 30.07.2026: train 3887, +0.049R; test 1466, +0.082R; ex-top1% +0.041R; PF 1.359; DD 14.748R. Это не переносится на другие строки лестницы: 80 баров там имеют другую длительность.
-- Следующее по indicators: не менять Apex defaults. Нужны точные TV status-line точки минимум BTC spot/futures на одинаковом timestamp для 5m/15m/1h/4h и отдельные Reversal events со свечой до/сигнальной/после, Risk Mode и состоянием Apex. Текущая формула остаётся approximation; §16.41 остаётся отрицательным baseline.
-
-## 9. Дополнение 30.07.2026: пользовательский Б1, лаги и новый indicator dataset
-
-- Пользователь подтвердил marker toggles и TF routing, затем воспроизвёл Б1 на реальных данных: после Heatmap→Confirmation→закрыть Heatmap→закрыть Confirmation свечи становились аномально тонкими.
-- `91e9775` исправил одну реальную проблему: visualizer сохранял `visibleLogicalRange` (индексы баров) между рядами разных TF; теперь сохраняется timestamp `visibleRange`, synthetic 500 main / 2000 LTF QA дал drift 0. **Но пользователь повторно проверил на реальных данных: визуальный Б1 остался. Значит это была сопутствующая ошибка, не полный root cause. Б1 открыт и по просьбе пользователя пока отложен.**
-- Источник периодических ~10 FPS: Heatmap создавал до 400 отдельных `LineSeries` при каждом redraw. `91e9775` заменил их одним canvas primitive. Fixture QA: 38 bands, overlay count не вырос (14→14), 62 rAF frames за секунду; это устранение O(N series), не обещание FPS на любом железе.
-- Пользователь передал точные BTC Spot TV status-line точки на 27.07.2026 01:00 Казахстан (26.07 20:00 UTC) для 4h/1h/15m/5m. Spot-to-spot сравнение текущего Apex: mean error −0.205% / +0.058% / +0.002% / +0.017%; width error +1.45% / +5.53% / +7.98% / −0.95%. Defaults не менялись: один timestamp ещё не OOS.
-- Полностью разобран гайд автора Reversal. Safe/Risk: dynamic partial на mean, затем BE, dynamic full на противоположной Apex zone; Risk имеет ближе add/stop. Standard: fixed entry/add/stop/take, без dynamic targets; ориентиры автора после add около 1:2, без add около 1:1.25. Это trade management, не раскрытая signal formula.
-- Следующий research gate: оцифровать предоставленные BUY/SELL/no-signal скриншоты в event dataset и отдельно восстановить signal detector; не смешивать его с trade manager и не менять defaults по таблице вендора.
+Commits for UI, production logic, research and documentation must remain separate. A failed result is recorded as negative knowledge, not silently discarded or reframed as success.

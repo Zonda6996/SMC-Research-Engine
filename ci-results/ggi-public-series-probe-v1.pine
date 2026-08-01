@@ -1,0 +1,23 @@
+//@version=6
+indicator("GGI public series probe v1", overlay = false)
+
+src1 = input.source(close, "GGI series 1")
+src2 = input.source(close, "GGI series 2")
+src3 = input.source(close, "GGI series 3")
+src4 = input.source(close, "GGI series 4")
+src5 = input.source(close, "GGI series 5")
+src6 = input.source(close, "GGI series 6")
+
+plot(src1, "Probe 1", color = color.blue)
+plot(src2, "Probe 2", color = color.orange)
+plot(src3, "Probe 3", color = color.purple)
+plot(src4, "Probe 4", color = color.teal)
+plot(src5, "Probe 5", color = color.red)
+plot(src6, "Probe 6", color = color.green)
+
+plot(src1 != src1[1] ? 1 : 0, "Probe 1 changed", display = display.data_window)
+plot(src2 != src2[1] ? 1 : 0, "Probe 2 changed", display = display.data_window)
+plot(src3 != src3[1] ? 1 : 0, "Probe 3 changed", display = display.data_window)
+plot(src4 != src4[1] ? 1 : 0, "Probe 4 changed", display = display.data_window)
+plot(src5 != src5[1] ? 1 : 0, "Probe 5 changed", display = display.data_window)
+plot(src6 != src6[1] ? 1 : 0, "Probe 6 changed", display = display.data_window)

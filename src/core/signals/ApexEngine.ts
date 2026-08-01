@@ -4,12 +4,12 @@
 // и ETH 1h (20/27/28/29.07.2026):
 //   mean = ALMA(hlc3, 200, offset=0.85, sigma=6)
 //   upper/lower = mean * exp(+-k*s), k = 5.6 (внутри) / 9.6 (снаружи)
-//   s ≈ ALMA(trueRange/close, 122, offset=0.625, sigma=3.5)
-// Средняя переносится с ошибкой 0.02–0.27%; закрытая мера s восстановлена как
-// устойчивая аппроксимация с максимальной наблюдавшейся ошибкой около 4%.
+//   s ≈ ALMA(trueRange/close, 122, offset=0.625, sigma=4)
+// Средняя переносится с ошибкой 0.02–0.60%; sigma=4 уменьшила width MAE против
+// 3.5 на BTC 15m/1h и на четырёх OOS-разрезах ETH/SOL/BTC 5m/BTC 4h.
 import type { Candle } from '../../models/price/Candle.js'
 
-export const APEX_VERSION = 'apex-1.1-tv-settings'
+export const APEX_VERSION = 'apex-1.2-cross-oos-sigma-4'
 export const REVERSAL_VERSION = 'reversal-1.0-directional-candle'
 
 export interface ApexParams {
@@ -38,7 +38,7 @@ export const APEX_PARAMS: ApexParams = {
 	meanSigma: 6,
 	devLookback: 122,
 	devOffset: 0.625,
-	devSigma: 3.5,
+	devSigma: 4,
 	widthScale: 1,
 	signalMode: 'outer',
 }

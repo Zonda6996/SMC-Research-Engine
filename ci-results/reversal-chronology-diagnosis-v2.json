@@ -1,0 +1,256 @@
+{
+  "summaries": [
+    {
+      "datasetId": "btc-perp-15m",
+      "market": "futures",
+      "timeframe": "15m",
+      "labels": 42,
+      "episodes": 65,
+      "positiveEpisodeShare": 0.49230769230769234,
+      "positive": {
+        "n": 32,
+        "durationMedian": 71,
+        "durationP90": 157,
+        "innerBarsMedian": 21,
+        "outerShare": 0.375,
+        "minRsiMedian": 16.436412515869137,
+        "maxRsiMedian": 78.58949416342426,
+        "labelOffsetMedian": 29,
+        "labelOffsetP90": 91
+      },
+      "negative": {
+        "n": 33,
+        "durationMedian": 39,
+        "durationP90": 73,
+        "innerBarsMedian": 9,
+        "outerShare": 0.3939393939393939,
+        "minRsiMedian": 22.02383389983214,
+        "maxRsiMedian": 77.2410091250671,
+        "labelOffsetMedian": null,
+        "labelOffsetP90": null
+      },
+      "sameSideGapBars": {
+        "long": {
+          "median": 288,
+          "p10": 76,
+          "p90": 496
+        },
+        "short": {
+          "median": 403,
+          "p10": 163,
+          "p90": 948
+        }
+      }
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "market": "futures",
+      "timeframe": "1h",
+      "labels": 23,
+      "episodes": 41,
+      "positiveEpisodeShare": 0.3170731707317073,
+      "positive": {
+        "n": 13,
+        "durationMedian": 78,
+        "durationP90": 124,
+        "innerBarsMedian": 17,
+        "outerShare": 0.15384615384615385,
+        "minRsiMedian": 18.161732213875368,
+        "maxRsiMedian": 79.57527838721711,
+        "labelOffsetMedian": 14,
+        "labelOffsetP90": 78
+      },
+      "negative": {
+        "n": 28,
+        "durationMedian": 43,
+        "durationP90": 101,
+        "innerBarsMedian": 10,
+        "outerShare": 0.32142857142857145,
+        "minRsiMedian": 23.19575676772361,
+        "maxRsiMedian": 80.62308044174338,
+        "labelOffsetMedian": null,
+        "labelOffsetP90": null
+      },
+      "sameSideGapBars": {
+        "long": {
+          "median": 294,
+          "p10": 130,
+          "p90": 520
+        },
+        "short": {
+          "median": 627,
+          "p10": 69,
+          "p90": 984
+        }
+      }
+    },
+    {
+      "datasetId": "eth-perp-15m",
+      "market": "futures",
+      "timeframe": "15m",
+      "labels": 47,
+      "episodes": 80,
+      "positiveEpisodeShare": 0.475,
+      "positive": {
+        "n": 38,
+        "durationMedian": 67,
+        "durationP90": 135,
+        "innerBarsMedian": 20,
+        "outerShare": 0.34210526315789475,
+        "minRsiMedian": 16.083916083916094,
+        "maxRsiMedian": 80.08331163759502,
+        "labelOffsetMedian": 26,
+        "labelOffsetP90": 71
+      },
+      "negative": {
+        "n": 42,
+        "durationMedian": 49,
+        "durationP90": 117,
+        "innerBarsMedian": 6,
+        "outerShare": 0.30952380952380953,
+        "minRsiMedian": 23.22993931220485,
+        "maxRsiMedian": 79.84152139461244,
+        "labelOffsetMedian": null,
+        "labelOffsetP90": null
+      },
+      "sameSideGapBars": {
+        "long": {
+          "median": 293,
+          "p10": 85,
+          "p90": 645
+        },
+        "short": {
+          "median": 389,
+          "p10": 134,
+          "p90": 1142
+        }
+      }
+    },
+    {
+      "datasetId": "sol-spot-15m",
+      "market": "spot",
+      "timeframe": "15m",
+      "labels": 37,
+      "episodes": 75,
+      "positiveEpisodeShare": 0.38666666666666666,
+      "positive": {
+        "n": 29,
+        "durationMedian": 84,
+        "durationP90": 144,
+        "innerBarsMedian": 17,
+        "outerShare": 0.3448275862068966,
+        "minRsiMedian": 20.171673819742452,
+        "maxRsiMedian": 78.41269841269833,
+        "labelOffsetMedian": 23,
+        "labelOffsetP90": 70
+      },
+      "negative": {
+        "n": 46,
+        "durationMedian": 45,
+        "durationP90": 99,
+        "innerBarsMedian": 8,
+        "outerShare": 0.32608695652173914,
+        "minRsiMedian": 18.957345971564678,
+        "maxRsiMedian": 78.02197802197841,
+        "labelOffsetMedian": null,
+        "labelOffsetP90": null
+      },
+      "sameSideGapBars": {
+        "long": {
+          "median": 279,
+          "p10": 83,
+          "p90": 1227
+        },
+        "short": {
+          "median": 559,
+          "p10": 136,
+          "p90": 940
+        }
+      }
+    },
+    {
+      "datasetId": "btc-perp-5m",
+      "market": "futures",
+      "timeframe": "5m",
+      "labels": 81,
+      "episodes": 160,
+      "positiveEpisodeShare": 0.4125,
+      "positive": {
+        "n": 66,
+        "durationMedian": 70,
+        "durationP90": 134,
+        "innerBarsMedian": 15,
+        "outerShare": 0.2727272727272727,
+        "minRsiMedian": 19.27227875424063,
+        "maxRsiMedian": 79.59431345353636,
+        "labelOffsetMedian": 16,
+        "labelOffsetP90": 55
+      },
+      "negative": {
+        "n": 94,
+        "durationMedian": 32,
+        "durationP90": 85,
+        "innerBarsMedian": 8,
+        "outerShare": 0.39361702127659576,
+        "minRsiMedian": 21.556848757900028,
+        "maxRsiMedian": 79.59330574050753,
+        "labelOffsetMedian": null,
+        "labelOffsetP90": null
+      },
+      "sameSideGapBars": {
+        "long": {
+          "median": 332,
+          "p10": 117,
+          "p90": 848
+        },
+        "short": {
+          "median": 319,
+          "p10": 105,
+          "p90": 1017
+        }
+      }
+    },
+    {
+      "datasetId": "btc-perp-4h",
+      "market": "futures",
+      "timeframe": "4h",
+      "labels": 38,
+      "episodes": 51,
+      "positiveEpisodeShare": 0.47058823529411764,
+      "positive": {
+        "n": 24,
+        "durationMedian": 84,
+        "durationP90": 136,
+        "innerBarsMedian": 21,
+        "outerShare": 0.375,
+        "minRsiMedian": 16.955897703549013,
+        "maxRsiMedian": 84.10397231417389,
+        "labelOffsetMedian": 23,
+        "labelOffsetP90": 87
+      },
+      "negative": {
+        "n": 27,
+        "durationMedian": 54,
+        "durationP90": 88,
+        "innerBarsMedian": 18,
+        "outerShare": 0.37037037037037035,
+        "minRsiMedian": 18.820403041263774,
+        "maxRsiMedian": 82.14448103393642,
+        "labelOffsetMedian": null,
+        "labelOffsetP90": null
+      },
+      "sameSideGapBars": {
+        "long": {
+          "median": 338,
+          "p10": 173,
+          "p90": 644
+        },
+        "short": {
+          "median": 376,
+          "p10": 64,
+          "p90": 524
+        }
+      }
+    }
+  ]
+}

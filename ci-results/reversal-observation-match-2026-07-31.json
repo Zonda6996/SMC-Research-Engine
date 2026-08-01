@@ -1,0 +1,432 @@
+{
+  "meta": {
+    "from": 1782345600000,
+    "until": 1785542400000,
+    "market": "spot",
+    "timezone": "Asia/Almaty",
+    "baseline": "H0"
+  },
+  "coverage": [
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "bars": 3456,
+      "from": "2026-06-25T00:00:00.000Z",
+      "to": "2026-07-30T23:45:00.000Z"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "bars": 864,
+      "from": "2026-06-25T00:00:00.000Z",
+      "to": "2026-07-30T23:00:00.000Z"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "bars": 864,
+      "from": "2026-06-25T00:00:00.000Z",
+      "to": "2026-07-30T23:00:00.000Z"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "45m",
+      "bars": 0,
+      "from": null,
+      "to": null
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "bars": 1728,
+      "from": "2026-06-25T00:00:00.000Z",
+      "to": "2026-07-30T23:30:00.000Z"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "bars": 10368,
+      "from": "2026-06-25T00:00:00.000Z",
+      "to": "2026-07-30T23:55:00.000Z"
+    }
+  ],
+  "rows": [
+    {
+      "id": "btc-12",
+      "status": "matched",
+      "expectedAt": "2026-07-26T04:00:00.000Z",
+      "candle": {
+        "timestamp": 1785038400000,
+        "open": 64518.9,
+        "high": 64523.7,
+        "low": 64473.8,
+        "close": 64474.9,
+        "volume": 310.719
+      },
+      "candleDirection": "bearish",
+      "apex": {
+        "mean": 64253.66728899758,
+        "redLo": 64587.17196300344,
+        "redHi": 64826.448881811935,
+        "greenHi": 63921.88471187572,
+        "greenLo": 63685.94657424652,
+        "distanceToMeanPct": 0.3443,
+        "lowToOuterLowerPct": 1.2371,
+        "highToOuterUpperPct": -0.467
+      },
+      "expected": {
+        "direction": "short",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "btc-13-buy",
+      "status": "matched",
+      "expectedAt": "2026-07-23T15:15:00.000Z",
+      "candle": {
+        "timestamp": 1784819700000,
+        "open": 64745.9,
+        "high": 64945.7,
+        "low": 64738.8,
+        "close": 64844,
+        "volume": 2269.006
+      },
+      "candleDirection": "bullish",
+      "apex": {
+        "mean": 65635.52754087307,
+        "redLo": 66408.73365807497,
+        "redHi": 66966.59420193499,
+        "greenHi": 64871.32396997414,
+        "greenLo": 64330.917928692084,
+        "distanceToMeanPct": -1.2059,
+        "lowToOuterLowerPct": 0.634,
+        "highToOuterUpperPct": -3.0178
+      },
+      "expected": {
+        "direction": "long",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "btc-13-sell",
+      "status": "matched",
+      "expectedAt": "2026-07-24T07:15:00.000Z",
+      "candle": {
+        "timestamp": 1784877300000,
+        "open": 65739.9,
+        "high": 65780,
+        "low": 65592.7,
+        "close": 65613.7,
+        "volume": 2884.025
+      },
+      "candleDirection": "bearish",
+      "apex": {
+        "mean": 65123.69039389775,
+        "redLo": 65905.15019202592,
+        "redHi": 66469.07038356524,
+        "greenHi": 64351.49663058342,
+        "greenLo": 63805.54182639628,
+        "distanceToMeanPct": 0.7524,
+        "lowToOuterLowerPct": 2.8009,
+        "highToOuterUpperPct": -1.0367
+      },
+      "expected": {
+        "direction": "short",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "btc-14",
+      "status": "matched",
+      "expectedAt": "2026-07-25T12:00:00.000Z",
+      "candle": {
+        "timestamp": 1784980800000,
+        "open": 64031.2,
+        "high": 64088.2,
+        "low": 64006.2,
+        "close": 64088.2,
+        "volume": 1166.645
+      },
+      "candleDirection": "bullish",
+      "apex": {
+        "mean": 65055.20036329065,
+        "redLo": 66648.89447837918,
+        "redHi": 67811.09512134628,
+        "greenHi": 63499.614321146844,
+        "greenLo": 62411.3072755205,
+        "distanceToMeanPct": -1.4864,
+        "lowToOuterLowerPct": 2.5555,
+        "highToOuterUpperPct": -5.4901
+      },
+      "expected": {
+        "direction": "long",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "btc-15",
+      "status": "matched",
+      "expectedAt": "2026-07-15T01:00:00.000Z",
+      "candle": {
+        "timestamp": 1784077200000,
+        "open": 64798.1,
+        "high": 64830.2,
+        "low": 64618.8,
+        "close": 64643.7,
+        "volume": 3480.114
+      },
+      "candleDirection": "bearish",
+      "apex": {
+        "mean": 63404.13538809094,
+        "redLo": 65144.128604155296,
+        "redHi": 66416.14013141666,
+        "greenHi": 61710.61721830967,
+        "greenLo": 60528.72654684362,
+        "distanceToMeanPct": 1.955,
+        "lowToOuterLowerPct": 6.7572,
+        "highToOuterUpperPct": -2.3879
+      },
+      "expected": {
+        "direction": "short",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "btc-16",
+      "status": "matched",
+      "expectedAt": "2026-07-01T01:00:00.000Z",
+      "candle": {
+        "timestamp": 1782867600000,
+        "open": 58548.7,
+        "high": 58991.6,
+        "low": 57758.6,
+        "close": 58741.7,
+        "volume": 28902.834
+      },
+      "candleDirection": "bullish",
+      "apex": null,
+      "expected": {
+        "direction": "long",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "btc-17-safe",
+      "status": "matched",
+      "expectedAt": "2026-07-28T14:00:00.000Z",
+      "candle": {
+        "timestamp": 1785247200000,
+        "open": 63078.9,
+        "high": 63521,
+        "low": 62937,
+        "close": 63384.1,
+        "volume": 10759.073
+      },
+      "candleDirection": "bullish",
+      "apex": {
+        "mean": 64471.11278836439,
+        "redLo": 65794.67164278688,
+        "redHi": 66756.67441934327,
+        "greenHi": 63174.17931252317,
+        "greenLo": 62263.80238865849,
+        "distanceToMeanPct": -1.686,
+        "lowToOuterLowerPct": 1.0812,
+        "highToOuterUpperPct": -4.847
+      },
+      "expected": {
+        "direction": "long",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "btc-18-risk",
+      "status": "matched",
+      "expectedAt": "2026-07-28T14:00:00.000Z",
+      "candle": {
+        "timestamp": 1785247200000,
+        "open": 63078.9,
+        "high": 63521,
+        "low": 62937,
+        "close": 63384.1,
+        "volume": 10759.073
+      },
+      "candleDirection": "bullish",
+      "apex": {
+        "mean": 64471.11278836439,
+        "redLo": 65794.67164278688,
+        "redHi": 66756.67441934327,
+        "greenHi": 63174.17931252317,
+        "greenLo": 62263.80238865849,
+        "distanceToMeanPct": -1.686,
+        "lowToOuterLowerPct": 1.0812,
+        "highToOuterUpperPct": -4.847
+      },
+      "expected": {
+        "direction": "long",
+        "mode": "risk",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "eth-safe-sell",
+      "status": "matched",
+      "expectedAt": "2026-07-22T14:00:00.000Z",
+      "candle": {
+        "timestamp": 1784728800000,
+        "open": 1939.05,
+        "high": 1958.75,
+        "low": 1921.77,
+        "close": 1932.4,
+        "volume": 485295.462
+      },
+      "candleDirection": "bearish",
+      "apex": {
+        "mean": 1900.9765308354665,
+        "redLo": 1974.8483889511506,
+        "redHi": 2029.365122191123,
+        "greenHi": 1829.8679488537857,
+        "greenLo": 1780.71049476079,
+        "distanceToMeanPct": 1.653,
+        "lowToOuterLowerPct": 7.9215,
+        "highToOuterUpperPct": -3.4797
+      },
+      "expected": {
+        "direction": "short",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "eth-safe-buy",
+      "status": "unresolved",
+      "reason": "exact timestamp is outside archive coverage or feed has no matching bar",
+      "expectedAt": "2026-07-24T01:30:00.000Z",
+      "signalPresent": true
+    },
+    {
+      "id": "sol-safe-sell-30m",
+      "status": "matched",
+      "expectedAt": "2026-07-15T05:00:00.000Z",
+      "candle": {
+        "timestamp": 1784091600000,
+        "open": 78.02,
+        "high": 78.11,
+        "low": 77.66,
+        "close": 77.66,
+        "volume": 37022.697
+      },
+      "candleDirection": "bearish",
+      "apex": {
+        "mean": 76.2360508339685,
+        "redLo": 78.58634637721485,
+        "redHi": 80.30936178856086,
+        "greenHi": 73.95604598872826,
+        "greenLo": 72.36933923172171,
+        "distanceToMeanPct": 1.8678,
+        "lowToOuterLowerPct": 7.3106,
+        "highToOuterUpperPct": -2.7386
+      },
+      "expected": {
+        "direction": "short",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    },
+    {
+      "id": "sol-safe-buy-active",
+      "status": "unresolved",
+      "reason": "exact timestamp is outside archive coverage or feed has no matching bar",
+      "expectedAt": "2026-07-31T04:25:00.000Z",
+      "signalPresent": true
+    },
+    {
+      "id": "sol-risk-buy-active",
+      "status": "unresolved",
+      "reason": "exact timestamp is outside archive coverage or feed has no matching bar",
+      "expectedAt": "2026-07-31T04:25:00.000Z",
+      "signalPresent": true
+    },
+    {
+      "id": "sol-standard-buy-active",
+      "status": "unresolved",
+      "reason": "exact timestamp is outside archive coverage or feed has no matching bar",
+      "expectedAt": "2026-07-31T04:25:00.000Z",
+      "signalPresent": true
+    },
+    {
+      "id": "sol-5m-no-signal-window",
+      "status": "unresolved",
+      "reason": "window-only observation; no exact timestamp",
+      "signalPresent": false
+    },
+    {
+      "id": "sol-safe-sell-5m",
+      "status": "matched",
+      "expectedAt": "2026-07-25T01:50:00.000Z",
+      "candle": {
+        "timestamp": 1784944200000,
+        "open": 74.2,
+        "high": 74.22,
+        "low": 74.14,
+        "close": 74.15,
+        "volume": 992.694
+      },
+      "candleDirection": "bearish",
+      "apex": {
+        "mean": 73.92701323593668,
+        "redLo": 74.41612937853452,
+        "redHi": 74.76747808672248,
+        "greenHi": 73.44111191521884,
+        "greenLo": 73.09599609133923,
+        "distanceToMeanPct": 0.3016,
+        "lowToOuterLowerPct": 1.4283,
+        "highToOuterUpperPct": -0.7322
+      },
+      "expected": {
+        "direction": "short",
+        "mode": "safe",
+        "signalPresent": true
+      },
+      "baselineSignalsAtBar": [],
+      "baselineDirectionMatch": false,
+      "windowBaselineSignals": []
+    }
+  ]
+}

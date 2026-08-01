@@ -1697,3 +1697,41 @@ Apex/Reversal вынесены из Подтверждения в самосто
 - Heatmap больше не создаёт до 400 отдельных `LineSeries`; все полосы рисуются одним canvas primitive. На fixture 38 bands не увеличили overlay-series count (14→14), headless rAF показал 62 кадра за секунду. Это исправляет архитектурный источник лагов, но не является гарантией FPS для любой машины/истории.
 - Новый BTC Spot TV anchor: 27.07.2026 01:00 Казахстан = 26.07 20:00 UTC, одинаковый bar-open на 4h/1h/15m/5m. Текущая Apex approximation дала mean error −0.205% / +0.058% / +0.002% / +0.017%, width error +1.45% / +5.53% / +7.98% / −0.95%. Feed сравнен spot-to-spot, поэтому futures basis здесь исключён. Defaults не меняются по одной дате.
 - Гайд автора подтверждает менеджмент Reversal: Safe/Risk используют dynamic partial на Apex mean, BE после partial и dynamic full на противоположной Apex zone; Risk сокращает add/stop. Standard фиксирует entry/add/stop/take и не двигает уровни. Эти правила относятся к trade plan/position manager и не раскрывают signal formula; detector остаётся отдельной задачей.
+
+## 16.46 Apex sigma=4: cross-symbol/cross-TF OOS и воспроизводимые exact exports (01.08.2026)
+
+- На exact Bybit BTCUSDT.P 15m/1h выбран кандидат ширины `ALMA(TR/close, 122, 0.625, 4)`: средний width MAE 1.93% против 2.16% у sigma=3.5.
+- Без повторного подбора sigma=4 улучшила width MAE на каждом новом наборе: ETH Futures 15m 2.38→2.13%, SOL Spot 15m 2.06→1.84%, BTC Futures 5m 2.31→2.13%, BTC Futures 4h 1.68→1.55%. Mean-параметры не менялись.
+- Production Apex обновлён до `apex-1.2-cross-oos-sigma-4`; `devSigma=4`. Геометрия линий, серверный payload и UI-контракт не менялись.
+- Шесть точных экспортов теперь лежат в `data/vendor-exports/` с SHA-256 manifest. Общий parser проверяет header, chronology, шаг TF, band order, labels, counts, UTC range и hash. Совокупность: 61 820 строк и 268 BUY/SELL; SOL Spot остаётся отдельным market-kind срезом.
+- Regression `tests/apexOosRegression.test.ts` запрещает возврат к sigma=3.5, пока sigma=4 выигрывает на всех четырёх OOS-наборах. Эти данные подтверждают точность Apex, но сами по себе не доказывают торговый edge.
+
+## 16.47 Reversal state-machine search v1: хронология подтверждена, production gate не пройден (01.08.2026)
+
+- Общий parser и one-to-one event matcher применены ко всем 61 820 строкам / 268 exact labels. Grid содержит 3564 симметричные каузальные машины `arm → bounded pending → confirm → emit once → lock → re-arm`.
+- Протокол: первые 50% BTC Futures 15m/1h — fit; только top-200 переходят на следующие 25% validation; последние 25% запечатаны до выбора family. ETH Futures 15m и BTC Futures 5m/4h остаются untouched group holdouts; SOL Spot 15m считается отдельно.
+- Выбранная на validation машина: `inner+rsi35 arm`, pending 8 баров, directional recovery ≥0.25 inner-half-width, re-arm после двух neutral-band closes.
+- Exact-bar: fit precision 9.30% / recall 28.57%; validation 9.62% / 31.25%; sealed BTC 15m/1h 9.80% / 23.81%. Untouched Futures aggregate 5.60% / 18.07%; BTC 4h провалился до 2.41% / 5.26%. SOL Spot отдельно: 6.85% / 27.03%.
+- Signal count остаётся завышенным в 2.18–3.56 раза на Futures holdouts. Production gate (каждый Futures holdout: precision ≥15%, recall ≥40%, count ratio 0.5–2.0) — **FAIL**.
+- Следствие: production `detectReversals()` и `REVERSAL_VERSION` не меняются. Исследовательская машина остаётся в `ReversalStateMachineResearch.ts`; добавление ещё условий без нового наблюдаемого state source запрещено. Fidelity-результат не используется как доказательство прибыльности.
+- Создан независимый каузальный feature snapshot `ZondaEdgeFeatures.ts`: Apex, Reversal freshness, liquidity shelf, BOS/CHoCH+sweeps, Fib только после `createdAtIndex/knownAt`, volume/regime. Это foundation для отдельной walk-forward ablation поверх существующей зонной системы, а не production-фильтр.
+
+## 16.48 Reversal v2: long-memory episode и причина, почему reconstruction продолжается через export (01.08.2026)
+
+- Пользователь отклонил остановку Reversal после v1; исследование продолжено более выразительной каузальной моделью, а не возвратом к single-bar thresholds.
+- Inner-zone episode определён от первого касания экспортированной Inner-линии до закрытия через mean. На всех шести наборах положительные episodes длиннее отрицательных; label появляется далеко после первого касания: median offset 14–29 баров, p90 55–91. Outer touch не различает классы (positive/negative outer share близки, а на BTC1h/BTC5m у negatives даже выше). Это подтверждает long memory и опровергает outer-edge trigger.
+- V2 проверил 55 080 causal episode machines: inner/oscillator arm, RSI/Stoch/composite state, dwell до 32 баров, episode memory 64/128/256, threshold/fast-slow/recovery confirmation, mean/opposite/cooldown re-arm. Протокол 50% fit → top-300 на 25% validation → один sealed 25%; group holdouts не участвовали в выборе.
+- Победитель validation: inner episode + Stoch<15 arm + cross 25 + cooldown 64. Но sealed collapsed до precision 3.03% / recall 4.76%; untouched Futures aggregate 6.89% / 12.65%, SOL Spot 5.81% / 13.51%. Gate снова FAIL, production не меняется.
+- Это не основание бросать Reversal. Это конкретное доказательство: в доступных CSV-полях OHLC + Apex lines + final Shapes не наблюдается ключевая internal state series. Следующий информативный шаг — повторный TV export тех же BTC Futures 15m/1h с каждым доступным числовым plot/Data Window series GGI Buy/Sell (fear/greed, smoothed score, thresholds, raw buy/sell, state/counters, HTF request series). Запрос зафиксирован в `ci-results/reversal-next-export-request-v2.md`.
+
+## 16.49 Reversal loop v3–v6: exact Outer, global cooldown, repaint audit и настоящий Volume (01.08.2026)
+
+- Получены расширенные exact exports с обеими Outer: BTC Futures 15m 14,683 rows/69 labels, BTC 1h 9,764/44, ETH Futures 15m 16,990/75, SOL Spot 15m 17,865/63. Вместе с BTC5m/4h теперь 86,420 rows / 370 labels. На пересечении старых/новых файлов label diffs=0; линии отличаются не более ~0.0011%, поэтому historical repaint/settings drift не обнаружен.
+- Exact Outer дал сильное отрицательное доказательство: среди всех 370 labels current/previous Outer touch=0. Median close на shape-баре уже находится примерно 0.66–0.74 Inner half-width от mean. Outer формирует предыдущее состояние, но не является trigger.
+- Across all datasets minimum gap между соседними сигналами 52–60 баров; V4 global cooldown выбрал 72 бара и улучшил Futures OOS до 10.38% precision / 17.01% recall, но sealed collapse 21.92→7.69% F1 и BTC4h 5.66/7.89% не прошли critic gate.
+- Backplotted centered-pivot гипотеза проверена для price/Apex-distance/RSI/Stoch/composite, left/right 2–50. Лучший BTC development candidate price pivot 50/50 дал только 2.24% precision / 6.19% recall; обычный Pine pivot+negative offset исключён.
+- V5 OHLC-only fear/greed proxy (momentum, volatility, Apex distance, score arm/release/cooldown) также FAIL: Futures OOS 4.33% / 11.34%.
+- Так как TV CSV не содержал Volume, он восстановлен через официальный Bybit V5 `/v5/market/kline`: 100% timestamp coverage всех шести рядов, mean close drift 0.000001–0.000007%, max 0.012–0.069%. Значит, это тот же feed и volume пригоден для reconstruction.
+- V6 staged volume-aware score (momentum + signed relative volume + signed range volatility + Apex distance) после исправления нормировки и отдельного critic audit также FAIL: sealed 0 signals; Futures OOS aggregate 6.25% precision / 5.67% recall. Победитель выбрал только signed range volatility, а volume weight=0 — стандартная OHLCV fear/greed family не объясняет vendor labels.
+- Automated strict critic `auditReversalSearchArtifacts.ts` отклоняет V1–V6 по sealed collapse, holdout precision/recall и/или count ratio. Внешний critic-agent вызывался, но среда вернула 403; этот факт не скрывается.
+- Production Reversal по-прежнему не меняется. Следующий reconstruction step требует **новой наблюдаемой internal series** самого GGI Buy/Sell (score/threshold/raw condition/state) либо доступа к Pine/source. Дальнейшие массовые OHLCV grids без такого источника запрещены как multiple-testing churn.

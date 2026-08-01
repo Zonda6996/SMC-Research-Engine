@@ -14,7 +14,9 @@
 		"multitf": "tsx tools/batch/runMultiTf.ts",
 		"execution-audit": "tsx tools/batch/runExecutionAudit.ts",
 		"review-telegram": "tsx tools/review/analyzeTelegramSignals.ts",
-		"reaction-audit": "tsx tools/review/runReactionAudit.ts"
+		"reaction-audit": "tsx tools/review/runReactionAudit.ts",
+		"research:integrity": "tsx --test tests/exactIndicatorExport.test.ts tests/apexOosRegression.test.ts tests/eventMetrics.test.ts",
+		"research:critic": "tsx ci/research/auditReversalSearchArtifacts.ts"
 	},
 	"keywords": [],
 	"author": "",
