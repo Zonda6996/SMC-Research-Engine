@@ -7,10 +7,10 @@
 ## Токены
 
 - Шрифты: `Geist` (интерфейс), `Geist Mono` (числа, цены, моноширинные значения).
-- Фон: `--bg #0a0a0b`, поверхность `--surface #0f0f11`.
-- Радиусы: 12px (карточки/панели), 8px (контролы), 6px (мелкие элементы).
-- Тени: `--shadow` для карточек, `--shadow-pop` для поповеров/палитры.
-- Тёмная строгая тема; акценты сдержанные.
+- Ахроматичная тёмная база: `--bg #0a0a0a`, `--card #171717`, `--elev #262626`; текст `--fg #fafafa`, вторичный `--muted #a1a1a1`.
+- Радиусы производятся от `--radius: 0.625rem`: 6px (мелкие элементы), 8px (контролы), 10px (плитки), 14px (панели).
+- Основное действие белое (`--accent-strong #fafafa`, тёмный текст); цвет сохраняется только для семантических статусов и dataviz.
+- Обычные карточки не используют тень; `--shadow-pop` оставлен только для всплывающих элементов и палитры.
 
 ## Палитра сигналов (согласована с `lib/format.mjs`)
 
@@ -54,4 +54,5 @@
 ## Проверка
 
 - Синтаксис фронта: `node --check tools/visualizer/public/*.mjs tools/visualizer/public/{lib,panels}/*.mjs`.
-- Визуальная приёмка: headless Chromium QA (`ci/research/finishRedesign.ts`, `vizIndicatorQa.ts`, `zonePanQa.ts`) со скриншотами в `ci-results/shots`.
+- Регрессии поведения: `npx tsx --test tests/visualizerChartRestore.test.ts tests/visualizerConfirmationRouting.test.ts tests/zoneTimelineSnap.test.ts tests/zoneTradeSort.test.ts tests/timeframeLabels.test.ts tests/indicatorTimeframeRouting.test.ts`.
+- Визуальную QA запускать через отдельную, неавтоматическую browser-процедуру. Старые одноразовые mutation-скрипты (`ci/research/finishRedesign.ts`, `vizIndicatorQa.ts`, `zonePanQa.ts`) не являются частью поддерживаемого UI workflow и не должны автоматически устанавливать зависимости, менять production-файлы или делать Git-коммиты.

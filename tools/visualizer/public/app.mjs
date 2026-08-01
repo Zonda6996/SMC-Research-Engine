@@ -149,6 +149,8 @@ async function load() {
 		redraw()
 		fitContent()
 		status('')
+		// Пустой стейт графика живёт до первой успешной загрузки.
+		$('chartEmpty')?.classList.add('hidden')
 	} catch (e) {
 		status(`Ошибка: ${e.message}`)
 	} finally {
@@ -313,6 +315,12 @@ function init() {
 	wireSections()
 	wireHotkeys()
 	renderConfigPanel()
+
+	// Поле «история до» — текст вместо нативного date (дизайн-система): только ISO гггг-мм-дд.
+	$('historyUntil').addEventListener('change', (e) => {
+		const v = e.target.value.trim()
+		if (v && !/^\d{4}-\d{2}-\d{2}$/.test(v)) e.target.value = ''
+	})
 
 	$('loadBtn').onclick = load
 	$('randomPeriod').onclick = randomHistoricalPeriod
