@@ -4,7 +4,7 @@
 
 import { S, setMode } from './lib/state.mjs'
 import { $, esc, time } from './lib/format.mjs'
-import { initChart, restoreMainCandles, setCandles, fitContent, priceAt, rectAt, getLogicalRange, setLogicalRange } from './lib/chart.mjs'
+import { initChart, restoreMainCandles, setCandles, fitContent, priceAt, rectAt, getLogicalRange, getTimeRange, setTimeRange } from './lib/chart.mjs'
 import { fetchAnalyze, fetchSymbols } from './lib/api.mjs'
 import { renderTradesMode, wireStatsPanel, navigateTrades, tradeTooltip, renderFunnel } from './panels/stats.mjs'
 import { hmBandTooltip, wireHeatmapPanel, hmApplyTfDefaults, drawHmProfile } from './panels/heatmap.mjs'
@@ -12,23 +12,24 @@ import { renderZones, wireZonesPanel, moveZoneFocus, zoneHoverHtml } from './pan
 import { renderConfirmation, wireConfirmationPanel, moveConfirmation } from './panels/confirmation.mjs'
 import { renderLab, wireLabPanel, moveLab, exitLabVisuals } from './panels/lab.mjs'
 import { renderConfigPanel, setEngineDefaults, wireConfigPanel } from './panels/config.mjs'
+import { drawIndicatorLayers, wireIndicatorSettings } from './panels/indicators.mjs'
 import { wirePalette, openPalette, closePalette, paletteOpen, setPaletteSymbols } from './lib/palette.mjs'
 
 // ---- Режимы ----
 
 const MODE_PANELS = { zones: 'poiZone', conf: 'conf', lab: 'lab' }
-/** Зум-позиция основного графика: сохраняется при уходе на 15m/5m (conf/lab) и возвращается. */
+/** Временной диапазон основного графика: не зависит от числа баров подменённого confirmation-ряда. */
 let savedMainRange = null
 
 function activateMode(mode) {
-	// Уходим с основного набора свечей — запоминаем зум, чтобы не «дёргать» график при возврате.
-	if ((mode === 'conf' || mode === 'lab') && S.mainShown) savedMainRange = getLogicalRange()
+	// Logical range — индексы баров и ломается при setData на другой TF. Сохраняем реальные timestamps.
+	if ((mode === 'conf' || mode === 'lab') && S.mainShown) savedMainRange = getTimeRange()
 	// Возврат на основной ряд (боевой вид и зоны рисуются по нему): если предыдущий режим
 	// подменил свечи на ряд подтверждения, их надо вернуть ДО отрисовки, иначе прямоугольники
 	// зон лягут на чужую шкалу времени и график будет выглядеть пустым.
 	if ((mode === 'trades' || mode === 'zones') && !S.mainShown) {
 		restoreMainCandles()
-		if (savedMainRange) { setLogicalRange(savedMainRange); savedMainRange = null } else fitContent()
+		if (savedMainRange) { setTimeRange(savedMainRange); savedMainRange = null } else fitContent()
 	}
 	for (const [m, prefix] of Object.entries(MODE_PANELS)) {
 		const on = m === mode
@@ -57,7 +58,7 @@ function deactivateMode() {
 	restoreMainCandles()
 	redraw()
 	// Возврат без прыжка: восстанавливаем сохранённый зум; fitContent — только если восстанавливать нечего.
-	if (!wasMain && savedMainRange) { setLogicalRange(savedMainRange); savedMainRange = null }
+	if (!wasMain && savedMainRange) { setTimeRange(savedMainRange); savedMainRange = null }
 	else if (!wasMain) fitContent()
 	// Страховка от «пропавшего графика»: если после возврата видимый диапазон оказался вне
 	// данных (пустой экран), просто показываем всё окно целиком.
@@ -69,10 +70,12 @@ function deactivateMode() {
 export function redraw() {
 	if (!S.data) return
 	const safe = (f) => { try { f() } catch (e) { console.error('render step failed:', e) } }
-	if (S.mode === 'zones') { safe(renderZones); return }
-	if (S.mode === 'conf') { safe(renderConfirmation); return }
-	if (S.mode === 'lab') { safe(renderLab); return }
-	safe(renderTradesMode)
+	if (S.mode === 'zones') safe(renderZones)
+	else if (S.mode === 'conf') { safe(renderConfirmation); return }
+	else if (S.mode === 'lab') { safe(renderLab); return }
+	else safe(renderTradesMode)
+	const cs = S.data.candles || []
+	if (cs.length) safe(() => drawIndicatorLayers(cs, time(cs[0].timestamp), time(cs[cs.length - 1].timestamp), S.data?.indicators?.main))
 }
 
 // ---- Тултипы и hover-карточки ----
@@ -140,12 +143,14 @@ async function load() {
 		initChart(onCrosshair, onChartClick, drawHmProfile)
 		setCandles(S.data.candles, true)
 		$('version').textContent = `${json.liquidityPoi?.version || ''} · ${json.strategy.version}`
-		$('dataset').textContent = `${json.dataset.symbol} · ${json.dataset.timeframe} · ${json.dataset.candleCount} свечей${json.dataset.ltfConfCount ? ` · ${json.dataset.confTf}: ${json.dataset.ltfConfCount}${json.dataset.fullLtf ? ' (архивы' + (json.dataset.ltfConfFrom ? ' с ' + new Date(json.dataset.ltfConfFrom).toISOString().slice(0, 10) : '') + ')' : ''}` : ''}${json.dataset.until ? ` · до ${json.dataset.until.slice(0, 10)}` : ''} · ${json.finalTrend}`
+		$('dataset').textContent = `${json.dataset.symbol} · ${json.dataset.timeframe} · ${json.dataset.candleCount} свечей${json.dataset.ltfSimplifiedCount ? ` · simplified ${json.dataset.simplifiedTf}: ${json.dataset.ltfSimplifiedCount}` : ''}${json.dataset.ltfConfCount ? ` · refined ${json.dataset.refinedTf ?? json.dataset.confTf}: ${json.dataset.ltfConfCount}${json.dataset.fullLtf ? ' (архивы' + (json.dataset.ltfConfFrom ? ' с ' + new Date(json.dataset.ltfConfFrom).toISOString().slice(0, 10) : '') + ')' : ''}` : ''}${json.dataset.until ? ` · до ${json.dataset.until.slice(0, 10)}` : ''} · ${json.finalTrend}`
 		setEngineDefaults(json.engineDefaults)
 		renderFunnel()
 		redraw()
 		fitContent()
 		status('')
+		// Пустой стейт графика живёт до первой успешной загрузки.
+		$('chartEmpty')?.classList.add('hidden')
 	} catch (e) {
 		status(`Ошибка: ${e.message}`)
 	} finally {
@@ -305,10 +310,17 @@ function init() {
 	wireConfirmationPanel(activateMode, deactivateMode)
 	wireLabPanel(activateMode, deactivateMode)
 	wireConfigPanel()
+	wireIndicatorSettings(redraw)
 	wirePalette()
 	wireSections()
 	wireHotkeys()
 	renderConfigPanel()
+
+	// Поле «история до» — текст вместо нативного date (дизайн-система): только ISO гггг-мм-дд.
+	$('historyUntil').addEventListener('change', (e) => {
+		const v = e.target.value.trim()
+		if (v && !/^\d{4}-\d{2}-\d{2}$/.test(v)) e.target.value = ''
+	})
 
 	$('loadBtn').onclick = load
 	$('randomPeriod').onclick = randomHistoricalPeriod

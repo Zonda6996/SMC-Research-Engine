@@ -3,12 +3,25 @@
 // слой «Мои зоны» (ручная разметка пользователя, localStorage по символу, экспорт в JSON).
 
 import { S } from '../lib/state.mjs'
-import { $, esc, fmtP, fmtN, dt, time, LIFE_RU, SPENT_RU, PRIO_RU, INTER_RU } from '../lib/format.mjs'
+import { $, esc, fmtP, fmtN, fmtTf, dt, time, LIFE_RU, SPENT_RU, PRIO_RU, INTER_RU } from '../lib/format.mjs'
 import { zonesPrim, clearOverlays, restoreMainCandles, setMarkers, setVisibleRange } from '../lib/chart.mjs'
 import { renderHeatmap } from './heatmap.mjs'
 
 const MY_KEY = 'smc-my-zones-v1'
 const TF4H = 14_400_000
+const zoneTf = (c) => c.__layer ?? S.data?.dataset?.timeframe
+const zoneConfTf = (c) => c.__confTf ?? S.data?.dataset?.confTf
+
+/** Snap MTF visual bounds to timestamps that exist in the displayed candle series. */
+export function snapZoneTime(ms, candles, edge = 'start') {
+	if (!candles?.length) return time(ms)
+	let lo = 0, hi = candles.length
+	while (lo < hi) { const mid = (lo + hi) >> 1; if (candles[mid].timestamp < ms) lo = mid + 1; else hi = mid }
+	const i = edge === 'end'
+		? Math.max(0, Math.min(candles.length - 1, candles[lo]?.timestamp === ms ? lo : lo - 1))
+		: Math.max(0, Math.min(candles.length - 1, lo))
+	return time(candles[i].timestamp)
+}
 
 /** §16.23: чип слоя (1d/4h/1h) включён? Чип текущего ТФ управляет контекстными зонами. */
 export function layerChipOn(tf) {
@@ -84,7 +97,7 @@ function renderMyZoneList() {
 	box.innerHTML = xs.length
 		? xs.map((z) => `<div class="list-item my-zone"><span class="pill ${z.side}">${z.side === 'long' ? 'LONG' : 'SHORT'}</span>
 			<span class="mono">${fmtP(z.lo)} – ${fmtP(z.hi)}</span><span class="muted grow">${esc(z.note || '')}</span>
-			<button class="icon-btn" data-del="${z.id}" title="Удалить">✕</button></div>`).join('')
+			<button class="icon-btn" data-del="${z.id}" title="Удалить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>`).join('')
 		: '<div class="empty">Отметь свою зону: сторона + границы. Слой рисуется голубым пунктиром поверх движковых зон — удобно сверять карту движка со своей.</div>'
 	box.querySelectorAll('[data-del]').forEach((b) => { b.onclick = () => { removeMyZone(b.dataset.del); renderZones() } })
 }
@@ -116,19 +129,20 @@ export function renderZones() {
 	}
 	const rects = xs.map((c) => ({
 		id: zid(c),
-		t1: time(drawFrom(c)),
-		t2: time(c.endAt || last),
+		// MTF values may fall between bars of the displayed series; snap only visual bounds.
+		t1: c.__layer ? snapZoneTime(drawFrom(c), S.data.candles, 'start') : time(drawFrom(c)),
+		t2: c.__layer ? snapZoneTime(c.endAt || last, S.data.candles, 'end') : time(c.endAt || last),
 		p1: c.near, p2: c.far, side: c.direction,
 		focused: zid(c) === focusId, dim: !!focusId && zid(c) !== focusId,
 		alpha: Math.min(1, (c.stackShare ?? 1) * (c.__role === 'local' ? 0.7 : 1)),
-		label: `${c.__layer ? c.__layer.toUpperCase() + (c.__role === 'swing' ? '·СВИНГ' : '·ЛОК') + ' ' : ''}${c.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(c.near)} · ${LIFE_RU[c.lifecycleState] || c.lifecycleState}`,
+		label: `${fmtTf(zoneTf(c))}${c.__role ? (c.__role === 'swing' ? '·СВИНГ' : c.__role === 'local' ? '·ЛОК' : '·СРЕД') : ''} ${c.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(c.near)} · ${LIFE_RU[c.lifecycleState] || c.lifecycleState}`,
 	}))
 	if ($('myZonesShow').checked) {
 		for (const z of myList()) rects.push({
 			id: z.id, manual: true, side: z.side,
 			t1: time(S.data.candles[0].timestamp), t2: time(last),
 			p1: z.side === 'long' ? z.hi : z.lo, p2: z.side === 'long' ? z.lo : z.hi,
-			label: `МОЯ ${fmtP(z.lo)}–${fmtP(z.hi)}${z.note ? ' · ' + z.note : ''}`,
+			label: `МОЯ ${fmtTf(S.data?.dataset?.timeframe)} ${fmtP(z.lo)}–${fmtP(z.hi)}${z.note ? ' · ' + z.note : ''}`,
 		})
 	}
 	const focused = xs.find((x) => zid(x) === focusId)
@@ -149,7 +163,7 @@ function renderZoneList(xs) {
 		const el = document.createElement('div')
 		const cid = c.__layer ? `${c.__layer}:${c.id}` : c.id
 		el.className = 'list-item zone' + (cid === S.poiFocusId ? ' selected' : '')
-		el.innerHTML = `<span class="pill ${c.direction}">${c.direction === 'long' ? 'LONG' : 'SHORT'}</span>${c.__layer ? `<span class="pill" title="Слой ${c.__role === 'swing' ? 'свинг' : 'локальный'} · подтверждение ${c.__confTf}">${c.__layer}</span>` : ''}
+		el.innerHTML = `<span class="pill ${c.direction}">${c.direction === 'long' ? 'LONG' : 'SHORT'}</span><span class="pill" title="ТФ зоны ${fmtTf(zoneTf(c))} · подтверждение ${fmtTf(zoneConfTf(c))}">${fmtTf(zoneTf(c))}</span>
 			<span class="mono">${fmtP(c.near)} → ${fmtP(c.far)}</span>
 			<span class="meter" title="Сила стека: ${Math.round(100 * (c.stackShare || 0))}% от сильнейшей полки стороны"><i style="width:${Math.min(100, Math.round(100 * (c.stackShare || 0)))}%"></i></span>
 			<span class="state">${(c.supersededAt ? 'заменена' : LIFE_RU[c.lifecycleState] || c.lifecycleState).toUpperCase()}</span>`
@@ -162,7 +176,8 @@ function renderZoneDetail(c, last) {
 	const box = $('poiZoneDetail')
 	if (!c) { box.innerHTML = ''; return }
 	box.innerHTML = `
-		<div class="detail-title"><span class="pill ${c.direction}">${c.direction === 'long' ? 'LONG' : 'SHORT'}</span> <b class="mono">${fmtP(c.near)} → ${fmtP(c.far)}</b></div>
+		<div class="detail-title"><span class="pill ${c.direction}">${c.direction === 'long' ? 'LONG' : 'SHORT'}</span> <span class="pill">${fmtTf(zoneTf(c))}</span> <b class="mono">${fmtP(c.near)} → ${fmtP(c.far)}</b></div>
+		<div class="kv"><span>ТФ зоны / подтверждения</span><b>${fmtTf(zoneTf(c))} → ${fmtTf(zoneConfTf(c))}</b></div>
 		<div class="kv"><span>Статус</span><b>${c.supersededAt ? 'заменена свежим поколением стека' : LIFE_RU[c.lifecycleState] || c.lifecycleState}${c.spentReason ? ` · ${SPENT_RU[c.spentReason] || c.spentReason}` : ''}</b></div>
 		<div class="kv"><span>Приоритет / касания</span><b>${PRIO_RU[c.priority] || c.priority} · ${INTER_RU[c.interaction] || c.interaction} (${c.touchCount || 0})</b></div>
 		${c.stackNotional != null ? `<div class="kv"><span>Сила стека</span><b>~${fmtN(c.stackNotional)} · ${Math.round(100 * (c.stackShare || 0))}% от сильнейшей${c.supersededAt ? ' · отставлена поколением ' + dt(c.supersededAt) : ''}</b></div>` : ''}
