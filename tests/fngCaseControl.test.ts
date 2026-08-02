@@ -13,6 +13,7 @@ const mkRow = (i: number, close: number, opts: Partial<ExactIndicatorRow> = {}):
 	high: close * 1.002,
 	low: close * 0.998,
 	close,
+	volume: 1,
 	mean: 100,
 	upperOuter: 130,
 	upperInner: 115,
