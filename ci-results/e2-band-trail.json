@@ -1,0 +1,642 @@
+{
+  "config": {
+    "seed": 4242,
+    "maxHold": 192,
+    "minForward": 48
+  },
+  "datasets": [
+    "btc-perp-1h",
+    "btc-perp-2h-b2",
+    "ondo-perp-1h-b2",
+    "ondo-perp-2h-b2"
+  ],
+  "pooled": {
+    "band_trail": {
+      "labels": {
+        "n": 215,
+        "winrateVendorStyle": 0.7302325581395349,
+        "winrateStrict": 0.6325581395348837,
+        "expectancy": 0.12113308420083868,
+        "medianR": 0.8118922271999351,
+        "stopRate": 0.22790697674418606,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 18.298761507927406
+      },
+      "control": {
+        "n": 215,
+        "winrateVendorStyle": 0.5209302325581395,
+        "winrateStrict": 0.4558139534883721,
+        "expectancy": -0.14869451436677378,
+        "medianR": 0.13879097698916362,
+        "stopRate": 0.29767441860465116,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 41.00770638586525
+      }
+    },
+    "band_trail_be": {
+      "labels": {
+        "n": 215,
+        "winrateVendorStyle": 0.7302325581395349,
+        "winrateStrict": 0.6883720930232559,
+        "expectancy": 0.08669688824698599,
+        "medianR": 0.873741897305405,
+        "stopRate": 0.22790697674418606,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 19.694827933805364
+      },
+      "control": {
+        "n": 215,
+        "winrateVendorStyle": 0.7162790697674418,
+        "winrateStrict": 0.6883720930232559,
+        "expectancy": -0.02904499687381805,
+        "medianR": 0.57,
+        "stopRate": 0.2558139534883721,
+        "partialBeRate": 0.28837209302325584,
+        "timeExitRate": 0,
+        "maxDrawdownR": 22.610770039152616
+      }
+    },
+    "wide_hold": {
+      "labels": {
+        "n": 215,
+        "winrateVendorStyle": 0.26976744186046514,
+        "winrateStrict": 0.26976744186046514,
+        "expectancy": 0.5177531906950685,
+        "medianR": -3,
+        "stopRate": 0.6976744186046512,
+        "partialBeRate": 0,
+        "timeExitRate": 0.3023255813953488,
+        "maxDrawdownR": 58.47645715842705
+      },
+      "control": {
+        "n": 215,
+        "winrateVendorStyle": 0.2186046511627907,
+        "winrateStrict": 0.21395348837209302,
+        "expectancy": -0.7527880410290616,
+        "medianR": -3,
+        "stopRate": 0.7627906976744186,
+        "partialBeRate": 0,
+        "timeExitRate": 0.2372093023255814,
+        "maxDrawdownR": 168.21910356944852
+      }
+    },
+    "fixed_2to1": {
+      "labels": {
+        "n": 215,
+        "winrateVendorStyle": 0.31627906976744186,
+        "winrateStrict": 0.31627906976744186,
+        "expectancy": -0.05116279069767442,
+        "medianR": -1,
+        "stopRate": 0.6837209302325581,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 24
+      },
+      "control": {
+        "n": 215,
+        "winrateVendorStyle": 0.34418604651162793,
+        "winrateStrict": 0.34418604651162793,
+        "expectancy": 0.03255813953488372,
+        "medianR": -1,
+        "stopRate": 0.6558139534883721,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 25
+      }
+    },
+    "partial_be": {
+      "labels": {
+        "n": 215,
+        "winrateVendorStyle": 0.641860465116279,
+        "winrateStrict": 0.641860465116279,
+        "expectancy": 0.04027906976744189,
+        "medianR": 0.57,
+        "stopRate": 0.3581395348837209,
+        "partialBeRate": 0.25116279069767444,
+        "timeExitRate": 0,
+        "maxDrawdownR": 16.6
+      },
+      "control": {
+        "n": 215,
+        "winrateVendorStyle": 0.6093023255813953,
+        "winrateStrict": 0.6093023255813953,
+        "expectancy": -0.07130232558139526,
+        "medianR": 0.57,
+        "stopRate": 0.39069767441860465,
+        "partialBeRate": 0.24651162790697675,
+        "timeExitRate": 0,
+        "maxDrawdownR": 22.639999999999993
+      }
+    }
+  },
+  "perDataset": [
+    {
+      "id": "btc-perp-1h",
+      "n": 44,
+      "policies": {
+        "band_trail": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.6818181818181818,
+            "winrateStrict": 0.5681818181818182,
+            "expectancy": -0.19560247088864927,
+            "medianR": 0.6929727459337893,
+            "stopRate": 0.2727272727272727,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15.926847003008604
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.5,
+            "winrateStrict": 0.45454545454545453,
+            "expectancy": -0.3139215208213503,
+            "medianR": 0.012601706524887665,
+            "stopRate": 0.25,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15.421656887109936
+          }
+        },
+        "band_trail_be": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.6818181818181818,
+            "winrateStrict": 0.6136363636363636,
+            "expectancy": -0.17801963223920603,
+            "medianR": 0.7454563454363168,
+            "stopRate": 0.2727272727272727,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15.30842114107297
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.7272727272727273,
+            "winrateStrict": 0.7045454545454546,
+            "expectancy": -0.01784179104441092,
+            "medianR": 0.57,
+            "stopRate": 0.22727272727272727,
+            "partialBeRate": 0.29545454545454547,
+            "timeExitRate": 0,
+            "maxDrawdownR": 7.955936734426372
+          }
+        },
+        "wide_hold": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.1590909090909091,
+            "winrateStrict": 0.1590909090909091,
+            "expectancy": -0.42489066575660317,
+            "medianR": -3,
+            "stopRate": 0.7954545454545454,
+            "partialBeRate": 0,
+            "timeExitRate": 0.20454545454545456,
+            "maxDrawdownR": 39.26232514433448
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.1590909090909091,
+            "winrateStrict": 0.1590909090909091,
+            "expectancy": -1.4283529048916443,
+            "medianR": -3,
+            "stopRate": 0.7954545454545454,
+            "partialBeRate": 0,
+            "timeExitRate": 0.20454545454545456,
+            "maxDrawdownR": 62.847527815232354
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.25,
+            "winrateStrict": 0.25,
+            "expectancy": -0.25,
+            "medianR": -1,
+            "stopRate": 0.75,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 17
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.3409090909090909,
+            "winrateStrict": 0.3409090909090909,
+            "expectancy": 0.022727272727272728,
+            "medianR": -1,
+            "stopRate": 0.6590909090909091,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.5909090909090909,
+            "winrateStrict": 0.5909090909090909,
+            "expectancy": -0.1631818181818182,
+            "medianR": 0.57,
+            "stopRate": 0.4090909090909091,
+            "partialBeRate": 0.2727272727272727,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14.88
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.6363636363636364,
+            "winrateStrict": 0.6363636363636364,
+            "expectancy": 0.04454545454545449,
+            "medianR": 0.57,
+            "stopRate": 0.36363636363636365,
+            "partialBeRate": 0.22727272727272727,
+            "timeExitRate": 0,
+            "maxDrawdownR": 7.44
+          }
+        }
+      }
+    },
+    {
+      "id": "btc-perp-2h-b2",
+      "n": 43,
+      "policies": {
+        "band_trail": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.6976744186046512,
+            "winrateStrict": 0.5116279069767442,
+            "expectancy": -0.041709600260177886,
+            "medianR": 0.5123305296254593,
+            "stopRate": 0.27906976744186046,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16.437246353549476
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.5581395348837209,
+            "winrateStrict": 0.5348837209302325,
+            "expectancy": 0.10378637268886869,
+            "medianR": 0.6498542775813461,
+            "stopRate": 0.3488372093023256,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14.843723152476255
+          }
+        },
+        "band_trail_be": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.6976744186046512,
+            "winrateStrict": 0.6046511627906976,
+            "expectancy": -0.09250207720870726,
+            "medianR": 0.7962639175904282,
+            "stopRate": 0.27906976744186046,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 18.118216334781852
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.6744186046511628,
+            "winrateStrict": 0.6744186046511628,
+            "expectancy": -0.06931606881953899,
+            "medianR": 0.57,
+            "stopRate": 0.3023255813953488,
+            "partialBeRate": 0.23255813953488372,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15.816057748195718
+          }
+        },
+        "wide_hold": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.2558139534883721,
+            "winrateStrict": 0.2558139534883721,
+            "expectancy": 0.5082868996069276,
+            "medianR": -3,
+            "stopRate": 0.7441860465116279,
+            "partialBeRate": 0,
+            "timeExitRate": 0.2558139534883721,
+            "maxDrawdownR": 45.672343865803455
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.23255813953488372,
+            "winrateStrict": 0.23255813953488372,
+            "expectancy": -0.7981234718897624,
+            "medianR": -3,
+            "stopRate": 0.7674418604651163,
+            "partialBeRate": 0,
+            "timeExitRate": 0.23255813953488372,
+            "maxDrawdownR": 51.87629720926331
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.27906976744186046,
+            "winrateStrict": 0.27906976744186046,
+            "expectancy": -0.16279069767441862,
+            "medianR": -1,
+            "stopRate": 0.7209302325581395,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.23255813953488372,
+            "winrateStrict": 0.23255813953488372,
+            "expectancy": -0.3023255813953488,
+            "medianR": -1,
+            "stopRate": 0.7674418604651163,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 13
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.627906976744186,
+            "winrateStrict": 0.627906976744186,
+            "expectancy": 0.03232558139534878,
+            "medianR": 0.57,
+            "stopRate": 0.37209302325581395,
+            "partialBeRate": 0.20930232558139536,
+            "timeExitRate": 0,
+            "maxDrawdownR": 9.870000000000001
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.5581395348837209,
+            "winrateStrict": 0.5581395348837209,
+            "expectancy": -0.26325581395348824,
+            "medianR": 0.57,
+            "stopRate": 0.4418604651162791,
+            "partialBeRate": 0.2558139534883721,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11.319999999999995
+          }
+        }
+      }
+    },
+    {
+      "id": "ondo-perp-1h-b2",
+      "n": 82,
+      "policies": {
+        "band_trail": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.7804878048780488,
+            "winrateStrict": 0.6951219512195121,
+            "expectancy": 0.45923307805662344,
+            "medianR": 0.8804117570251655,
+            "stopRate": 0.15853658536585366,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6.05948974926521
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.5487804878048781,
+            "winrateStrict": 0.45121951219512196,
+            "expectancy": -0.04656807783415265,
+            "medianR": 0.39862995630310416,
+            "stopRate": 0.2804878048780488,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 23.923562679547093
+          }
+        },
+        "band_trail_be": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.7804878048780488,
+            "winrateStrict": 0.7560975609756098,
+            "expectancy": 0.39102389248395164,
+            "medianR": 0.9605688439833375,
+            "stopRate": 0.15853658536585366,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.7317073170731707,
+            "winrateStrict": 0.6951219512195121,
+            "expectancy": 0.010347759727580964,
+            "medianR": 0.57,
+            "stopRate": 0.24390243902439024,
+            "partialBeRate": 0.2804878048780488,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15.099981717698984
+          }
+        },
+        "wide_hold": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.32926829268292684,
+            "winrateStrict": 0.32926829268292684,
+            "expectancy": 1.1013188435576167,
+            "medianR": -3,
+            "stopRate": 0.6219512195121951,
+            "partialBeRate": 0,
+            "timeExitRate": 0.3780487804878049,
+            "maxDrawdownR": 26.840126450652754
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.23170731707317074,
+            "winrateStrict": 0.21951219512195122,
+            "expectancy": -0.7440339772924569,
+            "medianR": -3,
+            "stopRate": 0.7439024390243902,
+            "partialBeRate": 0,
+            "timeExitRate": 0.25609756097560976,
+            "maxDrawdownR": 88.96936778363533
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.36585365853658536,
+            "winrateStrict": 0.36585365853658536,
+            "expectancy": 0.0975609756097561,
+            "medianR": -1,
+            "stopRate": 0.6341463414634146,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.3780487804878049,
+            "winrateStrict": 0.3780487804878049,
+            "expectancy": 0.13414634146341464,
+            "medianR": -1,
+            "stopRate": 0.6219512195121951,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.6829268292682927,
+            "winrateStrict": 0.6829268292682927,
+            "expectancy": 0.16975609756097562,
+            "medianR": 0.57,
+            "stopRate": 0.3170731707317073,
+            "partialBeRate": 0.2682926829268293,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8.43
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.6341463414634146,
+            "winrateStrict": 0.6341463414634146,
+            "expectancy": -0.028780487804878033,
+            "medianR": 0.57,
+            "stopRate": 0.36585365853658536,
+            "partialBeRate": 0.2926829268292683,
+            "timeExitRate": 0,
+            "maxDrawdownR": 9.319999999999999
+          }
+        }
+      }
+    },
+    {
+      "id": "ondo-perp-2h-b2",
+      "n": 46,
+      "policies": {
+        "band_trail": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.717391304347826,
+            "winrateStrict": 0.6956521739130435,
+            "expectancy": -0.02637995146031739,
+            "medianR": 0.916466310015404,
+            "stopRate": 0.2608695652173913,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 13.518089194040494
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.45652173913043476,
+            "winrateStrict": 0.391304347826087,
+            "expectancy": -0.4087175068682127,
+            "medianR": -0.2576209477517062,
+            "stopRate": 0.32608695652173914,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 30.135358733508973
+          }
+        },
+        "band_trail_be": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.717391304347826,
+            "winrateStrict": 0.717391304347826,
+            "expectancy": -0.03507989287136034,
+            "medianR": 0.916466310015404,
+            "stopRate": 0.2608695652173913,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12.593154233910191
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.717391304347826,
+            "winrateStrict": 0.6739130434782609,
+            "expectancy": -0.0723382795725709,
+            "medianR": 0.57,
+            "stopRate": 0.2608695652173913,
+            "partialBeRate": 0.34782608695652173,
+            "timeExitRate": 0,
+            "maxDrawdownR": 17.774491924487506
+          }
+        },
+        "wide_hold": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.2826086956521739,
+            "winrateStrict": 0.2826086956521739,
+            "expectancy": 0.3879922486501697,
+            "medianR": -3,
+            "stopRate": 0.6956521739130435,
+            "partialBeRate": 0,
+            "timeExitRate": 0.30434782608695654,
+            "maxDrawdownR": 21.39343911392025
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.2391304347826087,
+            "winrateStrict": 0.2391304347826087,
+            "expectancy": -0.0798218603646682,
+            "medianR": -3,
+            "stopRate": 0.7608695652173914,
+            "partialBeRate": 0,
+            "timeExitRate": 0.2391304347826087,
+            "maxDrawdownR": 70.67240686733058
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.32608695652173914,
+            "winrateStrict": 0.32608695652173914,
+            "expectancy": -0.021739130434782608,
+            "medianR": -1,
+            "stopRate": 0.6739130434782609,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.391304347826087,
+            "winrateStrict": 0.391304347826087,
+            "expectancy": 0.17391304347826086,
+            "medianR": -1,
+            "stopRate": 0.6086956521739131,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 7
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.6304347826086957,
+            "winrateStrict": 0.6304347826086957,
+            "expectancy": 0.01152173913043472,
+            "medianR": 0.57,
+            "stopRate": 0.3695652173913043,
+            "partialBeRate": 0.2391304347826087,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8.440000000000001
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.5869565217391305,
+            "winrateStrict": 0.5869565217391305,
+            "expectancy": -0.07847826086956528,
+            "medianR": 0.57,
+            "stopRate": 0.41304347826086957,
+            "partialBeRate": 0.17391304347826086,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10.15
+          }
+        }
+      }
+    }
+  ],
+  "verdict": "BANDS IRRELEVANT AS EXITS (band_trail exp 0.121 vs wide_hold 0.518; margin < 0.10 R) - band line CLOSED per pre-registration"
+}
