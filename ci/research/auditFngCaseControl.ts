@@ -289,20 +289,59 @@ export function computeAucTable(episodes: EpisodeCC[]): FeatureResult[] {
 	})
 }
 
-/** max-T permutation: re-draw case position uniformly within each episode. */
+/**
+ * max-T permutation: re-draw case position uniformly within each episode.
+ * Optimized: the pooled multiset of values is invariant across permutations
+ * (each episode always contributes all its bars), so per-feature average ranks
+ * are precomputed once and AUC per permutation is a rank sum:
+ * AUC = (R_cases - nc(nc+1)/2) / (nc * nk).
+ */
 export function maxTPermutationP(episodes: EpisodeCC[], observedMaxDev: number, nPerms: number, seed: number): { p: number; nullQ95: number } {
+	// flatten: for each episode, list of flat indices; ranks[f][flat]
+	const flatValues: number[][] = FEATURE_NAMES.map(() => [])
+	const episodeFlat: number[][] = []
+	for (const ep of episodes) {
+		const flats: number[] = []
+		for (const idx of [ep.caseIndex, ...ep.controlIndices]) {
+			const feats = ep.features.get(idx)!
+			flats.push(flatValues[0]!.length)
+			for (let f = 0; f < FEATURE_NAMES.length; f++) flatValues[f]!.push(feats[FEATURE_NAMES[f]!])
+		}
+		episodeFlat.push(flats)
+	}
+	const total = flatValues[0]!.length
+	const nc = episodes.length
+	const nk = total - nc
+	// average ranks (ties averaged), 1-based
+	const ranks: Float64Array[] = flatValues.map((vals) => {
+		const order = vals.map((v, i) => i).sort((a, b) => vals[a]! - vals[b]!)
+		const rk = new Float64Array(total)
+		let i = 0
+		while (i < total) {
+			let j = i
+			while (j + 1 < total && vals[order[j + 1]!]! === vals[order[i]!]!) j++
+			const avg = (i + j + 2) / 2
+			for (let k = i; k <= j; k++) rk[order[k]!] = avg
+			i = j + 1
+		}
+		return rk
+	})
+	const aucFromCaseFlats = (caseFlats: number[]): number[] => {
+		return FEATURE_NAMES.map((_, f) => {
+			let r = 0
+			for (const cf of caseFlats) r += ranks[f]![cf]!
+			return (r - (nc * (nc + 1)) / 2) / (nc * nk)
+		})
+	}
 	const rng = mulberry32(seed)
 	const devs: number[] = []
 	let ge = 0
 	for (let p = 0; p < nPerms; p++) {
-		const permuted: EpisodeCC[] = episodes.map((ep) => {
-			const all = [ep.caseIndex, ...ep.controlIndices]
-			const pick = all[Math.floor(rng() * all.length)]!
-			const controls = all.filter((x) => x !== pick)
-			return { ...ep, caseIndex: pick, controlIndices: controls }
-		})
-		const table = computeAucTable(permuted)
-		const maxDev = Math.max(...table.map((t) => Math.abs(t.auc - 0.5)))
+		const picks: number[] = []
+		for (const flats of episodeFlat) picks.push(flats[Math.floor(rng() * flats.length)]!)
+		const aucs = aucFromCaseFlats(picks)
+		let maxDev = 0
+		for (const a of aucs) maxDev = Math.max(maxDev, Math.abs(a - 0.5))
 		devs.push(maxDev)
 		if (maxDev >= observedMaxDev) ge++
 	}

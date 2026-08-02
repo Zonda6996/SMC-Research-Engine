@@ -1,0 +1,541 @@
+{
+  "config": {
+    "seed": 4242,
+    "nPerms": 2000,
+    "features": [
+      "rsi14",
+      "roc10",
+      "atrNorm14",
+      "atrRegime",
+      "devSma50",
+      "volPressure",
+      "signedVolPress",
+      "bandPos",
+      "stoch14",
+      "rangePos50",
+      "fngComposite",
+      "recoveryHW"
+    ]
+  },
+  "reports": [
+    {
+      "datasetId": "btc-perp-15m",
+      "role": "development",
+      "labeledEpisodes": 58,
+      "labelsOutsideEpisodes": 11,
+      "droppedNoControls": 0,
+      "medianControlsPerEpisode": 87,
+      "table": [
+        {
+          "feature": "rsi14",
+          "auc": 0.5006518005991552,
+          "medianCase": 43.39616009918558,
+          "medianControl": 43.12472129542103
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.4806089321751338,
+          "medianCase": -0.0011606345542781171,
+          "medianControl": -0.0011696459152933936
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.5486844909061281,
+          "medianCase": 0.0031258477793309333,
+          "medianControl": 0.0029142566195475765
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.5965291618094988,
+          "medianCase": 1.077721270574171,
+          "medianControl": 0.987555659296934
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.4170113689066045,
+          "medianCase": -0.007159873596796856,
+          "medianControl": -0.005270605521210843
+        },
+        {
+          "feature": "volPressure",
+          "auc": 0.6176625427744143,
+          "medianCase": 0.9035303593814917,
+          "medianControl": 0.6679959330305245
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.4700297070657692,
+          "medianCase": -0.14943610537259577,
+          "medianControl": -0.11080473562474749
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.4141033354642199,
+          "medianCase": 0.11118061374579276,
+          "medianControl": 0.16451610597798877
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5591665726569649,
+          "medianCase": 44.48237685262199,
+          "medianControl": 43.25481224787687
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.4558593113475977,
+          "medianCase": 0.23865267760943487,
+          "medianControl": 0.26999399011377934
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.45363128141490866,
+          "medianCase": 0.42437500000000006,
+          "medianControl": 0.45875
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.4641196304791988,
+          "medianCase": 0.36711842206272993,
+          "medianControl": 0.39739194679978873
+        }
+      ],
+      "maxDevFeature": "volPressure",
+      "maxDev": 0.11766254277441435,
+      "maxTP": 0.013993003498250875,
+      "nullQ95": 0.10324772183155972
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "role": "development",
+      "labeledEpisodes": 30,
+      "labelsOutsideEpisodes": 13,
+      "droppedNoControls": 1,
+      "medianControlsPerEpisode": 68,
+      "table": [
+        {
+          "feature": "rsi14",
+          "auc": 0.46790736145574857,
+          "medianCase": 42.37528729022781,
+          "medianControl": 43.08730938575536
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.5146401985111663,
+          "medianCase": -0.0014058559540944815,
+          "medianControl": -0.0022394009829890815
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.4956989247311828,
+          "medianCase": 0.005758824286634688,
+          "medianControl": 0.005834116329403099
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.5066721808657293,
+          "medianCase": 1.05761993747429,
+          "medianControl": 1.0491095734505236
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.411345464571271,
+          "medianCase": -0.013949053084084614,
+          "medianControl": -0.01078164223829438
+        },
+        {
+          "feature": "volPressure",
+          "auc": 0.708174800110284,
+          "medianCase": 1.6593615784744573,
+          "medianControl": 0.71174573890818
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.5108354011579818,
+          "medianCase": -0.09263067349229304,
+          "medianControl": -0.11391851313165458
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.43560794044665013,
+          "medianCase": 0.12105357286889151,
+          "medianControl": 0.15921946616272514
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5703060380479735,
+          "medianCase": 49.96951952886044,
+          "medianControl": 41.87274109952347
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.44583677970774743,
+          "medianCase": 0.23963146884658898,
+          "medianControl": 0.2790164836303362
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.45119244554728427,
+          "medianCase": 0.43374999999999997,
+          "medianControl": 0.44999999999999996
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.4431348221670802,
+          "medianCase": 0.3772051307339512,
+          "medianControl": 0.4058396869684404
+        }
+      ],
+      "maxDevFeature": "volPressure",
+      "maxDev": 0.208174800110284,
+      "maxTP": 0.0009995002498750624,
+      "nullQ95": 0.13336779707747448
+    },
+    {
+      "datasetId": "eth-perp-15m",
+      "role": "holdout-diagnostic",
+      "labeledEpisodes": 64,
+      "labelsOutsideEpisodes": 10,
+      "droppedNoControls": 1,
+      "medianControlsPerEpisode": 62,
+      "table": [
+        {
+          "feature": "rsi14",
+          "auc": 0.4969631764582017,
+          "medianCase": 42.264582668572174,
+          "medianControl": 42.430322891931866
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.4715861233943988,
+          "medianCase": -0.0019059072045711778,
+          "medianControl": -0.0014322277772621517
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.5386133922931143,
+          "medianCase": 0.004189133502664763,
+          "medianControl": 0.003967008063699305
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.556590861233944,
+          "medianCase": 1.0592949584326758,
+          "medianControl": 0.9840293520709209
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.44177721625605393,
+          "medianCase": -0.009116746426509538,
+          "medianControl": -0.007406646824393155
+        },
+        {
+          "feature": "volPressure",
+          "auc": 0.7026018635502211,
+          "medianCase": 1.4283901994569221,
+          "medianControl": 0.6424276648242143
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.4765279532533165,
+          "medianCase": -0.0999639889121402,
+          "medianControl": -0.10189893326856227
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.4815059749420931,
+          "medianCase": 0.11463687626710162,
+          "medianControl": 0.12977793623018893
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5784128895556959,
+          "medianCase": 49.41494318716237,
+          "medianControl": 43.21490972626661
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.50726468730259,
+          "medianCase": 0.2626317947514416,
+          "medianControl": 0.26614244669590204
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.45665699357759526,
+          "medianCase": 0.4225,
+          "medianControl": 0.45625000000000004
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.512288771320278,
+          "medianCase": 0.4614695169608145,
+          "medianControl": 0.42863669169109864
+        }
+      ],
+      "maxDevFeature": "volPressure",
+      "maxDev": 0.20260186355022114,
+      "maxTP": 0.0004997501249375312,
+      "nullQ95": 0.10328161191829854
+    },
+    {
+      "datasetId": "sol-spot-15m",
+      "role": "holdout-diagnostic",
+      "labeledEpisodes": 52,
+      "labelsOutsideEpisodes": 11,
+      "droppedNoControls": 0,
+      "medianControlsPerEpisode": 78,
+      "table": [
+        {
+          "feature": "rsi14",
+          "auc": 0.49714765100671143,
+          "medianCase": 43.42719546789882,
+          "medianControl": 43.3082984073305
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.4294656685596283,
+          "medianCase": -0.003939581923453006,
+          "medianControl": -0.0019781059902176934
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.4880356220960248,
+          "medianCase": 0.004549112043110077,
+          "medianControl": 0.0046817328733772
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.5541085871622784,
+          "medianCase": 1.0459934263128874,
+          "medianControl": 1.0018895335271303
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.4489975907761143,
+          "medianCase": -0.00960385521301732,
+          "medianControl": -0.008284560531639923
+        },
+        {
+          "feature": "volPressure",
+          "auc": 0.6970314919979349,
+          "medianCase": 1.2557579345940033,
+          "medianControl": 0.7026647779696614
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.45661245912923765,
+          "medianCase": -0.20271563723305938,
+          "medianControl": -0.09146030615419833
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.41694200653932195,
+          "medianCase": 0.11361111085519295,
+          "medianControl": 0.1765960255641091
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5533234383066598,
+          "medianCase": 47.21063982746232,
+          "medianControl": 43.649167733675505
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.47507098606091896,
+          "medianCase": 0.24683970137280378,
+          "medianControl": 0.27936946940802393
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.47514842540010327,
+          "medianCase": 0.42625,
+          "medianControl": 0.44875
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.5200309757356737,
+          "medianCase": 0.39840118515554085,
+          "medianControl": 0.380977801744423
+        }
+      ],
+      "maxDevFeature": "volPressure",
+      "maxDev": 0.1970314919979349,
+      "maxTP": 0.0004997501249375312,
+      "nullQ95": 0.10804508690414727
+    },
+    {
+      "datasetId": "btc-perp-5m",
+      "role": "holdout-diagnostic",
+      "labeledEpisodes": 69,
+      "labelsOutsideEpisodes": 12,
+      "droppedNoControls": 0,
+      "medianControlsPerEpisode": 67,
+      "table": [
+        {
+          "feature": "rsi14",
+          "auc": 0.45663430420711976,
+          "medianCase": 43.11102493113192,
+          "medianControl": 42.98719213533823
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.42281131279020684,
+          "medianCase": -0.001507308870766333,
+          "medianControl": -0.0006896378626708444
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.5033065991276207,
+          "medianCase": 0.0016541669640325438,
+          "medianControl": 0.0015907270199747982
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.5605937807795132,
+          "medianCase": 1.0605626116560678,
+          "medianControl": 0.9931139400566749
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.40670887857042354,
+          "medianCase": -0.0039199963745989415,
+          "medianControl": -0.0031516595633908954
+        },
+        {
+          "feature": "volPressure",
+          "auc": 0.6373913043478261,
+          "medianCase": 1.2261720927854578,
+          "medianControl": 0.6641516534012462
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.3909244406922752,
+          "medianCase": -0.28722135996580966,
+          "medianControl": -0.11370098584586145
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.4595215984240889,
+          "medianCase": 0.11092503898325157,
+          "medianControl": 0.13732702616611378
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5381708175038694,
+          "medianCase": 47.643769968052005,
+          "medianControl": 42.373844460197404
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.4574532151400028,
+          "medianCase": 0.23990055935363575,
+          "medianControl": 0.2571054356005248
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.4513353032221753,
+          "medianCase": 0.4325,
+          "medianControl": 0.459375
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.4915970170254679,
+          "medianCase": 0.36995008481832237,
+          "medianControl": 0.39173007622820866
+        }
+      ],
+      "maxDevFeature": "volPressure",
+      "maxDev": 0.1373913043478261,
+      "maxTP": 0.0029985007496251873,
+      "nullQ95": 0.10439003799071334
+    },
+    {
+      "datasetId": "btc-perp-4h",
+      "role": "holdout-diagnostic",
+      "labeledEpisodes": 27,
+      "labelsOutsideEpisodes": 11,
+      "droppedNoControls": 0,
+      "medianControlsPerEpisode": 92,
+      "table": [
+        {
+          "feature": "rsi14",
+          "auc": 0.5000822314321426,
+          "medianCase": 40.79219713604295,
+          "medianControl": 41.35761945834471
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.4564173409644102,
+          "medianCase": -0.008577871430030304,
+          "medianControl": -0.007678306700566295
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.4886849549371752,
+          "medianCase": 0.014042550023328649,
+          "medianControl": 0.014927549297692726
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.48723768173146503,
+          "medianCase": 1.063566632529975,
+          "medianControl": 1.0803804058126643
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.4905269390171699,
+          "medianCase": -0.042159374556274824,
+          "medianControl": -0.03308341279133387
+        },
+        {
+          "feature": "volPressure",
+          "auc": 0.6759588184987829,
+          "medianCase": 1.4725294423322595,
+          "medianControl": 0.7608403159132706
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.4285408854680613,
+          "medianCase": -0.15008781082811967,
+          "medianControl": -0.07137022464443821
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.4870074337214657,
+          "medianCase": 0.07948681058940667,
+          "medianControl": 0.1061122302842522
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5541247286362739,
+          "medianCase": 42.4582894934617,
+          "medianControl": 38.05767663342476
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.46279850009867773,
+          "medianCase": 0.20662286312361827,
+          "medianControl": 0.23807280089689736
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.4906831787382409,
+          "medianCase": 0.45875,
+          "medianControl": 0.47375
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.4683080060522334,
+          "medianCase": 0.30970368723845193,
+          "medianControl": 0.3765111095181082
+        }
+      ],
+      "maxDevFeature": "volPressure",
+      "maxDev": 0.17595881849878292,
+      "maxTP": 0.010494752623688156,
+      "nullQ95": 0.14378988224458916
+    }
+  ],
+  "strongOnBoth": [],
+  "sigOnBoth": true,
+  "verdict": "WEAK SIGNAL (significant but below AUC 0.70 threshold on both dev datasets)"
+}
