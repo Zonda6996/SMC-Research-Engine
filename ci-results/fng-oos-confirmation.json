@@ -1,0 +1,499 @@
+{
+  "config": {
+    "seed": 4242,
+    "nPerms": 2000,
+    "features": [
+      "rsi14",
+      "roc10",
+      "atrNorm14",
+      "atrRegime",
+      "devSma50",
+      "volPressure",
+      "signedVolPress",
+      "bandPos",
+      "stoch14",
+      "rangePos50",
+      "fngComposite",
+      "recoveryHW"
+    ]
+  },
+  "datasets": [
+    {
+      "datasetId": "btc-perp-15m-b2",
+      "newSymbol": false,
+      "rowsAnalyzed": 20527,
+      "labeledEpisodes": 69,
+      "labelsOutsideEpisodes": 16,
+      "volPressureAuc": 0.6184348006233055,
+      "medianCase": 0.897553098619216,
+      "medianControl": 0.6697634845479068,
+      "pOneSided": 0.0024987506246876563,
+      "passes": true,
+      "significantReversal": false,
+      "diagnostics": [
+        {
+          "feature": "rsi14",
+          "auc": 0.5228965691175543
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.4945933652191928
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.5575341602039254
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.5823943217949757
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.43404851334432226
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.48324866466704497
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.4341205717837166
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5877018762216157
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.46910269228344187
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.47853897010475493
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.4715639383540051
+        }
+      ]
+    },
+    {
+      "datasetId": "btc-perp-1h-b2",
+      "newSymbol": false,
+      "rowsAnalyzed": 8830,
+      "labeledEpisodes": 27,
+      "labelsOutsideEpisodes": 12,
+      "volPressureAuc": 0.7198133092442035,
+      "medianCase": 1.6671146694635972,
+      "medianControl": 0.7134093886046564,
+      "pOneSided": 0.0004997501249375312,
+      "passes": true,
+      "significantReversal": false,
+      "diagnostics": [
+        {
+          "feature": "rsi14",
+          "auc": 0.4637157482685938
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.5155408344206899
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.5054367827628894
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.5136505068754391
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.3931044866004216
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.5162267054769313
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.4124928903610024
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5713473184114557
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.43119542306534175
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.46797316738599487
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.43723443407273577
+        }
+      ]
+    },
+    {
+      "datasetId": "btc-perp-2h-b2",
+      "newSymbol": false,
+      "rowsAnalyzed": 8822,
+      "labeledEpisodes": 32,
+      "labelsOutsideEpisodes": 10,
+      "volPressureAuc": 0.7574180690876883,
+      "medianCase": 1.559937516433581,
+      "medianControl": 0.7673432529706046,
+      "pOneSided": 0.0004997501249375312,
+      "passes": true,
+      "significantReversal": false,
+      "diagnostics": [
+        {
+          "feature": "rsi14",
+          "auc": 0.47470106288751107
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.48649247121346323
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.418705713020372
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.4824236049601417
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.4527098095659876
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.5276516829052259
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.44119519486271036
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5416574402125776
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.45396922054915856
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.41550182683790965
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.4558375775022144
+        }
+      ]
+    },
+    {
+      "datasetId": "ondo-perp-15m-b2",
+      "newSymbol": true,
+      "rowsAnalyzed": 14672,
+      "labeledEpisodes": 48,
+      "labelsOutsideEpisodes": 15,
+      "volPressureAuc": 0.6892141664679228,
+      "medianCase": 1.2854517388381927,
+      "medianControl": 0.7212927158813194,
+      "pOneSided": 0.0004997501249375312,
+      "passes": true,
+      "significantReversal": false,
+      "diagnostics": [
+        {
+          "feature": "rsi14",
+          "auc": 0.4988075363701407
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.5108166388425153
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.5384221718737578
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.4920750854598935
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.414400985769934
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.49580153430320373
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.43480205103744335
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5668276492566977
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.4375049685984577
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.4889995230145481
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.45901403132204466
+        }
+      ]
+    },
+    {
+      "datasetId": "ondo-perp-1h-b2",
+      "newSymbol": true,
+      "rowsAnalyzed": 16920,
+      "labeledEpisodes": 63,
+      "labelsOutsideEpisodes": 18,
+      "volPressureAuc": 0.7185345518678852,
+      "medianCase": 1.5520460357320478,
+      "medianControl": 0.7760391209652918,
+      "pOneSided": 0.0004997501249375312,
+      "passes": true,
+      "significantReversal": false,
+      "diagnostics": [
+        {
+          "feature": "rsi14",
+          "auc": 0.541967291967292
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.49226755287361346
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.5037569052720567
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.5142842567084991
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.49085734691795296
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.517979214948912
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.5013008876645241
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.6012961505385748
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.5109154313699769
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.4981343011646042
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.5082936143542204
+        }
+      ]
+    },
+    {
+      "datasetId": "ondo-perp-2h-b2",
+      "newSymbol": true,
+      "rowsAnalyzed": 10935,
+      "labeledEpisodes": 32,
+      "labelsOutsideEpisodes": 14,
+      "volPressureAuc": 0.7243142444658325,
+      "medianCase": 1.673376486871839,
+      "medianControl": 0.7898273680136942,
+      "pOneSided": 0.0004997501249375312,
+      "passes": true,
+      "significantReversal": false,
+      "diagnostics": [
+        {
+          "feature": "rsi14",
+          "auc": 0.5380774783445621
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.5327388113570741
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.4181905678537055
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.47467516843118385
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.48031460538979787
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.5662596246390761
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.4709155437921078
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5839749759384023
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.4660881857555342
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.5331598893166506
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.4839088065447546
+        }
+      ]
+    },
+    {
+      "datasetId": "bnb-perp-3m-b2",
+      "newSymbol": true,
+      "rowsAnalyzed": 8521,
+      "labeledEpisodes": 40,
+      "labelsOutsideEpisodes": 6,
+      "volPressureAuc": 0.6933927173061863,
+      "medianCase": 1.4676457464917567,
+      "medianControl": 0.5406431892228271,
+      "pOneSided": 0.0004997501249375312,
+      "passes": true,
+      "significantReversal": false,
+      "diagnostics": [
+        {
+          "feature": "rsi14",
+          "auc": 0.5363938919342208
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.4777310101801096
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.4658183241973375
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.5228954581049334
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.47846515270164447
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.4855520751761942
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.4867071260767424
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.5907791699295223
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.5192149569303054
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.4625929913860611
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.5337803445575567
+        }
+      ]
+    },
+    {
+      "datasetId": "sp500-cfd-1m-b2",
+      "newSymbol": true,
+      "rowsAnalyzed": 9325,
+      "labeledEpisodes": 31,
+      "labelsOutsideEpisodes": 10,
+      "volPressureAuc": 0.5895968107010908,
+      "medianCase": 1.0687463893703062,
+      "medianControl": 0.9618573797678276,
+      "pOneSided": 0.046476761619190406,
+      "passes": false,
+      "significantReversal": false,
+      "diagnostics": [
+        {
+          "feature": "rsi14",
+          "auc": 0.6355671081645468
+        },
+        {
+          "feature": "roc10",
+          "auc": 0.6314052483243038
+        },
+        {
+          "feature": "atrNorm14",
+          "auc": 0.43778384614261306
+        },
+        {
+          "feature": "atrRegime",
+          "auc": 0.48680617415558053
+        },
+        {
+          "feature": "devSma50",
+          "auc": 0.5293885716789088
+        },
+        {
+          "feature": "signedVolPress",
+          "auc": 0.6153565326596475
+        },
+        {
+          "feature": "bandPos",
+          "auc": 0.5464887045663634
+        },
+        {
+          "feature": "stoch14",
+          "auc": 0.7374596591655836
+        },
+        {
+          "feature": "rangePos50",
+          "auc": 0.5747236379035909
+        },
+        {
+          "feature": "fngComposite",
+          "auc": 0.6664159815417865
+        },
+        {
+          "feature": "recoveryHW",
+          "auc": 0.5960659472246966
+        }
+      ]
+    }
+  ],
+  "nPass": 7,
+  "newSymbolPass": 4,
+  "newSymbolTotal": 5,
+  "anyReversal": false,
+  "verdict": "CONFIRMED"
+}
