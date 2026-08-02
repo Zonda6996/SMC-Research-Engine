@@ -1,0 +1,72 @@
+{
+  "config": {
+    "seed": 4242,
+    "nPerms": 2000,
+    "alignThreshold": 0.25
+  },
+  "perPair": [
+    {
+      "pair": "ondo-perp-15m-b2 -> ondo-perp-1h-b2",
+      "nAligned": 28,
+      "nNot": 35,
+      "meanAligned": 0.9225498378984694,
+      "meanNot": 0.7785794717361139,
+      "diff": 0.1439703661623556
+    },
+    {
+      "pair": "ondo-perp-15m-b2 -> ondo-perp-2h-b2",
+      "nAligned": 18,
+      "nNot": 45,
+      "meanAligned": 3.5288328340675688,
+      "meanNot": -0.23194031202878027,
+      "diff": 3.760773146096349
+    },
+    {
+      "pair": "ondo-perp-1h-b2 -> ondo-perp-2h-b2",
+      "nAligned": 62,
+      "nNot": 20,
+      "meanAligned": 1.6802125789790956,
+      "meanNot": -0.6932517362489687,
+      "diff": 2.3734643152280643
+    },
+    {
+      "pair": "btc-perp-15m-b2 -> btc-perp-1h-b2",
+      "nAligned": 46,
+      "nNot": 39,
+      "meanAligned": -0.19797010424603181,
+      "meanNot": -0.623591095747772,
+      "diff": 0.42562099150174026
+    },
+    {
+      "pair": "btc-perp-15m-b2 -> btc-perp-2h-b2",
+      "nAligned": 34,
+      "nNot": 51,
+      "meanAligned": -0.5791023036327045,
+      "meanNot": -0.26935684717585534,
+      "diff": -0.3097454564568492
+    },
+    {
+      "pair": "btc-perp-1h-b2 -> btc-perp-2h-b2",
+      "nAligned": 30,
+      "nNot": 10,
+      "meanAligned": -1.730051057263317,
+      "meanNot": 3.0083918082995122,
+      "diff": -4.7384428655628295
+    }
+  ],
+  "pooled": {
+    "observedDiff": 0.5426771502162095,
+    "pValue": 0.1854072963518241,
+    "agreeing": 4
+  },
+  "secondary": {
+    "spearman_stretchSigned": 0.08331500520846336,
+    "spearman_htfVp50": 0.07028477125651914,
+    "recentLabel": {
+      "withRate": -2.2418707198783445,
+      "withoutRate": 0.3129030975564944,
+      "nWith": 9
+    }
+  },
+  "verdict": "INCONCLUSIVE"
+}
