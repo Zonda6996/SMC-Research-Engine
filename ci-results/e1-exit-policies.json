@@ -1,0 +1,2635 @@
+{
+  "config": {
+    "seed": 4242,
+    "maxHold": 192,
+    "minForward": 48,
+    "policies": [
+      "fixed_1to1",
+      "fixed_2to1",
+      "wide_1to2",
+      "partial_be",
+      "be_only",
+      "time_stop"
+    ]
+  },
+  "pooled": {
+    "fixed_1to1": {
+      "labels": {
+        "n": 689,
+        "winrateVendorStyle": 0.5297532656023222,
+        "winrateStrict": 0.5297532656023222,
+        "expectancy": 0.059506531204644414,
+        "medianR": 1,
+        "stopRate": 0.4702467343976778,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 14
+      },
+      "control": {
+        "n": 692,
+        "winrateVendorStyle": 0.5086705202312138,
+        "winrateStrict": 0.5086705202312138,
+        "expectancy": 0.017341040462427744,
+        "medianR": 1,
+        "stopRate": 0.4913294797687861,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 33
+      }
+    },
+    "fixed_2to1": {
+      "labels": {
+        "n": 689,
+        "winrateVendorStyle": 0.35268505079825835,
+        "winrateStrict": 0.35268505079825835,
+        "expectancy": 0.05805515239477504,
+        "medianR": -1,
+        "stopRate": 0.6473149492017417,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 24
+      },
+      "control": {
+        "n": 692,
+        "winrateVendorStyle": 0.3511560693641618,
+        "winrateStrict": 0.3511560693641618,
+        "expectancy": 0.05346820809248555,
+        "medianR": -1,
+        "stopRate": 0.6488439306358381,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 28
+      }
+    },
+    "wide_1to2": {
+      "labels": {
+        "n": 689,
+        "winrateVendorStyle": 0.6806966618287373,
+        "winrateStrict": 0.6806966618287373,
+        "expectancy": 0.0420899854862119,
+        "medianR": 1,
+        "stopRate": 0.3193033381712627,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 30
+      },
+      "control": {
+        "n": 692,
+        "winrateVendorStyle": 0.6777456647398844,
+        "winrateStrict": 0.6777456647398844,
+        "expectancy": 0.033236994219653176,
+        "medianR": 1,
+        "stopRate": 0.3222543352601156,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 26
+      }
+    },
+    "partial_be": {
+      "labels": {
+        "n": 689,
+        "winrateVendorStyle": 0.6502177068214804,
+        "winrateStrict": 0.6502177068214804,
+        "expectancy": 0.044063860667634396,
+        "medianR": 0.57,
+        "stopRate": 0.3497822931785196,
+        "partialBeRate": 0.2772133526850508,
+        "timeExitRate": 0,
+        "maxDrawdownR": 40.36999999999996
+      },
+      "control": {
+        "n": 692,
+        "winrateVendorStyle": 0.6416184971098265,
+        "winrateStrict": 0.6416184971098265,
+        "expectancy": 0.021791907514450978,
+        "medianR": 0.57,
+        "stopRate": 0.3583815028901734,
+        "partialBeRate": 0.26878612716763006,
+        "timeExitRate": 0,
+        "maxDrawdownR": 27.599999999999994
+      }
+    },
+    "be_only": {
+      "labels": {
+        "n": 689,
+        "winrateVendorStyle": 0.2351233671988389,
+        "winrateStrict": 0.2351233671988389,
+        "expectancy": 0.06676342525399129,
+        "medianR": 0,
+        "stopRate": 0.3193033381712627,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 29
+      },
+      "control": {
+        "n": 692,
+        "winrateVendorStyle": 0.22254335260115607,
+        "winrateStrict": 0.22254335260115607,
+        "expectancy": 0.023121387283236993,
+        "medianR": 0,
+        "stopRate": 0.3222543352601156,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 38
+      }
+    },
+    "time_stop": {
+      "labels": {
+        "n": 689,
+        "winrateVendorStyle": 0.5181422351233672,
+        "winrateStrict": 0.5181422351233672,
+        "expectancy": 0.07256894049346879,
+        "medianR": 2,
+        "stopRate": 0.4818577648766328,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 38
+      },
+      "control": {
+        "n": 692,
+        "winrateVendorStyle": 0.5072254335260116,
+        "winrateStrict": 0.5057803468208093,
+        "expectancy": 0.029928219499970574,
+        "medianR": 2,
+        "stopRate": 0.48988439306358383,
+        "partialBeRate": 0,
+        "timeExitRate": 0.004335260115606936,
+        "maxDrawdownR": 36
+      }
+    }
+  },
+  "byDirection": {
+    "fixed_1to1": {
+      "long": {
+        "n": 380,
+        "winrateVendorStyle": 0.5263157894736842,
+        "winrateStrict": 0.5263157894736842,
+        "expectancy": 0.05263157894736842,
+        "medianR": 1,
+        "stopRate": 0.47368421052631576,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 11
+      },
+      "short": {
+        "n": 309,
+        "winrateVendorStyle": 0.5339805825242718,
+        "winrateStrict": 0.5339805825242718,
+        "expectancy": 0.06796116504854369,
+        "medianR": 1,
+        "stopRate": 0.46601941747572817,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 13
+      }
+    },
+    "fixed_2to1": {
+      "long": {
+        "n": 380,
+        "winrateVendorStyle": 0.3473684210526316,
+        "winrateStrict": 0.3473684210526316,
+        "expectancy": 0.042105263157894736,
+        "medianR": -1,
+        "stopRate": 0.6526315789473685,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 13
+      },
+      "short": {
+        "n": 309,
+        "winrateVendorStyle": 0.3592233009708738,
+        "winrateStrict": 0.3592233009708738,
+        "expectancy": 0.07766990291262135,
+        "medianR": -1,
+        "stopRate": 0.6407766990291263,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 17
+      }
+    },
+    "wide_1to2": {
+      "long": {
+        "n": 380,
+        "winrateVendorStyle": 0.6710526315789473,
+        "winrateStrict": 0.6710526315789473,
+        "expectancy": 0.013157894736842105,
+        "medianR": 1,
+        "stopRate": 0.32894736842105265,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 21
+      },
+      "short": {
+        "n": 309,
+        "winrateVendorStyle": 0.6925566343042071,
+        "winrateStrict": 0.6925566343042071,
+        "expectancy": 0.07766990291262135,
+        "medianR": 1,
+        "stopRate": 0.3074433656957929,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 30
+      }
+    },
+    "partial_be": {
+      "long": {
+        "n": 380,
+        "winrateVendorStyle": 0.6368421052631579,
+        "winrateStrict": 0.6368421052631579,
+        "expectancy": 0.007736842105263173,
+        "medianR": 0.57,
+        "stopRate": 0.3631578947368421,
+        "partialBeRate": 0.2657894736842105,
+        "timeExitRate": 0,
+        "maxDrawdownR": 25.91
+      },
+      "short": {
+        "n": 309,
+        "winrateVendorStyle": 0.6666666666666666,
+        "winrateStrict": 0.6666666666666666,
+        "expectancy": 0.08873786407767004,
+        "medianR": 0.57,
+        "stopRate": 0.3333333333333333,
+        "partialBeRate": 0.2912621359223301,
+        "timeExitRate": 0,
+        "maxDrawdownR": 35.07999999999999
+      }
+    },
+    "be_only": {
+      "long": {
+        "n": 380,
+        "winrateVendorStyle": 0.24473684210526317,
+        "winrateStrict": 0.24473684210526317,
+        "expectancy": 0.07631578947368421,
+        "medianR": 0,
+        "stopRate": 0.32894736842105265,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 25
+      },
+      "short": {
+        "n": 309,
+        "winrateVendorStyle": 0.22330097087378642,
+        "winrateStrict": 0.22330097087378642,
+        "expectancy": 0.05501618122977346,
+        "medianR": 0,
+        "stopRate": 0.3074433656957929,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 30
+      }
+    },
+    "time_stop": {
+      "long": {
+        "n": 380,
+        "winrateVendorStyle": 0.5289473684210526,
+        "winrateStrict": 0.5289473684210526,
+        "expectancy": 0.11578947368421053,
+        "medianR": 2,
+        "stopRate": 0.4710526315789474,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 24
+      },
+      "short": {
+        "n": 309,
+        "winrateVendorStyle": 0.5048543689320388,
+        "winrateStrict": 0.5048543689320388,
+        "expectancy": 0.019417475728155338,
+        "medianR": 2,
+        "stopRate": 0.49514563106796117,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 48
+      }
+    }
+  },
+  "byTimeframe": {
+    "fixed_1to1": {
+      "1m-5m": {
+        "n": 168,
+        "winrateVendorStyle": 0.5476190476190477,
+        "winrateStrict": 0.5476190476190477,
+        "expectancy": 0.09523809523809523,
+        "medianR": 1,
+        "stopRate": 0.4523809523809524,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 10
+      },
+      "15m": {
+        "n": 268,
+        "winrateVendorStyle": 0.5671641791044776,
+        "winrateStrict": 0.5671641791044776,
+        "expectancy": 0.13432835820895522,
+        "medianR": 1,
+        "stopRate": 0.43283582089552236,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 7
+      },
+      "1h-2h": {
+        "n": 253,
+        "winrateVendorStyle": 0.4782608695652174,
+        "winrateStrict": 0.4782608695652174,
+        "expectancy": -0.043478260869565216,
+        "medianR": -1,
+        "stopRate": 0.5217391304347826,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 15
+      }
+    },
+    "fixed_2to1": {
+      "1m-5m": {
+        "n": 168,
+        "winrateVendorStyle": 0.39285714285714285,
+        "winrateStrict": 0.39285714285714285,
+        "expectancy": 0.17857142857142858,
+        "medianR": -1,
+        "stopRate": 0.6071428571428571,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 14
+      },
+      "15m": {
+        "n": 268,
+        "winrateVendorStyle": 0.35447761194029853,
+        "winrateStrict": 0.35447761194029853,
+        "expectancy": 0.06343283582089553,
+        "medianR": -1,
+        "stopRate": 0.6455223880597015,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 12
+      },
+      "1h-2h": {
+        "n": 253,
+        "winrateVendorStyle": 0.3241106719367589,
+        "winrateStrict": 0.3241106719367589,
+        "expectancy": -0.02766798418972332,
+        "medianR": -1,
+        "stopRate": 0.6758893280632411,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 20
+      }
+    },
+    "wide_1to2": {
+      "1m-5m": {
+        "n": 168,
+        "winrateVendorStyle": 0.7202380952380952,
+        "winrateStrict": 0.7202380952380952,
+        "expectancy": 0.16071428571428573,
+        "medianR": 1,
+        "stopRate": 0.27976190476190477,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 13
+      },
+      "15m": {
+        "n": 268,
+        "winrateVendorStyle": 0.6716417910447762,
+        "winrateStrict": 0.6716417910447762,
+        "expectancy": 0.014925373134328358,
+        "medianR": 1,
+        "stopRate": 0.3283582089552239,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 17
+      },
+      "1h-2h": {
+        "n": 253,
+        "winrateVendorStyle": 0.6640316205533597,
+        "winrateStrict": 0.6640316205533597,
+        "expectancy": -0.007905138339920948,
+        "medianR": 1,
+        "stopRate": 0.3359683794466403,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 21
+      }
+    },
+    "partial_be": {
+      "1m-5m": {
+        "n": 168,
+        "winrateVendorStyle": 0.7023809523809523,
+        "winrateStrict": 0.7023809523809523,
+        "expectancy": 0.2217857142857144,
+        "medianR": 0.57,
+        "stopRate": 0.2976190476190476,
+        "partialBeRate": 0.2857142857142857,
+        "timeExitRate": 0,
+        "maxDrawdownR": 12.29
+      },
+      "15m": {
+        "n": 268,
+        "winrateVendorStyle": 0.6231343283582089,
+        "winrateStrict": 0.6231343283582089,
+        "expectancy": -0.07018656716417895,
+        "medianR": 0.57,
+        "stopRate": 0.376865671641791,
+        "partialBeRate": 0.2947761194029851,
+        "timeExitRate": 0,
+        "maxDrawdownR": 29.60999999999997
+      },
+      "1h-2h": {
+        "n": 253,
+        "winrateVendorStyle": 0.6442687747035574,
+        "winrateStrict": 0.6442687747035574,
+        "expectancy": 0.04707509881422928,
+        "medianR": 0.57,
+        "stopRate": 0.3557312252964427,
+        "partialBeRate": 0.25296442687747034,
+        "timeExitRate": 0,
+        "maxDrawdownR": 14.88
+      }
+    },
+    "be_only": {
+      "1m-5m": {
+        "n": 168,
+        "winrateVendorStyle": 0.2261904761904762,
+        "winrateStrict": 0.2261904761904762,
+        "expectancy": 0.11904761904761904,
+        "medianR": 0,
+        "stopRate": 0.27976190476190477,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 13
+      },
+      "15m": {
+        "n": 268,
+        "winrateVendorStyle": 0.23134328358208955,
+        "winrateStrict": 0.23134328358208955,
+        "expectancy": 0.03731343283582089,
+        "medianR": 0,
+        "stopRate": 0.3283582089552239,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 24
+      },
+      "1h-2h": {
+        "n": 253,
+        "winrateVendorStyle": 0.2450592885375494,
+        "winrateStrict": 0.2450592885375494,
+        "expectancy": 0.06324110671936758,
+        "medianR": 0,
+        "stopRate": 0.3359683794466403,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 19
+      }
+    },
+    "time_stop": {
+      "1m-5m": {
+        "n": 168,
+        "winrateVendorStyle": 0.5535714285714286,
+        "winrateStrict": 0.5535714285714286,
+        "expectancy": 0.21428571428571427,
+        "medianR": 2,
+        "stopRate": 0.44642857142857145,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 14
+      },
+      "15m": {
+        "n": 268,
+        "winrateVendorStyle": 0.48880597014925375,
+        "winrateStrict": 0.48880597014925375,
+        "expectancy": -0.04477611940298507,
+        "medianR": -2,
+        "stopRate": 0.5111940298507462,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 22
+      },
+      "1h-2h": {
+        "n": 253,
+        "winrateVendorStyle": 0.525691699604743,
+        "winrateStrict": 0.525691699604743,
+        "expectancy": 0.10276679841897234,
+        "medianR": 2,
+        "stopRate": 0.4743083003952569,
+        "partialBeRate": 0,
+        "timeExitRate": 0,
+        "maxDrawdownR": 20
+      }
+    }
+  },
+  "perDataset": [
+    {
+      "id": "btc-perp-15m",
+      "inPool": true,
+      "n": 68,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 68,
+            "winrateVendorStyle": 0.5882352941176471,
+            "winrateStrict": 0.5882352941176471,
+            "expectancy": 0.17647058823529413,
+            "medianR": 1,
+            "stopRate": 0.4117647058823529,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 5
+          },
+          "control": {
+            "n": 69,
+            "winrateVendorStyle": 0.4492753623188406,
+            "winrateStrict": 0.4492753623188406,
+            "expectancy": -0.10144927536231885,
+            "medianR": -1,
+            "stopRate": 0.5507246376811594,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 13
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 68,
+            "winrateVendorStyle": 0.3382352941176471,
+            "winrateStrict": 0.3382352941176471,
+            "expectancy": 0.014705882352941176,
+            "medianR": -1,
+            "stopRate": 0.6617647058823529,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          },
+          "control": {
+            "n": 69,
+            "winrateVendorStyle": 0.36231884057971014,
+            "winrateStrict": 0.36231884057971014,
+            "expectancy": 0.08695652173913043,
+            "medianR": -1,
+            "stopRate": 0.6376811594202898,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 68,
+            "winrateVendorStyle": 0.6764705882352942,
+            "winrateStrict": 0.6764705882352942,
+            "expectancy": 0.029411764705882353,
+            "medianR": 1,
+            "stopRate": 0.3235294117647059,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 69,
+            "winrateVendorStyle": 0.6376811594202898,
+            "winrateStrict": 0.6376811594202898,
+            "expectancy": -0.08695652173913043,
+            "medianR": 1,
+            "stopRate": 0.36231884057971014,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 68,
+            "winrateVendorStyle": 0.6029411764705882,
+            "winrateStrict": 0.6029411764705882,
+            "expectancy": -0.11220588235294111,
+            "medianR": 0.57,
+            "stopRate": 0.39705882352941174,
+            "partialBeRate": 0.2647058823529412,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15.89
+          },
+          "control": {
+            "n": 69,
+            "winrateVendorStyle": 0.6086956521739131,
+            "winrateStrict": 0.6086956521739131,
+            "expectancy": -0.04434782608695653,
+            "medianR": 0.57,
+            "stopRate": 0.391304347826087,
+            "partialBeRate": 0.21739130434782608,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12.870000000000001
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 68,
+            "winrateVendorStyle": 0.20588235294117646,
+            "winrateStrict": 0.20588235294117646,
+            "expectancy": -0.029411764705882353,
+            "medianR": 0,
+            "stopRate": 0.3235294117647059,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 17
+          },
+          "control": {
+            "n": 69,
+            "winrateVendorStyle": 0.30434782608695654,
+            "winrateStrict": 0.30434782608695654,
+            "expectancy": 0.18840579710144928,
+            "medianR": 0,
+            "stopRate": 0.36231884057971014,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 68,
+            "winrateVendorStyle": 0.47058823529411764,
+            "winrateStrict": 0.47058823529411764,
+            "expectancy": -0.11764705882352941,
+            "medianR": -2,
+            "stopRate": 0.5294117647058824,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16
+          },
+          "control": {
+            "n": 69,
+            "winrateVendorStyle": 0.5362318840579711,
+            "winrateStrict": 0.5362318840579711,
+            "expectancy": 0.14492753623188406,
+            "medianR": 2,
+            "stopRate": 0.463768115942029,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          }
+        }
+      }
+    },
+    {
+      "id": "btc-perp-1h",
+      "inPool": true,
+      "n": 44,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.4318181818181818,
+            "winrateStrict": 0.4318181818181818,
+            "expectancy": -0.13636363636363635,
+            "medianR": -1,
+            "stopRate": 0.5681818181818182,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 9
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.5681818181818182,
+            "winrateStrict": 0.5681818181818182,
+            "expectancy": 0.13636363636363635,
+            "medianR": 1,
+            "stopRate": 0.4318181818181818,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 7
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.25,
+            "winrateStrict": 0.25,
+            "expectancy": -0.25,
+            "medianR": -1,
+            "stopRate": 0.75,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 17
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.4090909090909091,
+            "winrateStrict": 0.4090909090909091,
+            "expectancy": 0.22727272727272727,
+            "medianR": -1,
+            "stopRate": 0.5909090909090909,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.6136363636363636,
+            "winrateStrict": 0.6136363636363636,
+            "expectancy": -0.1590909090909091,
+            "medianR": 1,
+            "stopRate": 0.38636363636363635,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.6818181818181818,
+            "winrateStrict": 0.6818181818181818,
+            "expectancy": 0.045454545454545456,
+            "medianR": 1,
+            "stopRate": 0.3181818181818182,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.5909090909090909,
+            "winrateStrict": 0.5909090909090909,
+            "expectancy": -0.1631818181818182,
+            "medianR": 0.57,
+            "stopRate": 0.4090909090909091,
+            "partialBeRate": 0.2727272727272727,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14.88
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.6818181818181818,
+            "winrateStrict": 0.6818181818181818,
+            "expectancy": 0.04772727272727283,
+            "medianR": 0.57,
+            "stopRate": 0.3181818181818182,
+            "partialBeRate": 0.38636363636363635,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12.29
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.22727272727272727,
+            "winrateStrict": 0.22727272727272727,
+            "expectancy": -0.09090909090909091,
+            "medianR": 0,
+            "stopRate": 0.38636363636363635,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 17
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.20454545454545456,
+            "winrateStrict": 0.20454545454545456,
+            "expectancy": -0.022727272727272728,
+            "medianR": 0,
+            "stopRate": 0.3181818181818182,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 44,
+            "winrateVendorStyle": 0.4318181818181818,
+            "winrateStrict": 0.4318181818181818,
+            "expectancy": -0.2727272727272727,
+            "medianR": -2,
+            "stopRate": 0.5681818181818182,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 20
+          },
+          "control": {
+            "n": 44,
+            "winrateVendorStyle": 0.5,
+            "winrateStrict": 0.5,
+            "expectancy": 0,
+            "medianR": 0,
+            "stopRate": 0.5,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16
+          }
+        }
+      }
+    },
+    {
+      "id": "eth-perp-15m",
+      "inPool": true,
+      "n": 74,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 74,
+            "winrateVendorStyle": 0.5,
+            "winrateStrict": 0.5,
+            "expectancy": 0,
+            "medianR": 0,
+            "stopRate": 0.5,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 7
+          },
+          "control": {
+            "n": 75,
+            "winrateVendorStyle": 0.4266666666666667,
+            "winrateStrict": 0.4266666666666667,
+            "expectancy": -0.14666666666666667,
+            "medianR": -1,
+            "stopRate": 0.5733333333333334,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 74,
+            "winrateVendorStyle": 0.36486486486486486,
+            "winrateStrict": 0.36486486486486486,
+            "expectancy": 0.0945945945945946,
+            "medianR": -1,
+            "stopRate": 0.6351351351351351,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 9
+          },
+          "control": {
+            "n": 75,
+            "winrateVendorStyle": 0.25333333333333335,
+            "winrateStrict": 0.25333333333333335,
+            "expectancy": -0.24,
+            "medianR": -1,
+            "stopRate": 0.7466666666666667,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 22
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 74,
+            "winrateVendorStyle": 0.6216216216216216,
+            "winrateStrict": 0.6216216216216216,
+            "expectancy": -0.13513513513513514,
+            "medianR": 1,
+            "stopRate": 0.3783783783783784,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16
+          },
+          "control": {
+            "n": 75,
+            "winrateVendorStyle": 0.68,
+            "winrateStrict": 0.68,
+            "expectancy": 0.04,
+            "medianR": 1,
+            "stopRate": 0.32,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 74,
+            "winrateVendorStyle": 0.581081081081081,
+            "winrateStrict": 0.581081081081081,
+            "expectancy": -0.12824324324324332,
+            "medianR": 0.57,
+            "stopRate": 0.4189189189189189,
+            "partialBeRate": 0.20270270270270271,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16.160000000000004
+          },
+          "control": {
+            "n": 75,
+            "winrateVendorStyle": 0.64,
+            "winrateStrict": 0.64,
+            "expectancy": 0.04480000000000008,
+            "medianR": 0.57,
+            "stopRate": 0.36,
+            "partialBeRate": 0.24,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15.879999999999997
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 74,
+            "winrateVendorStyle": 0.28378378378378377,
+            "winrateStrict": 0.28378378378378377,
+            "expectancy": 0.0945945945945946,
+            "medianR": 0,
+            "stopRate": 0.3783783783783784,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          },
+          "control": {
+            "n": 75,
+            "winrateVendorStyle": 0.18666666666666668,
+            "winrateStrict": 0.18666666666666668,
+            "expectancy": -0.08,
+            "medianR": 0,
+            "stopRate": 0.32,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 24
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 74,
+            "winrateVendorStyle": 0.4864864864864865,
+            "winrateStrict": 0.4864864864864865,
+            "expectancy": -0.05405405405405406,
+            "medianR": -2,
+            "stopRate": 0.5135135135135135,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          },
+          "control": {
+            "n": 75,
+            "winrateVendorStyle": 0.52,
+            "winrateStrict": 0.52,
+            "expectancy": 0.1001716668646186,
+            "medianR": 2,
+            "stopRate": 0.4666666666666667,
+            "partialBeRate": 0,
+            "timeExitRate": 0.013333333333333334,
+            "maxDrawdownR": 12.487124985153605
+          }
+        }
+      }
+    },
+    {
+      "id": "sol-spot-15m",
+      "inPool": true,
+      "n": 63,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.5714285714285714,
+            "winrateStrict": 0.5714285714285714,
+            "expectancy": 0.14285714285714285,
+            "medianR": 1,
+            "stopRate": 0.42857142857142855,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 4
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.47619047619047616,
+            "winrateStrict": 0.47619047619047616,
+            "expectancy": -0.047619047619047616,
+            "medianR": -1,
+            "stopRate": 0.5238095238095238,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 9
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.31746031746031744,
+            "winrateStrict": 0.31746031746031744,
+            "expectancy": -0.047619047619047616,
+            "medianR": -1,
+            "stopRate": 0.6825396825396826,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 9
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.36507936507936506,
+            "winrateStrict": 0.36507936507936506,
+            "expectancy": 0.09523809523809523,
+            "medianR": -1,
+            "stopRate": 0.6349206349206349,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.6825396825396826,
+            "winrateStrict": 0.6825396825396826,
+            "expectancy": 0.047619047619047616,
+            "medianR": 1,
+            "stopRate": 0.31746031746031744,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.7142857142857143,
+            "winrateStrict": 0.7142857142857143,
+            "expectancy": 0.14285714285714285,
+            "medianR": 1,
+            "stopRate": 0.2857142857142857,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.6507936507936508,
+            "winrateStrict": 0.6507936507936508,
+            "expectancy": -0.10523809523809531,
+            "medianR": 0.57,
+            "stopRate": 0.3492063492063492,
+            "partialBeRate": 0.42857142857142855,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10.460000000000003
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.6984126984126984,
+            "winrateStrict": 0.6984126984126984,
+            "expectancy": 0.1758730158730159,
+            "medianR": 0.57,
+            "stopRate": 0.30158730158730157,
+            "partialBeRate": 0.31746031746031744,
+            "timeExitRate": 0,
+            "maxDrawdownR": 13.719999999999999
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.15873015873015872,
+            "winrateStrict": 0.15873015873015872,
+            "expectancy": -0.15873015873015872,
+            "medianR": 0,
+            "stopRate": 0.31746031746031744,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 18
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.2698412698412698,
+            "winrateStrict": 0.2698412698412698,
+            "expectancy": 0.23809523809523808,
+            "medianR": 0,
+            "stopRate": 0.2857142857142857,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.47619047619047616,
+            "winrateStrict": 0.47619047619047616,
+            "expectancy": -0.09523809523809523,
+            "medianR": -2,
+            "stopRate": 0.5238095238095238,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.5238095238095238,
+            "winrateStrict": 0.5238095238095238,
+            "expectancy": 0.10938808267510756,
+            "medianR": 2,
+            "stopRate": 0.4603174603174603,
+            "partialBeRate": 0,
+            "timeExitRate": 0.015873015873015872,
+            "maxDrawdownR": 18
+          }
+        }
+      }
+    },
+    {
+      "id": "btc-perp-5m",
+      "inPool": true,
+      "n": 81,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 81,
+            "winrateVendorStyle": 0.5308641975308642,
+            "winrateStrict": 0.5308641975308642,
+            "expectancy": 0.06172839506172839,
+            "medianR": 1,
+            "stopRate": 0.4691358024691358,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 81,
+            "winrateVendorStyle": 0.49382716049382713,
+            "winrateStrict": 0.49382716049382713,
+            "expectancy": -0.012345679012345678,
+            "medianR": -1,
+            "stopRate": 0.5061728395061729,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 81,
+            "winrateVendorStyle": 0.35802469135802467,
+            "winrateStrict": 0.35802469135802467,
+            "expectancy": 0.07407407407407407,
+            "medianR": -1,
+            "stopRate": 0.6419753086419753,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          },
+          "control": {
+            "n": 81,
+            "winrateVendorStyle": 0.345679012345679,
+            "winrateStrict": 0.345679012345679,
+            "expectancy": 0.037037037037037035,
+            "medianR": -1,
+            "stopRate": 0.654320987654321,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 81,
+            "winrateVendorStyle": 0.7037037037037037,
+            "winrateStrict": 0.7037037037037037,
+            "expectancy": 0.1111111111111111,
+            "medianR": 1,
+            "stopRate": 0.2962962962962963,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 13
+          },
+          "control": {
+            "n": 81,
+            "winrateVendorStyle": 0.654320987654321,
+            "winrateStrict": 0.654320987654321,
+            "expectancy": -0.037037037037037035,
+            "medianR": 1,
+            "stopRate": 0.345679012345679,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 18
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 81,
+            "winrateVendorStyle": 0.691358024691358,
+            "winrateStrict": 0.691358024691358,
+            "expectancy": 0.15950617283950624,
+            "medianR": 0.57,
+            "stopRate": 0.30864197530864196,
+            "partialBeRate": 0.30864197530864196,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12.29
+          },
+          "control": {
+            "n": 81,
+            "winrateVendorStyle": 0.6419753086419753,
+            "winrateStrict": 0.6419753086419753,
+            "expectancy": 0.057283950617284064,
+            "medianR": 0.57,
+            "stopRate": 0.35802469135802467,
+            "partialBeRate": 0.2345679012345679,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11.449999999999996
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 81,
+            "winrateVendorStyle": 0.19753086419753085,
+            "winrateStrict": 0.19753086419753085,
+            "expectancy": 0,
+            "medianR": 0,
+            "stopRate": 0.2962962962962963,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 13
+          },
+          "control": {
+            "n": 81,
+            "winrateVendorStyle": 0.20987654320987653,
+            "winrateStrict": 0.20987654320987653,
+            "expectancy": -0.06172839506172839,
+            "medianR": 0,
+            "stopRate": 0.345679012345679,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 81,
+            "winrateVendorStyle": 0.5308641975308642,
+            "winrateStrict": 0.5308641975308642,
+            "expectancy": 0.12345679012345678,
+            "medianR": 2,
+            "stopRate": 0.4691358024691358,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          },
+          "control": {
+            "n": 81,
+            "winrateVendorStyle": 0.5061728395061729,
+            "winrateStrict": 0.49382716049382713,
+            "expectancy": 0.003777823093845308,
+            "medianR": 0.30600367060146977,
+            "stopRate": 0.49382716049382713,
+            "partialBeRate": 0,
+            "timeExitRate": 0.012345679012345678,
+            "maxDrawdownR": 13.69399632939853
+          }
+        }
+      }
+    },
+    {
+      "id": "btc-perp-4h",
+      "inPool": true,
+      "n": 38,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 38,
+            "winrateVendorStyle": 0.5263157894736842,
+            "winrateStrict": 0.5263157894736842,
+            "expectancy": 0.05263157894736842,
+            "medianR": 1,
+            "stopRate": 0.47368421052631576,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          },
+          "control": {
+            "n": 38,
+            "winrateVendorStyle": 0.6052631578947368,
+            "winrateStrict": 0.6052631578947368,
+            "expectancy": 0.21052631578947367,
+            "medianR": 1,
+            "stopRate": 0.39473684210526316,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 3
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 38,
+            "winrateVendorStyle": 0.3684210526315789,
+            "winrateStrict": 0.3684210526315789,
+            "expectancy": 0.10526315789473684,
+            "medianR": -1,
+            "stopRate": 0.631578947368421,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          },
+          "control": {
+            "n": 38,
+            "winrateVendorStyle": 0.42105263157894735,
+            "winrateStrict": 0.42105263157894735,
+            "expectancy": 0.2631578947368421,
+            "medianR": -1,
+            "stopRate": 0.5789473684210527,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 4
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 38,
+            "winrateVendorStyle": 0.6842105263157895,
+            "winrateStrict": 0.6842105263157895,
+            "expectancy": 0.05263157894736842,
+            "medianR": 1,
+            "stopRate": 0.3157894736842105,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 7
+          },
+          "control": {
+            "n": 38,
+            "winrateVendorStyle": 0.7105263157894737,
+            "winrateStrict": 0.7105263157894737,
+            "expectancy": 0.13157894736842105,
+            "medianR": 1,
+            "stopRate": 0.2894736842105263,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 38,
+            "winrateVendorStyle": 0.6578947368421053,
+            "winrateStrict": 0.6578947368421053,
+            "expectancy": 0.08552631578947358,
+            "medianR": 0.57,
+            "stopRate": 0.34210526315789475,
+            "partialBeRate": 0.2631578947368421,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8.86
+          },
+          "control": {
+            "n": 38,
+            "winrateVendorStyle": 0.6578947368421053,
+            "winrateStrict": 0.6578947368421053,
+            "expectancy": 0.08552631578947359,
+            "medianR": 0.57,
+            "stopRate": 0.34210526315789475,
+            "partialBeRate": 0.2631578947368421,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 38,
+            "winrateVendorStyle": 0.23684210526315788,
+            "winrateStrict": 0.23684210526315788,
+            "expectancy": 0.07894736842105263,
+            "medianR": 0,
+            "stopRate": 0.3157894736842105,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          },
+          "control": {
+            "n": 38,
+            "winrateVendorStyle": 0.2894736842105263,
+            "winrateStrict": 0.2894736842105263,
+            "expectancy": 0.2894736842105263,
+            "medianR": 0,
+            "stopRate": 0.2894736842105263,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 38,
+            "winrateVendorStyle": 0.5263157894736842,
+            "winrateStrict": 0.5263157894736842,
+            "expectancy": 0.10526315789473684,
+            "medianR": 2,
+            "stopRate": 0.47368421052631576,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 38,
+            "winrateVendorStyle": 0.5789473684210527,
+            "winrateStrict": 0.5789473684210527,
+            "expectancy": 0.3157894736842105,
+            "medianR": 2,
+            "stopRate": 0.42105263157894735,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "btc-perp-15m-b2",
+      "inPool": false,
+      "n": 85,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 85,
+            "winrateVendorStyle": 0.6,
+            "winrateStrict": 0.6,
+            "expectancy": 0.2,
+            "medianR": 1,
+            "stopRate": 0.4,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          },
+          "control": {
+            "n": 85,
+            "winrateVendorStyle": 0.611764705882353,
+            "winrateStrict": 0.611764705882353,
+            "expectancy": 0.2235294117647059,
+            "medianR": 1,
+            "stopRate": 0.38823529411764707,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 85,
+            "winrateVendorStyle": 0.3411764705882353,
+            "winrateStrict": 0.3411764705882353,
+            "expectancy": 0.023529411764705882,
+            "medianR": -1,
+            "stopRate": 0.6588235294117647,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          },
+          "control": {
+            "n": 85,
+            "winrateVendorStyle": 0.4,
+            "winrateStrict": 0.4,
+            "expectancy": 0.2,
+            "medianR": -1,
+            "stopRate": 0.6,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 85,
+            "winrateVendorStyle": 0.6823529411764706,
+            "winrateStrict": 0.6823529411764706,
+            "expectancy": 0.047058823529411764,
+            "medianR": 1,
+            "stopRate": 0.3176470588235294,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 85,
+            "winrateVendorStyle": 0.7294117647058823,
+            "winrateStrict": 0.7294117647058823,
+            "expectancy": 0.18823529411764706,
+            "medianR": 1,
+            "stopRate": 0.27058823529411763,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 85,
+            "winrateVendorStyle": 0.6,
+            "winrateStrict": 0.6,
+            "expectancy": -0.1521176470588234,
+            "medianR": 0.57,
+            "stopRate": 0.4,
+            "partialBeRate": 0.29411764705882354,
+            "timeExitRate": 0,
+            "maxDrawdownR": 17.189999999999994
+          },
+          "control": {
+            "n": 85,
+            "winrateVendorStyle": 0.7058823529411765,
+            "winrateStrict": 0.7058823529411765,
+            "expectancy": 0.2141176470588237,
+            "medianR": 0.57,
+            "stopRate": 0.29411764705882354,
+            "partialBeRate": 0.3058823529411765,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12.019999999999996
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 85,
+            "winrateVendorStyle": 0.2,
+            "winrateStrict": 0.2,
+            "expectancy": -0.03529411764705882,
+            "medianR": 0,
+            "stopRate": 0.3176470588235294,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 17
+          },
+          "control": {
+            "n": 85,
+            "winrateVendorStyle": 0.29411764705882354,
+            "winrateStrict": 0.29411764705882354,
+            "expectancy": 0.3411764705882353,
+            "medianR": 0,
+            "stopRate": 0.27058823529411763,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 85,
+            "winrateVendorStyle": 0.47058823529411764,
+            "winrateStrict": 0.47058823529411764,
+            "expectancy": -0.11764705882352941,
+            "medianR": -2,
+            "stopRate": 0.5294117647058824,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16
+          },
+          "control": {
+            "n": 85,
+            "winrateVendorStyle": 0.5294117647058824,
+            "winrateStrict": 0.5176470588235295,
+            "expectancy": 0.10910663402719802,
+            "medianR": 2,
+            "stopRate": 0.4588235294117647,
+            "partialBeRate": 0,
+            "timeExitRate": 0.023529411764705882,
+            "maxDrawdownR": 16.877126171166193
+          }
+        }
+      }
+    },
+    {
+      "id": "btc-perp-1h-b2",
+      "inPool": false,
+      "n": 40,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 40,
+            "winrateVendorStyle": 0.425,
+            "winrateStrict": 0.425,
+            "expectancy": -0.15,
+            "medianR": -1,
+            "stopRate": 0.575,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 9
+          },
+          "control": {
+            "n": 40,
+            "winrateVendorStyle": 0.475,
+            "winrateStrict": 0.475,
+            "expectancy": -0.05,
+            "medianR": -1,
+            "stopRate": 0.525,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 40,
+            "winrateVendorStyle": 0.25,
+            "winrateStrict": 0.25,
+            "expectancy": -0.25,
+            "medianR": -1,
+            "stopRate": 0.75,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16
+          },
+          "control": {
+            "n": 40,
+            "winrateVendorStyle": 0.375,
+            "winrateStrict": 0.375,
+            "expectancy": 0.125,
+            "medianR": -1,
+            "stopRate": 0.625,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 5
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 40,
+            "winrateVendorStyle": 0.6,
+            "winrateStrict": 0.6,
+            "expectancy": -0.2,
+            "medianR": 1,
+            "stopRate": 0.4,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 16
+          },
+          "control": {
+            "n": 40,
+            "winrateVendorStyle": 0.7,
+            "winrateStrict": 0.7,
+            "expectancy": 0.1,
+            "medianR": 1,
+            "stopRate": 0.3,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 4
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 40,
+            "winrateVendorStyle": 0.575,
+            "winrateStrict": 0.575,
+            "expectancy": -0.22224999999999992,
+            "medianR": 0.57,
+            "stopRate": 0.425,
+            "partialBeRate": 0.275,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14.879999999999997
+          },
+          "control": {
+            "n": 40,
+            "winrateVendorStyle": 0.65,
+            "winrateStrict": 0.65,
+            "expectancy": 0.020499999999999907,
+            "medianR": 0.57,
+            "stopRate": 0.35,
+            "partialBeRate": 0.3,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 40,
+            "winrateVendorStyle": 0.2,
+            "winrateStrict": 0.2,
+            "expectancy": -0.2,
+            "medianR": 0,
+            "stopRate": 0.4,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 17
+          },
+          "control": {
+            "n": 40,
+            "winrateVendorStyle": 0.225,
+            "winrateStrict": 0.225,
+            "expectancy": 0.075,
+            "medianR": 0,
+            "stopRate": 0.3,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 40,
+            "winrateVendorStyle": 0.425,
+            "winrateStrict": 0.425,
+            "expectancy": -0.3,
+            "medianR": -2,
+            "stopRate": 0.575,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 20
+          },
+          "control": {
+            "n": 40,
+            "winrateVendorStyle": 0.55,
+            "winrateStrict": 0.55,
+            "expectancy": 0.2,
+            "medianR": 2,
+            "stopRate": 0.45,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          }
+        }
+      }
+    },
+    {
+      "id": "btc-perp-2h-b2",
+      "inPool": true,
+      "n": 43,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.4186046511627907,
+            "winrateStrict": 0.4186046511627907,
+            "expectancy": -0.16279069767441862,
+            "medianR": -1,
+            "stopRate": 0.5813953488372093,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 9
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.4186046511627907,
+            "winrateStrict": 0.4186046511627907,
+            "expectancy": -0.16279069767441862,
+            "medianR": -1,
+            "stopRate": 0.5813953488372093,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.27906976744186046,
+            "winrateStrict": 0.27906976744186046,
+            "expectancy": -0.16279069767441862,
+            "medianR": -1,
+            "stopRate": 0.7209302325581395,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.3488372093023256,
+            "winrateStrict": 0.3488372093023256,
+            "expectancy": 0.046511627906976744,
+            "medianR": -1,
+            "stopRate": 0.6511627906976745,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.627906976744186,
+            "winrateStrict": 0.627906976744186,
+            "expectancy": -0.11627906976744186,
+            "medianR": 1,
+            "stopRate": 0.37209302325581395,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 13
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.5116279069767442,
+            "winrateStrict": 0.5116279069767442,
+            "expectancy": -0.46511627906976744,
+            "medianR": 1,
+            "stopRate": 0.4883720930232558,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 22
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.627906976744186,
+            "winrateStrict": 0.627906976744186,
+            "expectancy": 0.03232558139534878,
+            "medianR": 0.57,
+            "stopRate": 0.37209302325581395,
+            "partialBeRate": 0.20930232558139536,
+            "timeExitRate": 0,
+            "maxDrawdownR": 9.870000000000001
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.5116279069767442,
+            "winrateStrict": 0.5116279069767442,
+            "expectancy": -0.3595348837209302,
+            "medianR": 0.57,
+            "stopRate": 0.4883720930232558,
+            "partialBeRate": 0.18604651162790697,
+            "timeExitRate": 0,
+            "maxDrawdownR": 19.88
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.20930232558139536,
+            "winrateStrict": 0.20930232558139536,
+            "expectancy": -0.11627906976744186,
+            "medianR": 0,
+            "stopRate": 0.37209302325581395,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.18604651162790697,
+            "winrateStrict": 0.18604651162790697,
+            "expectancy": -0.4186046511627907,
+            "medianR": 0,
+            "stopRate": 0.4883720930232558,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 24
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 43,
+            "winrateVendorStyle": 0.5813953488372093,
+            "winrateStrict": 0.5813953488372093,
+            "expectancy": 0.32558139534883723,
+            "medianR": 2,
+            "stopRate": 0.4186046511627907,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 43,
+            "winrateVendorStyle": 0.3953488372093023,
+            "winrateStrict": 0.3953488372093023,
+            "expectancy": -0.4186046511627907,
+            "medianR": -2,
+            "stopRate": 0.6046511627906976,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 26
+          }
+        }
+      }
+    },
+    {
+      "id": "ondo-perp-15m-b2",
+      "inPool": true,
+      "n": 63,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.6190476190476191,
+            "winrateStrict": 0.6190476190476191,
+            "expectancy": 0.23809523809523808,
+            "medianR": 1,
+            "stopRate": 0.38095238095238093,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 3
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.5714285714285714,
+            "winrateStrict": 0.5714285714285714,
+            "expectancy": 0.14285714285714285,
+            "medianR": 1,
+            "stopRate": 0.42857142857142855,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 5
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.3968253968253968,
+            "winrateStrict": 0.3968253968253968,
+            "expectancy": 0.19047619047619047,
+            "medianR": -1,
+            "stopRate": 0.6031746031746031,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.36507936507936506,
+            "winrateStrict": 0.36507936507936506,
+            "expectancy": 0.09523809523809523,
+            "medianR": -1,
+            "stopRate": 0.6349206349206349,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.7142857142857143,
+            "winrateStrict": 0.7142857142857143,
+            "expectancy": 0.14285714285714285,
+            "medianR": 1,
+            "stopRate": 0.2857142857142857,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 7
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.7301587301587301,
+            "winrateStrict": 0.7301587301587301,
+            "expectancy": 0.19047619047619047,
+            "medianR": 1,
+            "stopRate": 0.2698412698412698,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.6666666666666666,
+            "winrateStrict": 0.6666666666666666,
+            "expectancy": 0.0784126984126984,
+            "medianR": 0.57,
+            "stopRate": 0.3333333333333333,
+            "partialBeRate": 0.30158730158730157,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6.579999999999998
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.6825396825396826,
+            "winrateStrict": 0.6825396825396826,
+            "expectancy": 0.21444444444444447,
+            "medianR": 0.57,
+            "stopRate": 0.31746031746031744,
+            "partialBeRate": 0.2222222222222222,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15.43
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.2698412698412698,
+            "winrateStrict": 0.2698412698412698,
+            "expectancy": 0.23809523809523808,
+            "medianR": 0,
+            "stopRate": 0.2857142857142857,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.25396825396825395,
+            "winrateStrict": 0.25396825396825395,
+            "expectancy": 0.2222222222222222,
+            "medianR": 0,
+            "stopRate": 0.2698412698412698,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 63,
+            "winrateVendorStyle": 0.5238095238095238,
+            "winrateStrict": 0.5238095238095238,
+            "expectancy": 0.09523809523809523,
+            "medianR": 2,
+            "stopRate": 0.47619047619047616,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          },
+          "control": {
+            "n": 63,
+            "winrateVendorStyle": 0.5396825396825397,
+            "winrateStrict": 0.5396825396825397,
+            "expectancy": 0.15873015873015872,
+            "medianR": 2,
+            "stopRate": 0.4603174603174603,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 18
+          }
+        }
+      }
+    },
+    {
+      "id": "ondo-perp-1h-b2",
+      "inPool": true,
+      "n": 82,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.5365853658536586,
+            "winrateStrict": 0.5365853658536586,
+            "expectancy": 0.07317073170731707,
+            "medianR": 1,
+            "stopRate": 0.4634146341463415,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 5
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.5487804878048781,
+            "winrateStrict": 0.5487804878048781,
+            "expectancy": 0.0975609756097561,
+            "medianR": 1,
+            "stopRate": 0.45121951219512196,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.36585365853658536,
+            "winrateStrict": 0.36585365853658536,
+            "expectancy": 0.0975609756097561,
+            "medianR": -1,
+            "stopRate": 0.6341463414634146,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.32926829268292684,
+            "winrateStrict": 0.32926829268292684,
+            "expectancy": -0.012195121951219513,
+            "medianR": -1,
+            "stopRate": 0.6707317073170732,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.7195121951219512,
+            "winrateStrict": 0.7195121951219512,
+            "expectancy": 0.15853658536585366,
+            "medianR": 1,
+            "stopRate": 0.2804878048780488,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.6707317073170732,
+            "winrateStrict": 0.6707317073170732,
+            "expectancy": 0.012195121951219513,
+            "medianR": 1,
+            "stopRate": 0.32926829268292684,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.6829268292682927,
+            "winrateStrict": 0.6829268292682927,
+            "expectancy": 0.16975609756097562,
+            "medianR": 0.57,
+            "stopRate": 0.3170731707317073,
+            "partialBeRate": 0.2682926829268293,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8.43
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.5853658536585366,
+            "winrateStrict": 0.5853658536585366,
+            "expectancy": -0.17853658536585348,
+            "medianR": 0.57,
+            "stopRate": 0.4146341463414634,
+            "partialBeRate": 0.2682926829268293,
+            "timeExitRate": 0,
+            "maxDrawdownR": 20.76999999999999
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.2804878048780488,
+            "winrateStrict": 0.2804878048780488,
+            "expectancy": 0.2804878048780488,
+            "medianR": 0,
+            "stopRate": 0.2804878048780488,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 15
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.17073170731707318,
+            "winrateStrict": 0.17073170731707318,
+            "expectancy": -0.14634146341463414,
+            "medianR": 0,
+            "stopRate": 0.32926829268292684,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 20
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 82,
+            "winrateVendorStyle": 0.5487804878048781,
+            "winrateStrict": 0.5487804878048781,
+            "expectancy": 0.1951219512195122,
+            "medianR": 2,
+            "stopRate": 0.45121951219512196,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          },
+          "control": {
+            "n": 82,
+            "winrateVendorStyle": 0.43902439024390244,
+            "winrateStrict": 0.43902439024390244,
+            "expectancy": -0.24390243902439024,
+            "medianR": -2,
+            "stopRate": 0.5609756097560976,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 26
+          }
+        }
+      }
+    },
+    {
+      "id": "ondo-perp-2h-b2",
+      "inPool": true,
+      "n": 46,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.43478260869565216,
+            "winrateStrict": 0.43478260869565216,
+            "expectancy": -0.13043478260869565,
+            "medianR": -1,
+            "stopRate": 0.5652173913043478,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.4782608695652174,
+            "winrateStrict": 0.4782608695652174,
+            "expectancy": -0.043478260869565216,
+            "medianR": -1,
+            "stopRate": 0.5217391304347826,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.32608695652173914,
+            "winrateStrict": 0.32608695652173914,
+            "expectancy": -0.021739130434782608,
+            "medianR": -1,
+            "stopRate": 0.6739130434782609,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.34782608695652173,
+            "winrateStrict": 0.34782608695652173,
+            "expectancy": 0.043478260869565216,
+            "medianR": -1,
+            "stopRate": 0.6521739130434783,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.6304347826086957,
+            "winrateStrict": 0.6304347826086957,
+            "expectancy": -0.10869565217391304,
+            "medianR": 1,
+            "stopRate": 0.3695652173913043,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.6956521739130435,
+            "winrateStrict": 0.6956521739130435,
+            "expectancy": 0.08695652173913043,
+            "medianR": 1,
+            "stopRate": 0.30434782608695654,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.6304347826086957,
+            "winrateStrict": 0.6304347826086957,
+            "expectancy": 0.01152173913043472,
+            "medianR": 0.57,
+            "stopRate": 0.3695652173913043,
+            "partialBeRate": 0.2391304347826087,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8.440000000000001
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.6304347826086957,
+            "winrateStrict": 0.6304347826086957,
+            "expectancy": -0.03195652173913048,
+            "medianR": 0.57,
+            "stopRate": 0.3695652173913043,
+            "partialBeRate": 0.2826086956521739,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8.870000000000001
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.2391304347826087,
+            "winrateStrict": 0.2391304347826087,
+            "expectancy": -0.021739130434782608,
+            "medianR": 0,
+            "stopRate": 0.3695652173913043,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.2391304347826087,
+            "winrateStrict": 0.2391304347826087,
+            "expectancy": 0.10869565217391304,
+            "medianR": 0,
+            "stopRate": 0.30434782608695654,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 46,
+            "winrateVendorStyle": 0.5217391304347826,
+            "winrateStrict": 0.5217391304347826,
+            "expectancy": 0.08695652173913043,
+            "medianR": 2,
+            "stopRate": 0.4782608695652174,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.5217391304347826,
+            "winrateStrict": 0.5217391304347826,
+            "expectancy": 0.08695652173913043,
+            "medianR": 2,
+            "stopRate": 0.4782608695652174,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          }
+        }
+      }
+    },
+    {
+      "id": "bnb-perp-3m-b2",
+      "inPool": true,
+      "n": 45,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 45,
+            "winrateVendorStyle": 0.6666666666666666,
+            "winrateStrict": 0.6666666666666666,
+            "expectancy": 0.3333333333333333,
+            "medianR": 1,
+            "stopRate": 0.3333333333333333,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 5
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.5652173913043478,
+            "winrateStrict": 0.5652173913043478,
+            "expectancy": 0.13043478260869565,
+            "medianR": 1,
+            "stopRate": 0.43478260869565216,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 3
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 45,
+            "winrateVendorStyle": 0.5333333333333333,
+            "winrateStrict": 0.5333333333333333,
+            "expectancy": 0.6,
+            "medianR": 2,
+            "stopRate": 0.4666666666666667,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 5
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.41304347826086957,
+            "winrateStrict": 0.41304347826086957,
+            "expectancy": 0.2391304347826087,
+            "medianR": -1,
+            "stopRate": 0.5869565217391305,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 5
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 45,
+            "winrateVendorStyle": 0.7777777777777778,
+            "winrateStrict": 0.7777777777777778,
+            "expectancy": 0.3333333333333333,
+            "medianR": 1,
+            "stopRate": 0.2222222222222222,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 4
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.7391304347826086,
+            "winrateStrict": 0.7391304347826086,
+            "expectancy": 0.21739130434782608,
+            "medianR": 1,
+            "stopRate": 0.2608695652173913,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 5
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 45,
+            "winrateVendorStyle": 0.7555555555555555,
+            "winrateStrict": 0.7555555555555555,
+            "expectancy": 0.4973333333333334,
+            "medianR": 1.5699999999999998,
+            "stopRate": 0.24444444444444444,
+            "partialBeRate": 0.2,
+            "timeExitRate": 0,
+            "maxDrawdownR": 4
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.6956521739130435,
+            "winrateStrict": 0.6956521739130435,
+            "expectancy": 0.20086956521739135,
+            "medianR": 0.57,
+            "stopRate": 0.30434782608695654,
+            "partialBeRate": 0.2826086956521739,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6.009999999999998
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 45,
+            "winrateVendorStyle": 0.3111111111111111,
+            "winrateStrict": 0.3111111111111111,
+            "expectancy": 0.4888888888888889,
+            "medianR": 0,
+            "stopRate": 0.2222222222222222,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.1956521739130435,
+            "winrateStrict": 0.1956521739130435,
+            "expectancy": 0.06521739130434782,
+            "medianR": 0,
+            "stopRate": 0.2608695652173913,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 45,
+            "winrateVendorStyle": 0.6444444444444445,
+            "winrateStrict": 0.6444444444444445,
+            "expectancy": 0.5777777777777777,
+            "medianR": 2,
+            "stopRate": 0.35555555555555557,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          },
+          "control": {
+            "n": 46,
+            "winrateVendorStyle": 0.5652173913043478,
+            "winrateStrict": 0.5652173913043478,
+            "expectancy": 0.2608695652173913,
+            "medianR": 2,
+            "stopRate": 0.43478260869565216,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 8
+          }
+        }
+      }
+    },
+    {
+      "id": "sp500-cfd-1m-b2",
+      "inPool": true,
+      "n": 42,
+      "policies": {
+        "fixed_1to1": {
+          "labels": {
+            "n": 42,
+            "winrateVendorStyle": 0.4523809523809524,
+            "winrateStrict": 0.4523809523809524,
+            "expectancy": -0.09523809523809523,
+            "medianR": -1,
+            "stopRate": 0.5476190476190477,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 7
+          },
+          "control": {
+            "n": 42,
+            "winrateVendorStyle": 0.5714285714285714,
+            "winrateStrict": 0.5714285714285714,
+            "expectancy": 0.14285714285714285,
+            "medianR": 1,
+            "stopRate": 0.42857142857142855,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 7
+          }
+        },
+        "fixed_2to1": {
+          "labels": {
+            "n": 42,
+            "winrateVendorStyle": 0.30952380952380953,
+            "winrateStrict": 0.30952380952380953,
+            "expectancy": -0.07142857142857142,
+            "medianR": -1,
+            "stopRate": 0.6904761904761905,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 14
+          },
+          "control": {
+            "n": 42,
+            "winrateVendorStyle": 0.3333333333333333,
+            "winrateStrict": 0.3333333333333333,
+            "expectancy": 0,
+            "medianR": -1,
+            "stopRate": 0.6666666666666666,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          }
+        },
+        "wide_1to2": {
+          "labels": {
+            "n": 42,
+            "winrateVendorStyle": 0.6904761904761905,
+            "winrateStrict": 0.6904761904761905,
+            "expectancy": 0.07142857142857142,
+            "medianR": 1,
+            "stopRate": 0.30952380952380953,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 6
+          },
+          "control": {
+            "n": 42,
+            "winrateVendorStyle": 0.7142857142857143,
+            "winrateStrict": 0.7142857142857143,
+            "expectancy": 0.14285714285714285,
+            "medianR": 1,
+            "stopRate": 0.2857142857142857,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          }
+        },
+        "partial_be": {
+          "labels": {
+            "n": 42,
+            "winrateVendorStyle": 0.6666666666666666,
+            "winrateStrict": 0.6666666666666666,
+            "expectancy": 0.04666666666666657,
+            "medianR": 0.57,
+            "stopRate": 0.3333333333333333,
+            "partialBeRate": 0.3333333333333333,
+            "timeExitRate": 0,
+            "maxDrawdownR": 4.870000000000001
+          },
+          "control": {
+            "n": 42,
+            "winrateVendorStyle": 0.6904761904761905,
+            "winrateStrict": 0.6904761904761905,
+            "expectancy": 0.06023809523809533,
+            "medianR": 0.57,
+            "stopRate": 0.30952380952380953,
+            "partialBeRate": 0.40476190476190477,
+            "timeExitRate": 0,
+            "maxDrawdownR": 12
+          }
+        },
+        "be_only": {
+          "labels": {
+            "n": 42,
+            "winrateVendorStyle": 0.19047619047619047,
+            "winrateStrict": 0.19047619047619047,
+            "expectancy": -0.047619047619047616,
+            "medianR": 0,
+            "stopRate": 0.30952380952380953,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 11
+          },
+          "control": {
+            "n": 42,
+            "winrateVendorStyle": 0.16666666666666666,
+            "winrateStrict": 0.16666666666666666,
+            "expectancy": -0.07142857142857142,
+            "medianR": 0,
+            "stopRate": 0.2857142857142857,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 17
+          }
+        },
+        "time_stop": {
+          "labels": {
+            "n": 42,
+            "winrateVendorStyle": 0.5,
+            "winrateStrict": 0.5,
+            "expectancy": 0,
+            "medianR": 0,
+            "stopRate": 0.5,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 10
+          },
+          "control": {
+            "n": 42,
+            "winrateVendorStyle": 0.47619047619047616,
+            "winrateStrict": 0.47619047619047616,
+            "expectancy": -0.09523809523809523,
+            "medianR": -2,
+            "stopRate": 0.5238095238095238,
+            "partialBeRate": 0,
+            "timeExitRate": 0,
+            "maxDrawdownR": 18
+          }
+        }
+      }
+    }
+  ]
+}
