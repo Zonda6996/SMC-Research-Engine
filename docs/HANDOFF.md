@@ -10,7 +10,7 @@ This file is the general entry point. Use the specialized documents instead of t
 - `SPEC.md` — active mechanical system, confirmed research and negative knowledge.
 - `docs/INDICATOR-RESEARCH-HANDOFF.md` — full Zonda Apex/Reversal reconstruction handoff.
 - `ci-results/README.md` — canonical research artifact index.
-- `docs/V0-CLAUDE-PROMPT.md` — ready-to-paste prompt for Claude Fable 5 in v0.app.
+- `docs/CLAUDE-GGI-NEXT-DISCOVERY-PROMPT.md` — актуальный ready-to-paste brief для следующего независимого GGI research cycle.
 - `docs/DESIGN-SYSTEM.md` — canonical visualizer UI contract.
 
 ## Current priorities

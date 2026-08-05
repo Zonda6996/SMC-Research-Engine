@@ -1,7 +1,7 @@
 # Согласованный план продолжения Reversal
 
 Дата: 2026-08-02  
-Текущая ветка: `research/episode-age-hazard`
+Текущая ветка на момент исторического этапа: `research/htf-gap-falsification` (этап завершён; старые локальные research branches очищены)
 
 ## Цель текущего этапа
 
@@ -11,7 +11,7 @@
 
 Только два действия:
 
-1. Передать Claude Fable 5 полный prompt из `docs/CLAUDE-H2-H3-CORRECTION-PROMPT.md` в том чате, где у него есть GitHub-доступ.
+1. Этот H2/H3 этап завершён и сохранён как исторический план. Для нового GGI цикла использовать только `docs/CLAUDE-GGI-NEXT-DISCOVERY-PROMPT.md`.
 2. После завершения Claude прислать Sol:
    - название ветки;
    - commit hashes;
