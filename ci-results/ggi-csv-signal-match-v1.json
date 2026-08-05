@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-08-03",
+  "timezone": "+05:00",
+  "formulaStatus": "diagnostic_candidate_not_identified",
+  "candidate": {
+    "formula": "safeStopDistance = 12.3 * SMA(TrueRange, 55)",
+    "meanObservedMultiplier": 12.291783009421197,
+    "coefficientOfVariation": 0.01849289045054633,
+    "warning": "Only four matched setups with screenshot-rounded levels; validate without refitting on new setups."
+  },
+  "matches": [
+    {
+      "asset": "ONDOUSDT.P",
+      "feed": "BYBIT.P",
+      "timeframe": "15m",
+      "signalTime": "2026-08-03T08:45:00+05:00",
+      "direction": "BUY",
+      "shape0Buy": true,
+      "shape1Sell": false,
+      "ohlc": {"open": 0.3704, "high": 0.3734, "low": 0.3685, "close": 0.3716},
+      "ggi": {"mean": 0.3849313939441824, "upperOuter": 0.40469044707649, "upperInner": 0.39633714590005065, "lowerInner": 0.37385387561219857, "lowerOuter": 0.3661370786343407},
+      "screenshotSafe": {"entry": 0.3715, "stop": 0.3459, "distance": 0.0256},
+      "atr55SmaTrueRange": 0.002089090909090912,
+      "distanceOverAtr55": 12.254134029590933,
+      "prediction12_3": 0.02569581818181822,
+      "predictionErrorPct": 0.3742897727274208
+    },
+    {
+      "asset": "AVAXUSDT.P",
+      "feed": "BYBIT.P",
+      "timeframe": "1h",
+      "signalTime": "2026-08-02T02:00:00+05:00",
+      "direction": "BUY",
+      "shape0Buy": true,
+      "shape1Sell": false,
+      "ohlc": {"open": 6.145, "high": 6.188, "low": 6.143, "close": 6.183},
+      "ggi": {"mean": 6.430205355956806, "upperOuter": 6.943192715568117, "upperInner": 6.724653261250575, "lowerInner": 6.148650244620382, "lowerOuter": 5.955119296496784},
+      "screenshotSafe": {"entry": 6.184, "stop": 5.563, "distance": 0.621},
+      "atr55SmaTrueRange": 0.04978181818181817,
+      "distanceOverAtr55": 12.474433893352815,
+      "prediction12_3": 0.6123163636363635,
+      "predictionErrorPct": -1.3983311374615837
+    },
+    {
+      "asset": "LTCUSDT.P",
+      "feed": "BYBIT.P",
+      "timeframe": "2h",
+      "signalTime": "2026-08-02T05:00:00+05:00",
+      "direction": "BUY",
+      "shape0Buy": true,
+      "shape1Sell": false,
+      "ohlc": {"open": 44.21, "high": 44.67, "low": 44.1, "close": 44.54},
+      "ggi": {"mean": 45.851790153870866, "upperOuter": 49.917867010872115, "upperInner": 48.1815907973278, "lowerInner": 43.6346460447547, "lowerOuter": 42.116916971967356},
+      "screenshotSafe": {"entry": 44.54, "stop": 39.45, "distance": 5.09},
+      "atr55SmaTrueRange": 0.4070909090909092,
+      "distanceOverAtr55": 12.503349709691822,
+      "prediction12_3": 5.007218181818184,
+      "predictionErrorPct": -1.6263618503303823
+    },
+    {
+      "asset": "BNBUSDT",
+      "feed": "BINANCE SPOT",
+      "timeframe": "15m",
+      "signalTime": "2026-08-03T03:45:00+05:00",
+      "direction": "SELL",
+      "shape0Buy": false,
+      "shape1Sell": true,
+      "ohlc": {"open": 588.69, "high": 588.81, "low": 588.25, "close": 588.33},
+      "ggi": {"mean": 583.5514653299068, "upperOuter": 593.4178024493037, "upperInner": 589.2867163261053, "lowerInner": 577.872032839502, "lowerOuter": 573.8491688034139},
+      "screenshotSafe": {"entry": 588.33, "stop": 600.02, "distance": 11.69},
+      "atr55SmaTrueRange": 0.9794545454545435,
+      "distanceOverAtr55": 11.935214405049216,
+      "prediction12_3": 12.047290909090885,
+      "predictionErrorPct": 3.0563807450032954
+    }
+  ]
+}

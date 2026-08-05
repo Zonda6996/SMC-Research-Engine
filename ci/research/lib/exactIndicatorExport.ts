@@ -47,6 +47,12 @@ export interface ExactIndicatorDataset {
 	rows: ExactIndicatorRow[]
 }
 
+export interface ExactIndicatorParseOptions {
+	expectedTimeframeMs?: number
+	allowIrregularBars?: boolean
+	allowInvalidBandOrder?: boolean
+}
+
 const HERE = dirname(fileURLToPath(import.meta.url))
 export const DEFAULT_EXACT_EXPORT_DIR = resolve(HERE, '../../../data/vendor-exports')
 
@@ -66,27 +72,43 @@ export function sha256File(path: string): string {
 	return createHash('sha256').update(readFileSync(path)).digest('hex')
 }
 
-export function parseExactIndicatorCsv(text: string, expectedTimeframeMs?: number): ExactIndicatorRow[] {
-	const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0)
+export function parseExactIndicatorCsv(
+	text: string,
+	expectedTimeframeOrOptions?: number | ExactIndicatorParseOptions,
+): ExactIndicatorRow[] {
+	const options = typeof expectedTimeframeOrOptions === 'number'
+		? { expectedTimeframeMs: expectedTimeframeOrOptions }
+		: expectedTimeframeOrOptions ?? {}
+	const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter((line) => line.trim().length > 0)
 	if (lines.length < 2) throw new Error('Exact indicator export is empty')
 	const header = lines[0]!.split(',')
 	const fullHeader = ['time', 'open', 'high', 'low', 'close', 'GGI Mean', 'GGI Upper Outer', 'GGI Upper Inner', 'GGI Lower Inner', 'GGI Lower Outer', 'Shapes', 'Shapes']
 	const legacyHeader = ['time', 'open', 'high', 'low', 'close', 'GGI Mean', 'GGI Upper Inner', 'GGI Lower Inner', 'Shapes', 'Shapes']
-	const sameHeader = (expected: string[]) => header.length === expected.length && header.every((value, i) => value === expected[i])
-	const hasExportedOuter = sameHeader(fullHeader)
-	if (!hasExportedOuter && !sameHeader(legacyHeader)) throw new Error(`Unexpected exact indicator CSV header: ${header.join(',')}`)
-	const expectedColumns = hasExportedOuter ? fullHeader.length : legacyHeader.length
+	const withoutVolume = header.at(-1) === 'Volume' ? header.slice(0, -1) : header
+	const hasExportedOuter = withoutVolume.length === fullHeader.length && withoutVolume.every((value, i) => value === fullHeader[i])
+	const isLegacy = withoutVolume.length === legacyHeader.length && withoutVolume.every((value, i) => value === legacyHeader[i])
+	if (!hasExportedOuter && !isLegacy) throw new Error(`Unexpected exact indicator CSV header: ${header.join(',')}`)
+	const hasVolume = header.length === withoutVolume.length + 1
+	const expectedColumns = withoutVolume.length + (hasVolume ? 1 : 0)
 	const rows: ExactIndicatorRow[] = []
 	let previousTimestamp = -Infinity
 	for (let i = 1; i < lines.length; i++) {
 		const lineNumber = i + 1
 		const fields = lines[i]!.split(',')
 		if (fields.length !== expectedColumns) throw new Error(`Expected ${expectedColumns} columns at line ${lineNumber}, got ${fields.length}`)
-		const timestamp = finite(fields[0]!, 'time', lineNumber) * 1000
-		if (!Number.isInteger(timestamp)) throw new Error(`Timestamp is not whole milliseconds at line ${lineNumber}`)
+		const numericSeconds = Number(fields[0])
+		const timestamp = Number.isFinite(numericSeconds)
+			? numericSeconds * 1000
+			: Date.parse(fields[0]!)
+		if (!Number.isInteger(timestamp)) throw new Error(`Invalid timestamp at line ${lineNumber}: ${fields[0]}`)
 		if (timestamp <= previousTimestamp) throw new Error(`Timestamps are not strictly increasing at line ${lineNumber}`)
-		if (expectedTimeframeMs != null && rows.length > 0 && timestamp - previousTimestamp !== expectedTimeframeMs) {
-			throw new Error(`Missing or irregular bar at line ${lineNumber}: expected ${expectedTimeframeMs}ms, got ${timestamp - previousTimestamp}ms`)
+		if (
+			options.expectedTimeframeMs != null
+			&& rows.length > 0
+			&& timestamp - previousTimestamp !== options.expectedTimeframeMs
+			&& !options.allowIrregularBars
+		) {
+			throw new Error(`Missing or irregular bar at line ${lineNumber}: expected ${options.expectedTimeframeMs}ms, got ${timestamp - previousTimestamp}ms`)
 		}
 		const mean = finite(fields[5]!, 'mean', lineNumber)
 		const upperInner = finite(fields[hasExportedOuter ? 7 : 6]!, 'upperInner', lineNumber)
@@ -98,7 +120,7 @@ export function parseExactIndicatorCsv(text: string, expectedTimeframeMs?: numbe
 			high: finite(fields[2]!, 'high', lineNumber),
 			low: finite(fields[3]!, 'low', lineNumber),
 			close: finite(fields[4]!, 'close', lineNumber),
-			volume: 0,
+			volume: hasVolume ? finite(fields.at(-1)!, 'volume', lineNumber) : 0,
 			mean,
 			upperOuter: hasExportedOuter ? finite(fields[6]!, 'upperOuter', lineNumber) : mean * Math.exp(Math.log(upperInner / mean) * outerRatio),
 			upperInner,
@@ -108,7 +130,10 @@ export function parseExactIndicatorCsv(text: string, expectedTimeframeMs?: numbe
 			sell: label(fields[hasExportedOuter ? 11 : 9]!, 'Shape1/SELL', lineNumber),
 		}
 		if (row.low > row.high) throw new Error(`Low exceeds high at line ${lineNumber}`)
-		if (row.lowerOuter >= row.lowerInner || row.lowerInner >= row.mean || row.mean >= row.upperInner || row.upperInner >= row.upperOuter) throw new Error(`Invalid band order at line ${lineNumber}`)
+		if (
+			!options.allowInvalidBandOrder
+			&& (row.lowerOuter >= row.lowerInner || row.lowerInner >= row.mean || row.mean >= row.upperInner || row.upperInner >= row.upperOuter)
+		) throw new Error(`Invalid band order at line ${lineNumber}`)
 		if (row.buy && row.sell) throw new Error(`BUY and SELL are both set at line ${lineNumber}`)
 		rows.push(row)
 		previousTimestamp = timestamp
