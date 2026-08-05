@@ -7,8 +7,11 @@
  *  - partialFrac: 0.25 (GGI-style) | 0.5
  *  - breakeven after partial: no (GGI-style) | yes (stop -> avg entry)
  *  - stopMult: 8 | 10 | 12 (x TR55, static)
- *  - add-on: none (GGI table match) | add 1x initial size at entry - 0.5 x stopDist
- *    (approximation of the frozen "add" line; R stays denominated in INITIAL risk)
+ *  - add-on: none (GGI table match) | SPLIT ENTRY per Nikita: 50% of planned
+ *    size at signal, 50% at the add line (entry - 0.5 x stopDist). R is
+ *    denominated in PLANNED FULL risk = 0.5x(entry-stop) + 0.5x(add-stop)
+ *    = 0.75 x stopDist, so a post-add stop costs exactly -1R and a pre-add
+ *    stop costs -0.667R (only half the size was deployed).
  *
  * Base semantics inherited from DM3 V2: entry next bar open, adverse-first,
  * partial at moving Mean wick, full at static signal-bar opposite-Inner wick.
@@ -51,23 +54,26 @@ export function replayVar1Trade(
 	if (signal == null || entryRow == null || vol == null || vol <= 0 || !validGgiBand(signal) || !validGgiBand(entryRow)) return null
 	const entryPrice = entryRow.open
 	const stopDistance = vol * cfg.stopMult
-	const initialRiskPct = (stopDistance / entryPrice) * 100
 	const staticTp = side === 1 ? signal.upperInner : signal.lowerInner
 	const addLevel = entryPrice - side * 0.5 * stopDistance
+	// Split-entry risk denominator (see header): without ADD the whole planned
+	// size enters at signal (risk = stopDist); with ADD, 0.5 at entry + 0.5 at
+	// the add line (planned risk = 0.75 x stopDist, post-add stop = -1R).
+	const plannedRiskPct = ((cfg.addOn ? 0.75 * stopDistance : stopDistance) / entryPrice) * 100
 
 	let stop = entryPrice - side * stopDistance
 	let partialDone = false
 	let addDone = false
 	let realisedPct = 0
-	// weights are in units of INITIAL position size; add-on brings +1 unit
-	let activeWeight = 1
+	// weights are fractions of PLANNED FULL size
+	let activeWeight = cfg.addOn ? 0.5 : 1
 	let avgEntry = entryPrice
 
 	const pnlPct = (to: number, w: number, from: number) => ((side * (to - from)) / entryPrice) * w * 100
 
 	const finish = (outcome: Var1Trade['outcome'], exitPrice: number): Var1Trade => ({
 		outcome,
-		grossR: (realisedPct + pnlPct(exitPrice, activeWeight, avgEntry)) / initialRiskPct,
+		grossR: (realisedPct + pnlPct(exitPrice, activeWeight, avgEntry)) / plannedRiskPct,
 	})
 
 	for (let i = signalIndex + 1; i < rows.length; i++) {
@@ -75,8 +81,8 @@ export function replayVar1Trade(
 		if (!validGgiBand(bar)) continue
 		// 0) add-on BEFORE stop check only if the add level is hit while the stop is NOT
 		if (cfg.addOn && !addDone && advWick(side, bar, addLevel) && !advWick(side, bar, stop)) {
-			avgEntry = (avgEntry * activeWeight + addLevel * 1) / (activeWeight + 1)
-			activeWeight += 1
+			avgEntry = (avgEntry * activeWeight + addLevel * 0.5) / (activeWeight + 0.5)
+			activeWeight += 0.5
 			addDone = true
 		}
 		// 1) adverse first: stop (conservative)
@@ -178,8 +184,8 @@ async function main() {
 	md.push('')
 	md.push('EXPLORATORY: no pre-registration, winners are overfit until confirmed on fresh data.')
 	md.push('Config key: P<partial%>[+BE]/S<stopMult>[+ADD]. Base = P25/S12 (GGI-style DM3 V2).')
-	md.push('ADD = 1x initial size added at entry - 0.5 x stopDist (approximation of the frozen add line);')
-	md.push('R stays denominated in INITIAL risk, so ADD configs can lose ~1.5R on a stop.')
+	md.push('ADD = SPLIT ENTRY: 50% planned size at signal + 50% at entry - 0.5 x stopDist;')
+	md.push('R denominated in planned full risk: post-add stop = -1R, pre-add stop = -0.667R.')
 	md.push('')
 	for (const src of ['arrows', 'own1'] as const) {
 		md.push(`## Pooled across all 5 datasets - ${src.toUpperCase()}`)
