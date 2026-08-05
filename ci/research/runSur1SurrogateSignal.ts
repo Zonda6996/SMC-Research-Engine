@@ -143,13 +143,23 @@ function loadDataset(path: string) {
 }
 
 async function main() {
-	// Amendment 1: BTC 2h full20k and XRP 3m exports lack a volume column -> VOID
-	// for the volume-gated surrogate; calibration re-based to BTC 15m (has volume).
-	const CALIB = 'data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_15m.csv'
-	const OOS = [
-		{ id: 'ondo-2h', file: 'data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_2h.csv' },
-		{ id: 'ondo-15m', file: 'data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_15m.csv' },
-	]
+	// Deferred decisive run (sur1-deferred-run-preregistration.md): volume
+	// re-exports received; calibration back on BTC 2h per original prereg.
+	// SUR1_MODE=deferred selects it; default remains the amendment-1 layout.
+	const deferred = process.env.SUR1_MODE === 'deferred'
+	const CALIB = deferred
+		? 'data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_2h_full20k_vol.csv'
+		: 'data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_15m.csv'
+	const OOS = deferred
+		? [
+			{ id: 'xrp-3m', file: 'data/vendor-exports/incoming-2026-08/BINANCE_XRPUSDT_3m_vol.csv' },
+			{ id: 'ondo-2h', file: 'data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_2h.csv' },
+			{ id: 'ondo-15m', file: 'data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_15m.csv' },
+		]
+		: [
+			{ id: 'ondo-2h', file: 'data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_2h.csv' },
+			{ id: 'ondo-15m', file: 'data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_15m.csv' },
+		]
 	const rng = mulberry32(SEED)
 
 	// Phase 1: calibration
@@ -217,7 +227,7 @@ async function main() {
 	md.push('')
 	md.push('Pre-registration: `sur1-surrogate-signal-preregistration.md`. DM3 V2 exits everywhere; capture C = (sur - rand) / (arrows - rand).')
 	md.push('')
-	md.push(`## Calibration - BTC.P 2h (arrows: n=${arrowsEval.n}, meanR=${arrowsEval.meanR.toFixed(4)}, WR=${(arrowsEval.wr * 100).toFixed(1)}%; random @ arrow-n: ${calibRandom.mean.toFixed(4)} [${calibRandom.p5.toFixed(4)}..${calibRandom.p95.toFixed(4)}])`)
+	md.push(`## Calibration - ${deferred ? 'BTC.P 2h full20k (vol re-export)' : 'BTC.P 15m (amendment 1)'} (arrows: n=${arrowsEval.n}, meanR=${arrowsEval.meanR.toFixed(4)}, WR=${(arrowsEval.wr * 100).toFixed(1)}%; random @ arrow-n: ${calibRandom.mean.toFixed(4)} [${calibRandom.p5.toFixed(4)}..${calibRandom.p95.toFixed(4)}])`)
 	md.push('')
 	md.push('| rule | n | mean R | WR | capture C |')
 	md.push('|---|---|---|---|---|')
@@ -241,8 +251,9 @@ async function main() {
 	md.push('## Pre-registered verdict')
 	md.push('')
 	md.push(`**${verdict}**`)
-	writeFileSync(resolve('ci-results/sur1-surrogate-signal.md'), md.join('\n'))
-	writeFileSync(resolve('ci-results/sur1-surrogate-signal.json'), JSON.stringify({
+	const outBase = deferred ? 'sur1-deferred-decisive' : 'sur1-surrogate-signal'
+	writeFileSync(resolve(`ci-results/${outBase}.md`), md.join('\n'))
+	writeFileSync(resolve(`ci-results/${outBase}.json`), JSON.stringify({
 		shaCalib: sha256File(resolve(CALIB)),
 		config: { cooldown: COOLDOWN, draws: RANDOM_DRAWS, seed: SEED },
 		arrows: arrowsEval, calibRandom, rules, winner: winner?.name ?? null, oos: oosResults, pooledCapture, verdict,
