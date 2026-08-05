@@ -203,8 +203,8 @@ async function main() {
 	for (const ds of DATASETS) {
 		const p2h = resolve('data/vendor-exports', ds.f2h)
 		const p15 = resolve('data/vendor-exports', ds.f15)
-		const rows2h = parseExactIndicatorCsv(readFileSync(p2h, 'utf8'))
-		const rows15m = parseExactIndicatorCsv(readFileSync(p15, 'utf8'))
+		const rows2h = parseExactIndicatorCsv(readFileSync(p2h, 'utf8'), { allowInvalidBandOrder: true })
+		const rows15m = parseExactIndicatorCsv(readFileSync(p15, 'utf8'), { allowInvalidBandOrder: true })
 		const ltf = buildLtfMap(rows2h, rows15m)
 		const violationShare = ltf.coveredBars > 0 ? ltf.violations / ltf.coveredBars : 1
 		console.log(`[${ds.id}] covered=${ltf.coveredBars} aligned=${ltf.alignedBars} violations=${ltf.violations} (${(violationShare * 100).toFixed(2)}%)`)
