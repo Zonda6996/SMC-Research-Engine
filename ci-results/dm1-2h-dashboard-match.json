@@ -1,0 +1,74 @@
+{
+  "sha2h": "f2d6e56db50a34a649cee5950ab38c74368f9594342b5ecaec1fe87d3d940c52",
+  "config": {
+    "stopMult": 12,
+    "warmup": 100
+  },
+  "signals": 42,
+  "results": {
+    "optimistic-initial-stop": {
+      "model": {
+        "long": {
+          "trades": 20,
+          "partial": 4,
+          "stop": 2,
+          "full": 14,
+          "end": 1
+        },
+        "short": {
+          "trades": 20,
+          "partial": 4,
+          "stop": 1,
+          "full": 15,
+          "end": 1
+        }
+      },
+      "d": 29.76979039479039,
+      "wr": 0.925,
+      "meanR": 0.06460586570608735
+    },
+    "next-bar-blended-be": {
+      "model": {
+        "long": {
+          "trades": 21,
+          "partial": 16,
+          "stop": 2,
+          "full": 3,
+          "end": 0
+        },
+        "short": {
+          "trades": 21,
+          "partial": 17,
+          "stop": 1,
+          "full": 3,
+          "end": 0
+        }
+      },
+      "d": 45.84386446886447,
+      "wr": 0.9285714285714286,
+      "meanR": 0.04349977471599523
+    },
+    "next-bar-entry-be": {
+      "model": {
+        "long": {
+          "trades": 21,
+          "partial": 16,
+          "stop": 2,
+          "full": 3,
+          "end": 0
+        },
+        "short": {
+          "trades": 21,
+          "partial": 17,
+          "stop": 1,
+          "full": 3,
+          "end": 0
+        }
+      },
+      "d": 45.84386446886447,
+      "wr": 0.9285714285714286,
+      "meanR": 0.04349977471599523
+    }
+  },
+  "verdict": "NO MATCH: best optimistic-initial-stop D=29.77 > 12"
+}
