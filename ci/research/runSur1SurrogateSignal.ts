@@ -143,10 +143,10 @@ function loadDataset(path: string) {
 }
 
 async function main() {
-	const CALIB = 'data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_2h_full20k.csv'
+	// Amendment 1: BTC 2h full20k and XRP 3m exports lack a volume column -> VOID
+	// for the volume-gated surrogate; calibration re-based to BTC 15m (has volume).
+	const CALIB = 'data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_15m.csv'
 	const OOS = [
-		{ id: 'xrp-3m', file: 'data/vendor-exports/incoming-2026-08/BINANCE_XRPUSDT_3m.csv' },
-		{ id: 'btc-15m', file: 'data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_15m.csv' },
 		{ id: 'ondo-2h', file: 'data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_2h.csv' },
 		{ id: 'ondo-15m', file: 'data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_15m.csv' },
 	]
@@ -154,6 +154,7 @@ async function main() {
 
 	// Phase 1: calibration
 	const c = loadDataset(resolve(CALIB))
+	if (!c.rows.some((r) => r.volume > 0)) throw new Error('calibration dataset has no volume data - aborting (SUR1 amendment 1)')
 	const arrowsEval = evalSignals(c.rows, c.tr55, c.arrows)
 	const nArrows = c.arrows.length
 	const rules: Array<{ name: string; stretch: Stretch; k: number; n: number; meanR: number; wr: number; capture: number; qualified: boolean }> = []
