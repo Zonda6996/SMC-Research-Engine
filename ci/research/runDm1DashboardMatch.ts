@@ -48,7 +48,7 @@ export function tally(outcomes: Array<{ side: CorrectedGgiSide; outcome: Correct
 }
 
 async function main() {
-	const path = resolve('data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_2h.csv')
+	const path = resolve(process.env.DM_DATA ?? 'data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_2h.csv')
 	const rows = parseExactIndicatorCsv(readFileSync(path, 'utf8'), { allowInvalidBandOrder: true })
 	const tr55 = trueRangeSma(rows, 55)
 	const signals: Array<{ idx: number; side: CorrectedGgiSide }> = []
@@ -111,8 +111,9 @@ async function main() {
 	md.push('## Pre-registered verdict')
 	md.push('')
 	md.push(`**${verdict}**`)
-	writeFileSync(resolve('ci-results/dm1-2h-dashboard-match.md'), md.join('\n'))
-	writeFileSync(resolve('ci-results/dm1-2h-dashboard-match.json'), JSON.stringify({ sha2h: sha256File(path), config: { stopMult: STOP_MULT, warmup: WARMUP }, signals: signals.length, results, verdict }, null, 2))
+	const outBase = process.env.DM_OUT ?? 'dm1-2h-dashboard-match'
+	writeFileSync(resolve(`ci-results/${outBase}.md`), md.join('\n'))
+	writeFileSync(resolve(`ci-results/${outBase}.json`), JSON.stringify({ sha2h: sha256File(path), config: { stopMult: STOP_MULT, warmup: WARMUP }, signals: signals.length, results, verdict }, null, 2))
 	for (const b of BOUNDS) console.log(`${b}: D=${results[b]!.d.toFixed(2)} WR=${(results[b]!.wr * 100).toFixed(1)}%`)
 	console.log(`VERDICT: ${verdict}`)
 }
