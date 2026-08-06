@@ -1,0 +1,1588 @@
+{
+ "agg": {
+  "safe": {
+   "n": 695,
+   "stop": 172,
+   "pStop": 126,
+   "pBe": 138,
+   "full": 225,
+   "open": 34,
+   "sumR": -105.71111274856597,
+   "nR": 661,
+   "addFills": 440
+  },
+  "risk": {
+   "n": 695,
+   "stop": 200,
+   "pStop": 147,
+   "pBe": 103,
+   "full": 213,
+   "open": 32,
+   "sumR": -114.96095708153251,
+   "nR": 663,
+   "addFills": 473
+  }
+ },
+ "perSeries": [
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 7,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 1,
+    "full": 3,
+    "open": 2,
+    "sumR": 5.144317489879175,
+    "nR": 5,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 7,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 1,
+    "full": 3,
+    "open": 2,
+    "sumR": 6.152207436458906,
+    "nR": 5,
+    "addFills": 5
+   }
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 12,
+    "stop": 5,
+    "pStop": 2,
+    "pBe": 3,
+    "full": 2,
+    "open": 0,
+    "sumR": -8.94213234984633,
+    "nR": 12,
+    "addFills": 10
+   },
+   "risk": {
+    "n": 12,
+    "stop": 5,
+    "pStop": 2,
+    "pBe": 2,
+    "full": 3,
+    "open": 0,
+    "sumR": -3.354372334256036,
+    "nR": 12,
+    "addFills": 11
+   }
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 7,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 4,
+    "open": 0,
+    "sumR": 4.417633019395133,
+    "nR": 7,
+    "addFills": 2
+   },
+   "risk": {
+    "n": 7,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 4,
+    "open": 0,
+    "sumR": 11.660845551532077,
+    "nR": 7,
+    "addFills": 4
+   }
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 8,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 2,
+    "open": 0,
+    "sumR": -6.102996425960732,
+    "nR": 8,
+    "addFills": 4
+   },
+   "risk": {
+    "n": 8,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 2,
+    "open": 0,
+    "sumR": -4.327968084331563,
+    "nR": 8,
+    "addFills": 4
+   }
+  },
+  {
+   "symbol": "APEUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 6,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 3,
+    "full": 2,
+    "open": 0,
+    "sumR": 3.4662154075848615,
+    "nR": 6,
+    "addFills": 3
+   },
+   "risk": {
+    "n": 6,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 3,
+    "full": 2,
+    "open": 0,
+    "sumR": 4.5742041554863215,
+    "nR": 6,
+    "addFills": 3
+   }
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 1,
+    "pBe": 3,
+    "full": 0,
+    "open": 0,
+    "sumR": -3.8708285808224883,
+    "nR": 5,
+    "addFills": 3
+   },
+   "risk": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 0,
+    "open": 1,
+    "sumR": -3.835370962975164,
+    "nR": 4,
+    "addFills": 4
+   }
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 19,
+    "stop": 5,
+    "pStop": 4,
+    "pBe": 6,
+    "full": 3,
+    "open": 1,
+    "sumR": -11.236583015963504,
+    "nR": 18,
+    "addFills": 11
+   },
+   "risk": {
+    "n": 19,
+    "stop": 7,
+    "pStop": 2,
+    "pBe": 5,
+    "full": 4,
+    "open": 1,
+    "sumR": -6.722809321438861,
+    "nR": 18,
+    "addFills": 13
+   }
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 2,
+    "open": 1,
+    "sumR": -1.2929905178637577,
+    "nR": 4,
+    "addFills": 3
+   },
+   "risk": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 2,
+    "open": 1,
+    "sumR": 0.00012666775344949421,
+    "nR": 4,
+    "addFills": 3
+   }
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 13,
+    "stop": 2,
+    "pStop": 2,
+    "pBe": 2,
+    "full": 6,
+    "open": 1,
+    "sumR": 10.512296233632425,
+    "nR": 12,
+    "addFills": 7
+   },
+   "risk": {
+    "n": 13,
+    "stop": 2,
+    "pStop": 5,
+    "pBe": 1,
+    "full": 5,
+    "open": 0,
+    "sumR": 24.604662407798767,
+    "nR": 13,
+    "addFills": 9
+   }
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 8,
+    "stop": 4,
+    "pStop": 0,
+    "pBe": 0,
+    "full": 4,
+    "open": 0,
+    "sumR": -2.4465664118641683,
+    "nR": 8,
+    "addFills": 4
+   },
+   "risk": {
+    "n": 8,
+    "stop": 4,
+    "pStop": 0,
+    "pBe": 0,
+    "full": 4,
+    "open": 0,
+    "sumR": -1.3108843540118906,
+    "nR": 8,
+    "addFills": 4
+   }
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 21,
+    "stop": 8,
+    "pStop": 12,
+    "pBe": 0,
+    "full": 1,
+    "open": 0,
+    "sumR": -36.93521753851839,
+    "nR": 21,
+    "addFills": 20
+   },
+   "risk": {
+    "n": 21,
+    "stop": 8,
+    "pStop": 12,
+    "pBe": 0,
+    "full": 1,
+    "open": 0,
+    "sumR": -34.454222432960584,
+    "nR": 21,
+    "addFills": 20
+   }
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 13,
+    "stop": 1,
+    "pStop": 5,
+    "pBe": 1,
+    "full": 6,
+    "open": 0,
+    "sumR": 2.373928731833211,
+    "nR": 13,
+    "addFills": 7
+   },
+   "risk": {
+    "n": 13,
+    "stop": 2,
+    "pStop": 4,
+    "pBe": 1,
+    "full": 6,
+    "open": 0,
+    "sumR": 4.671032809902703,
+    "nR": 13,
+    "addFills": 7
+   }
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 15,
+    "stop": 1,
+    "pStop": 5,
+    "pBe": 2,
+    "full": 7,
+    "open": 0,
+    "sumR": 3.71265699780493,
+    "nR": 15,
+    "addFills": 10
+   },
+   "risk": {
+    "n": 15,
+    "stop": 2,
+    "pStop": 5,
+    "pBe": 1,
+    "full": 7,
+    "open": 0,
+    "sumR": 9.23531242996464,
+    "nR": 15,
+    "addFills": 11
+   }
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 6,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 2,
+    "open": 0,
+    "sumR": -5.162715888568181,
+    "nR": 6,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 6,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 2,
+    "open": 0,
+    "sumR": -4.7733850165775555,
+    "nR": 6,
+    "addFills": 5
+   }
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 3,
+    "full": 1,
+    "open": 0,
+    "sumR": -0.28998017525505465,
+    "nR": 5,
+    "addFills": 2
+   },
+   "risk": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 1,
+    "open": 0,
+    "sumR": -1.3116777629747411,
+    "nR": 5,
+    "addFills": 2
+   }
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 9,
+    "stop": 1,
+    "pStop": 2,
+    "pBe": 2,
+    "full": 4,
+    "open": 0,
+    "sumR": 3.7765195847343866,
+    "nR": 9,
+    "addFills": 7
+   },
+   "risk": {
+    "n": 9,
+    "stop": 2,
+    "pStop": 2,
+    "pBe": 1,
+    "full": 4,
+    "open": 0,
+    "sumR": 1.77369781772173,
+    "nR": 9,
+    "addFills": 7
+   }
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 5,
+    "stop": 0,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 2,
+    "open": 1,
+    "sumR": 3.5106698804167804,
+    "nR": 4,
+    "addFills": 2
+   },
+   "risk": {
+    "n": 5,
+    "stop": 0,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 2,
+    "open": 1,
+    "sumR": 4.396853832517878,
+    "nR": 4,
+    "addFills": 2
+   }
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 8,
+    "stop": 2,
+    "pStop": 2,
+    "pBe": 1,
+    "full": 3,
+    "open": 0,
+    "sumR": -2.7315329001305604,
+    "nR": 8,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 8,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 1,
+    "full": 3,
+    "open": 0,
+    "sumR": -4.29103437227243,
+    "nR": 8,
+    "addFills": 5
+   }
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 6,
+    "stop": 1,
+    "pStop": 2,
+    "pBe": 3,
+    "full": 0,
+    "open": 0,
+    "sumR": -5.508787760306386,
+    "nR": 6,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 6,
+    "stop": 2,
+    "pStop": 2,
+    "pBe": 2,
+    "full": 0,
+    "open": 0,
+    "sumR": -7.63662865863657,
+    "nR": 6,
+    "addFills": 5
+   }
+  },
+  {
+   "symbol": "ENSUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 2,
+    "open": 0,
+    "sumR": 0.42017869648486617,
+    "nR": 5,
+    "addFills": 2
+   },
+   "risk": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 2,
+    "open": 0,
+    "sumR": 0.9437327929084445,
+    "nR": 5,
+    "addFills": 2
+   }
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 6,
+    "stop": 1,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 1,
+    "open": 1,
+    "sumR": -2.5041312455716986,
+    "nR": 5,
+    "addFills": 2
+   },
+   "risk": {
+    "n": 6,
+    "stop": 1,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 1,
+    "open": 1,
+    "sumR": -2.171833997759626,
+    "nR": 5,
+    "addFills": 2
+   }
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 16,
+    "stop": 5,
+    "pStop": 2,
+    "pBe": 3,
+    "full": 6,
+    "open": 0,
+    "sumR": -7.832711508746239,
+    "nR": 16,
+    "addFills": 9
+   },
+   "risk": {
+    "n": 16,
+    "stop": 5,
+    "pStop": 3,
+    "pBe": 2,
+    "full": 6,
+    "open": 0,
+    "sumR": -7.94118115583057,
+    "nR": 16,
+    "addFills": 10
+   }
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 10,
+    "stop": 6,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 3,
+    "open": 0,
+    "sumR": -6.038248073337443,
+    "nR": 10,
+    "addFills": 8
+   },
+   "risk": {
+    "n": 10,
+    "stop": 7,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 2,
+    "open": 0,
+    "sumR": -10.841280215204598,
+    "nR": 10,
+    "addFills": 8
+   }
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 5,
+    "stop": 0,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 2,
+    "open": 2,
+    "sumR": 2.8526797004206825,
+    "nR": 3,
+    "addFills": 3
+   },
+   "risk": {
+    "n": 5,
+    "stop": 0,
+    "pStop": 2,
+    "pBe": 0,
+    "full": 2,
+    "open": 1,
+    "sumR": 4.756061835684301,
+    "nR": 4,
+    "addFills": 3
+   }
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 18,
+    "stop": 3,
+    "pStop": 7,
+    "pBe": 1,
+    "full": 7,
+    "open": 0,
+    "sumR": -5.605884229648741,
+    "nR": 18,
+    "addFills": 12
+   },
+   "risk": {
+    "n": 18,
+    "stop": 4,
+    "pStop": 6,
+    "pBe": 1,
+    "full": 7,
+    "open": 0,
+    "sumR": -4.361321941073854,
+    "nR": 18,
+    "addFills": 13
+   }
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 7,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 3,
+    "open": 1,
+    "sumR": 1.5428822317555664,
+    "nR": 6,
+    "addFills": 1
+   },
+   "risk": {
+    "n": 7,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 3,
+    "open": 1,
+    "sumR": 2.4445908725477654,
+    "nR": 6,
+    "addFills": 1
+   }
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 9,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 3,
+    "full": 2,
+    "open": 0,
+    "sumR": -3.92495234977231,
+    "nR": 9,
+    "addFills": 6
+   },
+   "risk": {
+    "n": 9,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 3,
+    "full": 2,
+    "open": 0,
+    "sumR": -2.6334573880587286,
+    "nR": 9,
+    "addFills": 6
+   }
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 12,
+    "stop": 5,
+    "pStop": 2,
+    "pBe": 1,
+    "full": 4,
+    "open": 0,
+    "sumR": 13.806715746216586,
+    "nR": 12,
+    "addFills": 9
+   },
+   "risk": {
+    "n": 12,
+    "stop": 5,
+    "pStop": 2,
+    "pBe": 1,
+    "full": 4,
+    "open": 0,
+    "sumR": -1.9587153117017682,
+    "nR": 12,
+    "addFills": 8
+   }
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 7,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 3,
+    "open": 1,
+    "sumR": 2.2124091860578003,
+    "nR": 6,
+    "addFills": 3
+   },
+   "risk": {
+    "n": 7,
+    "stop": 1,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 3,
+    "open": 1,
+    "sumR": 2.9752346475213574,
+    "nR": 6,
+    "addFills": 4
+   }
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 16,
+    "stop": 6,
+    "pStop": 5,
+    "pBe": 2,
+    "full": 3,
+    "open": 0,
+    "sumR": -15.565429661029153,
+    "nR": 16,
+    "addFills": 15
+   },
+   "risk": {
+    "n": 16,
+    "stop": 7,
+    "pStop": 6,
+    "pBe": 1,
+    "full": 2,
+    "open": 0,
+    "sumR": -21.071680114927172,
+    "nR": 16,
+    "addFills": 15
+   }
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 10,
+    "stop": 2,
+    "pStop": 5,
+    "pBe": 1,
+    "full": 1,
+    "open": 1,
+    "sumR": -10.444934328943562,
+    "nR": 9,
+    "addFills": 9
+   },
+   "risk": {
+    "n": 10,
+    "stop": 3,
+    "pStop": 6,
+    "pBe": 0,
+    "full": 1,
+    "open": 0,
+    "sumR": -12.61668089893648,
+    "nR": 10,
+    "addFills": 9
+   }
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 13,
+    "stop": 2,
+    "pStop": 3,
+    "pBe": 2,
+    "full": 6,
+    "open": 0,
+    "sumR": 7.353760271337309,
+    "nR": 13,
+    "addFills": 10
+   },
+   "risk": {
+    "n": 13,
+    "stop": 2,
+    "pStop": 4,
+    "pBe": 2,
+    "full": 5,
+    "open": 0,
+    "sumR": 6.16518077193628,
+    "nR": 13,
+    "addFills": 10
+   }
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 6,
+    "stop": 0,
+    "pStop": 5,
+    "pBe": 0,
+    "full": 1,
+    "open": 0,
+    "sumR": -4.605647079609012,
+    "nR": 6,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 6,
+    "stop": 1,
+    "pStop": 4,
+    "pBe": 0,
+    "full": 1,
+    "open": 0,
+    "sumR": -6.820369143320416,
+    "nR": 6,
+    "addFills": 5
+   }
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 11,
+    "stop": 4,
+    "pStop": 2,
+    "pBe": 2,
+    "full": 3,
+    "open": 0,
+    "sumR": -6.480143462851252,
+    "nR": 11,
+    "addFills": 6
+   },
+   "risk": {
+    "n": 11,
+    "stop": 3,
+    "pStop": 4,
+    "pBe": 1,
+    "full": 3,
+    "open": 0,
+    "sumR": -4.49446022281132,
+    "nR": 11,
+    "addFills": 7
+   }
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 10,
+    "stop": 2,
+    "pStop": 3,
+    "pBe": 1,
+    "full": 2,
+    "open": 2,
+    "sumR": -7.37370862727061,
+    "nR": 8,
+    "addFills": 6
+   },
+   "risk": {
+    "n": 10,
+    "stop": 4,
+    "pStop": 2,
+    "pBe": 1,
+    "full": 2,
+    "open": 1,
+    "sumR": -7.529440749360512,
+    "nR": 9,
+    "addFills": 6
+   }
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 8,
+    "stop": 2,
+    "pStop": 0,
+    "pBe": 1,
+    "full": 5,
+    "open": 0,
+    "sumR": 3.9875424820928,
+    "nR": 8,
+    "addFills": 4
+   },
+   "risk": {
+    "n": 8,
+    "stop": 2,
+    "pStop": 0,
+    "pBe": 1,
+    "full": 5,
+    "open": 0,
+    "sumR": 5.763507032415076,
+    "nR": 8,
+    "addFills": 4
+   }
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 1,
+    "open": 0,
+    "sumR": -2.780371172769788,
+    "nR": 5,
+    "addFills": 3
+   },
+   "risk": {
+    "n": 5,
+    "stop": 1,
+    "pStop": 2,
+    "pBe": 0,
+    "full": 2,
+    "open": 0,
+    "sumR": -2.3722965891616665,
+    "nR": 5,
+    "addFills": 4
+   }
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 7,
+    "stop": 5,
+    "pStop": 1,
+    "pBe": 1,
+    "full": 0,
+    "open": 0,
+    "sumR": -11.932729444807949,
+    "nR": 7,
+    "addFills": 7
+   },
+   "risk": {
+    "n": 7,
+    "stop": 6,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 0,
+    "open": 0,
+    "sumR": -13.97312397808794,
+    "nR": 7,
+    "addFills": 7
+   }
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 5,
+    "stop": 0,
+    "pStop": 0,
+    "pBe": 1,
+    "full": 2,
+    "open": 2,
+    "sumR": 2.701489419822532,
+    "nR": 3,
+    "addFills": 3
+   },
+   "risk": {
+    "n": 5,
+    "stop": 0,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 2,
+    "open": 2,
+    "sumR": 1.0715295378157563,
+    "nR": 3,
+    "addFills": 3
+   }
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 9,
+    "stop": 2,
+    "pStop": 2,
+    "pBe": 1,
+    "full": 3,
+    "open": 1,
+    "sumR": -1.9930706425003948,
+    "nR": 8,
+    "addFills": 6
+   },
+   "risk": {
+    "n": 9,
+    "stop": 2,
+    "pStop": 3,
+    "pBe": 0,
+    "full": 3,
+    "open": 1,
+    "sumR": -2.2537680716272934,
+    "nR": 8,
+    "addFills": 6
+   }
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 5,
+    "stop": 0,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 2,
+    "open": 1,
+    "sumR": 1.1616204606434206,
+    "nR": 4,
+    "addFills": 2
+   },
+   "risk": {
+    "n": 5,
+    "stop": 0,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 2,
+    "open": 1,
+    "sumR": 1.3232802301983928,
+    "nR": 4,
+    "addFills": 2
+   }
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 24,
+    "stop": 5,
+    "pStop": 4,
+    "pBe": 6,
+    "full": 9,
+    "open": 0,
+    "sumR": -0.43201988511481354,
+    "nR": 24,
+    "addFills": 16
+   },
+   "risk": {
+    "n": 24,
+    "stop": 5,
+    "pStop": 7,
+    "pBe": 3,
+    "full": 9,
+    "open": 0,
+    "sumR": 0.7775597281958235,
+    "nR": 24,
+    "addFills": 18
+   }
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 6,
+    "stop": 2,
+    "pStop": 0,
+    "pBe": 4,
+    "full": 0,
+    "open": 0,
+    "sumR": -3.9814774922852063,
+    "nR": 6,
+    "addFills": 2
+   },
+   "risk": {
+    "n": 6,
+    "stop": 2,
+    "pStop": 0,
+    "pBe": 4,
+    "full": 0,
+    "open": 0,
+    "sumR": -3.978354097204346,
+    "nR": 6,
+    "addFills": 2
+   }
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 11,
+    "stop": 2,
+    "pStop": 1,
+    "pBe": 3,
+    "full": 5,
+    "open": 0,
+    "sumR": -0.40010582227619107,
+    "nR": 11,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 11,
+    "stop": 2,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 6,
+    "open": 0,
+    "sumR": 5.916526265033637,
+    "nR": 11,
+    "addFills": 8
+   }
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 7,
+    "stop": 2,
+    "pStop": 2,
+    "pBe": 1,
+    "full": 2,
+    "open": 0,
+    "sumR": 0.4131419548934261,
+    "nR": 7,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 7,
+    "stop": 4,
+    "pStop": 1,
+    "pBe": 1,
+    "full": 1,
+    "open": 0,
+    "sumR": -7.470690500736142,
+    "nR": 7,
+    "addFills": 5
+   }
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 13,
+    "stop": 2,
+    "pStop": 4,
+    "pBe": 3,
+    "full": 4,
+    "open": 0,
+    "sumR": -4.766541797503427,
+    "nR": 13,
+    "addFills": 8
+   },
+   "risk": {
+    "n": 13,
+    "stop": 2,
+    "pStop": 4,
+    "pBe": 4,
+    "full": 3,
+    "open": 0,
+    "sumR": -4.33941054606087,
+    "nR": 13,
+    "addFills": 9
+   }
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 7,
+    "stop": 2,
+    "pStop": 0,
+    "pBe": 3,
+    "full": 2,
+    "open": 0,
+    "sumR": -1.6531271545921926,
+    "nR": 7,
+    "addFills": 3
+   },
+   "risk": {
+    "n": 7,
+    "stop": 2,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 2,
+    "open": 0,
+    "sumR": -2.6632808174388476,
+    "nR": 7,
+    "addFills": 3
+   }
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 13,
+    "stop": 4,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 6,
+    "open": 0,
+    "sumR": 2.49155736450528,
+    "nR": 13,
+    "addFills": 8
+   },
+   "risk": {
+    "n": 13,
+    "stop": 4,
+    "pStop": 3,
+    "pBe": 1,
+    "full": 5,
+    "open": 0,
+    "sumR": -0.8625777384259818,
+    "nR": 13,
+    "addFills": 9
+   }
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 6,
+    "stop": 0,
+    "pStop": 0,
+    "pBe": 1,
+    "full": 4,
+    "open": 1,
+    "sumR": 5.309574044316267,
+    "nR": 5,
+    "addFills": 1
+   },
+   "risk": {
+    "n": 6,
+    "stop": 0,
+    "pStop": 0,
+    "pBe": 2,
+    "full": 3,
+    "open": 1,
+    "sumR": 8.949123943161847,
+    "nR": 5,
+    "addFills": 3
+   }
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 14,
+    "stop": 5,
+    "pStop": 1,
+    "pBe": 4,
+    "full": 4,
+    "open": 0,
+    "sumR": -1.4827799666048882,
+    "nR": 14,
+    "addFills": 10
+   },
+   "risk": {
+    "n": 14,
+    "stop": 6,
+    "pStop": 2,
+    "pBe": 3,
+    "full": 3,
+    "open": 0,
+    "sumR": -10.787151424150668,
+    "nR": 14,
+    "addFills": 10
+   }
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 8,
+    "stop": 3,
+    "pStop": 0,
+    "pBe": 4,
+    "full": 1,
+    "open": 0,
+    "sumR": -4.753214230842776,
+    "nR": 8,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 8,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 2,
+    "full": 1,
+    "open": 1,
+    "sumR": -3.9930542653283823,
+    "nR": 7,
+    "addFills": 6
+   }
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 18,
+    "stop": 3,
+    "pStop": 4,
+    "pBe": 5,
+    "full": 6,
+    "open": 0,
+    "sumR": 3.1608160068267708,
+    "nR": 18,
+    "addFills": 13
+   },
+   "risk": {
+    "n": 18,
+    "stop": 5,
+    "pStop": 4,
+    "pBe": 3,
+    "full": 6,
+    "open": 0,
+    "sumR": -2.8348606876482,
+    "nR": 18,
+    "addFills": 14
+   }
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 10,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 5,
+    "open": 1,
+    "sumR": -0.9407879626954425,
+    "nR": 9,
+    "addFills": 7
+   },
+   "risk": {
+    "n": 10,
+    "stop": 3,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 5,
+    "open": 1,
+    "sumR": -0.00676907059578058,
+    "nR": 9,
+    "addFills": 7
+   }
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 9,
+    "stop": 1,
+    "pStop": 6,
+    "pBe": 1,
+    "full": 1,
+    "open": 0,
+    "sumR": -8.522924403658557,
+    "nR": 9,
+    "addFills": 8
+   },
+   "risk": {
+    "n": 9,
+    "stop": 1,
+    "pStop": 6,
+    "pBe": 1,
+    "full": 1,
+    "open": 0,
+    "sumR": 17.18316205963104,
+    "nR": 9,
+    "addFills": 9
+   }
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 10,
+    "stop": 5,
+    "pStop": 0,
+    "pBe": 1,
+    "full": 4,
+    "open": 0,
+    "sumR": 1.8176962956254998,
+    "nR": 10,
+    "addFills": 7
+   },
+   "risk": {
+    "n": 10,
+    "stop": 5,
+    "pStop": 1,
+    "pBe": 0,
+    "full": 4,
+    "open": 0,
+    "sumR": 6.571079549510939,
+    "nR": 10,
+    "addFills": 9
+   }
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 17,
+    "stop": 6,
+    "pStop": 4,
+    "pBe": 3,
+    "full": 4,
+    "open": 0,
+    "sumR": -4.767159253335617,
+    "nR": 17,
+    "addFills": 14
+   },
+   "risk": {
+    "n": 17,
+    "stop": 8,
+    "pStop": 4,
+    "pBe": 3,
+    "full": 2,
+    "open": 0,
+    "sumR": -17.18308040058479,
+    "nR": 17,
+    "addFills": 15
+   }
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 120,
+   "safe": {
+    "n": 5,
+    "stop": 0,
+    "pStop": 0,
+    "pBe": 0,
+    "full": 4,
+    "open": 1,
+    "sumR": 12.529098292119482,
+    "nR": 4,
+    "addFills": 3
+   },
+   "risk": {
+    "n": 5,
+    "stop": 2,
+    "pStop": 0,
+    "pBe": 0,
+    "full": 2,
+    "open": 1,
+    "sumR": 0.09195702065886335,
+    "nR": 4,
+    "addFills": 3
+   }
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 8,
+    "stop": 0,
+    "pStop": 2,
+    "pBe": 1,
+    "full": 4,
+    "open": 1,
+    "sumR": 4.770640184796035,
+    "nR": 7,
+    "addFills": 4
+   },
+   "risk": {
+    "n": 8,
+    "stop": 1,
+    "pStop": 2,
+    "pBe": 1,
+    "full": 3,
+    "open": 1,
+    "sumR": -0.45622010546719804,
+    "nR": 7,
+    "addFills": 4
+   }
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 10,
+    "stop": 1,
+    "pStop": 3,
+    "pBe": 2,
+    "full": 4,
+    "open": 0,
+    "sumR": 0.8261281306587631,
+    "nR": 10,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 10,
+    "stop": 1,
+    "pStop": 4,
+    "pBe": 0,
+    "full": 5,
+    "open": 0,
+    "sumR": 2.8890206923051625,
+    "nR": 10,
+    "addFills": 6
+   }
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "safe": {
+    "n": 12,
+    "stop": 5,
+    "pStop": 0,
+    "pBe": 3,
+    "full": 4,
+    "open": 0,
+    "sumR": -6.20768268457272,
+    "nR": 12,
+    "addFills": 5
+   },
+   "risk": {
+    "n": 12,
+    "stop": 5,
+    "pStop": 0,
+    "pBe": 3,
+    "full": 4,
+    "open": 0,
+    "sumR": -5.3023269707034855,
+    "nR": 12,
+    "addFills": 5
+   }
+  }
+ ]
+}
