@@ -1,8 +1,8 @@
 # Gate
 
-- run: 31033477241 attempt 1
-- commit: 2174d3a3b8ae56a73da1b094ecd249a8a30655f5
-- date UTC: 2026-08-05T18:10:45Z
+- run: 31078193667 attempt 1
+- commit: d2e80460721408c84cc637614cea335cbbad1e32
+- date UTC: 2026-08-06T06:42:45Z
 - node: v24.18.0, npm: 11.16.0
 
 ## tests (tsx --test tests/*.test.ts)
@@ -15,7 +15,7 @@ exit=0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 7206.218861
+ℹ duration_ms 5006.047334
 ```
 
 ## tsc --noEmit
