@@ -1,0 +1,2639 @@
+{
+ "groups": {
+  "in-zone": {
+   "n": 291,
+   "sumR": 35.23980831555152,
+   "p": 75,
+   "s": 18,
+   "f": 198
+  },
+  "out-zone": {
+   "n": 1173,
+   "sumR": 56.584028311359454,
+   "p": 347,
+   "s": 75,
+   "f": 751
+  }
+ },
+ "inZoneTrades": [
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-24T10:00:00.000Z",
+   "grossR": 0.512646765810533,
+   "outcome": "Full fix",
+   "zone": "AAVEUSDT Зона покупок(локально) 72-68"
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-24T10:00:00.000Z",
+   "grossR": 0.5345495293329844,
+   "outcome": "Full fix",
+   "zone": "AAVEUSDT Зона покупок(локально) 72-68"
+  },
+  {
+   "symbol": "AEROUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-28T12:00:00.000Z",
+   "grossR": -0.7188596827271037,
+   "outcome": "Partial",
+   "zone": "AEROUSDT Зона покупок 0.4378-0.408"
+  },
+  {
+   "symbol": "AEROUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-31T22:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "zone": "AEROUSDT Зона покупок 0.4378-0.408"
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-15T18:00:00.000Z",
+   "grossR": 0.6696375405568756,
+   "outcome": "Full fix",
+   "zone": "ALGOUSDT Зона покупок(доп) 0.1185-0.113"
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-03-30T00:00:00.000Z",
+   "grossR": 0.5889100085989374,
+   "outcome": "Full fix",
+   "zone": "ALGOUSDT Зона покупок 0.08-0.07"
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-04-24T18:00:00.000Z",
+   "grossR": -1.0000000000000002,
+   "outcome": "Stop",
+   "zone": "ALGOUSDT Зона продаж 0.105-0.11"
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-14T01:00:00.000Z",
+   "grossR": 0.5295919438937974,
+   "outcome": "Full fix",
+   "zone": "ALGOUSDT Зона покупок(доп) 0.1185-0.113"
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-23T15:00:00.000Z",
+   "grossR": 0.5522236083972918,
+   "outcome": "Full fix",
+   "zone": "ALGOUSDT Зона покупок(доп) 0.1185-0.113"
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-10T04:00:00.000Z",
+   "grossR": 0.4647124891069882,
+   "outcome": "Full fix",
+   "zone": "ALGOUSDT Зона покупок 0.1-0.092"
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-22T01:00:00.000Z",
+   "grossR": -0.6741849847396194,
+   "outcome": "Partial",
+   "zone": "ALGOUSDT Зона покупок 0.1-0.092"
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-23T21:00:00.000Z",
+   "grossR": -0.736668825880922,
+   "outcome": "Partial",
+   "zone": "APTUSDT Зона покупок 0.74-0.6"
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-29T10:00:00.000Z",
+   "grossR": 0.5528303425491946,
+   "outcome": "Full fix",
+   "zone": "APTUSDT Зона покупок 0.74-0.6"
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-12T15:00:00.000Z",
+   "grossR": -0.7940940341559428,
+   "outcome": "Partial",
+   "zone": "APTUSDT Зона покупок 0.74-0.6"
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-18T23:00:00.000Z",
+   "grossR": -0.7782125205956265,
+   "outcome": "Partial",
+   "zone": "APTUSDT Зона покупок 0.74-0.6"
+  },
+  {
+   "symbol": "ARBUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-25T00:00:00.000Z",
+   "grossR": -0.695321632514253,
+   "outcome": "Partial",
+   "zone": "ARBUSDT Зона покупок 0.113-0.1"
+  },
+  {
+   "symbol": "ARBUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-28T18:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "zone": "ARBUSDT Зона покупок 0.113-0.1"
+  },
+  {
+   "symbol": "ARBUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-01T04:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "zone": "ARBUSDT Зона покупок 0.113-0.1"
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-31T10:00:00.000Z",
+   "grossR": 0.5641093393312492,
+   "outcome": "Full fix",
+   "zone": "ASTERUSDT Зона продаж 0.712-0.73"
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-25T09:00:00.000Z",
+   "grossR": 0.6372503953743617,
+   "outcome": "Full fix",
+   "zone": "ASTERUSDT Зона продаж 0.712-0.73"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-03-30T02:00:00.000Z",
+   "grossR": 0.6800207947368199,
+   "outcome": "Full fix",
+   "zone": "ATOMUSDT Зона покупок(риск) 1.65-1.54"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-13T12:00:00.000Z",
+   "grossR": 0.5524964152181008,
+   "outcome": "Full fix",
+   "zone": "ATOMUSDT Зона продаж(локально) 2.1-2.25"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-22T20:00:00.000Z",
+   "grossR": 0.42223956734831203,
+   "outcome": "Full fix",
+   "zone": "ATOMUSDT Зона продаж(локально) 2.1-2.25"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-26T06:00:00.000Z",
+   "grossR": 0.4151490746722808,
+   "outcome": "Full fix",
+   "zone": "ATOMUSDT Зона продаж(локально) 2.1-2.25"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-05-26T20:00:00.000Z",
+   "grossR": 0.5199613130377716,
+   "outcome": "Full fix",
+   "zone": "ATOMUSDT Зона продаж(локально) 2.1-2.25"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-03-30T00:00:00.000Z",
+   "grossR": 0.7046093307103025,
+   "outcome": "Full fix",
+   "zone": "ATOMUSDT Зона покупок(риск) 1.65-1.54"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-02T15:00:00.000Z",
+   "grossR": 0.5430810530545574,
+   "outcome": "Full fix",
+   "zone": "ATOMUSDT Зона покупок(риск) 1.65-1.54"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-22T19:00:00.000Z",
+   "grossR": 0.4503074306686856,
+   "outcome": "Full fix",
+   "zone": "ATOMUSDT Зона продаж(локально) 2.1-2.25"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-25T23:00:00.000Z",
+   "grossR": 0.40490374167096393,
+   "outcome": "Full fix",
+   "zone": "ATOMUSDT Зона продаж(локально) 2.1-2.25"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-03-08T10:00:00.000Z",
+   "grossR": 0.5733732775509721,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-03-28T14:00:00.000Z",
+   "grossR": 0.6859023278595587,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-04-03T06:00:00.000Z",
+   "grossR": 0.3232719013148847,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-04-07T20:00:00.000Z",
+   "grossR": 0.47302355349223885,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-04-19T12:00:00.000Z",
+   "grossR": 0.4881879756171154,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-04-29T04:00:00.000Z",
+   "grossR": 0.5046702829795168,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-02-25T04:00:00.000Z",
+   "grossR": 0.6082798327154709,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок 8.43"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-03-08T20:00:00.000Z",
+   "grossR": 0.44485145307218765,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-03-31T04:00:00.000Z",
+   "grossR": 0.5249020288842754,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-05-01T16:00:00.000Z",
+   "grossR": 0.5124102952262416,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-02-23T07:00:00.000Z",
+   "grossR": 0.7727415264093483,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок 8.43"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-02-28T08:00:00.000Z",
+   "grossR": 0.8120230160266457,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-03-07T21:00:00.000Z",
+   "grossR": 0.7133078067002528,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-03-26T21:00:00.000Z",
+   "grossR": 0.6849123777369868,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-03-28T14:00:00.000Z",
+   "grossR": 0.5660660153586582,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-02T15:00:00.000Z",
+   "grossR": 0.4323763250096137,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-05T16:00:00.000Z",
+   "grossR": 0.4651959469191047,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-07T20:00:00.000Z",
+   "grossR": 0.45993168245316696,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 8.9-8.5"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-12T18:00:00.000Z",
+   "grossR": 0.5622296785698414,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-19T12:00:00.000Z",
+   "grossR": 0.6263939727985376,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-23T15:00:00.000Z",
+   "grossR": 0.37962998500490336,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-27T23:00:00.000Z",
+   "grossR": 0.5410717223730754,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-30T01:00:00.000Z",
+   "grossR": 0.36827313312025284,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-02T14:00:00.000Z",
+   "grossR": 0.4816592638451683,
+   "outcome": "Full fix",
+   "zone": "AVAXUSDT Зона покупок(локально) 9.3-9.1"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-03-18T00:00:00.000Z",
+   "grossR": 0.583680398594307,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 73500-80000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-04-12T00:00:00.000Z",
+   "grossR": -0.6889464563166197,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона продаж 72900-74000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-04-16T14:00:00.000Z",
+   "grossR": -0.7813846467437473,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона продаж 72900-74000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-04-21T14:00:00.000Z",
+   "grossR": 0.43349974445065653,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-04-25T16:00:00.000Z",
+   "grossR": 0.3938575264415792,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-03T02:00:00.000Z",
+   "grossR": 0.42201958249666915,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-06T14:00:00.000Z",
+   "grossR": 0.7047813867494318,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 80000-83000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-10T22:00:00.000Z",
+   "grossR": 0.43495186572175687,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 80000-83000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-23T14:00:00.000Z",
+   "grossR": -0.6675010372869098,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона покупок 74800-72000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-28T08:00:00.000Z",
+   "grossR": -1.0000000000000004,
+   "outcome": "Stop",
+   "zone": "BTCUSDT Зона покупок 74800-72000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-31T22:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "zone": "BTCUSDT Зона покупок 74800-72000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-02-25T04:00:00.000Z",
+   "grossR": 0.5856818988770682,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона покупок(локально) 65800-64500"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-03-18T00:00:00.000Z",
+   "grossR": 0.6040682131039867,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 73500-80000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-03-31T04:00:00.000Z",
+   "grossR": 0.4884624257618171,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона покупок(локально) 68850-67800"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-04-12T00:00:00.000Z",
+   "grossR": 0.5818973571504829,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 72900-74000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-04-27T08:00:00.000Z",
+   "grossR": 0.5030811348910151,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-05-04T08:00:00.000Z",
+   "grossR": 0.5926223875159927,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 80000-83000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-05-11T04:00:00.000Z",
+   "grossR": 0.4752258604260976,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 80000-83000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-06-01T20:00:00.000Z",
+   "grossR": -1.0000000000000002,
+   "outcome": "Stop",
+   "zone": "BTCUSDT Зона покупок 74800-72000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-02-28T08:00:00.000Z",
+   "grossR": 0.8105225199292655,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона покупок(локально) 65000-64000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-03-05T08:00:00.000Z",
+   "grossR": -0.7065149374308375,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона продаж 73500-80000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-03-13T15:00:00.000Z",
+   "grossR": 0.6340739860227281,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 73500-80000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-03-17T16:00:00.000Z",
+   "grossR": 0.41420762582082604,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 73500-80000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-03-26T21:00:00.000Z",
+   "grossR": 0.4747325550298987,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона покупок(локально) 68850-67800"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-04-10T16:00:00.000Z",
+   "grossR": -0.7401155874799159,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона продаж 73500-80000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-04-14T15:00:00.000Z",
+   "grossR": -0.6971422944790402,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона продаж 73500-80000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-04-16T08:00:00.000Z",
+   "grossR": -0.7147202490222186,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона продаж 73500-80000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-04-18T11:00:00.000Z",
+   "grossR": -0.7232575038846251,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-04-22T17:00:00.000Z",
+   "grossR": 0.7101322619360799,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-01T15:00:00.000Z",
+   "grossR": 0.5802511175711276,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-04T00:00:00.000Z",
+   "grossR": -0.732455045008574,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-05T22:00:00.000Z",
+   "grossR": 0.537749868884184,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 80000-83000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-10T19:00:00.000Z",
+   "grossR": 0.7038439004142933,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 80000-83000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-21T10:00:00.000Z",
+   "grossR": 0.4632189066579726,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-23T14:00:00.000Z",
+   "grossR": -0.6552223356655787,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона покупок 74800-72000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-25T23:00:00.000Z",
+   "grossR": 0.4566897762002876,
+   "outcome": "Full fix",
+   "zone": "BTCUSDT Зона продаж 76000-79000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-27T16:00:00.000Z",
+   "grossR": -0.8273764133864348,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона покупок 74800-72000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-29T16:00:00.000Z",
+   "grossR": -0.7421778128200849,
+   "outcome": "Partial",
+   "zone": "BTCUSDT Зона покупок 74800-72000"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-01T17:00:00.000Z",
+   "grossR": -1.0000000000000018,
+   "outcome": "Stop",
+   "zone": "BTCUSDT Зона покупок 74800-72000"
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-10T02:00:00.000Z",
+   "grossR": 0.6986475147652478,
+   "outcome": "Full fix",
+   "zone": "DYDXUSDT Зона покупок 0.127-0.117"
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-13T22:00:00.000Z",
+   "grossR": 0.5589920629561586,
+   "outcome": "Full fix",
+   "zone": "DYDXUSDT Зона покупок 0.127-0.117"
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-09T21:00:00.000Z",
+   "grossR": 0.5408223070325077,
+   "outcome": "Full fix",
+   "zone": "DYDXUSDT Зона покупок 0.127-0.117"
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-11T14:00:00.000Z",
+   "grossR": 0.70536142459512,
+   "outcome": "Full fix",
+   "zone": "DYDXUSDT Зона покупок 0.127-0.117"
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-14T20:00:00.000Z",
+   "grossR": 0.581645218234582,
+   "outcome": "Full fix",
+   "zone": "DYDXUSDT Зона покупок 0.127-0.117"
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-18T15:00:00.000Z",
+   "grossR": 0.5113730047879156,
+   "outcome": "Full fix",
+   "zone": "DYDXUSDT Зона покупок 0.127-0.117"
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-12T02:00:00.000Z",
+   "grossR": -0.7021839236290426,
+   "outcome": "Partial",
+   "zone": "DYDXUSDT Зона покупок 0.127-0.117"
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-01-21T04:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "zone": "ETCUSDT Зона покупок 12.5-11"
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-10T13:00:00.000Z",
+   "grossR": 0.460414367741252,
+   "outcome": "Full fix",
+   "zone": "ETCUSDT Зона покупок 7-6.3"
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-14T21:00:00.000Z",
+   "grossR": 0.7793673715862777,
+   "outcome": "Full fix",
+   "zone": "ETCUSDT Зона покупок 7-6.3"
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-18T17:00:00.000Z",
+   "grossR": 0.6076331743402442,
+   "outcome": "Full fix",
+   "zone": "ETCUSDT Зона покупок 7-6.3"
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-24T05:00:00.000Z",
+   "grossR": -0.7615320622421373,
+   "outcome": "Partial",
+   "zone": "ETCUSDT Зона покупок 7-6.3"
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-05T16:00:00.000Z",
+   "grossR": -0.7476286884069552,
+   "outcome": "Partial",
+   "zone": "ETCUSDT Зона покупок 7-6.3"
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-13T01:00:00.000Z",
+   "grossR": -0.6940727020666857,
+   "outcome": "Partial",
+   "zone": "ETCUSDT Зона покупок 7-6.3"
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-19T18:00:00.000Z",
+   "grossR": -0.7040853153492499,
+   "outcome": "Partial",
+   "zone": "ETCUSDT Зона покупок 7-6.3"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-01-26T04:00:00.000Z",
+   "grossR": -1.0000000000000002,
+   "outcome": "Stop",
+   "zone": "ETHUSDT Зона покупок 2907-2837"
+  },
+  {
+   "symbol": "FARTCOINUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-31T16:00:00.000Z",
+   "grossR": -0.7080361193332413,
+   "outcome": "Partial",
+   "zone": "FARTCOINUSDT Зона покупок 0.17-0.15"
+  },
+  {
+   "symbol": "FARTCOINUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-05T14:00:00.000Z",
+   "grossR": -0.7283781956145291,
+   "outcome": "Partial",
+   "zone": "FARTCOINUSDT Зона покупок 0.17-0.15"
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-04-20T02:00:00.000Z",
+   "grossR": 0.542502426400557,
+   "outcome": "Full fix",
+   "zone": "GRASSUSDT Зона покупок 0.32-0.3"
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-17T20:00:00.000Z",
+   "grossR": 0.693364128873973,
+   "outcome": "Full fix",
+   "zone": "GRASSUSDT Зона покупок 0.307-0.285"
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-07T02:00:00.000Z",
+   "grossR": 0.6394046033155001,
+   "outcome": "Full fix",
+   "zone": "GRASSUSDT Зона покупок 0.386-0.35"
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-10T14:00:00.000Z",
+   "grossR": 0.6099916775708009,
+   "outcome": "Full fix",
+   "zone": "GRASSUSDT Зона покупок 0.386-0.35"
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-07T02:00:00.000Z",
+   "grossR": 0.648717216437985,
+   "outcome": "Full fix",
+   "zone": "GRASSUSDT Зона покупок 0.386-0.35"
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-11T03:00:00.000Z",
+   "grossR": -0.750599998124618,
+   "outcome": "Partial",
+   "zone": "GRASSUSDT Зона покупок 0.386-0.35"
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-17T04:00:00.000Z",
+   "grossR": -0.7858653379786069,
+   "outcome": "Partial",
+   "zone": "GRASSUSDT Зона покупок 0.386-0.35"
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-18T22:00:00.000Z",
+   "grossR": -0.7332575813958362,
+   "outcome": "Partial",
+   "zone": "GRASSUSDT Зона покупок 0.386-0.35"
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-07-14T00:00:00.000Z",
+   "grossR": -0.6916770320712319,
+   "outcome": "Partial",
+   "zone": "GRTUSDT Зона покупок 0.0171-0.0166"
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-07-17T10:00:00.000Z",
+   "grossR": -0.8447087019597231,
+   "outcome": "Partial",
+   "zone": "GRTUSDT Зона покупок 0.0171-0.0166"
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-07-21T04:00:00.000Z",
+   "grossR": -0.7960167481698762,
+   "outcome": "Partial",
+   "zone": "GRTUSDT Зона покупок 0.0171-0.0166"
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-17T07:00:00.000Z",
+   "grossR": -0.8069751967251065,
+   "outcome": "Partial",
+   "zone": "GRTUSDT Зона покупок 0.0171-0.0166"
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-19T11:00:00.000Z",
+   "grossR": -0.718460014803997,
+   "outcome": "Partial",
+   "zone": "GRTUSDT Зона покупок 0.0171-0.0166"
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-04T00:00:00.000Z",
+   "grossR": -0.6661523814402693,
+   "outcome": "Partial",
+   "zone": "JTOUSDT Зона продаж 0.4-0.44"
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-04T00:00:00.000Z",
+   "grossR": -0.7114665145629334,
+   "outcome": "Partial",
+   "zone": "JTOUSDT Зона продаж 0.4-0.44"
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-06T20:00:00.000Z",
+   "grossR": -1.0000000000000002,
+   "outcome": "Stop",
+   "zone": "JTOUSDT Зона продаж 0.4-0.44"
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-11T02:00:00.000Z",
+   "grossR": 0.659600354889118,
+   "outcome": "Full fix",
+   "zone": "JUPUSDT Зона продаж 0.25-0.28"
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-01-21T04:00:00.000Z",
+   "grossR": 0.6118029957956047,
+   "outcome": "Full fix",
+   "zone": "JUPUSDT Зона покупок 0.19-0.157"
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-09T16:00:00.000Z",
+   "grossR": 0.6642968990160331,
+   "outcome": "Full fix",
+   "zone": "JUPUSDT Зона продаж 0.25-0.28"
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-24T20:00:00.000Z",
+   "grossR": 0.7543457001373175,
+   "outcome": "Full fix",
+   "zone": "LDOUSDT Зона покупок 0.25-0.22"
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-29T00:00:00.000Z",
+   "grossR": 0.5177174554123002,
+   "outcome": "Full fix",
+   "zone": "LDOUSDT Зона покупок 0.25-0.22"
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-25T15:00:00.000Z",
+   "grossR": 0.6249830408844695,
+   "outcome": "Full fix",
+   "zone": "LDOUSDT Зона покупок 0.25-0.22"
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-29T00:00:00.000Z",
+   "grossR": 0.6480165149907057,
+   "outcome": "Full fix",
+   "zone": "LDOUSDT Зона покупок 0.25-0.22"
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-01T03:00:00.000Z",
+   "grossR": 0.4320426674037998,
+   "outcome": "Full fix",
+   "zone": "LDOUSDT Зона покупок 0.25-0.22"
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-31T18:00:00.000Z",
+   "grossR": -0.8309996935577988,
+   "outcome": "Partial",
+   "zone": "LDOUSDT Зона покупок 0.35-0.33"
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-08-02T19:00:00.000Z",
+   "grossR": -0.7146541001290461,
+   "outcome": "Partial",
+   "zone": "LDOUSDT Зона покупок 0.35-0.33"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-04-13T14:00:00.000Z",
+   "grossR": 0.4676950706813248,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона покупок(локально) 9-8.8"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-06T14:00:00.000Z",
+   "grossR": 0.6297410257588278,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона продаж 10.15-11"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-10T22:00:00.000Z",
+   "grossR": 0.6258672947289763,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона продаж 10.15-11"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-18T12:00:00.000Z",
+   "grossR": -0.7080491536721988,
+   "outcome": "Partial",
+   "zone": "LINKUSDT Зона покупок 9.75-9.4"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-23T22:00:00.000Z",
+   "grossR": -0.7494160648480129,
+   "outcome": "Partial",
+   "zone": "LINKUSDT Зона покупок 9.75-9.4"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-27T16:00:00.000Z",
+   "grossR": -0.7744028577260325,
+   "outcome": "Partial",
+   "zone": "LINKUSDT Зона покупок 9.75-9.4"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-24T20:00:00.000Z",
+   "grossR": 0.7921069097240163,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона покупок 7.15-6.5"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-28T16:00:00.000Z",
+   "grossR": 0.46228155194523934,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона покупок 7.15-6.5"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-05-06T16:00:00.000Z",
+   "grossR": 0.6627207530104796,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона продаж 10.15-11"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-05-13T16:00:00.000Z",
+   "grossR": 0.3275011120089985,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона продаж 10.15-11"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-05-21T04:00:00.000Z",
+   "grossR": -0.7273911603331356,
+   "outcome": "Partial",
+   "zone": "LINKUSDT Зона покупок 9.75-9.4"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-03-26T21:00:00.000Z",
+   "grossR": 0.5172457963411053,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона покупок(локально) 9-8.8"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-09T15:00:00.000Z",
+   "grossR": 0.4574098173776579,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона покупок(локально) 9-8.8"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-12T21:00:00.000Z",
+   "grossR": 0.564316633567833,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона покупок(локально) 9-8.8"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-06T14:00:00.000Z",
+   "grossR": 0.6136115518396532,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона продаж 10.15-11"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-08T21:00:00.000Z",
+   "grossR": 0.5920919147498086,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона продаж 10.15-11"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-10T15:00:00.000Z",
+   "grossR": 0.6394576177153688,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона продаж 10.15-11"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-16T16:00:00.000Z",
+   "grossR": -0.7480358559896048,
+   "outcome": "Partial",
+   "zone": "LINKUSDT Зона покупок 9.75-9.4"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-18T12:00:00.000Z",
+   "grossR": -0.6923699771232928,
+   "outcome": "Partial",
+   "zone": "LINKUSDT Зона покупок 9.75-9.4"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-20T06:00:00.000Z",
+   "grossR": -0.7452537475785468,
+   "outcome": "Partial",
+   "zone": "LINKUSDT Зона покупок 9.75-9.4"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-23T19:00:00.000Z",
+   "grossR": -0.6979825295475632,
+   "outcome": "Partial",
+   "zone": "LINKUSDT Зона покупок 9.75-9.4"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-27T13:00:00.000Z",
+   "grossR": -0.7327015008447978,
+   "outcome": "Partial",
+   "zone": "LINKUSDT Зона покупок 9.75-9.4"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-25T15:00:00.000Z",
+   "grossR": 0.6774670069217459,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона покупок 7.15-6.5"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-28T08:00:00.000Z",
+   "grossR": 0.4728554167864198,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона покупок 7.15-6.5"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-01T03:00:00.000Z",
+   "grossR": 0.37221288769920763,
+   "outcome": "Full fix",
+   "zone": "LINKUSDT Зона покупок 7.15-6.5"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-11T18:00:00.000Z",
+   "grossR": 0.4906401101337275,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-19T14:00:00.000Z",
+   "grossR": 0.43109963236985294,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-24T20:00:00.000Z",
+   "grossR": 0.9341435099326326,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-07-09T06:00:00.000Z",
+   "grossR": 0.37513559354537646,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-07-14T00:00:00.000Z",
+   "grossR": 0.6079946602514865,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-03-09T04:00:00.000Z",
+   "grossR": -0.7302436945738271,
+   "outcome": "Partial",
+   "zone": "LTCUSDT Зона покупок(локально) 53-51"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-02-28T14:00:00.000Z",
+   "grossR": 0.6609520839949045,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок(локально) 53-51"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-03T04:00:00.000Z",
+   "grossR": 0.5740320534143447,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок(локально) 53-51"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-07T23:00:00.000Z",
+   "grossR": 0.43629068599804816,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-18T17:00:00.000Z",
+   "grossR": 0.7125064914928281,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-24T06:00:00.000Z",
+   "grossR": 0.7125383774856858,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-26T04:00:00.000Z",
+   "grossR": 0.4415541138801371,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-30T22:00:00.000Z",
+   "grossR": 0.5007943349853999,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-07T15:00:00.000Z",
+   "grossR": 0.43263715713265,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-13T15:00:00.000Z",
+   "grossR": 0.642900627796567,
+   "outcome": "Full fix",
+   "zone": "LTCUSDT Зона покупок 45-40"
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-07T02:00:00.000Z",
+   "grossR": 0.5910298070905279,
+   "outcome": "Full fix",
+   "zone": "ONDOUSDT Зона покупок 0.34-0.32"
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-21T10:00:00.000Z",
+   "grossR": 0.5522154784630623,
+   "outcome": "Full fix",
+   "zone": "ONDOUSDT Зона покупок 0.34-0.32"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-19T07:00:00.000Z",
+   "grossR": -0.6857369112174185,
+   "outcome": "Partial",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-19T21:15:00.000Z",
+   "grossR": -0.7429845371772276,
+   "outcome": "Partial",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-20T14:30:00.000Z",
+   "grossR": 0.7655606926023135,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-21T18:45:00.000Z",
+   "grossR": -0.7258198889801232,
+   "outcome": "Partial",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-22T23:30:00.000Z",
+   "grossR": 0.51336635462103,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-23T13:45:00.000Z",
+   "grossR": 0.4605314263018801,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-25T19:45:00.000Z",
+   "grossR": 0.594500830121763,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-28T01:15:00.000Z",
+   "grossR": -0.7627951065570547,
+   "outcome": "Partial",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-28T14:15:00.000Z",
+   "grossR": 0.4539483520510836,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-29T00:45:00.000Z",
+   "grossR": 0.4885940695308609,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-30T05:45:00.000Z",
+   "grossR": 0.6192322495754954,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-08T03:15:00.000Z",
+   "grossR": 0.6122127446104135,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-08T13:45:00.000Z",
+   "grossR": 0.5121424176286906,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-12T01:30:00.000Z",
+   "grossR": -0.7081816600322621,
+   "outcome": "Partial",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-12T11:45:00.000Z",
+   "grossR": -0.7419499827366012,
+   "outcome": "Partial",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-12T23:00:00.000Z",
+   "grossR": 0.8581575735402152,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-13T14:30:00.000Z",
+   "grossR": 0.34546634946211724,
+   "outcome": "Full fix",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-16T13:15:00.000Z",
+   "grossR": -0.8811352578954031,
+   "outcome": "Partial",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-17T03:15:00.000Z",
+   "grossR": -0.7994722744431715,
+   "outcome": "Partial",
+   "zone": "OPUSDT Зона покупок(локально) 0.102-0.098"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-03-30T02:00:00.000Z",
+   "grossR": 0.6340433029270675,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 85-83"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-04-29T04:00:00.000Z",
+   "grossR": 0.5343570135548931,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 85-83"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-07T02:00:00.000Z",
+   "grossR": 0.6134138602647601,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-10T14:00:00.000Z",
+   "grossR": 0.521168375325659,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-24T20:00:00.000Z",
+   "grossR": 0.7341736071895409,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 67-65"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-06T18:30:00.000Z",
+   "grossR": 0.49259322960457697,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-09T12:15:00.000Z",
+   "grossR": 0.315247166040127,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-10T01:00:00.000Z",
+   "grossR": 0.36585330342544814,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-10T12:45:00.000Z",
+   "grossR": 0.4140044108346209,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-10T23:30:00.000Z",
+   "grossR": 0.48591455671645994,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-13T00:00:00.000Z",
+   "grossR": 0.38167910247536097,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-14T09:45:00.000Z",
+   "grossR": 0.3796503415770177,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-14T20:30:00.000Z",
+   "grossR": 0.5031987679973862,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-19T11:00:00.000Z",
+   "grossR": 0.6605510929383616,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-23T08:45:00.000Z",
+   "grossR": -0.7004617115024366,
+   "outcome": "Partial",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-24T16:15:00.000Z",
+   "grossR": 0.6473256483629981,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-06-25T17:30:00.000Z",
+   "grossR": 0.372518836371945,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 67-65"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-17T14:00:00.000Z",
+   "grossR": 0.5787817367211918,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-24T15:00:00.000Z",
+   "grossR": 0.7810470574484821,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-25T01:45:00.000Z",
+   "grossR": 0.4743926809172301,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-29T17:00:00.000Z",
+   "grossR": 0.5094114072999987,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-07-31T05:15:00.000Z",
+   "grossR": -0.719386859349501,
+   "outcome": "Partial",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-08-01T12:30:00.000Z",
+   "grossR": -0.7332490046548817,
+   "outcome": "Partial",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-08-02T00:15:00.000Z",
+   "grossR": 0.4745794174366505,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "date": "2026-08-03T04:45:00.000Z",
+   "grossR": 0.4120815853282557,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-03-30T04:00:00.000Z",
+   "grossR": -0.7582509277298787,
+   "outcome": "Partial",
+   "zone": "SOLUSDT Зона покупок(локально) 85-83"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-05-01T04:00:00.000Z",
+   "grossR": 0.5394169216501407,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 85-83"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-06-25T00:00:00.000Z",
+   "grossR": 0.4906530765906444,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 30,
+   "side": 1,
+   "date": "2026-06-04T23:00:00.000Z",
+   "grossR": 0.4041742521822658,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 30,
+   "side": 1,
+   "date": "2026-06-06T05:30:00.000Z",
+   "grossR": 0.5744633057491007,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 30,
+   "side": 1,
+   "date": "2026-06-09T17:30:00.000Z",
+   "grossR": 0.544996890403359,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 30,
+   "side": 1,
+   "date": "2026-06-10T14:00:00.000Z",
+   "grossR": 0.38157605580587833,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 30,
+   "side": 1,
+   "date": "2026-06-19T13:00:00.000Z",
+   "grossR": 0.5962706231749021,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 30,
+   "side": 1,
+   "date": "2026-06-25T05:00:00.000Z",
+   "grossR": 0.35451815114661916,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 30,
+   "side": 1,
+   "date": "2026-07-25T04:30:00.000Z",
+   "grossR": 0.6082188788694655,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 30,
+   "side": 1,
+   "date": "2026-08-01T16:30:00.000Z",
+   "grossR": 0.5733048204828168,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 74-72"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-03-28T14:00:00.000Z",
+   "grossR": 0.6570475766703798,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 85-83"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-12T21:00:00.000Z",
+   "grossR": 0.5278811235101668,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 85-83"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-29T00:00:00.000Z",
+   "grossR": 0.49586766715580016,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 85-83"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-01T02:00:00.000Z",
+   "grossR": 0.383009921307565,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок(локально) 85-83"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-05T17:00:00.000Z",
+   "grossR": 0.5744222957341896,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-10T13:00:00.000Z",
+   "grossR": 0.5638462927666635,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-26T04:00:00.000Z",
+   "grossR": 0.3601687184737954,
+   "outcome": "Full fix",
+   "zone": "SOLUSDT Зона покупок 67-60"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-05-12T12:00:00.000Z",
+   "grossR": 0.5331908859250302,
+   "outcome": "Full fix",
+   "zone": "SUIUSDT Зона продаж 1.2-1.3"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-16T16:00:00.000Z",
+   "grossR": -0.7341432301922012,
+   "outcome": "Partial",
+   "zone": "SUIUSDT Зона покупок 1.06-1"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-20T16:00:00.000Z",
+   "grossR": -0.7365573407927628,
+   "outcome": "Partial",
+   "zone": "SUIUSDT Зона покупок 1.06-1"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-25T00:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "zone": "SUIUSDT Зона покупок 1.06-1"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-29T04:00:00.000Z",
+   "grossR": 0.388783275438601,
+   "outcome": "Full fix",
+   "zone": "SUIUSDT Зона покупок 0.788-0.7"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-05-11T09:00:00.000Z",
+   "grossR": 0.5692404784103361,
+   "outcome": "Full fix",
+   "zone": "SUIUSDT Зона продаж 1.2-1.3"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-16T16:00:00.000Z",
+   "grossR": -0.7487029710901121,
+   "outcome": "Partial",
+   "zone": "SUIUSDT Зона покупок 1.06-1"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-18T12:00:00.000Z",
+   "grossR": 0.6161678220395944,
+   "outcome": "Full fix",
+   "zone": "SUIUSDT Зона покупок 1.06-1"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-23T14:00:00.000Z",
+   "grossR": -0.6807850256790463,
+   "outcome": "Partial",
+   "zone": "SUIUSDT Зона покупок 1.06-1"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-27T01:00:00.000Z",
+   "grossR": -0.8980807123637121,
+   "outcome": "Partial",
+   "zone": "SUIUSDT Зона покупок 1.06-1"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-21T10:00:00.000Z",
+   "grossR": 0.5625519306793236,
+   "outcome": "Full fix",
+   "zone": "SUIUSDT Зона покупок 0.788-0.7"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-24T12:00:00.000Z",
+   "grossR": 0.37952219835776085,
+   "outcome": "Full fix",
+   "zone": "SUIUSDT Зона покупок 0.788-0.7"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-28T08:00:00.000Z",
+   "grossR": 0.4763050305830923,
+   "outcome": "Full fix",
+   "zone": "SUIUSDT Зона покупок 0.788-0.7"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-13T15:00:00.000Z",
+   "grossR": 0.40903070629447497,
+   "outcome": "Full fix",
+   "zone": "SUIUSDT Зона покупок 0.788-0.7"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-18T15:00:00.000Z",
+   "grossR": 0.5019843374080797,
+   "outcome": "Full fix",
+   "zone": "SUIUSDT Зона покупок 0.788-0.7"
+  },
+  {
+   "symbol": "TONUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-28T17:00:00.000Z",
+   "grossR": 0.5818755454367697,
+   "outcome": "Full fix",
+   "zone": "TONUSDT Зона покупок 1.9-1.7"
+  },
+  {
+   "symbol": "TONUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-30T15:00:00.000Z",
+   "grossR": 0.5085611630020899,
+   "outcome": "Full fix",
+   "zone": "TONUSDT Зона покупок 1.9-1.7"
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-03-09T00:00:00.000Z",
+   "grossR": -0.6685020310498724,
+   "outcome": "Partial",
+   "zone": "TRXUSDT Зона продаж 0.2885-0.295"
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-03-12T12:00:00.000Z",
+   "grossR": -1.000000000000001,
+   "outcome": "Stop",
+   "zone": "TRXUSDT Зона продаж 0.2885-0.295"
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "date": "2026-03-16T08:00:00.000Z",
+   "grossR": -0.9999999999999998,
+   "outcome": "Stop",
+   "zone": "TRXUSDT Зона продаж 0.2885-0.295"
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-03-09T08:00:00.000Z",
+   "grossR": -0.6984742280980905,
+   "outcome": "Partial",
+   "zone": "TRXUSDT Зона продаж 0.2885-0.295"
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "date": "2026-03-16T20:00:00.000Z",
+   "grossR": -1.000000000000001,
+   "outcome": "Stop",
+   "zone": "TRXUSDT Зона продаж 0.2885-0.295"
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-03-12T11:00:00.000Z",
+   "grossR": -0.722520728073411,
+   "outcome": "Partial",
+   "zone": "TRXUSDT Зона продаж 0.2885-0.295"
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-03-14T07:00:00.000Z",
+   "grossR": -0.8147176799444003,
+   "outcome": "Partial",
+   "zone": "TRXUSDT Зона продаж 0.2885-0.295"
+  },
+  {
+   "symbol": "TWTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-20T08:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "zone": "TWTUSDT Зона покупок 0.393-0.377"
+  },
+  {
+   "symbol": "TWTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-20T07:00:00.000Z",
+   "grossR": -0.7165146434550955,
+   "outcome": "Partial",
+   "zone": "TWTUSDT Зона покупок 0.393-0.377"
+  },
+  {
+   "symbol": "TWTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-23T03:00:00.000Z",
+   "grossR": -1.000000000000001,
+   "outcome": "Stop",
+   "zone": "TWTUSDT Зона покупок 0.393-0.377"
+  },
+  {
+   "symbol": "UNIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-05T22:00:00.000Z",
+   "grossR": 0.6147676189237757,
+   "outcome": "Full fix",
+   "zone": "UNIUSDT Зона покупок 2.83-2.5"
+  },
+  {
+   "symbol": "UNIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-10T14:00:00.000Z",
+   "grossR": 0.5771885257476205,
+   "outcome": "Full fix",
+   "zone": "UNIUSDT Зона покупок 2.83-2.5"
+  },
+  {
+   "symbol": "UNIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-07-01T04:00:00.000Z",
+   "grossR": 0.5282807106242176,
+   "outcome": "Full fix",
+   "zone": "UNIUSDT Зона покупок 2.83-2.5"
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "date": "2026-07-21T18:00:00.000Z",
+   "grossR": 0.5860010424123199,
+   "outcome": "Full fix",
+   "zone": "VIRTUALUSDT Зона продаж 0.673-0.73"
+  },
+  {
+   "symbol": "WIFUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-09T05:00:00.000Z",
+   "grossR": -0.8288928922459563,
+   "outcome": "Partial",
+   "zone": "WIFUSDT Зона покупок(локально) 0.164-0.157"
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "date": "2026-01-19T20:00:00.000Z",
+   "grossR": -0.7687300439131342,
+   "outcome": "Partial",
+   "zone": "WLDUSDT Зона покупок 0.5-0.4"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-04-29T04:00:00.000Z",
+   "grossR": 0.6407029463636694,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.385-1.35"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-05-21T18:00:00.000Z",
+   "grossR": -0.7621192986919989,
+   "outcome": "Partial",
+   "zone": "XRPUSDT Зона покупок 1.385-1.35"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-10T14:00:00.000Z",
+   "grossR": 0.4831381694717501,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-06-29T00:00:00.000Z",
+   "grossR": 0.4633267727360638,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-07-13T20:00:00.000Z",
+   "grossR": 0.7762135816510092,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "date": "2026-07-18T18:00:00.000Z",
+   "grossR": 0.3675703185291419,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-04-29T21:00:00.000Z",
+   "grossR": 0.6319653835672912,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.385-1.35"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-08T15:00:00.000Z",
+   "grossR": 0.5172148960986149,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.385-1.35"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-18T12:00:00.000Z",
+   "grossR": -0.777201462374826,
+   "outcome": "Partial",
+   "zone": "XRPUSDT Зона покупок 1.385-1.35"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-05-20T06:00:00.000Z",
+   "grossR": -0.728884770714176,
+   "outcome": "Partial",
+   "zone": "XRPUSDT Зона покупок 1.385-1.35"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-05T17:00:00.000Z",
+   "grossR": 0.563044122737458,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-10T13:00:00.000Z",
+   "grossR": 0.5673670697880281,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-20T10:00:00.000Z",
+   "grossR": -0.7470036993839145,
+   "outcome": "Partial",
+   "zone": "XRPUSDT Зона покупок(локально) 1.17-1.13"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-23T12:00:00.000Z",
+   "grossR": -1.0000000000000002,
+   "outcome": "Stop",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-25T15:00:00.000Z",
+   "grossR": 0.7772866703375767,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-06-30T14:00:00.000Z",
+   "grossR": 0.4912536708317991,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-13T15:00:00.000Z",
+   "grossR": 0.612451646352027,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "date": "2026-07-17T07:00:00.000Z",
+   "grossR": 0.4880358218540861,
+   "outcome": "Full fix",
+   "zone": "XRPUSDT Зона покупок 1.115-1"
+  }
+ ]
+}
