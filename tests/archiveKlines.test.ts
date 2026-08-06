@@ -5,7 +5,7 @@ import { mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
-	archiveSymbol, fetchArchiveKlines, mergeCandleSeries, parseKlinesCsv, planPeriods, unzipCsv,
+	archiveSymbol, fetchArchiveKlines, internalGapDays, mergeCandleSeries, parseKlinesCsv, planPeriods, unzipCsv,
 } from '../tools/shared/archiveKlines.js'
 
 /** Минимальный валидный ZIP c одной записью (stored или deflate) — как пишут архиваторы. */
@@ -88,6 +88,15 @@ it('archive: planPeriods — целые месяцы + дни хвостовог
 	const w = planPeriods(Date.UTC(2026, 6, 3), Date.UTC(2026, 6, 5))
 	assert.deepEqual(w.months, [])
 	assert.deepEqual(w.days, ['2026-07-03', '2026-07-04'])
+})
+
+it('archive: internalGapDays находит только UTC-дни внутренних разрывов', () => {
+	const tfMs = 900_000
+	const candles = [
+		{ timestamp: Date.UTC(2022, 1, 25, 23, 45), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+		{ timestamp: Date.UTC(2022, 2, 1), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+	]
+	assert.deepEqual(internalGapDays(candles, tfMs), ['2022-02-26', '2022-02-27', '2022-02-28'])
 })
 
 it('archive: fetchArchiveKlines — символ нормализуется, 404 пропускается, дисковый кэш работает', async () => {
