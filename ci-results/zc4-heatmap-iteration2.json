@@ -1,0 +1,2805 @@
+{
+ "groups": {
+  "out|any": {
+   "n": 627,
+   "sumR": 0.1952402693820109,
+   "p": 207,
+   "s": 26,
+   "f": 394
+  },
+  "in|z60": {
+   "n": 1361,
+   "sumR": 2.280194386133438,
+   "p": 474,
+   "s": 96,
+   "f": 791
+  },
+  "in|z60|strict": {
+   "n": 1127,
+   "sumR": 6.8615643045832435,
+   "p": 390,
+   "s": 86,
+   "f": 651
+  },
+  "in|z60|w-top": {
+   "n": 1232,
+   "sumR": -3.803408769856201,
+   "p": 434,
+   "s": 89,
+   "f": 709
+  },
+  "in|z240": {
+   "n": 859,
+   "sumR": -23.291353853926,
+   "p": 315,
+   "s": 80,
+   "f": 464
+  },
+  "in|z240|w-top": {
+   "n": 737,
+   "sumR": -45.66951134603528,
+   "p": 283,
+   "s": 74,
+   "f": 380
+  },
+  "in|any": {
+   "n": 1486,
+   "sumR": -18.430551610113426,
+   "p": 529,
+   "s": 109,
+   "f": 848
+  },
+  "in|z60|top5strict": {
+   "n": 243,
+   "sumR": -10.654396312744522,
+   "p": 94,
+   "s": 19,
+   "f": 130
+  },
+  "in|z240|strict": {
+   "n": 571,
+   "sumR": -22.435097641501162,
+   "p": 216,
+   "s": 57,
+   "f": 298
+  },
+  "in|z240|top5strict": {
+   "n": 135,
+   "sumR": -26.14418135075924,
+   "p": 66,
+   "s": 13,
+   "f": 56
+  },
+  "in|z240|w-mid": {
+   "n": 97,
+   "sumR": 14.149943311273754,
+   "p": 28,
+   "s": 5,
+   "f": 64
+  },
+  "in|z60|w-mid": {
+   "n": 78,
+   "sumR": 7.506473128992193,
+   "p": 23,
+   "s": 3,
+   "f": 52
+  },
+  "in|z60|w-low": {
+   "n": 51,
+   "sumR": -1.4228699730025507,
+   "p": 17,
+   "s": 4,
+   "f": 30
+  },
+  "in|z240|w-low": {
+   "n": 25,
+   "sumR": 8.22821418083549,
+   "p": 4,
+   "s": 1,
+   "f": 20
+  }
+ },
+ "samples": [
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-07-01T14:00:00.000Z",
+   "grossR": 0.42790096899014457,
+   "outcome": "Full fix",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-07-01T14:00:00.000Z",
+   "grossR": 0.42790096899014457,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-07-02T21:00:00.000Z",
+   "grossR": -0.7160363581163094,
+   "outcome": "Partial",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-07-02T21:00:00.000Z",
+   "grossR": -0.7160363581163094,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-07-05T20:00:00.000Z",
+   "grossR": 0.5076501183545838,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-07-05T20:00:00.000Z",
+   "grossR": 0.5076501183545838,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-07-07T07:00:00.000Z",
+   "grossR": -0.7228309147949168,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-07-07T07:00:00.000Z",
+   "grossR": -0.7228309147949168,
+   "outcome": "Partial",
+   "causalRank": "0.56"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-07-11T16:00:00.000Z",
+   "grossR": 0.7000325176719935,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-07-11T16:00:00.000Z",
+   "grossR": 0.7000325176719935,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-07-13T22:00:00.000Z",
+   "grossR": 0.6932004189908703,
+   "outcome": "Full fix",
+   "causalRank": "0.71"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-07-13T22:00:00.000Z",
+   "grossR": 0.6932004189908703,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-07-15T14:00:00.000Z",
+   "grossR": 0.36041884035475963,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-07-22T06:00:00.000Z",
+   "grossR": 0.42577832723396236,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-07-25T10:00:00.000Z",
+   "grossR": 0.623899869109485,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-07-25T10:00:00.000Z",
+   "grossR": 0.623899869109485,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-07-26T21:00:00.000Z",
+   "grossR": 0.4198967643620142,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-07-28T14:00:00.000Z",
+   "grossR": 0.5391181508735615,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-01T12:00:00.000Z",
+   "grossR": 0.5334796535362477,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-01T12:00:00.000Z",
+   "grossR": 0.5334796535362477,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-08-05T04:00:00.000Z",
+   "grossR": -0.7451943606523829,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-07T17:00:00.000Z",
+   "grossR": -0.8313369102362558,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-08-07T17:00:00.000Z",
+   "grossR": -0.8313369102362558,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-09T12:00:00.000Z",
+   "grossR": -0.8051100189829733,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-11T08:00:00.000Z",
+   "grossR": 1.01580535903532,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-08-11T08:00:00.000Z",
+   "grossR": 1.01580535903532,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-14T06:00:00.000Z",
+   "grossR": 0.6114748914157057,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-08-14T06:00:00.000Z",
+   "grossR": 0.6114748914157057,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-15T23:00:00.000Z",
+   "grossR": -0.7298332384966899,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-15T23:00:00.000Z",
+   "grossR": -0.7298332384966899,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-18T13:00:00.000Z",
+   "grossR": -0.8547051584501795,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-18T13:00:00.000Z",
+   "grossR": -0.8547051584501795,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-20T09:00:00.000Z",
+   "grossR": 0.47490740938443404,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-20T09:00:00.000Z",
+   "grossR": 0.47490740938443404,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-22T03:00:00.000Z",
+   "grossR": 0.4729854785286498,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-23T14:00:00.000Z",
+   "grossR": 0.4396226765311971,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-25T15:00:00.000Z",
+   "grossR": 0.5749371799790263,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-25T15:00:00.000Z",
+   "grossR": 0.5749371799790263,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-28T16:00:00.000Z",
+   "grossR": 0.5265423523944627,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-08-28T16:00:00.000Z",
+   "grossR": 0.5265423523944627,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-29T22:00:00.000Z",
+   "grossR": 0.6497962254537248,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-29T22:00:00.000Z",
+   "grossR": 0.6497962254537248,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-31T16:00:00.000Z",
+   "grossR": 0.5289579191071151,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-31T16:00:00.000Z",
+   "grossR": 0.5289579191071151,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-02T12:00:00.000Z",
+   "grossR": -0.718596376053201,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-09-07T01:00:00.000Z",
+   "grossR": 0.5164810448258013,
+   "outcome": "Full fix",
+   "causalRank": "0.47"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-08T20:00:00.000Z",
+   "grossR": -0.6919539401891306,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-09-08T20:00:00.000Z",
+   "grossR": -0.6919539401891306,
+   "outcome": "Partial",
+   "causalRank": "0.74"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-11T16:00:00.000Z",
+   "grossR": 0.4837078471023434,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-09-11T16:00:00.000Z",
+   "grossR": 0.4837078471023434,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-13T17:00:00.000Z",
+   "grossR": 0.4541520355081967,
+   "outcome": "Full fix",
+   "causalRank": "0.93"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-17T04:00:00.000Z",
+   "grossR": 0.42604791878531095,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-09-17T04:00:00.000Z",
+   "grossR": 0.42604791878531095,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-09-20T08:00:00.000Z",
+   "grossR": -1.0000000000000009,
+   "outcome": "Stop",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-09-20T08:00:00.000Z",
+   "grossR": -1.0000000000000009,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-09-22T04:00:00.000Z",
+   "grossR": -0.9999999999999991,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-09-22T04:00:00.000Z",
+   "grossR": -0.9999999999999991,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-09-23T21:00:00.000Z",
+   "grossR": 0.5734253787255683,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-09-25T15:00:00.000Z",
+   "grossR": 0.4270070324357191,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-09-27T23:00:00.000Z",
+   "grossR": 0.5074908489094817,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-29T02:00:00.000Z",
+   "grossR": -0.9999999999999984,
+   "outcome": "Stop",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-09-29T02:00:00.000Z",
+   "grossR": -0.9999999999999984,
+   "outcome": "Stop",
+   "causalRank": "0.92"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-30T22:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-09-30T22:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-10-02T15:00:00.000Z",
+   "grossR": -0.9999999999999999,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-10-02T15:00:00.000Z",
+   "grossR": -0.9999999999999999,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-10-04T15:00:00.000Z",
+   "grossR": 0.557128568054574,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-10-04T15:00:00.000Z",
+   "grossR": 0.557128568054574,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-08T09:00:00.000Z",
+   "grossR": -0.7212809370578661,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-10-08T09:00:00.000Z",
+   "grossR": -0.7212809370578661,
+   "outcome": "Partial",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-10T09:00:00.000Z",
+   "grossR": -0.7307838222173022,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-14T16:00:00.000Z",
+   "grossR": -0.7347714953878498,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-16T17:00:00.000Z",
+   "grossR": -0.7833298969030259,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-10-16T17:00:00.000Z",
+   "grossR": -0.7833298969030259,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-10-20T00:00:00.000Z",
+   "grossR": -0.7059003772151032,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-10-20T00:00:00.000Z",
+   "grossR": -0.7059003772151032,
+   "outcome": "Partial",
+   "causalRank": "0.93"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-10-27T08:00:00.000Z",
+   "grossR": 1.004679028108422,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-10-27T08:00:00.000Z",
+   "grossR": 1.004679028108422,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-29T18:00:00.000Z",
+   "grossR": -0.7773700920622456,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-10-29T18:00:00.000Z",
+   "grossR": -0.7773700920622456,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-11-02T13:00:00.000Z",
+   "grossR": 0.6023569527043187,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-03T12:00:00.000Z",
+   "grossR": -1.0000000000000002,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-11-03T12:00:00.000Z",
+   "grossR": -1.0000000000000002,
+   "outcome": "Stop",
+   "causalRank": "0.89"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-11-10T02:00:00.000Z",
+   "grossR": 0.7904915181900218,
+   "outcome": "Full fix",
+   "causalRank": "0.95"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-11-10T02:00:00.000Z",
+   "grossR": 0.7904915181900218,
+   "outcome": "Full fix",
+   "causalRank": "0.91"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-12T09:00:00.000Z",
+   "grossR": -0.7402975694676898,
+   "outcome": "Partial",
+   "causalRank": "0.87"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-14T15:00:00.000Z",
+   "grossR": -0.762401393592653,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-11-14T15:00:00.000Z",
+   "grossR": -0.762401393592653,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-18T08:00:00.000Z",
+   "grossR": -0.701790403188385,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-11-18T08:00:00.000Z",
+   "grossR": -0.701790403188385,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-21T17:00:00.000Z",
+   "grossR": 0.5827403987913737,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-11-21T17:00:00.000Z",
+   "grossR": 0.5827403987913737,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-11-24T00:00:00.000Z",
+   "grossR": -0.7195915693859724,
+   "outcome": "Partial",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-11-24T00:00:00.000Z",
+   "grossR": -0.7195915693859724,
+   "outcome": "Partial",
+   "causalRank": "0.76"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-11-30T18:00:00.000Z",
+   "grossR": 0.4797887881417823,
+   "outcome": "Full fix",
+   "causalRank": "0.95"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-12-01T22:00:00.000Z",
+   "grossR": 0.7153897119365378,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-12-01T22:00:00.000Z",
+   "grossR": 0.7153897119365378,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-12-03T15:00:00.000Z",
+   "grossR": 0.5866868807242521,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-12-03T15:00:00.000Z",
+   "grossR": 0.5866868807242521,
+   "outcome": "Full fix",
+   "causalRank": "0.48"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-12-05T20:00:00.000Z",
+   "grossR": 0.5577894485125944,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-12-05T20:00:00.000Z",
+   "grossR": 0.5577894485125944,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-12-08T15:00:00.000Z",
+   "grossR": 0.4496076173721582,
+   "outcome": "Full fix",
+   "causalRank": "0.90"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-12-08T15:00:00.000Z",
+   "grossR": 0.4496076173721582,
+   "outcome": "Full fix",
+   "causalRank": "0.78"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-12-10T11:00:00.000Z",
+   "grossR": 0.4939441540962176,
+   "outcome": "Full fix",
+   "causalRank": "0.51"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-12-11T19:00:00.000Z",
+   "grossR": 0.41797624283837426,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-12-16T11:00:00.000Z",
+   "grossR": 0.5323691795158106,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-12-16T11:00:00.000Z",
+   "grossR": 0.5323691795158106,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-12-22T14:00:00.000Z",
+   "grossR": -0.6632663839125034,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-12-22T14:00:00.000Z",
+   "grossR": -0.6632663839125034,
+   "outcome": "Partial",
+   "causalRank": "0.95"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-12-23T16:00:00.000Z",
+   "grossR": 0.4466082413178964,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-12-23T16:00:00.000Z",
+   "grossR": 0.4466082413178964,
+   "outcome": "Full fix",
+   "causalRank": "0.88"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-12-29T10:00:00.000Z",
+   "grossR": -0.7331472674048519,
+   "outcome": "Partial",
+   "causalRank": "0.80"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-12-30T09:00:00.000Z",
+   "grossR": 0.31006592161695956,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-12-31T15:00:00.000Z",
+   "grossR": -0.7307874325258179,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-01-02T19:00:00.000Z",
+   "grossR": -0.9999999999999991,
+   "outcome": "Stop",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-01-02T19:00:00.000Z",
+   "grossR": -0.9999999999999991,
+   "outcome": "Stop",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-01-04T12:00:00.000Z",
+   "grossR": -0.7961496720869802,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-01-04T12:00:00.000Z",
+   "grossR": -0.7961496720869802,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-01-06T08:00:00.000Z",
+   "grossR": 0.5933787721611732,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-01-08T08:00:00.000Z",
+   "grossR": 0.5741368974240323,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-01-08T08:00:00.000Z",
+   "grossR": 0.5741368974240323,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-01-11T01:00:00.000Z",
+   "grossR": 0.5230131867597825,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-01-14T23:00:00.000Z",
+   "grossR": 0.7172989422188775,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-01-14T23:00:00.000Z",
+   "grossR": 0.7172989422188775,
+   "outcome": "Full fix",
+   "causalRank": "0.94"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-01-17T12:00:00.000Z",
+   "grossR": -0.7354066246532436,
+   "outcome": "Partial",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-01-21T01:00:00.000Z",
+   "grossR": -0.713038269712347,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-01-21T01:00:00.000Z",
+   "grossR": -0.713038269712347,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-01-25T11:00:00.000Z",
+   "grossR": -0.7438797240634848,
+   "outcome": "Partial",
+   "causalRank": "0.93"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-01-25T11:00:00.000Z",
+   "grossR": -0.7438797240634848,
+   "outcome": "Partial",
+   "causalRank": "0.93"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-01-28T15:00:00.000Z",
+   "grossR": 0.5082078268805871,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-01-28T15:00:00.000Z",
+   "grossR": 0.5082078268805871,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-01-30T19:00:00.000Z",
+   "grossR": -0.8816367604149725,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-01-30T19:00:00.000Z",
+   "grossR": -0.8816367604149725,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-02-01T23:00:00.000Z",
+   "grossR": -0.7070891482694615,
+   "outcome": "Partial",
+   "causalRank": "0.53"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-02-03T20:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-02-05T17:00:00.000Z",
+   "grossR": 0.7971501284891921,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-02-05T17:00:00.000Z",
+   "grossR": 0.7971501284891921,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-02-08T17:00:00.000Z",
+   "grossR": 0.5554548262389682,
+   "outcome": "Full fix",
+   "causalRank": "0.92"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-02-14T13:00:00.000Z",
+   "grossR": 0.6573308769604265,
+   "outcome": "Full fix",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-02-19T15:00:00.000Z",
+   "grossR": 0.5605963099775996,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-02-19T15:00:00.000Z",
+   "grossR": 0.5605963099775996,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-02-21T17:00:00.000Z",
+   "grossR": 0.5274135038497112,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-02-21T17:00:00.000Z",
+   "grossR": 0.5274135038497112,
+   "outcome": "Full fix",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-02-23T10:00:00.000Z",
+   "grossR": 0.5623507845375646,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-02-23T10:00:00.000Z",
+   "grossR": 0.5623507845375646,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-02-28T08:00:00.000Z",
+   "grossR": 0.8105225199292659,
+   "outcome": "Full fix",
+   "causalRank": "0.73"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-03-05T08:00:00.000Z",
+   "grossR": -0.7065149374308376,
+   "outcome": "Partial",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-03-05T08:00:00.000Z",
+   "grossR": -0.7065149374308376,
+   "outcome": "Partial",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-03-07T21:00:00.000Z",
+   "grossR": 0.7902308724641978,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-03-10T04:00:00.000Z",
+   "grossR": 0.45446847520747746,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-03-10T04:00:00.000Z",
+   "grossR": 0.45446847520747746,
+   "outcome": "Full fix",
+   "causalRank": "0.46"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-03-13T15:00:00.000Z",
+   "grossR": 0.6340739860227284,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-03-13T15:00:00.000Z",
+   "grossR": 0.6340739860227284,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-03-15T13:00:00.000Z",
+   "grossR": 0.42939177284923585,
+   "outcome": "Full fix",
+   "causalRank": "0.27"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-03-19T10:00:00.000Z",
+   "grossR": 0.6781013847772749,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-03-19T10:00:00.000Z",
+   "grossR": 0.6781013847772749,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-03-22T03:00:00.000Z",
+   "grossR": 0.637021252078089,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-03-26T21:00:00.000Z",
+   "grossR": 0.474732555029899,
+   "outcome": "Full fix",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-03-26T21:00:00.000Z",
+   "grossR": 0.474732555029899,
+   "outcome": "Full fix",
+   "causalRank": "0.94"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-03-30T14:00:00.000Z",
+   "grossR": -0.7156023275261356,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-04-01T18:00:00.000Z",
+   "grossR": -0.7248959241173086,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-04-02T15:00:00.000Z",
+   "grossR": 0.4291643595917501,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-04-06T22:00:00.000Z",
+   "grossR": -0.66477894299576,
+   "outcome": "Partial",
+   "causalRank": "0.94"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-04-06T22:00:00.000Z",
+   "grossR": -0.66477894299576,
+   "outcome": "Partial",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-04-08T15:00:00.000Z",
+   "grossR": -0.8014854140525803,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-04-08T15:00:00.000Z",
+   "grossR": -0.8014854140525803,
+   "outcome": "Partial",
+   "causalRank": "0.88"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-04-10T16:00:00.000Z",
+   "grossR": -0.7401155874799163,
+   "outcome": "Partial",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-04-13T01:00:00.000Z",
+   "grossR": 0.6734389148022593,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-04-14T15:00:00.000Z",
+   "grossR": -0.6971422944790406,
+   "outcome": "Partial",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-04-14T15:00:00.000Z",
+   "grossR": -0.6971422944790406,
+   "outcome": "Partial",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-04-16T08:00:00.000Z",
+   "grossR": -0.7147202490222191,
+   "outcome": "Partial",
+   "causalRank": "0.62"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-04-18T11:00:00.000Z",
+   "grossR": -0.7232575038846256,
+   "outcome": "Partial",
+   "causalRank": "0.92"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-04-18T11:00:00.000Z",
+   "grossR": -0.7232575038846256,
+   "outcome": "Partial",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-04-20T07:00:00.000Z",
+   "grossR": 0.6179234113379082,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-04-20T07:00:00.000Z",
+   "grossR": 0.6179234113379082,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-04-22T17:00:00.000Z",
+   "grossR": 0.7101322619360804,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-04-22T17:00:00.000Z",
+   "grossR": 0.7101322619360804,
+   "outcome": "Full fix",
+   "causalRank": "0.88"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-05-01T15:00:00.000Z",
+   "grossR": 0.580251117571128,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-05-01T15:00:00.000Z",
+   "grossR": 0.580251117571128,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-05-04T00:00:00.000Z",
+   "grossR": -0.7324550450085747,
+   "outcome": "Partial",
+   "causalRank": "0.90"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-05-04T00:00:00.000Z",
+   "grossR": -0.7324550450085747,
+   "outcome": "Partial",
+   "causalRank": "0.86"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-05-05T22:00:00.000Z",
+   "grossR": 0.5377498688841843,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-05-05T22:00:00.000Z",
+   "grossR": 0.5377498688841843,
+   "outcome": "Full fix",
+   "causalRank": "0.95"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-05-08T11:00:00.000Z",
+   "grossR": -0.7304762697232093,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-05-08T11:00:00.000Z",
+   "grossR": -0.7304762697232093,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-05-10T19:00:00.000Z",
+   "grossR": 0.7038439004142941,
+   "outcome": "Full fix",
+   "causalRank": "0.81"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-05-10T19:00:00.000Z",
+   "grossR": 0.7038439004142941,
+   "outcome": "Full fix",
+   "causalRank": "0.51"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-05-13T02:00:00.000Z",
+   "grossR": -0.7496623189809074,
+   "outcome": "Partial",
+   "causalRank": "0.94"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-05-13T02:00:00.000Z",
+   "grossR": -0.7496623189809074,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-05-17T03:00:00.000Z",
+   "grossR": -0.7877825446566386,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-05-17T03:00:00.000Z",
+   "grossR": -0.7877825446566386,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-05-18T20:00:00.000Z",
+   "grossR": -0.728437991649251,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-05-18T20:00:00.000Z",
+   "grossR": -0.728437991649251,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-05-21T10:00:00.000Z",
+   "grossR": 0.46321890665797294,
+   "outcome": "Full fix",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-05-23T14:00:00.000Z",
+   "grossR": -0.6552223356655767,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-05-23T14:00:00.000Z",
+   "grossR": -0.6552223356655767,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-05-25T23:00:00.000Z",
+   "grossR": 0.45668977620028794,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-05-27T16:00:00.000Z",
+   "grossR": -0.827376413386433,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-05-27T16:00:00.000Z",
+   "grossR": -0.827376413386433,
+   "outcome": "Partial",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-06-01T17:00:00.000Z",
+   "grossR": -0.9999999999999986,
+   "outcome": "Stop",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-06-01T17:00:00.000Z",
+   "grossR": -0.9999999999999986,
+   "outcome": "Stop",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-06-03T22:00:00.000Z",
+   "grossR": -0.8708361652154535,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-06-03T22:00:00.000Z",
+   "grossR": -0.8708361652154535,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-06-10T13:00:00.000Z",
+   "grossR": 0.5426835717351634,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-06-11T15:00:00.000Z",
+   "grossR": 0.37135368938110475,
+   "outcome": "Full fix",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-06-13T17:00:00.000Z",
+   "grossR": 0.592069072747068,
+   "outcome": "Full fix",
+   "causalRank": "0.86"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-06-16T03:00:00.000Z",
+   "grossR": 0.5115549001223093,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-06-18T13:00:00.000Z",
+   "grossR": -0.7780758144789903,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-06-18T13:00:00.000Z",
+   "grossR": -0.7780758144789903,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-06-21T12:00:00.000Z",
+   "grossR": 0.5843590235688784,
+   "outcome": "Full fix",
+   "causalRank": "0.79"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-06-21T12:00:00.000Z",
+   "grossR": 0.5843590235688784,
+   "outcome": "Full fix",
+   "causalRank": "0.52"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-06-24T01:00:00.000Z",
+   "grossR": -0.9999999999999997,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-06-24T01:00:00.000Z",
+   "grossR": -0.9999999999999997,
+   "outcome": "Stop",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-06-25T22:00:00.000Z",
+   "grossR": 0.5270961856904557,
+   "outcome": "Full fix",
+   "causalRank": "0.54"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-06-29T03:00:00.000Z",
+   "grossR": 0.6007849063067212,
+   "outcome": "Full fix",
+   "causalRank": "0.57"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-07-01T03:00:00.000Z",
+   "grossR": 0.4164380257347564,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-07-08T17:00:00.000Z",
+   "grossR": 0.4666274051818489,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-07-13T15:00:00.000Z",
+   "grossR": 0.66199692361393,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-07-13T15:00:00.000Z",
+   "grossR": 0.66199692361393,
+   "outcome": "Full fix",
+   "causalRank": "0.95"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2026-07-17T16:00:00.000Z",
+   "grossR": 0.5271825102928162,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2026-07-17T16:00:00.000Z",
+   "grossR": 0.5271825102928162,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-07-19T04:00:00.000Z",
+   "grossR": 0.636253555363361,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-07-19T04:00:00.000Z",
+   "grossR": 0.636253555363361,
+   "outcome": "Full fix",
+   "causalRank": "0.85"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-07-21T18:00:00.000Z",
+   "grossR": 0.5446967841483362,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-07-21T18:00:00.000Z",
+   "grossR": 0.5446967841483362,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2026-07-27T01:00:00.000Z",
+   "grossR": 0.8101846751560932,
+   "outcome": "Full fix",
+   "causalRank": "0.76"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-07-27T01:00:00.000Z",
+   "grossR": 0.8101846751560932,
+   "outcome": "Full fix",
+   "causalRank": "0.54"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2026-07-31T03:00:00.000Z",
+   "grossR": 0.3574942400829799,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-07-03T15:00:00.000Z",
+   "grossR": -0.6896267914355318,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-07-10T19:00:00.000Z",
+   "grossR": -0.895568577722342,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-07-14T15:00:00.000Z",
+   "grossR": -0.7068141278157584,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-07-17T02:00:00.000Z",
+   "grossR": -1.0000000000000004,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-07-21T16:00:00.000Z",
+   "grossR": 0.7065557605048084,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-07-24T08:00:00.000Z",
+   "grossR": 0.5290372548416032,
+   "outcome": "Full fix",
+   "causalRank": "0.88"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-02T21:00:00.000Z",
+   "grossR": 0.7166530947851166,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-05T01:00:00.000Z",
+   "grossR": -0.6522895348025755,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-08-05T01:00:00.000Z",
+   "grossR": -0.6522895348025755,
+   "outcome": "Partial",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-07T15:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-08-07T15:00:00.000Z",
+   "grossR": -1,
+   "outcome": "Stop",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-09T14:00:00.000Z",
+   "grossR": -0.7620286545013857,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-08-09T14:00:00.000Z",
+   "grossR": -0.7620286545013857,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-14T01:00:00.000Z",
+   "grossR": 0.744027086368278,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-08-14T01:00:00.000Z",
+   "grossR": 0.744027086368278,
+   "outcome": "Full fix",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-19T18:00:00.000Z",
+   "grossR": 0.5937269481454198,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-19T18:00:00.000Z",
+   "grossR": 0.5937269481454198,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-26T02:00:00.000Z",
+   "grossR": -0.6774863821363539,
+   "outcome": "Partial",
+   "causalRank": "0.85"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-26T02:00:00.000Z",
+   "grossR": -0.6774863821363539,
+   "outcome": "Partial",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-08-29T13:00:00.000Z",
+   "grossR": -0.7383480966712034,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-08-29T13:00:00.000Z",
+   "grossR": -0.7383480966712034,
+   "outcome": "Partial",
+   "causalRank": "0.94"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-08-31T20:00:00.000Z",
+   "grossR": 0.47328613377334877,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-04T03:00:00.000Z",
+   "grossR": 0.42448827606619244,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-09-04T03:00:00.000Z",
+   "grossR": 0.42448827606619244,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-13T14:00:00.000Z",
+   "grossR": 0.7200381370884161,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-09-13T14:00:00.000Z",
+   "grossR": 0.7200381370884161,
+   "outcome": "Full fix",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-09-16T16:00:00.000Z",
+   "grossR": -0.694083656392247,
+   "outcome": "Partial",
+   "causalRank": "0.90"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-18T20:00:00.000Z",
+   "grossR": 0.4312595359042094,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-09-18T20:00:00.000Z",
+   "grossR": 0.4312595359042094,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-09-20T15:00:00.000Z",
+   "grossR": -0.9999999999999989,
+   "outcome": "Stop",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-09-22T21:00:00.000Z",
+   "grossR": 0.6803716258104566,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-09-22T21:00:00.000Z",
+   "grossR": 0.6803716258104566,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-09-30T10:00:00.000Z",
+   "grossR": -0.7130600785906236,
+   "outcome": "Partial",
+   "causalRank": "0.16"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-10-02T08:00:00.000Z",
+   "grossR": 0.5657577386506432,
+   "outcome": "Full fix",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-10-02T08:00:00.000Z",
+   "grossR": 0.5657577386506432,
+   "outcome": "Full fix",
+   "causalRank": "0.74"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-10-06T21:00:00.000Z",
+   "grossR": 0.7144159562469261,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-10-06T21:00:00.000Z",
+   "grossR": 0.7144159562469261,
+   "outcome": "Full fix",
+   "causalRank": "0.94"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-11T03:00:00.000Z",
+   "grossR": -0.6918436401804463,
+   "outcome": "Partial",
+   "causalRank": "0.98"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-10-11T03:00:00.000Z",
+   "grossR": -0.6918436401804463,
+   "outcome": "Partial",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-10-13T12:00:00.000Z",
+   "grossR": 0.5274985036423021,
+   "outcome": "Full fix",
+   "causalRank": "0.93"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-10-13T12:00:00.000Z",
+   "grossR": 0.5274985036423021,
+   "outcome": "Full fix",
+   "causalRank": "0.71"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-16T07:00:00.000Z",
+   "grossR": -0.7399402547930468,
+   "outcome": "Partial",
+   "causalRank": "0.95"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-10-20T00:00:00.000Z",
+   "grossR": 0.6397894321724616,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-23T00:00:00.000Z",
+   "grossR": 0.5288370465671595,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-10-27T08:00:00.000Z",
+   "grossR": 1.0551202827931982,
+   "outcome": "Full fix",
+   "causalRank": "0.95"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-10-27T08:00:00.000Z",
+   "grossR": 1.0551202827931982,
+   "outcome": "Full fix",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-29T18:00:00.000Z",
+   "grossR": -0.8232389133965392,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-10-29T18:00:00.000Z",
+   "grossR": -0.8232389133965392,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-10-31T12:00:00.000Z",
+   "grossR": -0.7466788876788892,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-03T12:00:00.000Z",
+   "grossR": -0.9999999999999996,
+   "outcome": "Stop",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-11-03T12:00:00.000Z",
+   "grossR": -0.9999999999999996,
+   "outcome": "Stop",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-05T16:00:00.000Z",
+   "grossR": -0.7570056823556166,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-11-05T16:00:00.000Z",
+   "grossR": -0.7570056823556166,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-07T15:00:00.000Z",
+   "grossR": -0.708913644218473,
+   "outcome": "Partial",
+   "causalRank": "0.80"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-11-08T12:00:00.000Z",
+   "grossR": 0.4427977096166363,
+   "outcome": "Full fix",
+   "causalRank": "0.96"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-11-10T15:00:00.000Z",
+   "grossR": 0.5618315065768222,
+   "outcome": "Full fix",
+   "causalRank": "0.97"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-12T02:00:00.000Z",
+   "grossR": -0.7111956479795357,
+   "outcome": "Partial",
+   "causalRank": "0.99"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-11-12T02:00:00.000Z",
+   "grossR": -0.7111956479795357,
+   "outcome": "Partial",
+   "causalRank": "0.90"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-14T15:00:00.000Z",
+   "grossR": -0.7372433851207671,
+   "outcome": "Partial",
+   "causalRank": "0.90"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-11-14T15:00:00.000Z",
+   "grossR": -0.7372433851207671,
+   "outcome": "Partial",
+   "causalRank": "0.93"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-17T01:00:00.000Z",
+   "grossR": -0.7233222124775638,
+   "outcome": "Partial",
+   "causalRank": "0.93"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-11-20T20:00:00.000Z",
+   "grossR": 0.6359640024951269,
+   "outcome": "Full fix",
+   "causalRank": "0.95"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-11-20T20:00:00.000Z",
+   "grossR": 0.6359640024951269,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-11-25T02:00:00.000Z",
+   "grossR": -0.8066417260304964,
+   "outcome": "Partial",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-11-27T13:00:00.000Z",
+   "grossR": 0.4699163526153931,
+   "outcome": "Full fix",
+   "causalRank": "0.58"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": -1,
+   "date": "2025-11-27T13:00:00.000Z",
+   "grossR": 0.4699163526153931,
+   "outcome": "Full fix",
+   "causalRank": "0.79"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-12-01T22:00:00.000Z",
+   "grossR": 0.8232241751626459,
+   "outcome": "Full fix",
+   "causalRank": "1.00"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-12-01T22:00:00.000Z",
+   "grossR": 0.8232241751626459,
+   "outcome": "Full fix",
+   "causalRank": "0.95"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-12-04T15:00:00.000Z",
+   "grossR": 0.6115461409602019,
+   "outcome": "Full fix",
+   "causalRank": "0.91"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": 1,
+   "date": "2025-12-06T15:00:00.000Z",
+   "grossR": 0.48989003091845257,
+   "outcome": "Full fix",
+   "causalRank": "0.82"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z240",
+   "side": 1,
+   "date": "2025-12-06T15:00:00.000Z",
+   "grossR": 0.48989003091845257,
+   "outcome": "Full fix",
+   "causalRank": "0.94"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "layer": "z60",
+   "side": -1,
+   "date": "2025-12-08T16:00:00.000Z",
+   "grossR": 0.3302055979999598,
+   "outcome": "Full fix",
+   "causalRank": "0.76"
+  }
+ ],
+ "pBoot": 0.7643
+}
