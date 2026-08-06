@@ -1,0 +1,535 @@
+{
+ "groups": {
+  "out|any": {
+   "n": 1261,
+   "sumR": 7.420949633998976,
+   "p": 423,
+   "s": 54,
+   "f": 784
+  },
+  "in|any": {
+   "n": 852,
+   "sumR": -25.656260974730383,
+   "p": 313,
+   "s": 81,
+   "f": 458
+  },
+  "in|w-top": {
+   "n": 729,
+   "sumR": -48.53566479452434,
+   "p": 281,
+   "s": 75,
+   "f": 373
+  },
+  "in|w-mid": {
+   "n": 98,
+   "sumR": 16.194296729620987,
+   "p": 27,
+   "s": 5,
+   "f": 66
+  },
+  "in|SELECTIVE": {
+   "n": 54,
+   "sumR": 9.658701223068165,
+   "p": 16,
+   "s": 1,
+   "f": 37
+  },
+  "in|w-low": {
+   "n": 25,
+   "sumR": 6.685107090172924,
+   "p": 5,
+   "s": 1,
+   "f": 19
+  }
+ },
+ "selective": [
+  {
+   "symbol": "BTCUSDT",
+   "side": -1,
+   "date": "2025-07-07T07:00:00.000Z",
+   "grossR": -0.7228309147949168,
+   "outcome": "Partial",
+   "rank": "0.56",
+   "alive": 287
+  },
+  {
+   "symbol": "BTCUSDT",
+   "side": -1,
+   "date": "2025-12-03T15:00:00.000Z",
+   "grossR": 0.5866868807242521,
+   "outcome": "Full fix",
+   "rank": "0.48",
+   "alive": 381
+  },
+  {
+   "symbol": "BTCUSDT",
+   "side": -1,
+   "date": "2026-03-10T04:00:00.000Z",
+   "grossR": 0.45446847520747746,
+   "outcome": "Full fix",
+   "rank": "0.46",
+   "alive": 608
+  },
+  {
+   "symbol": "BTCUSDT",
+   "side": -1,
+   "date": "2026-06-21T12:00:00.000Z",
+   "grossR": 0.5843590235688784,
+   "outcome": "Full fix",
+   "rank": "0.52",
+   "alive": 767
+  },
+  {
+   "symbol": "ETHUSDT",
+   "side": -1,
+   "date": "2025-12-08T16:00:00.000Z",
+   "grossR": 0.3302055979999598,
+   "outcome": "Full fix",
+   "rank": "0.65",
+   "alive": 354
+  },
+  {
+   "symbol": "ETHUSDT",
+   "side": -1,
+   "date": "2026-01-28T15:00:00.000Z",
+   "grossR": 0.5512709944073394,
+   "outcome": "Full fix",
+   "rank": "0.50",
+   "alive": 441
+  },
+  {
+   "symbol": "ETHUSDT",
+   "side": -1,
+   "date": "2026-07-10T15:00:00.000Z",
+   "grossR": -0.7641648430222342,
+   "outcome": "Partial",
+   "rank": "0.21",
+   "alive": 774
+  },
+  {
+   "symbol": "SOLUSDT",
+   "side": -1,
+   "date": "2025-08-05T04:00:00.000Z",
+   "grossR": -0.6975170222924761,
+   "outcome": "Partial",
+   "rank": "0.48",
+   "alive": 197
+  },
+  {
+   "symbol": "SOLUSDT",
+   "side": -1,
+   "date": "2025-10-14T05:00:00.000Z",
+   "grossR": 0.6450909044812877,
+   "outcome": "Full fix",
+   "rank": "0.60",
+   "alive": 162
+  },
+  {
+   "symbol": "SOLUSDT",
+   "side": -1,
+   "date": "2026-02-21T17:00:00.000Z",
+   "grossR": 0.6069728221330459,
+   "outcome": "Full fix",
+   "rank": "0.30",
+   "alive": 535
+  },
+  {
+   "symbol": "SOLUSDT",
+   "side": -1,
+   "date": "2026-05-21T06:00:00.000Z",
+   "grossR": 0.508298116489092,
+   "outcome": "Full fix",
+   "rank": "0.35",
+   "alive": 677
+  },
+  {
+   "symbol": "XRPUSDT",
+   "side": -1,
+   "date": "2026-01-14T05:00:00.000Z",
+   "grossR": 0.5672608091740369,
+   "outcome": "Full fix",
+   "rank": "0.53",
+   "alive": 458
+  },
+  {
+   "symbol": "XRPUSDT",
+   "side": -1,
+   "date": "2026-02-25T23:00:00.000Z",
+   "grossR": 0.6944953052812837,
+   "outcome": "Full fix",
+   "rank": "0.42",
+   "alive": 596
+  },
+  {
+   "symbol": "XRPUSDT",
+   "side": -1,
+   "date": "2026-03-04T23:00:00.000Z",
+   "grossR": 0.5734940744034032,
+   "outcome": "Full fix",
+   "rank": "0.55",
+   "alive": 618
+  },
+  {
+   "symbol": "XRPUSDT",
+   "side": -1,
+   "date": "2026-03-13T12:00:00.000Z",
+   "grossR": -0.6987929105671196,
+   "outcome": "Partial",
+   "rank": "0.14",
+   "alive": 640
+  },
+  {
+   "symbol": "XRPUSDT",
+   "side": -1,
+   "date": "2026-04-06T17:00:00.000Z",
+   "grossR": -0.6840055974548277,
+   "outcome": "Partial",
+   "rank": "0.15",
+   "alive": 679
+  },
+  {
+   "symbol": "XRPUSDT",
+   "side": -1,
+   "date": "2026-06-15T22:00:00.000Z",
+   "grossR": 0.8801339511535525,
+   "outcome": "Full fix",
+   "rank": "0.46",
+   "alive": 847
+  },
+  {
+   "symbol": "XRPUSDT",
+   "side": -1,
+   "date": "2026-07-21T21:00:00.000Z",
+   "grossR": 0.6596962068655852,
+   "outcome": "Full fix",
+   "rank": "0.63",
+   "alive": 944
+  },
+  {
+   "symbol": "BNBUSDT",
+   "side": -1,
+   "date": "2025-12-03T15:00:00.000Z",
+   "grossR": 0.6699573898182537,
+   "outcome": "Full fix",
+   "rank": "0.02",
+   "alive": 174
+  },
+  {
+   "symbol": "BNBUSDT",
+   "side": -1,
+   "date": "2025-12-08T12:00:00.000Z",
+   "grossR": 0.5509746191341559,
+   "outcome": "Full fix",
+   "rank": "0.10",
+   "alive": 176
+  },
+  {
+   "symbol": "BNBUSDT",
+   "side": -1,
+   "date": "2026-01-17T17:00:00.000Z",
+   "grossR": 0.6446025331757793,
+   "outcome": "Full fix",
+   "rank": "0.24",
+   "alive": 234
+  },
+  {
+   "symbol": "BNBUSDT",
+   "side": -1,
+   "date": "2026-02-14T13:00:00.000Z",
+   "grossR": 0.5959228940561123,
+   "outcome": "Full fix",
+   "rank": "0.60",
+   "alive": 335
+  },
+  {
+   "symbol": "BNBUSDT",
+   "side": -1,
+   "date": "2026-02-21T16:00:00.000Z",
+   "grossR": 0.638458028563768,
+   "outcome": "Full fix",
+   "rank": "0.61",
+   "alive": 358
+  },
+  {
+   "symbol": "BNBUSDT",
+   "side": -1,
+   "date": "2026-04-18T04:00:00.000Z",
+   "grossR": -0.6979393976251366,
+   "outcome": "Partial",
+   "rank": "0.50",
+   "alive": 468
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "side": -1,
+   "date": "2025-08-05T04:00:00.000Z",
+   "grossR": -0.7022258148695006,
+   "outcome": "Partial",
+   "rank": "0.42",
+   "alive": 251
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "side": -1,
+   "date": "2026-02-14T13:00:00.000Z",
+   "grossR": -0.9999999999999997,
+   "outcome": "Stop",
+   "rank": "0.52",
+   "alive": 623
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "side": -1,
+   "date": "2026-04-22T17:00:00.000Z",
+   "grossR": -0.7109315469263953,
+   "outcome": "Partial",
+   "rank": "0.42",
+   "alive": 753
+  },
+  {
+   "symbol": "ADAUSDT",
+   "side": -1,
+   "date": "2026-02-25T23:00:00.000Z",
+   "grossR": 0.9271130622031019,
+   "outcome": "Full fix",
+   "rank": "0.47",
+   "alive": 697
+  },
+  {
+   "symbol": "ADAUSDT",
+   "side": -1,
+   "date": "2026-04-16T17:00:00.000Z",
+   "grossR": -0.75917462075906,
+   "outcome": "Partial",
+   "rank": "0.04",
+   "alive": 803
+  },
+  {
+   "symbol": "LINKUSDT",
+   "side": -1,
+   "date": "2025-07-03T15:00:00.000Z",
+   "grossR": -0.6926329545447417,
+   "outcome": "Partial",
+   "rank": "0.66",
+   "alive": 354
+  },
+  {
+   "symbol": "LINKUSDT",
+   "side": -1,
+   "date": "2026-03-09T23:00:00.000Z",
+   "grossR": -0.7547283914901078,
+   "outcome": "Partial",
+   "rank": "0.51",
+   "alive": 666
+  },
+  {
+   "symbol": "LINKUSDT",
+   "side": -1,
+   "date": "2026-04-06T17:00:00.000Z",
+   "grossR": -0.6596966949528082,
+   "outcome": "Partial",
+   "rank": "0.62",
+   "alive": 717
+  },
+  {
+   "symbol": "LINKUSDT",
+   "side": 1,
+   "date": "2026-04-12T21:00:00.000Z",
+   "grossR": 0.5643166335678274,
+   "outcome": "Full fix",
+   "rank": "0.49",
+   "alive": 543
+  },
+  {
+   "symbol": "LINKUSDT",
+   "side": -1,
+   "date": "2026-05-06T14:00:00.000Z",
+   "grossR": 0.6136115518396489,
+   "outcome": "Full fix",
+   "rank": "0.54",
+   "alive": 768
+  },
+  {
+   "symbol": "LINKUSDT",
+   "side": 1,
+   "date": "2026-05-12T18:00:00.000Z",
+   "grossR": -0.7052591863375653,
+   "outcome": "Partial",
+   "rank": "0.63",
+   "alive": 655
+  },
+  {
+   "symbol": "LTCUSDT",
+   "side": -1,
+   "date": "2026-02-21T10:00:00.000Z",
+   "grossR": 0.5859281153914672,
+   "outcome": "Full fix",
+   "rank": "0.05",
+   "alive": 531
+  },
+  {
+   "symbol": "LTCUSDT",
+   "side": 1,
+   "date": "2026-06-24T06:00:00.000Z",
+   "grossR": 0.7125383774856825,
+   "outcome": "Full fix",
+   "rank": "0.52",
+   "alive": 68
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "side": -1,
+   "date": "2025-12-08T16:00:00.000Z",
+   "grossR": 0.3598074068246066,
+   "outcome": "Full fix",
+   "rank": "0.61",
+   "alive": 576
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "side": -1,
+   "date": "2026-01-14T11:00:00.000Z",
+   "grossR": 0.6916247906327205,
+   "outcome": "Full fix",
+   "rank": "0.67",
+   "alive": 546
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "side": -1,
+   "date": "2026-05-09T15:00:00.000Z",
+   "grossR": 0.4470478941985864,
+   "outcome": "Full fix",
+   "rank": "0.38",
+   "alive": 821
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "side": -1,
+   "date": "2026-07-03T23:00:00.000Z",
+   "grossR": 0.6535485305333603,
+   "outcome": "Full fix",
+   "rank": "0.58",
+   "alive": 968
+  },
+  {
+   "symbol": "DOTUSDT",
+   "side": 1,
+   "date": "2025-07-04T23:00:00.000Z",
+   "grossR": 0.5128784099290637,
+   "outcome": "Full fix",
+   "rank": "0.19",
+   "alive": 76
+  },
+  {
+   "symbol": "DOTUSDT",
+   "side": 1,
+   "date": "2026-01-19T17:00:00.000Z",
+   "grossR": -0.7696991704142505,
+   "outcome": "Partial",
+   "rank": "0.54",
+   "alive": 127
+  },
+  {
+   "symbol": "DOTUSDT",
+   "side": -1,
+   "date": "2026-07-10T15:00:00.000Z",
+   "grossR": 0.5752987449753979,
+   "outcome": "Full fix",
+   "rank": "0.39",
+   "alive": 1103
+  },
+  {
+   "symbol": "DOTUSDT",
+   "side": -1,
+   "date": "2026-07-21T21:00:00.000Z",
+   "grossR": 0.5039512127623177,
+   "outcome": "Full fix",
+   "rank": "0.39",
+   "alive": 1139
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "side": -1,
+   "date": "2025-07-27T09:00:00.000Z",
+   "grossR": 0.5734386393844876,
+   "outcome": "Full fix",
+   "rank": "0.58",
+   "alive": 882
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "side": -1,
+   "date": "2025-08-04T02:00:00.000Z",
+   "grossR": -0.7146550391035571,
+   "outcome": "Partial",
+   "rank": "0.31",
+   "alive": 920
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "side": -1,
+   "date": "2026-01-10T14:00:00.000Z",
+   "grossR": 0.49126197802571736,
+   "outcome": "Full fix",
+   "rank": "0.59",
+   "alive": 1169
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "side": -1,
+   "date": "2026-04-25T17:00:00.000Z",
+   "grossR": 0.7381551569365464,
+   "outcome": "Full fix",
+   "rank": "0.48",
+   "alive": 1243
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "side": 1,
+   "date": "2026-04-28T17:00:00.000Z",
+   "grossR": 0.7038755067736678,
+   "outcome": "Full fix",
+   "rank": "0.41",
+   "alive": 178
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "side": 1,
+   "date": "2026-05-01T09:00:00.000Z",
+   "grossR": 0.6640434684106561,
+   "outcome": "Full fix",
+   "rank": "0.44",
+   "alive": 182
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "side": -1,
+   "date": "2026-06-09T00:00:00.000Z",
+   "grossR": -0.7337615395864232,
+   "outcome": "Partial",
+   "rank": "0.54",
+   "alive": 1248
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "side": -1,
+   "date": "2026-06-11T10:00:00.000Z",
+   "grossR": 0.4541348229673908,
+   "outcome": "Full fix",
+   "rank": "0.39",
+   "alive": 1234
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "side": -1,
+   "date": "2026-07-11T22:00:00.000Z",
+   "grossR": 0.6117939383297786,
+   "outcome": "Full fix",
+   "rank": "0.26",
+   "alive": 1277
+  }
+ ],
+ "outMean": 0.005884971954003946
+}
