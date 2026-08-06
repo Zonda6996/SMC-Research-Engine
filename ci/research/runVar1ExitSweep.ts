@@ -35,6 +35,8 @@ export interface Var1Config {
 export interface Var1Trade {
 	outcome: 'Stop' | 'Partial' | 'Full fix' | 'End mark'
 	grossR: number
+	/** bar index at which the trade closed (undefined for End mark) */
+	exitIndex?: number
 }
 
 const favWick = (side: CorrectedGgiSide, r: ExactIndicatorRow, lvl: number) => (side === 1 ? r.high >= lvl : r.low <= lvl)
@@ -71,12 +73,15 @@ export function replayVar1Trade(
 
 	const pnlPct = (to: number, w: number, from: number) => ((side * (to - from)) / entryPrice) * w * 100
 
+	let curIndex = signalIndex
 	const finish = (outcome: Var1Trade['outcome'], exitPrice: number): Var1Trade => ({
 		outcome,
 		grossR: (realisedPct + pnlPct(exitPrice, activeWeight, avgEntry)) / plannedRiskPct,
+		exitIndex: curIndex,
 	})
 
 	for (let i = signalIndex + 1; i < rows.length; i++) {
+		curIndex = i
 		const bar = rows[i]!
 		if (!validGgiBand(bar)) continue
 		// 0) add-on BEFORE stop check only if the add level is hit while the stop is NOT
