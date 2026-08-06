@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T08:09:29.560Z",
+  "older": {
+    "file": "D:/FrontEnd/2025/Projects/SMC-Research-Engine/ci-results/ggi-snapshot-bnb-2h-2026-08-05-1155.csv",
+    "name": "ggi-snapshot-bnb-2h-2026-08-05-1155.csv",
+    "sha256": "d3bf92669d4c9b8281f311dac8a27e16b2ba0a4e5b055b4aa6f4d41c316cb01b",
+    "rows": 20128
+  },
+  "newer": {
+    "file": "C:/Users/Никита/Downloads/BNB_2h_2026-08-05_1307.csv",
+    "name": "BNB_2h_2026-08-05_1307.csv",
+    "sha256": "3e137feeb784092f34d36c614b4a459cafcdb7df473916da6887941c77fed461",
+    "rows": 20129
+  },
+  "timeframeMs": 7200000,
+  "priceTolerance": 1e-10,
+  "sharedRows": 20128,
+  "olderOnlyRows": 0,
+  "newerOnlyRows": 1,
+  "oldOnlyRange": null,
+  "newOnlyRange": {
+    "firstUtc": "2026-08-05T08:00:00.000Z",
+    "lastUtc": "2026-08-05T08:00:00.000Z"
+  },
+  "ignoreNewestBars": 1,
+  "changes": 1,
+  "recentChanges": 1,
+  "historicalChanges": 0,
+  "historicalShapeChanges": 0,
+  "historicalBandChanges": 0,
+  "historicalPriceChanges": 0,
+  "verdict": "no-historical-change-detected-in-this-pair",
+  "historicalChangesDetail": [],
+  "recentChangesDetail": [
+    {
+      "timestamp": 1785909600000,
+      "utc": "2026-08-05T06:00:00.000Z",
+      "ageFromNewestBars": 0,
+      "shapeChanged": false,
+      "oldBuy": false,
+      "newBuy": false,
+      "oldSell": false,
+      "newSell": false,
+      "priceChanged": true,
+      "bandChanged": true,
+      "changes": {
+        "low": {
+          "old": 600.4,
+          "new": 598.1,
+          "delta": -2.2999999999999545
+        },
+        "close": {
+          "old": 600.8,
+          "new": 599.7,
+          "delta": -1.099999999999909
+        },
+        "mean": {
+          "old": 583.4738426574827,
+          "new": 583.4727796950332,
+          "delta": -0.0010629624495095413
+        },
+        "upperOuter": {
+          "old": 621.4558622133654,
+          "new": 621.4768335498633,
+          "delta": 0.020971336497837
+        },
+        "upperInner": {
+          "old": 605.3384331781151,
+          "new": 605.3498895972291,
+          "delta": 0.01145641911398343
+        },
+        "lowerInner": {
+          "old": 562.3989927058161,
+          "new": 562.3863000479963,
+          "delta": -0.012692657819798114
+        },
+        "lowerOuter": {
+          "old": 547.8132008490162,
+          "new": 547.7927193206212,
+          "delta": -0.020481528394952875
+        }
+      }
+    }
+  ]
+}

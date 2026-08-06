@@ -1,0 +1,3208 @@
+{
+  "version": "ggi-econ0-common-corrected-replay-v1",
+  "generatedAt": "2026-08-06T10:03:33.186Z",
+  "coverage": {
+    "status": "PARTIAL_INPUT_COVERAGE",
+    "available": 5,
+    "expectedLocal": 5,
+    "note": "Ten historical ETH/SOL/XRP/AAVE/BNB 1h/2h holdout exports are absent by preregistration."
+  },
+  "protocol": {
+    "management": "next-open; 12x causal SMA(TR,55) initial stop; 25% Mean-wick partial; next-bar entry BE; close-confirmed moving opposite Inner full; adverse wick first; max 2000 bars; no add",
+    "oneWayCostBps": 6,
+    "funding": "excluded",
+    "own2Retention": 0.35,
+    "own2Cutoff": 0.03788925513805964,
+    "null": "dataset/window count matched by direction, calendar month, signal-side Mean state and causal expanding ATR55 quintile; deterministic fallback tiers"
+  },
+  "inputs": [
+    {
+      "id": "btc-2h",
+      "file": "data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_2h_full20k_vol.csv",
+      "role": "development",
+      "timeframeMinutes": 120,
+      "available": true,
+      "sha256": "61f4eed2e5d1732a34c69ab48b5f3a3e0994d7c30fef215f1787e7fb31ee29e0"
+    },
+    {
+      "id": "xrp-3m",
+      "file": "data/vendor-exports/incoming-2026-08/BINANCE_XRPUSDT_3m_vol.csv",
+      "role": "transfer",
+      "timeframeMinutes": 3,
+      "available": true,
+      "sha256": "393305f4f16214e372c571bf075dd975bc33137fa149996638f0a54100a8c090"
+    },
+    {
+      "id": "ondo-2h",
+      "file": "data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_2h.csv",
+      "role": "transfer",
+      "timeframeMinutes": 120,
+      "available": true,
+      "sha256": "aaa953cedb33958e8141a166d1262af88d2d862887084ee1f628e962cf261e5d"
+    },
+    {
+      "id": "ondo-15m",
+      "file": "data/vendor-exports/incoming-2026-08/BYBIT_ONDOUSDT.P_15m.csv",
+      "role": "transfer",
+      "timeframeMinutes": 15,
+      "available": true,
+      "sha256": "5d5c7907e0505b7b228c317a24368fd7c09c88944faf5249da7a68217b3fafb3"
+    },
+    {
+      "id": "btc-15m",
+      "file": "data/vendor-exports/incoming-2026-08/BYBIT_BTCUSDT.P_15m.csv",
+      "role": "transfer",
+      "timeframeMinutes": 15,
+      "available": true,
+      "sha256": "9798b630854817cfaa8c38760286cb6d01a2d12063b296bc9128897ce06883fe"
+    }
+  ],
+  "frozenOwn2": {
+    "retention": 0.35,
+    "cutoff": 0.03788925513805964,
+    "fitCandidates": 1455,
+    "validationClosedTrades": 90,
+    "validationMeanNetR": 0.11459199623060203
+  },
+  "cells": [
+    {
+      "dataset": "btc-2h",
+      "window": "full",
+      "stream": "GGI",
+      "summary": {
+        "signals": 91,
+        "closedTrades": 91,
+        "partial": 68,
+        "stop": 6,
+        "full": 17,
+        "end": 0,
+        "dashboardWinRate": 0.9340659340659341,
+        "positiveNetRate": 0.6813186813186813,
+        "meanGrossR": 0.07207836141134555,
+        "medianGrossR": 0.037184173598163624,
+        "meanNetR": 0.060977352434692614,
+        "medianNetR": 0.02432546788721049,
+        "profitFactorNet": 1.7925932555113053,
+        "best1RemovedMeanNetR": 0.04979115427610563,
+        "turnover": 182,
+        "meanHoldingBars": 55.527472527472526,
+        "timeInMarketBars": 5053,
+        "netRPer1000Bars": 0.27565519481157613,
+        "outcomes": {
+          "Partial": {
+            "count": 68,
+            "meanNetR": 0.011567719651806689,
+            "totalNetR": 0.7866049363228549
+          },
+          "Stop": {
+            "count": 6,
+            "meanNetR": -1.0149504209898463,
+            "totalNetR": -6.089702525939078
+          },
+          "Full fix": {
+            "count": 17,
+            "meanNetR": 0.6383550977160736,
+            "totalNetR": 10.852036661173251
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 91,
+        "closedTrades": 91,
+        "partial": 78,
+        "stop": 4,
+        "full": 9,
+        "end": 0,
+        "dashboardWinRate": 0.9560439560439561,
+        "positiveNetRate": 0.6153846153846154,
+        "meanGrossR": 0.027823637500823842,
+        "medianGrossR": 0.020838791502447458,
+        "meanNetR": 0.016611155658640433,
+        "medianNetR": 0.011574941789815121,
+        "profitFactorNet": 1.297161518097027,
+        "best1RemovedMeanNetR": 0.006815660427807657,
+        "turnover": 182,
+        "meanHoldingBars": 45.45054945054945,
+        "timeInMarketBars": 4136,
+        "netRPer1000Bars": 0.07509265598292496,
+        "outcomes": {
+          "Partial": {
+            "count": 78,
+            "meanNetR": 0.004373172212621631,
+            "totalNetR": 0.3411074325844872
+          },
+          "Stop": {
+            "count": 4,
+            "meanNetR": -1.0162753244818856,
+            "totalNetR": -4.0651012979275425
+          },
+          "Full fix": {
+            "count": 9,
+            "meanNetR": 0.5817343366977037,
+            "totalNetR": 5.235609030279333
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 91,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.04436619677605218
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "full",
+      "stream": "OWN1",
+      "summary": {
+        "signals": 385,
+        "closedTrades": 384,
+        "partial": 308,
+        "stop": 27,
+        "full": 49,
+        "end": 1,
+        "dashboardWinRate": 0.9296875,
+        "positiveNetRate": 0.6119791666666666,
+        "meanGrossR": 0.009897260315228746,
+        "medianGrossR": 0.01921756684491935,
+        "meanNetR": -0.0010887720729972337,
+        "medianNetR": 0.009490174386095056,
+        "profitFactorNet": 0.9866250298612697,
+        "best1RemovedMeanNetR": -0.009677746680689719,
+        "turnover": 768,
+        "meanHoldingBars": 43.651041666666664,
+        "timeInMarketBars": 16762,
+        "netRPer1000Bars": -0.02076942255493978,
+        "outcomes": {
+          "Partial": {
+            "count": 308,
+            "meanNetR": 0.003088449426968642,
+            "totalNetR": 0.9512424235063417
+          },
+          "Stop": {
+            "count": 27,
+            "meanNetR": -1.0137220322509353,
+            "totalNetR": -27.370494870775254
+          },
+          "Full fix": {
+            "count": 49,
+            "meanNetR": 0.5306359994130199,
+            "totalNetR": 26.001163971237975
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 385,
+        "closedTrades": 385,
+        "partial": 288,
+        "stop": 31,
+        "full": 66,
+        "end": 0,
+        "dashboardWinRate": 0.9194805194805195,
+        "positiveNetRate": 0.5974025974025974,
+        "meanGrossR": 0.018255165188089447,
+        "medianGrossR": 0.017547644997266965,
+        "meanNetR": 0.007298918237700787,
+        "medianNetR": 0.0064167532816348715,
+        "profitFactorNet": 1.07875572502434,
+        "best1RemovedMeanNetR": -0.0018063330449408358,
+        "turnover": 770,
+        "meanHoldingBars": 45.04155844155844,
+        "timeInMarketBars": 17341,
+        "netRPer1000Bars": 0.13959679689591667,
+        "outcomes": {
+          "Partial": {
+            "count": 288,
+            "meanNetR": -0.00006518351693630195,
+            "totalNetR": -0.018772852877654962
+          },
+          "Stop": {
+            "count": 31,
+            "meanNetR": -1.013279131527032,
+            "totalNetR": -31.411653077337988
+          },
+          "Full fix": {
+            "count": 66,
+            "meanNetR": 0.5187955977534917,
+            "totalNetR": 34.24050945173045
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 385,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.00838769031069802
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "full",
+      "stream": "OWN2_BROAD",
+      "summary": {
+        "signals": 721,
+        "closedTrades": 718,
+        "partial": 543,
+        "stop": 57,
+        "full": 118,
+        "end": 3,
+        "dashboardWinRate": 0.9206128133704735,
+        "positiveNetRate": 0.6476323119777159,
+        "meanGrossR": 0.020318354831984558,
+        "medianGrossR": 0.022369668219846463,
+        "meanNetR": 0.00947146243392996,
+        "medianNetR": 0.012053060548949954,
+        "profitFactorNet": 1.1047120776581258,
+        "best1RemovedMeanNetR": 0.00015039902503478532,
+        "turnover": 1436,
+        "meanHoldingBars": 49.02506963788301,
+        "timeInMarketBars": 35200,
+        "netRPer1000Bars": 0.3378296089201049,
+        "outcomes": {
+          "Partial": {
+            "count": 543,
+            "meanNetR": 0.0034057085414685535,
+            "totalNetR": 1.8492997380174245
+          },
+          "Stop": {
+            "count": 57,
+            "meanNetR": -1.012769627329997,
+            "totalNetR": -57.72786875780983
+          },
+          "Full fix": {
+            "count": 118,
+            "meanNetR": 0.5311786359945264,
+            "totalNetR": 62.67907904735412
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 721,
+        "closedTrades": 719,
+        "partial": 550,
+        "stop": 50,
+        "full": 119,
+        "end": 2,
+        "dashboardWinRate": 0.9304589707927677,
+        "positiveNetRate": 0.6008344923504868,
+        "meanGrossR": 0.0268103771179856,
+        "medianGrossR": 0.01752499428307573,
+        "meanNetR": 0.015930057326957816,
+        "medianNetR": 0.007664860745903928,
+        "profitFactorNet": 1.1949406819297765,
+        "best1RemovedMeanNetR": 0.0063185212770724185,
+        "turnover": 1438,
+        "meanHoldingBars": 47.44367176634214,
+        "timeInMarketBars": 34112,
+        "netRPer1000Bars": 0.5689871444651103,
+        "outcomes": {
+          "Partial": {
+            "count": 550,
+            "meanNetR": -0.0005791044502503628,
+            "totalNetR": -0.31850744763769956
+          },
+          "Stop": {
+            "count": 50,
+            "meanNetR": -1.0127082801803986,
+            "totalNetR": -50.63541400901993
+          },
+          "Full fix": {
+            "count": 119,
+            "meanNetR": 0.5244338880230279,
+            "totalNetR": 62.40763267474032
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 721,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.006458594893027856
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "full",
+      "stream": "OWN2_SELECTED",
+      "summary": {
+        "signals": 386,
+        "closedTrades": 385,
+        "partial": 286,
+        "stop": 34,
+        "full": 65,
+        "end": 1,
+        "dashboardWinRate": 0.9116883116883117,
+        "positiveNetRate": 0.6753246753246753,
+        "meanGrossR": 0.0217049628526962,
+        "medianGrossR": 0.028555095792076254,
+        "meanNetR": 0.010885377067551888,
+        "medianNetR": 0.018127843852222134,
+        "profitFactorNet": 1.1111231195901936,
+        "best1RemovedMeanNetR": 0.0021865943559166386,
+        "turnover": 770,
+        "meanHoldingBars": 53.103896103896105,
+        "timeInMarketBars": 20445,
+        "netRPer1000Bars": 0.2081902717837793,
+        "outcomes": {
+          "Partial": {
+            "count": 286,
+            "meanNetR": 0.008998200390773753,
+            "totalNetR": 2.5734853117612935
+          },
+          "Stop": {
+            "count": 34,
+            "meanNetR": -1.0133755299676412,
+            "totalNetR": -34.4547680188998
+          },
+          "Full fix": {
+            "count": 65,
+            "meanNetR": 0.5549561981253225,
+            "totalNetR": 36.072152878145964
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 386,
+        "closedTrades": 386,
+        "partial": 288,
+        "stop": 26,
+        "full": 72,
+        "end": 0,
+        "dashboardWinRate": 0.9326424870466321,
+        "positiveNetRate": 0.6424870466321243,
+        "meanGrossR": 0.043027754986941516,
+        "medianGrossR": 0.02564769742235428,
+        "meanNetR": 0.032355178826218765,
+        "medianNetR": 0.015354237415872636,
+        "profitFactorNet": 1.4171846706226139,
+        "best1RemovedMeanNetR": 0.023395721907906664,
+        "turnover": 772,
+        "meanHoldingBars": 48.65544041450777,
+        "timeInMarketBars": 18781,
+        "netRPer1000Bars": 0.6204222070005189,
+        "outcomes": {
+          "Partial": {
+            "count": 288,
+            "meanNetR": 0.004140672463100157,
+            "totalNetR": 1.1925136693728453
+          },
+          "Stop": {
+            "count": 26,
+            "meanNetR": -1.0136802745175173,
+            "totalNetR": -26.35568713745545
+          },
+          "Full fix": {
+            "count": 72,
+            "meanNetR": 0.5229482290972646,
+            "totalNetR": 37.65227249500305
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 386,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.021469801758666876
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "fit",
+      "stream": "GGI",
+      "summary": {
+        "signals": 41,
+        "closedTrades": 41,
+        "partial": 29,
+        "stop": 2,
+        "full": 10,
+        "end": 0,
+        "dashboardWinRate": 0.9512195121951219,
+        "positiveNetRate": 0.7073170731707317,
+        "meanGrossR": 0.12846610812704126,
+        "medianGrossR": 0.037184173598163624,
+        "meanNetR": 0.11820197241927975,
+        "medianNetR": 0.02432546788721049,
+        "profitFactorNet": 2.9634617864123083,
+        "best1RemovedMeanNetR": 0.09446364206207389,
+        "turnover": 82,
+        "meanHoldingBars": 60.31707317073171,
+        "timeInMarketBars": 2473,
+        "netRPer1000Bars": 0.4814983476592618,
+        "outcomes": {
+          "Partial": {
+            "count": 29,
+            "meanNetR": 0.009377405626612849,
+            "totalNetR": 0.27194476317177263
+          },
+          "Stop": {
+            "count": 2,
+            "meanNetR": -1.019847414643278,
+            "totalNetR": -2.039694829286556
+          },
+          "Full fix": {
+            "count": 10,
+            "meanNetR": 0.6614030935305255,
+            "totalNetR": 6.614030935305255
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 41,
+        "closedTrades": 41,
+        "partial": 32,
+        "stop": 2,
+        "full": 7,
+        "end": 0,
+        "dashboardWinRate": 0.9512195121951219,
+        "positiveNetRate": 0.6829268292682927,
+        "meanGrossR": 0.07214508189122662,
+        "medianGrossR": 0.019091587368223504,
+        "meanNetR": 0.06160423922881911,
+        "medianNetR": 0.012217573552210516,
+        "profitFactorNet": 2.1042160021715848,
+        "best1RemovedMeanNetR": 0.04068920204869981,
+        "turnover": 82,
+        "meanHoldingBars": 47.73170731707317,
+        "timeInMarketBars": 1957,
+        "netRPer1000Bars": 0.2509462303409422,
+        "outcomes": {
+          "Partial": {
+            "count": 32,
+            "meanNetR": 0.008086889029413742,
+            "totalNetR": 0.25878044894123975
+          },
+          "Stop": {
+            "count": 2,
+            "meanNetR": -1.0159262019930893,
+            "totalNetR": -2.0318524039861785
+          },
+          "Full fix": {
+            "count": 7,
+            "meanNetR": 0.614120823346646,
+            "totalNetR": 4.298845763426522
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 41,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.056597733190460645
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "fit",
+      "stream": "OWN1",
+      "summary": {
+        "signals": 191,
+        "closedTrades": 191,
+        "partial": 153,
+        "stop": 14,
+        "full": 24,
+        "end": 0,
+        "dashboardWinRate": 0.9267015706806283,
+        "positiveNetRate": 0.6387434554973822,
+        "meanGrossR": 0.008727918976502635,
+        "medianGrossR": 0.019282751082681855,
+        "meanNetR": -0.002122574021575218,
+        "medianNetR": 0.008621664507954766,
+        "profitFactorNet": 0.9748172875433289,
+        "best1RemovedMeanNetR": -0.01140432831370327,
+        "turnover": 382,
+        "meanHoldingBars": 44.17801047120419,
+        "timeInMarketBars": 8438,
+        "netRPer1000Bars": -0.0402793480497632,
+        "outcomes": {
+          "Partial": {
+            "count": 153,
+            "meanNetR": 0.0035697361057004016,
+            "totalNetR": 0.5461696241721614
+          },
+          "Stop": {
+            "count": 14,
+            "meanNetR": -1.0146833763528795,
+            "totalNetR": -14.205567268940312
+          },
+          "Full fix": {
+            "count": 24,
+            "meanNetR": 0.5522494169436368,
+            "totalNetR": 13.253986006647285
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 191,
+        "closedTrades": 191,
+        "partial": 134,
+        "stop": 18,
+        "full": 39,
+        "end": 0,
+        "dashboardWinRate": 0.9057591623036649,
+        "positiveNetRate": 0.6178010471204188,
+        "meanGrossR": 0.015468114682736492,
+        "medianGrossR": 0.0210852126639811,
+        "meanNetR": 0.004743065880270118,
+        "medianNetR": 0.010119538066072783,
+        "profitFactorNet": 1.0450659736306935,
+        "best1RemovedMeanNetR": -0.0033436087755177347,
+        "turnover": 382,
+        "meanHoldingBars": 44.696335078534034,
+        "timeInMarketBars": 8537,
+        "netRPer1000Bars": 0.09000750950140017,
+        "outcomes": {
+          "Partial": {
+            "count": 134,
+            "meanNetR": 0.0005583310925104372,
+            "totalNetR": 0.07481636639639858
+          },
+          "Stop": {
+            "count": 18,
+            "meanNetR": -1.0135690988273567,
+            "totalNetR": -18.24424377889242
+          },
+          "Full fix": {
+            "count": 39,
+            "meanNetR": 0.48911161527250296,
+            "totalNetR": 19.075352995627615
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 193,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.006865639901845336
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "fit",
+      "stream": "OWN2_BROAD",
+      "summary": {
+        "signals": 347,
+        "closedTrades": 347,
+        "partial": 257,
+        "stop": 29,
+        "full": 61,
+        "end": 0,
+        "dashboardWinRate": 0.9164265129682997,
+        "positiveNetRate": 0.6628242074927954,
+        "meanGrossR": 0.021656527010996972,
+        "medianGrossR": 0.025009389227900018,
+        "meanNetR": 0.011060444630623924,
+        "medianNetR": 0.014970208016549021,
+        "profitFactorNet": 1.1169788342220894,
+        "best1RemovedMeanNetR": 0.0010715743976930216,
+        "turnover": 694,
+        "meanHoldingBars": 50.357348703170025,
+        "timeInMarketBars": 17474,
+        "netRPer1000Bars": 0.3813188561178839,
+        "outcomes": {
+          "Partial": {
+            "count": 257,
+            "meanNetR": 0.004246350238058857,
+            "totalNetR": 1.091312011181126
+          },
+          "Stop": {
+            "count": 29,
+            "meanNetR": -1.0132000254392555,
+            "totalNetR": -29.382800737738407
+          },
+          "Full fix": {
+            "count": 61,
+            "meanNetR": 0.5267125084161276,
+            "totalNetR": 32.129463013383784
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 346,
+        "closedTrades": 346,
+        "partial": 258,
+        "stop": 23,
+        "full": 65,
+        "end": 0,
+        "dashboardWinRate": 0.9335260115606936,
+        "positiveNetRate": 0.6069364161849711,
+        "meanGrossR": 0.038434341577030934,
+        "medianGrossR": 0.016114459580945012,
+        "meanNetR": 0.027909651909201704,
+        "medianNetR": 0.008052860596131185,
+        "profitFactorNet": 1.3471997649839669,
+        "best1RemovedMeanNetR": 0.017770304484879824,
+        "turnover": 692,
+        "meanHoldingBars": 49.99710982658959,
+        "timeInMarketBars": 17299,
+        "netRPer1000Bars": 0.9594376115830888,
+        "outcomes": {
+          "Partial": {
+            "count": 258,
+            "meanNetR": -0.004182690918421233,
+            "totalNetR": -1.0791342569526783
+          },
+          "Stop": {
+            "count": 23,
+            "meanNetR": -1.014009462902201,
+            "totalNetR": -23.32221764675062
+          },
+          "Full fix": {
+            "count": 65,
+            "meanNetR": 0.523970637912109,
+            "totalNetR": 34.05809146428708
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 350,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.01684920727857778
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "fit",
+      "stream": "OWN2_SELECTED",
+      "summary": {
+        "signals": 176,
+        "closedTrades": 176,
+        "partial": 131,
+        "stop": 14,
+        "full": 31,
+        "end": 0,
+        "dashboardWinRate": 0.9204545454545454,
+        "positiveNetRate": 0.7215909090909091,
+        "meanGrossR": 0.03544259512406654,
+        "medianGrossR": 0.030395988831107182,
+        "meanNetR": 0.025113256135516723,
+        "medianNetR": 0.02148532594493266,
+        "profitFactorNet": 1.2836632138190986,
+        "best1RemovedMeanNetR": 0.015622762458654169,
+        "turnover": 352,
+        "meanHoldingBars": 53.52272727272727,
+        "timeInMarketBars": 9420,
+        "netRPer1000Bars": 0.43913890510193176,
+        "outcomes": {
+          "Partial": {
+            "count": 131,
+            "meanNetR": 0.01115689960643498,
+            "totalNetR": 1.4615538484429824
+          },
+          "Stop": {
+            "count": 14,
+            "meanNetR": -1.0149248408533098,
+            "totalNetR": -14.208947771946336
+          },
+          "Full fix": {
+            "count": 31,
+            "meanNetR": 0.5537847420436869,
+            "totalNetR": 17.167327003354295
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 177,
+        "closedTrades": 177,
+        "partial": 130,
+        "stop": 13,
+        "full": 34,
+        "end": 0,
+        "dashboardWinRate": 0.9265536723163842,
+        "positiveNetRate": 0.632768361581921,
+        "meanGrossR": 0.03808158952201615,
+        "medianGrossR": 0.02579384890288743,
+        "meanNetR": 0.028188053548399976,
+        "medianNetR": 0.017376766090724808,
+        "profitFactorNet": 1.3297858840546037,
+        "best1RemovedMeanNetR": 0.018167937302711427,
+        "turnover": 354,
+        "meanHoldingBars": 55.08474576271186,
+        "timeInMarketBars": 9750,
+        "netRPer1000Bars": 0.49570645584369555,
+        "outcomes": {
+          "Partial": {
+            "count": 130,
+            "meanNetR": 0.0011351219174862122,
+            "totalNetR": 0.1475658492732076
+          },
+          "Stop": {
+            "count": 13,
+            "meanNetR": -1.0146949681294823,
+            "totalNetR": -13.19103458568327
+          },
+          "Full fix": {
+            "count": 34,
+            "meanNetR": 0.5303751239552016,
+            "totalNetR": 18.032754214476853
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 179,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.0030747974128832525
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "validation",
+      "stream": "GGI",
+      "summary": {
+        "signals": 21,
+        "closedTrades": 21,
+        "partial": 14,
+        "stop": 1,
+        "full": 6,
+        "end": 0,
+        "dashboardWinRate": 0.9523809523809523,
+        "positiveNetRate": 0.8095238095238095,
+        "meanGrossR": 0.13697683411536246,
+        "medianGrossR": 0.03431559042136582,
+        "meanNetR": 0.12671548294505358,
+        "medianNetR": 0.023905662563888586,
+        "profitFactorNet": 3.2853987709320207,
+        "best1RemovedMeanNetR": 0.09232315046899146,
+        "turnover": 42,
+        "meanHoldingBars": 48.42857142857143,
+        "timeInMarketBars": 1017,
+        "netRPer1000Bars": 0.6609600451679396,
+        "outcomes": {
+          "Partial": {
+            "count": 14,
+            "meanNetR": 0.012930930632286366,
+            "totalNetR": 0.18103302885200911
+          },
+          "Stop": {
+            "count": 1,
+            "meanNetR": -1.0089114475456156,
+            "totalNetR": -1.0089114475456156
+          },
+          "Full fix": {
+            "count": 6,
+            "meanNetR": 0.581483926756622,
+            "totalNetR": 3.4889035605397316
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 21,
+        "closedTrades": 21,
+        "partial": 16,
+        "stop": 1,
+        "full": 4,
+        "end": 0,
+        "dashboardWinRate": 0.9523809523809523,
+        "positiveNetRate": 0.6190476190476191,
+        "meanGrossR": 0.04260816771831089,
+        "medianGrossR": 0.020839833416663133,
+        "meanNetR": 0.0328146028572197,
+        "medianNetR": 0.01398685122059004,
+        "profitFactorNet": 1.5661864615453736,
+        "best1RemovedMeanNetR": 0.008102794492170162,
+        "turnover": 42,
+        "meanHoldingBars": 47.857142857142854,
+        "timeInMarketBars": 1005,
+        "netRPer1000Bars": 0.1711640983610566,
+        "outcomes": {
+          "Partial": {
+            "count": 16,
+            "meanNetR": -0.00043620885901850823,
+            "totalNetR": -0.006979341744296132
+          },
+          "Stop": {
+            "count": 1,
+            "meanNetR": -1.0155244537894652,
+            "totalNetR": -1.0155244537894652
+          },
+          "Full fix": {
+            "count": 4,
+            "meanNetR": 0.4279026138838437,
+            "totalNetR": 1.7116104555353748
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 21,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.09390088008783387
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "validation",
+      "stream": "OWN1",
+      "summary": {
+        "signals": 81,
+        "closedTrades": 81,
+        "partial": 60,
+        "stop": 6,
+        "full": 15,
+        "end": 0,
+        "dashboardWinRate": 0.9259259259259259,
+        "positiveNetRate": 0.7037037037037037,
+        "meanGrossR": 0.033110494927693496,
+        "medianGrossR": 0.028635372620376586,
+        "meanNetR": 0.023218246584461782,
+        "medianNetR": 0.021659814210257266,
+        "profitFactorNet": 1.2834067250767327,
+        "best1RemovedMeanNetR": 0.015385152170832608,
+        "turnover": 162,
+        "meanHoldingBars": 38.80246913580247,
+        "timeInMarketBars": 3143,
+        "netRPer1000Bars": 0.46713312800332946,
+        "outcomes": {
+          "Partial": {
+            "count": 60,
+            "meanNetR": 0.010669960498166032,
+            "totalNetR": 0.6401976298899619
+          },
+          "Stop": {
+            "count": 6,
+            "meanNetR": -1.0117777274941082,
+            "totalNetR": -6.070666364964649
+          },
+          "Full fix": {
+            "count": 15,
+            "meanNetR": 0.48740978056107287,
+            "totalNetR": 7.311146708416093
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 82,
+        "closedTrades": 82,
+        "partial": 70,
+        "stop": 1,
+        "full": 11,
+        "end": 0,
+        "dashboardWinRate": 0.9878048780487805,
+        "positiveNetRate": 0.5975609756097561,
+        "meanGrossR": 0.06762819456647289,
+        "medianGrossR": 0.017835646241807744,
+        "meanNetR": 0.05811038959174734,
+        "medianNetR": 0.00967746543727167,
+        "profitFactorNet": 3.208914386386898,
+        "best1RemovedMeanNetR": 0.050746863494120345,
+        "turnover": 164,
+        "meanHoldingBars": 45.74390243902439,
+        "timeInMarketBars": 3751,
+        "netRPer1000Bars": 1.1835697830410536,
+        "outcomes": {
+          "Partial": {
+            "count": 70,
+            "meanNetR": -0.0008244096453501695,
+            "totalNetR": -0.057708675174511864
+          },
+          "Stop": {
+            "count": 1,
+            "meanNetR": -1.0122183058770304,
+            "totalNetR": -1.0122183058770304
+          },
+          "Full fix": {
+            "count": 11,
+            "meanNetR": 0.5304526297795289,
+            "totalNetR": 5.834978927574818
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 82,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.034892143007285555
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "validation",
+      "stream": "OWN2_BROAD",
+      "summary": {
+        "signals": 155,
+        "closedTrades": 155,
+        "partial": 116,
+        "stop": 12,
+        "full": 27,
+        "end": 0,
+        "dashboardWinRate": 0.9225806451612903,
+        "positiveNetRate": 0.6580645161290323,
+        "meanGrossR": 0.023627797441003382,
+        "medianGrossR": 0.019940546054732576,
+        "meanNetR": 0.01391138733892001,
+        "medianNetR": 0.011571086136469979,
+        "profitFactorNet": 1.1566349492705623,
+        "best1RemovedMeanNetR": 0.003969104958720142,
+        "turnover": 310,
+        "meanHoldingBars": 46.019354838709674,
+        "timeInMarketBars": 7133,
+        "netRPer1000Bars": 0.5355849571616,
+        "outcomes": {
+          "Partial": {
+            "count": 116,
+            "meanNetR": 0.0023022463187736524,
+            "totalNetR": 0.26706057297774366
+          },
+          "Stop": {
+            "count": 12,
+            "meanNetR": -1.0108858497305053,
+            "totalNetR": -12.130630196766063
+          },
+          "Full fix": {
+            "count": 27,
+            "meanNetR": 0.5192531356044786,
+            "totalNetR": 14.019834661320923
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 155,
+        "closedTrades": 155,
+        "partial": 125,
+        "stop": 12,
+        "full": 18,
+        "end": 0,
+        "dashboardWinRate": 0.9225806451612903,
+        "positiveNetRate": 0.6258064516129033,
+        "meanGrossR": -0.006046972089306588,
+        "medianGrossR": 0.020298828714741896,
+        "meanNetR": -0.015660144284265296,
+        "medianNetR": 0.008468438263132065,
+        "profitFactorNet": 0.8199884857850039,
+        "best1RemovedMeanNetR": -0.02417311595395957,
+        "turnover": 310,
+        "meanHoldingBars": 46.99354838709677,
+        "timeInMarketBars": 7284,
+        "netRPer1000Bars": -0.6029116651915353,
+        "outcomes": {
+          "Partial": {
+            "count": 125,
+            "meanNetR": 0.005680736828996754,
+            "totalNetR": 0.7100921036245942
+          },
+          "Stop": {
+            "count": 12,
+            "meanNetR": -1.010063029357859,
+            "totalNetR": -12.120756352294308
+          },
+          "Full fix": {
+            "count": 18,
+            "meanNetR": 0.4990745491449219,
+            "totalNetR": 8.983341884608594
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 157,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.029571531623185307
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "validation",
+      "stream": "OWN2_SELECTED",
+      "summary": {
+        "signals": 88,
+        "closedTrades": 88,
+        "partial": 62,
+        "stop": 8,
+        "full": 18,
+        "end": 0,
+        "dashboardWinRate": 0.9090909090909091,
+        "positiveNetRate": 0.6704545454545454,
+        "meanGrossR": 0.029947342148560156,
+        "medianGrossR": 0.026082169236041598,
+        "meanNetR": 0.020040868202112615,
+        "medianNetR": 0.01631254649668787,
+        "profitFactorNet": 1.1993435087796496,
+        "best1RemovedMeanNetR": 0.012358446295227879,
+        "turnover": 176,
+        "meanHoldingBars": 49.71590909090909,
+        "timeInMarketBars": 4375,
+        "netRPer1000Bars": 0.4380517639806036,
+        "outcomes": {
+          "Partial": {
+            "count": 62,
+            "meanNetR": 0.007410097795459201,
+            "totalNetR": 0.45942606331847047
+          },
+          "Stop": {
+            "count": 8,
+            "meanNetR": -1.0108117835158483,
+            "totalNetR": -8.086494268126787
+          },
+          "Full fix": {
+            "count": 18,
+            "meanNetR": 0.5217035892552349,
+            "totalNetR": 9.390664606594228
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 90,
+        "closedTrades": 90,
+        "partial": 70,
+        "stop": 11,
+        "full": 9,
+        "end": 0,
+        "dashboardWinRate": 0.8777777777777778,
+        "positiveNetRate": 0.5222222222222223,
+        "meanGrossR": -0.059426824603258606,
+        "medianGrossR": 0.012283597756994058,
+        "meanNetR": -0.06921072632298077,
+        "medianNetR": 0.0029161335605203576,
+        "profitFactorNet": 0.48907705563650367,
+        "best1RemovedMeanNetR": -0.0790521401895037,
+        "turnover": 180,
+        "meanHoldingBars": 41.922222222222224,
+        "timeInMarketBars": 3773,
+        "netRPer1000Bars": -1.5471846420934598,
+        "outcomes": {
+          "Partial": {
+            "count": 70,
+            "meanNetR": 0.0013938087365209986,
+            "totalNetR": 0.0975666115564699
+          },
+          "Stop": {
+            "count": 11,
+            "meanNetR": -1.0106527349547811,
+            "totalNetR": -11.117180084502593
+          },
+          "Full fix": {
+            "count": 9,
+            "meanNetR": 0.532294233764206,
+            "totalNetR": 4.790648103877855
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 90,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.08925159452509338
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "test",
+      "stream": "GGI",
+      "summary": {
+        "signals": 29,
+        "closedTrades": 29,
+        "partial": 25,
+        "stop": 3,
+        "full": 1,
+        "end": 0,
+        "dashboardWinRate": 0.896551724137931,
+        "positiveNetRate": 0.5517241379310345,
+        "meanGrossR": -0.05463769176547789,
+        "medianGrossR": 0.037646898941895254,
+        "meanNetR": -0.06752989446481276,
+        "medianNetR": 0.027443420504467998,
+        "profitFactorNet": 0.4186061758454917,
+        "best1RemovedMeanNetR": -0.09669532517170833,
+        "turnover": 58,
+        "meanHoldingBars": 53.89655172413793,
+        "timeInMarketBars": 1563,
+        "netRPer1000Bars": -0.32428662683880943,
+        "outcomes": {
+          "Partial": {
+            "count": 25,
+            "meanNetR": 0.01334508577196294,
+            "totalNetR": 0.3336271442990735
+          },
+          "Stop": {
+            "count": 3,
+            "meanNetR": -1.013698749702302,
+            "totalNetR": -3.0410962491069062
+          },
+          "Full fix": {
+            "count": 1,
+            "meanNetR": 0.7491021653282632,
+            "totalNetR": 0.7491021653282632
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 29,
+        "closedTrades": 29,
+        "partial": 26,
+        "stop": 1,
+        "full": 2,
+        "end": 0,
+        "dashboardWinRate": 0.9655172413793104,
+        "positiveNetRate": 0.5172413793103449,
+        "meanGrossR": 0.0009428438044994158,
+        "medianGrossR": 0.014007238648424836,
+        "meanNetR": -0.01200836145743958,
+        "medianNetR": 0.002706493806213083,
+        "profitFactorNet": 0.7770067364500327,
+        "best1RemovedMeanNetR": -0.02855418111133985,
+        "turnover": 58,
+        "meanHoldingBars": 38.310344827586206,
+        "timeInMarketBars": 1111,
+        "netRPer1000Bars": -0.057665587392904095,
+        "outcomes": {
+          "Partial": {
+            "count": 26,
+            "meanNetR": -0.009013077275935708,
+            "totalNetR": -0.2343400091743284
+          },
+          "Stop": {
+            "count": 1,
+            "meanNetR": -1.0109952077392073,
+            "totalNetR": -1.0109952077392073
+          },
+          "Full fix": {
+            "count": 2,
+            "meanNetR": 0.44854636732389397,
+            "totalNetR": 0.8970927346477879
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 29,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.05552153300737318
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "test",
+      "stream": "OWN1",
+      "summary": {
+        "signals": 110,
+        "closedTrades": 109,
+        "partial": 92,
+        "stop": 7,
+        "full": 10,
+        "end": 1,
+        "dashboardWinRate": 0.9357798165137615,
+        "positiveNetRate": 0.4954128440366973,
+        "meanGrossR": -0.005809791217178296,
+        "medianGrossR": 0.01178643293508724,
+        "meanNetR": -0.017953420677845274,
+        "medianNetR": -0.00005761112687741028,
+        "profitFactorNet": 0.7698496170824008,
+        "best1RemovedMeanNetR": -0.03239599722754428,
+        "turnover": 218,
+        "meanHoldingBars": 45.669724770642205,
+        "timeInMarketBars": 4978,
+        "netRPer1000Bars": -0.3240475002293649,
+        "outcomes": {
+          "Partial": {
+            "count": 92,
+            "meanNetR": -0.003246661665102622,
+            "totalNetR": -0.2986928731894412
+          },
+          "Stop": {
+            "count": 7,
+            "meanNetR": -1.0134658909814704,
+            "totalNetR": -7.0942612368702935
+          },
+          "Full fix": {
+            "count": 10,
+            "meanNetR": 0.5436031256174599,
+            "totalNetR": 5.4360312561746
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 110,
+        "closedTrades": 110,
+        "partial": 90,
+        "stop": 7,
+        "full": 13,
+        "end": 0,
+        "dashboardWinRate": 0.9363636363636364,
+        "positiveNetRate": 0.5181818181818182,
+        "meanGrossR": 0.0043274607368191335,
+        "medianGrossR": 0.012982767509619677,
+        "meanNetR": -0.007731834655240841,
+        "medianNetR": 0.0005436181212681874,
+        "profitFactorNet": 0.8973391571179664,
+        "best1RemovedMeanNetR": -0.022825158616783244,
+        "turnover": 220,
+        "meanHoldingBars": 43.68181818181818,
+        "timeInMarketBars": 4805,
+        "netRPer1000Bars": -0.14083487532314828,
+        "outcomes": {
+          "Partial": {
+            "count": 90,
+            "meanNetR": -0.0020188966452326057,
+            "totalNetR": -0.18170069807093453
+          },
+          "Stop": {
+            "count": 7,
+            "meanNetR": -1.0116067185321955,
+            "totalNetR": -7.081247029725368
+          },
+          "Full fix": {
+            "count": 13,
+            "meanNetR": 0.49326507043998546,
+            "totalNetR": 6.412445915719811
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 110,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.010221586022604433
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "test",
+      "stream": "OWN2_BROAD",
+      "summary": {
+        "signals": 214,
+        "closedTrades": 211,
+        "partial": 166,
+        "stop": 16,
+        "full": 29,
+        "end": 3,
+        "dashboardWinRate": 0.9241706161137441,
+        "positiveNetRate": 0.6066350710900474,
+        "meanGrossR": 0.013754763877322168,
+        "medianGrossR": 0.02060577602145364,
+        "meanNetR": 0.001560887696100854,
+        "medianNetR": 0.008530362927403931,
+        "profitFactorNet": 1.0179289967124818,
+        "best1RemovedMeanNetR": -0.009997081803007098,
+        "turnover": 422,
+        "meanHoldingBars": 48.170616113744074,
+        "timeInMarketBars": 10164,
+        "netRPer1000Bars": 0.05453672857712869,
+        "outcomes": {
+          "Partial": {
+            "count": 166,
+            "meanNetR": 0.002201416049219023,
+            "totalNetR": 0.3654350641703578
+          },
+          "Stop": {
+            "count": 16,
+            "meanNetR": -1.013402363956583,
+            "totalNetR": -16.214437823305328
+          },
+          "Full fix": {
+            "count": 29,
+            "meanNetR": 0.5578741401038707,
+            "totalNetR": 16.17835006301225
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 214,
+        "closedTrades": 212,
+        "partial": 169,
+        "stop": 15,
+        "full": 28,
+        "end": 2,
+        "dashboardWinRate": 0.9292452830188679,
+        "positiveNetRate": 0.5613207547169812,
+        "meanGrossR": 0.008772860550915631,
+        "medianGrossR": 0.01726472459537794,
+        "meanNetR": -0.0034542148851141605,
+        "medianNetR": 0.005372680245187487,
+        "profitFactorNet": 0.9590483865767907,
+        "best1RemovedMeanNetR": -0.01500352372764709,
+        "turnover": 424,
+        "meanHoldingBars": 45.056603773584904,
+        "timeInMarketBars": 9552,
+        "netRPer1000Bars": -0.12126073118797848,
+        "outcomes": {
+          "Partial": {
+            "count": 169,
+            "meanNetR": -0.00033993504338412716,
+            "totalNetR": -0.05744902233191749
+          },
+          "Stop": {
+            "count": 15,
+            "meanNetR": -1.0137469653678717,
+            "totalNetR": -15.206204480518076
+          },
+          "Full fix": {
+            "count": 28,
+            "meanNetR": 0.5189771409716354,
+            "totalNetR": 14.531359947205791
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 214,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.005015102581215014
+    },
+    {
+      "dataset": "btc-2h",
+      "window": "test",
+      "stream": "OWN2_SELECTED",
+      "summary": {
+        "signals": 117,
+        "closedTrades": 116,
+        "partial": 89,
+        "stop": 12,
+        "full": 15,
+        "end": 1,
+        "dashboardWinRate": 0.896551724137931,
+        "positiveNetRate": 0.5948275862068966,
+        "meanGrossR": -0.008845278169822682,
+        "medianGrossR": 0.022837561540316735,
+        "meanNetR": -0.021289506120299187,
+        "medianNetR": 0.012917340770186265,
+        "profitFactorNet": 0.8141089925829741,
+        "best1RemovedMeanNetR": -0.03619112297642817,
+        "turnover": 232,
+        "meanHoldingBars": 53.62931034482759,
+        "timeInMarketBars": 6221,
+        "netRPer1000Bars": -0.408939014730039,
+        "outcomes": {
+          "Partial": {
+            "count": 89,
+            "meanNetR": 0.0059214978686701345,
+            "totalNetR": 0.527013310311642
+          },
+          "Stop": {
+            "count": 12,
+            "meanNetR": -1.0132771649022223,
+            "totalNetR": -12.159325978826667
+          },
+          "Full fix": {
+            "count": 15,
+            "meanNetR": 0.6108486639040213,
+            "totalNetR": 9.16272995856032
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 117,
+        "closedTrades": 117,
+        "partial": 91,
+        "stop": 10,
+        "full": 16,
+        "end": 0,
+        "dashboardWinRate": 0.9145299145299145,
+        "positiveNetRate": 0.5811965811965812,
+        "meanGrossR": 0.010180777430330962,
+        "medianGrossR": 0.020411359733421796,
+        "meanNetR": -0.0023860706630480736,
+        "medianNetR": 0.006141339302377313,
+        "profitFactorNet": 0.9755671411284222,
+        "best1RemovedMeanNetR": -0.017049285251741146,
+        "turnover": 234,
+        "meanHoldingBars": 46.547008547008545,
+        "timeInMarketBars": 5446,
+        "netRPer1000Bars": -0.046227896601527506,
+        "outcomes": {
+          "Partial": {
+            "count": 91,
+            "meanNetR": 0.0017629678556786161,
+            "totalNetR": 0.16043007486675406
+          },
+          "Stop": {
+            "count": 10,
+            "meanNetR": -1.0151909466935618,
+            "totalNetR": -10.151909466935617
+          },
+          "Full fix": {
+            "count": 16,
+            "meanNetR": 0.6070193202807648,
+            "totalNetR": 9.712309124492236
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 117,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.018903435457251115
+    },
+    {
+      "dataset": "xrp-3m",
+      "window": "full",
+      "stream": "GGI",
+      "summary": {
+        "signals": 63,
+        "closedTrades": 63,
+        "partial": 48,
+        "stop": 5,
+        "full": 10,
+        "end": 0,
+        "dashboardWinRate": 0.9206349206349206,
+        "positiveNetRate": 0.2222222222222222,
+        "meanGrossR": 0.03015936649787506,
+        "medianGrossR": 0.04705499286491255,
+        "meanNetR": -0.07299447677499081,
+        "medianNetR": -0.05673192368042015,
+        "profitFactorNet": 0.49249769937695825,
+        "best1RemovedMeanNetR": -0.08349565761251238,
+        "turnover": 126,
+        "meanHoldingBars": 57.492063492063494,
+        "timeInMarketBars": 3622,
+        "netRPer1000Bars": -0.21552477090614525,
+        "outcomes": {
+          "Partial": {
+            "count": 48,
+            "meanNetR": -0.07082987375001988,
+            "totalNetR": -3.399833940000954
+          },
+          "Stop": {
+            "count": 5,
+            "meanNetR": -1.1260448551549596,
+            "totalNetR": -5.630224275774798
+          },
+          "Full fix": {
+            "count": 10,
+            "meanNetR": 0.4431406178951329,
+            "totalNetR": 4.431406178951329
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 63,
+        "closedTrades": 63,
+        "partial": 50,
+        "stop": 6,
+        "full": 7,
+        "end": 0,
+        "dashboardWinRate": 0.9047619047619048,
+        "positiveNetRate": 0.1746031746031746,
+        "meanGrossR": -0.025415908524028634,
+        "medianGrossR": 0.007716850648317056,
+        "meanNetR": -0.132012920909929,
+        "medianNetR": -0.08196970861991502,
+        "profitFactorNet": 0.2697359221482788,
+        "best1RemovedMeanNetR": -0.14272432663555418,
+        "turnover": 126,
+        "meanHoldingBars": 36.3968253968254,
+        "timeInMarketBars": 2293,
+        "netRPer1000Bars": -0.3897836629950568,
+        "outcomes": {
+          "Partial": {
+            "count": 50,
+            "meanNetR": -0.08730639158703127,
+            "totalNetR": -4.365319579351564
+          },
+          "Stop": {
+            "count": 6,
+            "meanNetR": -1.1561980853705836,
+            "totalNetR": -6.937188512223502
+          },
+          "Full fix": {
+            "count": 7,
+            "meanNetR": 0.4265277248927911,
+            "totalNetR": 2.9856940742495377
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 63,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.05901844413493819
+    },
+    {
+      "dataset": "xrp-3m",
+      "window": "full",
+      "stream": "OWN1",
+      "summary": {
+        "signals": 418,
+        "closedTrades": 416,
+        "partial": 329,
+        "stop": 30,
+        "full": 57,
+        "end": 2,
+        "dashboardWinRate": 0.9278846153846154,
+        "positiveNetRate": 0.1875,
+        "meanGrossR": 0.016845616546530443,
+        "medianGrossR": 0.023257646562421963,
+        "meanNetR": -0.07277773057676959,
+        "medianNetR": -0.0594689344133118,
+        "profitFactorNet": 0.47152065830431306,
+        "best1RemovedMeanNetR": -0.0832642418174415,
+        "turnover": 832,
+        "meanHoldingBars": 44.95192307692308,
+        "timeInMarketBars": 18700,
+        "netRPer1000Bars": -1.4189218690507637,
+        "outcomes": {
+          "Partial": {
+            "count": 329,
+            "meanNetR": -0.071496995425692,
+            "totalNetR": -23.52251149505267
+          },
+          "Stop": {
+            "count": 30,
+            "meanNetR": -1.1085355019604484,
+            "totalNetR": -33.25606505881345
+          },
+          "Full fix": {
+            "count": 57,
+            "meanNetR": 0.46496562515666606,
+            "totalNetR": 26.503040633929967
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 418,
+        "closedTrades": 416,
+        "partial": 315,
+        "stop": 31,
+        "full": 70,
+        "end": 2,
+        "dashboardWinRate": 0.9254807692307693,
+        "positiveNetRate": 0.21875,
+        "meanGrossR": 0.02644369153128576,
+        "medianGrossR": 0.022146688884734644,
+        "meanNetR": -0.0650636203012871,
+        "medianNetR": -0.058663219853063886,
+        "profitFactorNet": 0.5359014496250082,
+        "best1RemovedMeanNetR": -0.07563179787189891,
+        "turnover": 832,
+        "meanHoldingBars": 49.48798076923077,
+        "timeInMarketBars": 20587,
+        "netRPer1000Bars": -1.2685225685586272,
+        "outcomes": {
+          "Partial": {
+            "count": 315,
+            "meanNetR": -0.07412655888736297,
+            "totalNetR": -23.349866049519335
+          },
+          "Stop": {
+            "count": 31,
+            "meanNetR": -1.1116600163042338,
+            "totalNetR": -34.46146050543125
+          },
+          "Full fix": {
+            "count": 70,
+            "meanNetR": 0.4392122929945021,
+            "totalNetR": 30.744860509615147
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 418,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.007714110275482494
+    },
+    {
+      "dataset": "xrp-3m",
+      "window": "full",
+      "stream": "OWN2_BROAD",
+      "summary": {
+        "signals": 769,
+        "closedTrades": 765,
+        "partial": 590,
+        "stop": 61,
+        "full": 114,
+        "end": 4,
+        "dashboardWinRate": 0.9202614379084967,
+        "positiveNetRate": 0.21176470588235294,
+        "meanGrossR": 0.013296338259705843,
+        "medianGrossR": 0.025342640781611817,
+        "meanNetR": -0.07557747459423673,
+        "medianNetR": -0.05919695794765942,
+        "profitFactorNet": 0.47089551608957836,
+        "best1RemovedMeanNetR": -0.08514069733850249,
+        "turnover": 1530,
+        "meanHoldingBars": 49.24313725490196,
+        "timeInMarketBars": 37671,
+        "netRPer1000Bars": -2.709695274152463,
+        "outcomes": {
+          "Partial": {
+            "count": 590,
+            "meanNetR": -0.06898520429828865,
+            "totalNetR": -40.701270535990304
+          },
+          "Stop": {
+            "count": 61,
+            "meanNetR": -1.1083916426679081,
+            "totalNetR": -67.6118902027424
+          },
+          "Full fix": {
+            "count": 114,
+            "meanNetR": 0.44295081293106614,
+            "totalNetR": 50.49639267414154
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 769,
+        "closedTrades": 764,
+        "partial": 606,
+        "stop": 44,
+        "full": 114,
+        "end": 5,
+        "dashboardWinRate": 0.9424083769633508,
+        "positiveNetRate": 0.19895287958115182,
+        "meanGrossR": 0.03962932487146481,
+        "medianGrossR": 0.020645048260463997,
+        "meanNetR": -0.048127256528497656,
+        "medianNetR": -0.057251899628716484,
+        "profitFactorNet": 0.6003541210094551,
+        "best1RemovedMeanNetR": -0.0583792916298183,
+        "turnover": 1528,
+        "meanHoldingBars": 46.58507853403141,
+        "timeInMarketBars": 35591,
+        "netRPer1000Bars": -1.7232611889099785,
+        "outcomes": {
+          "Partial": {
+            "count": 606,
+            "meanNetR": -0.07027798719105312,
+            "totalNetR": -42.58846023777819
+          },
+          "Stop": {
+            "count": 44,
+            "meanNetR": -1.1018743662016564,
+            "totalNetR": -48.48247211287288
+          },
+          "Full fix": {
+            "count": 114,
+            "meanNetR": 0.4763307751129729,
+            "totalNetR": 54.30170836287891
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 769,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.02745021806573908
+    },
+    {
+      "dataset": "xrp-3m",
+      "window": "full",
+      "stream": "OWN2_SELECTED",
+      "summary": {
+        "signals": 469,
+        "closedTrades": 467,
+        "partial": 355,
+        "stop": 43,
+        "full": 69,
+        "end": 2,
+        "dashboardWinRate": 0.9079229122055674,
+        "positiveNetRate": 0.21413276231263384,
+        "meanGrossR": 0.008703832650374888,
+        "medianGrossR": 0.03083303890471863,
+        "meanNetR": -0.08112755452970137,
+        "medianNetR": -0.051948702246769805,
+        "profitFactorNet": 0.4628350080464105,
+        "best1RemovedMeanNetR": -0.09029507607252259,
+        "turnover": 934,
+        "meanHoldingBars": 54.03640256959315,
+        "timeInMarketBars": 25235,
+        "netRPer1000Bars": -1.7756276873679775,
+        "outcomes": {
+          "Partial": {
+            "count": 355,
+            "meanNetR": -0.06267029443217004,
+            "totalNetR": -22.247954523420365
+          },
+          "Stop": {
+            "count": 43,
+            "meanNetR": -1.109964915831042,
+            "totalNetR": -47.72849138073481
+          },
+          "Full fix": {
+            "count": 69,
+            "meanNetR": 0.46507069476499474,
+            "totalNetR": 32.08987793878464
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 469,
+        "closedTrades": 469,
+        "partial": 374,
+        "stop": 28,
+        "full": 67,
+        "end": 0,
+        "dashboardWinRate": 0.9402985074626866,
+        "positiveNetRate": 0.2068230277185501,
+        "meanGrossR": 0.03216577767667253,
+        "medianGrossR": 0.02494582218128256,
+        "meanNetR": -0.05617889364892094,
+        "medianNetR": -0.05765890416112893,
+        "profitFactorNet": 0.5352070520354506,
+        "best1RemovedMeanNetR": -0.06520007700615527,
+        "turnover": 938,
+        "meanHoldingBars": 45.39232409381663,
+        "timeInMarketBars": 21289,
+        "netRPer1000Bars": -1.2348456259710325,
+        "outcomes": {
+          "Partial": {
+            "count": 374,
+            "meanNetR": -0.06694865889268325,
+            "totalNetR": -25.03879842586354
+          },
+          "Stop": {
+            "count": 28,
+            "meanNetR": -1.1021050664543766,
+            "totalNetR": -30.858941860722545
+          },
+          "Full fix": {
+            "count": 67,
+            "meanNetR": 0.4410423756006292,
+            "totalNetR": 29.549839165242155
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 469,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.024948660880780432
+    },
+    {
+      "dataset": "ondo-2h",
+      "window": "full",
+      "stream": "GGI",
+      "summary": {
+        "signals": 46,
+        "closedTrades": 46,
+        "partial": 30,
+        "stop": 4,
+        "full": 12,
+        "end": 0,
+        "dashboardWinRate": 0.9130434782608695,
+        "positiveNetRate": 0.6956521739130435,
+        "meanGrossR": 0.08024253060150933,
+        "medianGrossR": 0.03968551210500461,
+        "meanNetR": 0.07541059065638543,
+        "medianNetR": 0.034186026444039924,
+        "profitFactorNet": 1.7853329602717807,
+        "best1RemovedMeanNetR": 0.06034761669135076,
+        "turnover": 92,
+        "meanHoldingBars": 57.56521739130435,
+        "timeInMarketBars": 2648,
+        "netRPer1000Bars": 0.31335927463357993,
+        "outcomes": {
+          "Partial": {
+            "count": 30,
+            "meanNetR": 0.009964997590177301,
+            "totalNetR": 0.29894992770531903
+          },
+          "Stop": {
+            "count": 4,
+            "meanNetR": -1.0062206484781524,
+            "totalNetR": -4.02488259391261
+          },
+          "Full fix": {
+            "count": 12,
+            "meanNetR": 0.5995683197000851,
+            "totalNetR": 7.19481983640102
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 46,
+        "closedTrades": 46,
+        "partial": 33,
+        "stop": 2,
+        "full": 11,
+        "end": 0,
+        "dashboardWinRate": 0.9565217391304348,
+        "positiveNetRate": 0.7608695652173914,
+        "meanGrossR": 0.10083041747757178,
+        "medianGrossR": 0.03579004316203363,
+        "meanNetR": 0.09626573101529674,
+        "medianNetR": 0.030958901910455052,
+        "profitFactorNet": 2.9027394920737897,
+        "best1RemovedMeanNetR": 0.0816016034297334,
+        "turnover": 92,
+        "meanHoldingBars": 51.21739130434783,
+        "timeInMarketBars": 2356,
+        "netRPer1000Bars": 0.40002020114757453,
+        "outcomes": {
+          "Partial": {
+            "count": 33,
+            "meanNetR": 0.014137648710032591,
+            "totalNetR": 0.4665424074310755
+          },
+          "Stop": {
+            "count": 2,
+            "meanNetR": -1.0037818799648712,
+            "totalNetR": -2.0075637599297425
+          },
+          "Full fix": {
+            "count": 11,
+            "meanNetR": 0.5426586344729378,
+            "totalNetR": 5.969244979202316
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 46,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.02085514035891131
+    },
+    {
+      "dataset": "ondo-2h",
+      "window": "full",
+      "stream": "OWN1",
+      "summary": {
+        "signals": 220,
+        "closedTrades": 219,
+        "partial": 175,
+        "stop": 14,
+        "full": 30,
+        "end": 1,
+        "dashboardWinRate": 0.9360730593607306,
+        "positiveNetRate": 0.6621004566210046,
+        "meanGrossR": 0.02331653769501864,
+        "medianGrossR": 0.018764287833696807,
+        "meanNetR": 0.018744135328215537,
+        "medianNetR": 0.01524916901794847,
+        "profitFactorNet": 1.2616792334336937,
+        "best1RemovedMeanNetR": 0.00817838439495666,
+        "turnover": 438,
+        "meanHoldingBars": 43.178082191780824,
+        "timeInMarketBars": 9456,
+        "netRPer1000Bars": 0.37081893738746186,
+        "outcomes": {
+          "Partial": {
+            "count": 175,
+            "meanNetR": 0.008166623488671618,
+            "totalNetR": 1.4291591105175332
+          },
+          "Stop": {
+            "count": 14,
+            "meanNetR": -1.0052967007289204,
+            "totalNetR": -14.074153810204887
+          },
+          "Full fix": {
+            "count": 30,
+            "meanNetR": 0.5583320112188852,
+            "totalNetR": 16.749960336566556
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 220,
+        "closedTrades": 218,
+        "partial": 166,
+        "stop": 13,
+        "full": 39,
+        "end": 2,
+        "dashboardWinRate": 0.9403669724770642,
+        "positiveNetRate": 0.7155963302752294,
+        "meanGrossR": 0.05118263865029603,
+        "medianGrossR": 0.019174696236147037,
+        "meanNetR": 0.046573860494779344,
+        "medianNetR": 0.014471911768845054,
+        "profitFactorNet": 1.6602983508226612,
+        "best1RemovedMeanNetR": 0.03427793803275935,
+        "turnover": 436,
+        "meanHoldingBars": 49.37155963302752,
+        "timeInMarketBars": 10763,
+        "netRPer1000Bars": 0.917172681830343,
+        "outcomes": {
+          "Partial": {
+            "count": 166,
+            "meanNetR": 0.0037216446166968924,
+            "totalNetR": 0.6177930063716841
+          },
+          "Stop": {
+            "count": 13,
+            "meanNetR": -1.0056759757039826,
+            "totalNetR": -13.073787684151773
+          },
+          "Full fix": {
+            "count": 39,
+            "meanNetR": 0.5797204170677432,
+            "totalNetR": 22.609096265641988
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 220,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.027829725166563807
+    },
+    {
+      "dataset": "ondo-2h",
+      "window": "full",
+      "stream": "OWN2_BROAD",
+      "summary": {
+        "signals": 393,
+        "closedTrades": 391,
+        "partial": 309,
+        "stop": 23,
+        "full": 59,
+        "end": 2,
+        "dashboardWinRate": 0.9411764705882353,
+        "positiveNetRate": 0.731457800511509,
+        "meanGrossR": 0.03277290386951909,
+        "medianGrossR": 0.021599788469354606,
+        "meanNetR": 0.02823666869837238,
+        "medianNetR": 0.01733616142292614,
+        "profitFactorNet": 1.4149263834497512,
+        "best1RemovedMeanNetR": 0.02048405015629942,
+        "turnover": 782,
+        "meanHoldingBars": 51.34526854219949,
+        "timeInMarketBars": 20076,
+        "netRPer1000Bars": 0.9973385240346522,
+        "outcomes": {
+          "Partial": {
+            "count": 309,
+            "meanNetR": 0.008738775009809796,
+            "totalNetR": 2.700281478031227
+          },
+          "Stop": {
+            "count": 23,
+            "meanNetR": -1.0053523580826487,
+            "totalNetR": -23.123104235900918
+          },
+          "Full fix": {
+            "count": 59,
+            "meanNetR": 0.533277291846327,
+            "totalNetR": 31.463360218933293
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 393,
+        "closedTrades": 392,
+        "partial": 312,
+        "stop": 23,
+        "full": 57,
+        "end": 1,
+        "dashboardWinRate": 0.9413265306122449,
+        "positiveNetRate": 0.7066326530612245,
+        "meanGrossR": 0.033511150341186936,
+        "medianGrossR": 0.02236690431342256,
+        "meanNetR": 0.0289916606302103,
+        "medianNetR": 0.018581397286424495,
+        "profitFactorNet": 1.4355034122052786,
+        "best1RemovedMeanNetR": 0.021013140102785734,
+        "turnover": 784,
+        "meanHoldingBars": 50.00255102040816,
+        "timeInMarketBars": 19601,
+        "netRPer1000Bars": 1.0266242969324695,
+        "outcomes": {
+          "Partial": {
+            "count": 312,
+            "meanNetR": 0.010858934278049497,
+            "totalNetR": 3.3879874947514432
+          },
+          "Stop": {
+            "count": 23,
+            "meanNetR": -1.0054339681464284,
+            "totalNetR": -23.124981267367854
+          },
+          "Full fix": {
+            "count": 57,
+            "meanNetR": 0.5456442936782254,
+            "totalNetR": 31.10172473965885
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 393,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.0007549919318379193
+    },
+    {
+      "dataset": "ondo-2h",
+      "window": "full",
+      "stream": "OWN2_SELECTED",
+      "summary": {
+        "signals": 238,
+        "closedTrades": 236,
+        "partial": 174,
+        "stop": 13,
+        "full": 49,
+        "end": 2,
+        "dashboardWinRate": 0.9449152542372882,
+        "positiveNetRate": 0.7966101694915254,
+        "meanGrossR": 0.07126737373447861,
+        "medianGrossR": 0.03319431210232621,
+        "meanNetR": 0.06659256177411634,
+        "medianNetR": 0.02817619936821697,
+        "profitFactorNet": 2.0676610099560544,
+        "best1RemovedMeanNetR": 0.058216041668749954,
+        "turnover": 472,
+        "meanHoldingBars": 56.59322033898305,
+        "timeInMarketBars": 13356,
+        "netRPer1000Bars": 1.419678823730032,
+        "outcomes": {
+          "Partial": {
+            "count": 174,
+            "meanNetR": 0.015902237636289653,
+            "totalNetR": 2.7669893487143997
+          },
+          "Stop": {
+            "count": 13,
+            "meanNetR": -1.005255406967224,
+            "totalNetR": -13.068320290573912
+          },
+          "Full fix": {
+            "count": 49,
+            "meanNetR": 0.5309627657255299,
+            "totalNetR": 26.017175520550968
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 238,
+        "closedTrades": 237,
+        "partial": 187,
+        "stop": 17,
+        "full": 33,
+        "end": 1,
+        "dashboardWinRate": 0.9282700421940928,
+        "positiveNetRate": 0.6497890295358649,
+        "meanGrossR": 0.0178321657776105,
+        "medianGrossR": 0.02384968664092156,
+        "meanNetR": 0.01315697914708918,
+        "medianNetR": 0.01919523262100734,
+        "profitFactorNet": 1.1612139697041652,
+        "best1RemovedMeanNetR": 0.0029049996837942392,
+        "turnover": 474,
+        "meanHoldingBars": 47.426160337552744,
+        "timeInMarketBars": 11240,
+        "netRPer1000Bars": 0.28168058336586593,
+        "outcomes": {
+          "Partial": {
+            "count": 187,
+            "meanNetR": 0.008627743540185523,
+            "totalNetR": 1.6133880420146929
+          },
+          "Stop": {
+            "count": 17,
+            "meanNetR": -1.0055482289099626,
+            "totalNetR": -17.094319891469365
+          },
+          "Full fix": {
+            "count": 33,
+            "meanNetR": 0.5636101790095396,
+            "totalNetR": 18.599135907314807
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 238,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.053435582627027155
+    },
+    {
+      "dataset": "ondo-15m",
+      "window": "full",
+      "stream": "GGI",
+      "summary": {
+        "signals": 62,
+        "closedTrades": 62,
+        "partial": 48,
+        "stop": 3,
+        "full": 11,
+        "end": 0,
+        "dashboardWinRate": 0.9516129032258065,
+        "positiveNetRate": 0.5806451612903226,
+        "meanGrossR": 0.04554506202102576,
+        "medianGrossR": 0.036511655985027515,
+        "meanNetR": 0.029746565991617315,
+        "medianNetR": 0.020855576870693136,
+        "profitFactorNet": 1.4377291348641899,
+        "best1RemovedMeanNetR": 0.01994289327872854,
+        "turnover": 124,
+        "meanHoldingBars": 69.12903225806451,
+        "timeInMarketBars": 4286,
+        "netRPer1000Bars": 0.12570113764178525,
+        "outcomes": {
+          "Partial": {
+            "count": 48,
+            "meanNetR": -0.003438193428434161,
+            "totalNetR": -0.16503328456483973
+          },
+          "Stop": {
+            "count": 3,
+            "meanNetR": -1.0217427418537532,
+            "totalNetR": -3.0652282255612597
+          },
+          "Full fix": {
+            "count": 11,
+            "meanNetR": 0.46132260014603405,
+            "totalNetR": 5.0745486016063746
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 62,
+        "closedTrades": 61,
+        "partial": 46,
+        "stop": 6,
+        "full": 9,
+        "end": 1,
+        "dashboardWinRate": 0.9016393442622951,
+        "positiveNetRate": 0.5573770491803278,
+        "meanGrossR": -0.013095056522659068,
+        "medianGrossR": 0.01565622670337191,
+        "meanNetR": -0.028570887421508505,
+        "medianNetR": 0.002705549477593473,
+        "profitFactorNet": 0.7440182886870217,
+        "best1RemovedMeanNetR": -0.041389320633495395,
+        "turnover": 122,
+        "meanHoldingBars": 53.42622950819672,
+        "timeInMarketBars": 3259,
+        "netRPer1000Bars": -0.11878572333097184,
+        "outcomes": {
+          "Partial": {
+            "count": 46,
+            "meanNetR": -0.005140583798316965,
+            "totalNetR": -0.23646685472258042
+          },
+          "Stop": {
+            "count": 6,
+            "meanNetR": -1.0171874002239396,
+            "totalNetR": -6.103124401343638
+          },
+          "Full fix": {
+            "count": 9,
+            "meanNetR": 0.5107519025949112,
+            "totalNetR": 4.5967671233542005
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 62,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.05831745341312582
+    },
+    {
+      "dataset": "ondo-15m",
+      "window": "full",
+      "stream": "OWN1",
+      "summary": {
+        "signals": 283,
+        "closedTrades": 282,
+        "partial": 230,
+        "stop": 11,
+        "full": 41,
+        "end": 1,
+        "dashboardWinRate": 0.9609929078014184,
+        "positiveNetRate": 0.5212765957446809,
+        "meanGrossR": 0.03672901930402132,
+        "medianGrossR": 0.01573598195836036,
+        "meanNetR": 0.020538910160964687,
+        "medianNetR": 0.0009081251350675111,
+        "profitFactorNet": 1.3700257389910704,
+        "best1RemovedMeanNetR": 0.012819205720651124,
+        "turnover": 564,
+        "meanHoldingBars": 48.04255319148936,
+        "timeInMarketBars": 13548,
+        "netRPer1000Bars": 0.3947636767579091,
+        "outcomes": {
+          "Partial": {
+            "count": 230,
+            "meanNetR": -0.009268862353666562,
+            "totalNetR": -2.1318383413433093
+          },
+          "Stop": {
+            "count": 11,
+            "meanNetR": -1.0189922697324159,
+            "totalNetR": -11.208914967056575
+          },
+          "Full fix": {
+            "count": 41,
+            "meanNetR": 0.4666518530193152,
+            "totalNetR": 19.132725973791924
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 283,
+        "closedTrades": 282,
+        "partial": 229,
+        "stop": 11,
+        "full": 42,
+        "end": 1,
+        "dashboardWinRate": 0.9609929078014184,
+        "positiveNetRate": 0.4929078014184397,
+        "meanGrossR": 0.04409714877112018,
+        "medianGrossR": 0.015917688402051135,
+        "meanNetR": 0.02750274195206309,
+        "medianNetR": -0.0003407742559471222,
+        "profitFactorNet": 1.4879406912238868,
+        "best1RemovedMeanNetR": 0.018967102500566303,
+        "turnover": 564,
+        "meanHoldingBars": 47.96099290780142,
+        "timeInMarketBars": 13525,
+        "netRPer1000Bars": 0.5286104982607546,
+        "outcomes": {
+          "Partial": {
+            "count": 229,
+            "meanNetR": -0.009990643569023693,
+            "totalNetR": -2.287857377306426
+          },
+          "Stop": {
+            "count": 11,
+            "meanNetR": -1.0187638690370766,
+            "totalNetR": -11.206402559407842
+          },
+          "Full fix": {
+            "count": 42,
+            "meanNetR": 0.5059531706475252,
+            "totalNetR": 21.250033167196058
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 283,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.006963831791098402
+    },
+    {
+      "dataset": "ondo-15m",
+      "window": "full",
+      "stream": "OWN2_BROAD",
+      "summary": {
+        "signals": 537,
+        "closedTrades": 535,
+        "partial": 422,
+        "stop": 30,
+        "full": 83,
+        "end": 2,
+        "dashboardWinRate": 0.9439252336448598,
+        "positiveNetRate": 0.5869158878504673,
+        "meanGrossR": 0.030612349828061786,
+        "medianGrossR": 0.021306534107767967,
+        "meanNetR": 0.01448692931621402,
+        "medianNetR": 0.006864780180572816,
+        "profitFactorNet": 1.1984937442102632,
+        "best1RemovedMeanNetR": 0.005306882913296917,
+        "turnover": 1070,
+        "meanHoldingBars": 54.467289719626166,
+        "timeInMarketBars": 29140,
+        "netRPer1000Bars": 0.5282515801645651,
+        "outcomes": {
+          "Partial": {
+            "count": 422,
+            "meanNetR": -0.006596599659586447,
+            "totalNetR": -2.7837650563454805
+          },
+          "Stop": {
+            "count": 30,
+            "meanNetR": -1.0190805084247538,
+            "totalNetR": -30.572415252742612
+          },
+          "Full fix": {
+            "count": 83,
+            "meanNetR": 0.4952612950995493,
+            "totalNetR": 41.10668749326259
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 537,
+        "closedTrades": 536,
+        "partial": 414,
+        "stop": 34,
+        "full": 88,
+        "end": 1,
+        "dashboardWinRate": 0.9365671641791045,
+        "positiveNetRate": 0.5466417910447762,
+        "meanGrossR": 0.03166198172696059,
+        "medianGrossR": 0.01794529050845413,
+        "meanNetR": 0.015423698880836988,
+        "medianNetR": 0.003421008753733545,
+        "profitFactorNet": 1.197795755724917,
+        "best1RemovedMeanNetR": 0.006575318750770067,
+        "turnover": 1072,
+        "meanHoldingBars": 53.423507462686565,
+        "timeInMarketBars": 28635,
+        "netRPer1000Bars": 0.5634611913937176,
+        "outcomes": {
+          "Partial": {
+            "count": 414,
+            "meanNetR": -0.0069501324361033396,
+            "totalNetR": -2.8773548285467827
+          },
+          "Stop": {
+            "count": 34,
+            "meanNetR": -1.0178649973510667,
+            "totalNetR": -34.607409909936266
+          },
+          "Full fix": {
+            "count": 88,
+            "meanNetR": 0.5199075833933144,
+            "totalNetR": 45.751867338611675
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 537,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.0009367695646229687
+    },
+    {
+      "dataset": "ondo-15m",
+      "window": "full",
+      "stream": "OWN2_SELECTED",
+      "summary": {
+        "signals": 345,
+        "closedTrades": 344,
+        "partial": 269,
+        "stop": 19,
+        "full": 56,
+        "end": 1,
+        "dashboardWinRate": 0.9447674418604651,
+        "positiveNetRate": 0.6133720930232558,
+        "meanGrossR": 0.039347891190544666,
+        "medianGrossR": 0.02824793154802105,
+        "meanNetR": 0.02255138218853085,
+        "medianNetR": 0.01119751877137909,
+        "profitFactorNet": 1.3136070147245928,
+        "best1RemovedMeanNetR": 0.013718447537651765,
+        "turnover": 688,
+        "meanHoldingBars": 58.44767441860465,
+        "timeInMarketBars": 20106,
+        "netRPer1000Bars": 0.528740149458466,
+        "outcomes": {
+          "Partial": {
+            "count": 269,
+            "meanNetR": -0.003940087974246342,
+            "totalNetR": -1.0598836650722658
+          },
+          "Stop": {
+            "count": 19,
+            "meanNetR": -1.0205871973068006,
+            "totalNetR": -19.39115674882921
+          },
+          "Full fix": {
+            "count": 56,
+            "meanNetR": 0.5037270694063586,
+            "totalNetR": 28.20871588675608
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 345,
+        "closedTrades": 344,
+        "partial": 285,
+        "stop": 11,
+        "full": 48,
+        "end": 1,
+        "dashboardWinRate": 0.9680232558139535,
+        "positiveNetRate": 0.5145348837209303,
+        "meanGrossR": 0.042744633127250915,
+        "medianGrossR": 0.016740536573380663,
+        "meanNetR": 0.02616910273727102,
+        "medianNetR": 0.0007261114465159636,
+        "profitFactorNet": 1.528659141910743,
+        "best1RemovedMeanNetR": 0.01684735047045868,
+        "turnover": 688,
+        "meanHoldingBars": 49.71220930232558,
+        "timeInMarketBars": 17101,
+        "netRPer1000Bars": 0.6135612964572813,
+        "outcomes": {
+          "Partial": {
+            "count": 285,
+            "meanNetR": -0.010180046189220877,
+            "totalNetR": -2.90131316392795
+          },
+          "Stop": {
+            "count": 11,
+            "meanNetR": -1.0194474736592907,
+            "totalNetR": -11.213922210252196
+          },
+          "Full fix": {
+            "count": 48,
+            "meanNetR": 0.48161263991252884,
+            "totalNetR": 23.117406715801383
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 345,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.0036177205487401727
+    },
+    {
+      "dataset": "btc-15m",
+      "window": "full",
+      "stream": "GGI",
+      "summary": {
+        "signals": 85,
+        "closedTrades": 85,
+        "partial": 62,
+        "stop": 10,
+        "full": 13,
+        "end": 0,
+        "dashboardWinRate": 0.8823529411764706,
+        "positiveNetRate": 0.4470588235294118,
+        "meanGrossR": -0.020709703942609826,
+        "medianGrossR": 0.029690658901912123,
+        "meanNetR": -0.05711313801518103,
+        "medianNetR": -0.007443569283398589,
+        "profitFactorNet": 0.6141727781073241,
+        "best1RemovedMeanNetR": -0.06732581493872639,
+        "turnover": 170,
+        "meanHoldingBars": 66.11764705882354,
+        "timeInMarketBars": 5620,
+        "netRPer1000Bars": -0.23649908565744568,
+        "outcomes": {
+          "Partial": {
+            "count": 62,
+            "meanNetR": -0.02498286610687955,
+            "totalNetR": -1.5489376986265322
+          },
+          "Stop": {
+            "count": 10,
+            "meanNetR": -1.0452809588486358,
+            "totalNetR": -10.452809588486359
+          },
+          "Full fix": {
+            "count": 13,
+            "meanNetR": 0.549779273524808,
+            "totalNetR": 7.147130555822504
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 85,
+        "closedTrades": 85,
+        "partial": 69,
+        "stop": 8,
+        "full": 8,
+        "end": 0,
+        "dashboardWinRate": 0.9058823529411765,
+        "positiveNetRate": 0.2823529411764706,
+        "meanGrossR": -0.04075311886478025,
+        "medianGrossR": 0.014743629694623802,
+        "meanNetR": -0.0775905195978355,
+        "medianNetR": -0.016290323599545232,
+        "profitFactorNet": 0.4085212510055255,
+        "best1RemovedMeanNetR": -0.08696107105130482,
+        "turnover": 170,
+        "meanHoldingBars": 56.44705882352941,
+        "timeInMarketBars": 4798,
+        "netRPer1000Bars": -0.3212936213677604,
+        "outcomes": {
+          "Partial": {
+            "count": 69,
+            "meanNetR": -0.03261004700231722,
+            "totalNetR": -2.2500932431598883
+          },
+          "Stop": {
+            "count": 8,
+            "meanNetR": -1.0654299617041616,
+            "totalNetR": -8.523439693633293
+          },
+          "Full fix": {
+            "count": 8,
+            "meanNetR": 0.5222923463721454,
+            "totalNetR": 4.178338770977163
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 85,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.02047738158265447
+    },
+    {
+      "dataset": "btc-15m",
+      "window": "full",
+      "stream": "OWN1",
+      "summary": {
+        "signals": 384,
+        "closedTrades": 384,
+        "partial": 306,
+        "stop": 37,
+        "full": 41,
+        "end": 0,
+        "dashboardWinRate": 0.9036458333333334,
+        "positiveNetRate": 0.296875,
+        "meanGrossR": -0.030286705657125403,
+        "medianGrossR": 0.014709939792934883,
+        "meanNetR": -0.06846950379660993,
+        "medianNetR": -0.018793291496390696,
+        "profitFactorNet": 0.46032470923583857,
+        "best1RemovedMeanNetR": -0.07778143738157123,
+        "turnover": 768,
+        "meanHoldingBars": 45.497395833333336,
+        "timeInMarketBars": 17471,
+        "netRPer1000Bars": -1.2808637140302144,
+        "outcomes": {
+          "Partial": {
+            "count": 306,
+            "meanNetR": -0.028026978016702085,
+            "totalNetR": -8.576255273110839
+          },
+          "Stop": {
+            "count": 37,
+            "meanNetR": -1.0462905453312448,
+            "totalNetR": -38.712750177256055
+          },
+          "Full fix": {
+            "count": 41,
+            "meanNetR": 0.5121150242065533,
+            "totalNetR": 20.996715992468687
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 384,
+        "closedTrades": 384,
+        "partial": 307,
+        "stop": 33,
+        "full": 44,
+        "end": 0,
+        "dashboardWinRate": 0.9140625,
+        "positiveNetRate": 0.3177083333333333,
+        "meanGrossR": -0.014760152296909928,
+        "medianGrossR": 0.013995101437454995,
+        "meanNetR": -0.05325700346508153,
+        "medianNetR": -0.01919440446637566,
+        "profitFactorNet": 0.5392351759224802,
+        "best1RemovedMeanNetR": -0.062169575290200806,
+        "turnover": 768,
+        "meanHoldingBars": 45.473958333333336,
+        "timeInMarketBars": 17462,
+        "netRPer1000Bars": -0.9962824246402937,
+        "outcomes": {
+          "Partial": {
+            "count": 307,
+            "meanNetR": -0.02662208670592426,
+            "totalNetR": -8.172980618718748
+          },
+          "Stop": {
+            "count": 33,
+            "meanNetR": -1.0474019917322532,
+            "totalNetR": -34.564265727164354
+          },
+          "Full fix": {
+            "count": 44,
+            "meanNetR": 0.5065126594384497,
+            "totalNetR": 22.286557015291788
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 384,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.015212500331528399
+    },
+    {
+      "dataset": "btc-15m",
+      "window": "full",
+      "stream": "OWN2_BROAD",
+      "summary": {
+        "signals": 749,
+        "closedTrades": 749,
+        "partial": 595,
+        "stop": 65,
+        "full": 89,
+        "end": 0,
+        "dashboardWinRate": 0.9132176234979973,
+        "positiveNetRate": 0.3364485981308411,
+        "meanGrossR": -0.017337153601932075,
+        "medianGrossR": 0.018224595530521706,
+        "meanNetR": -0.05506451592039262,
+        "medianNetR": -0.01594930427603324,
+        "profitFactorNet": 0.527403031592193,
+        "best1RemovedMeanNetR": -0.06410867809813361,
+        "turnover": 1498,
+        "meanHoldingBars": 52.3845126835781,
+        "timeInMarketBars": 39236,
+        "netRPer1000Bars": -2.0092230927253896,
+        "outcomes": {
+          "Partial": {
+            "count": 595,
+            "meanNetR": -0.02689197390444223,
+            "totalNetR": -16.000724473143126
+          },
+          "Stop": {
+            "count": 65,
+            "meanNetR": -1.0468103936708912,
+            "totalNetR": -68.04267558860793
+          },
+          "Full fix": {
+            "count": 89,
+            "meanNetR": 0.4808997487345732,
+            "totalNetR": 42.800077637377015
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 749,
+        "closedTrades": 748,
+        "partial": 603,
+        "stop": 70,
+        "full": 75,
+        "end": 1,
+        "dashboardWinRate": 0.9064171122994652,
+        "positiveNetRate": 0.3088235294117647,
+        "meanGrossR": -0.033121058138948875,
+        "medianGrossR": 0.014216373436646224,
+        "meanNetR": -0.07028874884975603,
+        "medianNetR": -0.020006715920041405,
+        "profitFactorNet": 0.4323623607034233,
+        "best1RemovedMeanNetR": -0.07952544901552333,
+        "turnover": 1496,
+        "meanHoldingBars": 46.31951871657754,
+        "timeInMarketBars": 34647,
+        "netRPer1000Bars": -2.5613087221521655,
+        "outcomes": {
+          "Partial": {
+            "count": 603,
+            "meanNetR": -0.026095436658658006,
+            "totalNetR": -15.735548305170777
+          },
+          "Stop": {
+            "count": 70,
+            "meanNetR": -1.0470563428849122,
+            "totalNetR": -73.29394400194386
+          },
+          "Full fix": {
+            "count": 75,
+            "meanNetR": 0.48604677556662873,
+            "totalNetR": 36.453508167497155
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 749,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": 0.01522423292936341
+    },
+    {
+      "dataset": "btc-15m",
+      "window": "full",
+      "stream": "OWN2_SELECTED",
+      "summary": {
+        "signals": 445,
+        "closedTrades": 445,
+        "partial": 339,
+        "stop": 47,
+        "full": 59,
+        "end": 0,
+        "dashboardWinRate": 0.8943820224719101,
+        "positiveNetRate": 0.350561797752809,
+        "meanGrossR": -0.026482593906985513,
+        "medianGrossR": 0.020463235737025787,
+        "meanNetR": -0.06595620499552551,
+        "medianNetR": -0.016187421620377236,
+        "profitFactorNet": 0.5145608548280791,
+        "best1RemovedMeanNetR": -0.0753764790912387,
+        "turnover": 890,
+        "meanHoldingBars": 55.47191011235955,
+        "timeInMarketBars": 24685,
+        "netRPer1000Bars": -1.4298490389734912,
+        "outcomes": {
+          "Partial": {
+            "count": 339,
+            "meanNetR": -0.026571710083548774,
+            "totalNetR": -9.007809718323035
+          },
+          "Stop": {
+            "count": 47,
+            "meanNetR": -1.0465306323342563,
+            "totalNetR": -49.18693971971005
+          },
+          "Full fix": {
+            "count": 59,
+            "meanNetR": 0.4888853934749871,
+            "totalNetR": 28.84423821502424
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullSummary": {
+        "signals": 445,
+        "closedTrades": 444,
+        "partial": 362,
+        "stop": 34,
+        "full": 48,
+        "end": 1,
+        "dashboardWinRate": 0.9234234234234234,
+        "positiveNetRate": 0.29504504504504503,
+        "meanGrossR": -0.016073483367671275,
+        "medianGrossR": 0.012677893723660915,
+        "meanNetR": -0.054774261515193934,
+        "medianNetR": -0.022472608263275802,
+        "profitFactorNet": 0.5047553605403227,
+        "best1RemovedMeanNetR": -0.06355119886538615,
+        "turnover": 888,
+        "meanHoldingBars": 48.46396396396396,
+        "timeInMarketBars": 21518,
+        "netRPer1000Bars": -1.1847699182903546,
+        "outcomes": {
+          "Partial": {
+            "count": 362,
+            "meanNetR": -0.03217438057180395,
+            "totalNetR": -11.64712576699303
+          },
+          "Stop": {
+            "count": 34,
+            "meanNetR": -1.0485055887161325,
+            "totalNetR": -35.649190016348506
+          },
+          "Full fix": {
+            "count": 48,
+            "meanNetR": 0.4786779931374048,
+            "totalNetR": 22.97654367059543
+          },
+          "End mark": {
+            "count": 0,
+            "meanNetR": null,
+            "totalNetR": 0
+          }
+        }
+      },
+      "nullTiers": {
+        "month-side-mean-atr": 445,
+        "month-side-mean": 0,
+        "side-mean-atr": 0,
+        "side-mean": 0,
+        "unmatched": 0
+      },
+      "deltaMeanNetR": -0.01118194348033158
+    }
+  ],
+  "transfers": [
+    {
+      "stream": "GGI",
+      "closedTrades": 256,
+      "closedWeightedMeanNetR": -0.016172244165784395,
+      "equalDatasetMeanNetR": -0.006237614535542273,
+      "positiveDatasets": 2,
+      "datasets": 4
+    },
+    {
+      "stream": "OWN1",
+      "closedTrades": 1301,
+      "closedWeightedMeanNetR": -0.035873087682984715,
+      "equalDatasetMeanNetR": -0.025491047221049827,
+      "positiveDatasets": 2,
+      "datasets": 4
+    },
+    {
+      "stream": "OWN2_BROAD",
+      "closedTrades": 2440,
+      "closedWeightedMeanNetR": -0.03289714993595372,
+      "equalDatasetMeanNetR": -0.021979598125010737,
+      "positiveDatasets": 2,
+      "datasets": 4
+    },
+    {
+      "stream": "OWN2_SELECTED",
+      "closedTrades": 1492,
+      "closedWeightedMeanNetR": -0.02933214419358802,
+      "equalDatasetMeanNetR": -0.014484953890644924,
+      "positiveDatasets": 2,
+      "datasets": 4
+    }
+  ],
+  "verdict": "TEACHER_INVALID_IN_CELL"
+}

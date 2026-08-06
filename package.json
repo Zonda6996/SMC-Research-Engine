@@ -15,8 +15,14 @@
 		"execution-audit": "tsx tools/batch/runExecutionAudit.ts",
 		"review-telegram": "tsx tools/review/analyzeTelegramSignals.ts",
 		"reaction-audit": "tsx tools/review/runReactionAudit.ts",
-		"research:integrity": "tsx --test tests/exactIndicatorExport.test.ts tests/apexOosRegression.test.ts tests/eventMetrics.test.ts",
-		"research:critic": "tsx ci/research/auditReversalSearchArtifacts.ts"
+		"research:integrity": "tsx --test tests/exactIndicatorExport.test.ts tests/apexOosRegression.test.ts tests/eventMetrics.test.ts tests/independentReversalProtocol.test.ts tests/independentReversalRunner.test.ts",
+		"research:critic": "tsx ci/research/auditReversalSearchArtifacts.ts",
+		"research:reversal": "tsx ci/research/runIndependentReversalResearch.ts",
+		"research:ggi:gross": "tsx ci/research/runGgiGrossReplay.ts",
+		"research:ggi:own1:path": "tsx ci/research/runGgiOwn1PathRegimeAuditV1.ts",
+		"research:ggi:g2": "tsx ci/research/runGgiG2StateDetectorV1.ts",
+		"research:ggi:own2": "tsx ci/research/runGgiOwn2ExpectancyRankerV1.ts",
+		"research:ggi:econ0": "tsx ci/research/runGgiEcon0CommonReplayV1.ts"
 	},
 	"keywords": [],
 	"author": "",

@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "version": "ggi-g2-state-detector-v1",
+  "generatedAt": "2026-08-05T15:50:25.895Z",
+  "protocol": {
+    "bodyK": 1.5,
+    "droughtBars": 10,
+    "cooldownBars": 40,
+    "recoveryInnerWidth": 0.25,
+    "entry": "two bars after candidate close: next confirmation close then next open",
+    "management": "DM3 V2 unchanged; estimated net proxy 6 bps per side",
+    "null": "100 deterministic regime-matched draws"
+  },
+  "coverage": {
+    "available": 5,
+    "expected": 5,
+    "missing": []
+  },
+  "datasets": [
+    {
+      "id": "btc-2h",
+      "available": true,
+      "role": "development",
+      "asset": "BTC",
+      "timeframeMinutes": 120,
+      "rows": 20130,
+      "sha256": "61f4eed2e5d1732a34c69ab48b5f3a3e0994d7c30fef215f1787e7fb31ee29e0",
+      "fromIndex": 14091,
+      "toIndex": 20130,
+      "g2": {
+        "signals": 45,
+        "closed": 41,
+        "meanGrossR": 0.098839859927312,
+        "meanNetR": 0.08682855078007522,
+        "profitFactorNet": 1.3421417606094213,
+        "winRate": 0.6829268292682927,
+        "partial": 12,
+        "stop": 1,
+        "full": 28,
+        "fullStop": 28,
+        "best1RemovedNetR": 0.06552027966831198
+      },
+      "matchedNull": {
+        "signals": 45,
+        "closed": 41,
+        "meanGrossR": -0.009075708440458654,
+        "meanNetR": -0.02138350163634856,
+        "profitFactorNet": 0.9430748993033623,
+        "winRate": 0.6060184651080477,
+        "partial": 12,
+        "stop": 2,
+        "full": 28,
+        "fullStop": 20.171296296296298,
+        "best1RemovedNetR": -0.0429271106960824
+      },
+      "deltaNetR": 0.10821205241642377,
+      "proximity": {
+        "exact": 0.044444444444444446,
+        "plusMinus1": 0.1111111111111111,
+        "plusMinus3": 0.13333333333333333
+      },
+      "train": {
+        "id": "btc-2h",
+        "available": true,
+        "role": "development",
+        "asset": "BTC",
+        "timeframeMinutes": 120,
+        "rows": 20130,
+        "sha256": "61f4eed2e5d1732a34c69ab48b5f3a3e0994d7c30fef215f1787e7fb31ee29e0",
+        "fromIndex": 0,
+        "toIndex": 14091,
+        "g2": {
+          "signals": 90,
+          "closed": 90,
+          "meanGrossR": -0.008289582677847691,
+          "meanNetR": -0.018457749484109342,
+          "profitFactorNet": 0.9443076825272735,
+          "winRate": 0.5777777777777777,
+          "partial": 34,
+          "stop": 4,
+          "full": 52,
+          "fullStop": 13,
+          "best1RemovedNetR": -0.028409254731745964
+        },
+        "matchedNull": {
+          "signals": 90,
+          "closed": 90,
+          "meanGrossR": -0.047308064747401825,
+          "meanNetR": -0.05757448472683697,
+          "profitFactorNet": 0.8181459845184249,
+          "winRate": 0.560444444444445,
+          "partial": 27,
+          "stop": 4,
+          "full": 58,
+          "fullStop": 16.603353174603175,
+          "best1RemovedNetR": -0.06903724751870498
+        },
+        "deltaNetR": 0.03911673524272763,
+        "proximity": {
+          "exact": 0.011111111111111112,
+          "plusMinus1": 0.044444444444444446,
+          "plusMinus3": 0.1111111111111111
+        }
+      }
+    },
+    {
+      "id": "ondo-2h",
+      "available": true,
+      "role": "transfer",
+      "asset": "ONDO",
+      "timeframeMinutes": 120,
+      "rows": 11070,
+      "sha256": "aaa953cedb33958e8141a166d1262af88d2d862887084ee1f628e962cf261e5d",
+      "fromIndex": 0,
+      "toIndex": 11070,
+      "g2": {
+        "signals": 76,
+        "closed": 74,
+        "meanGrossR": -0.15322738858151885,
+        "meanNetR": -0.15769347918430163,
+        "profitFactorNet": 0.6119957730016446,
+        "winRate": 0.47297297297297297,
+        "partial": 35,
+        "stop": 4,
+        "full": 35,
+        "fullStop": 8.75,
+        "best1RemovedNetR": -0.16966728031050007
+      },
+      "matchedNull": {
+        "signals": 76,
+        "closed": 73,
+        "meanGrossR": -0.15696644244152513,
+        "meanNetR": -0.16144010899420114,
+        "profitFactorNet": 0.5524061151444836,
+        "winRate": 0.49792643659480446,
+        "partial": 30,
+        "stop": 3,
+        "full": 41,
+        "fullStop": 15.150261904761905,
+        "best1RemovedNetR": -0.17477083629410595
+      },
+      "deltaNetR": 0.00374662980989951,
+      "proximity": {
+        "exact": 0,
+        "plusMinus1": 0.07894736842105263,
+        "plusMinus3": 0.09210526315789473
+      },
+      "train": null
+    },
+    {
+      "id": "ondo-15m",
+      "available": true,
+      "role": "transfer",
+      "asset": "ONDO",
+      "timeframeMinutes": 15,
+      "rows": 14672,
+      "sha256": "5d5c7907e0505b7b228c317a24368fd7c09c88944faf5249da7a68217b3fafb3",
+      "fromIndex": 0,
+      "toIndex": 14672,
+      "g2": {
+        "signals": 100,
+        "closed": 98,
+        "meanGrossR": 0.04430974431944266,
+        "meanNetR": 0.028161603715600305,
+        "profitFactorNet": 1.0915252447376391,
+        "winRate": 0.6122448979591837,
+        "partial": 34,
+        "stop": 4,
+        "full": 60,
+        "fullStop": 15,
+        "best1RemovedNetR": 0.01880701138560771
+      },
+      "matchedNull": {
+        "signals": 100,
+        "closed": 99,
+        "meanGrossR": -0.021533279752624326,
+        "meanNetR": -0.03752152105443457,
+        "profitFactorNet": 0.8807912481284146,
+        "winRate": 0.5916119284577318,
+        "partial": 27,
+        "stop": 3,
+        "full": 68,
+        "fullStop": 25.95221088435374,
+        "best1RemovedNetR": -0.047091810367266236
+      },
+      "deltaNetR": 0.06568312477003488,
+      "proximity": {
+        "exact": 0,
+        "plusMinus1": 0.05,
+        "plusMinus3": 0.07
+      },
+      "train": null
+    },
+    {
+      "id": "btc-15m",
+      "available": true,
+      "role": "transfer",
+      "asset": "BTC",
+      "timeframeMinutes": 15,
+      "rows": 20527,
+      "sha256": "9798b630854817cfaa8c38760286cb6d01a2d12063b296bc9128897ce06883fe",
+      "fromIndex": 0,
+      "toIndex": 20527,
+      "g2": {
+        "signals": 126,
+        "closed": 123,
+        "meanGrossR": -0.07709784341640095,
+        "meanNetR": -0.11401004685275765,
+        "profitFactorNet": 0.7031409571052101,
+        "winRate": 0.5365853658536586,
+        "partial": 47,
+        "stop": 10,
+        "full": 66,
+        "fullStop": 6.6,
+        "best1RemovedNetR": -0.12902819476886107
+      },
+      "matchedNull": {
+        "signals": 126,
+        "closed": 125,
+        "meanGrossR": -0.07012009742294452,
+        "meanNetR": -0.10701290901192267,
+        "profitFactorNet": 0.6526513740638827,
+        "winRate": 0.5323444392647446,
+        "partial": 37,
+        "stop": 5,
+        "full": 83,
+        "fullStop": 19.548224306557636,
+        "best1RemovedNetR": -0.1231723461119466
+      },
+      "deltaNetR": -0.006997137840834972,
+      "proximity": {
+        "exact": 0.015873015873015872,
+        "plusMinus1": 0.10317460317460317,
+        "plusMinus3": 0.1111111111111111
+      },
+      "train": null
+    },
+    {
+      "id": "xrp-3m",
+      "available": true,
+      "role": "transfer",
+      "asset": "XRP",
+      "timeframeMinutes": 3,
+      "rows": 21337,
+      "sha256": "393305f4f16214e372c571bf075dd975bc33137fa149996638f0a54100a8c090",
+      "fromIndex": 0,
+      "toIndex": 21337,
+      "g2": {
+        "signals": 142,
+        "closed": 139,
+        "meanGrossR": -0.01805915080659065,
+        "meanNetR": -0.104729155676963,
+        "profitFactorNet": 0.7199463134564527,
+        "winRate": 0.5683453237410072,
+        "partial": 52,
+        "stop": 8,
+        "full": 79,
+        "fullStop": 9.875,
+        "best1RemovedNetR": -0.1189290053621247
+      },
+      "matchedNull": {
+        "signals": 142,
+        "closed": 141,
+        "meanGrossR": -0.044641028811299555,
+        "meanNetR": -0.1313110388201063,
+        "profitFactorNet": 0.568605218292357,
+        "winRate": 0.5125976940781378,
+        "partial": 38,
+        "stop": 4,
+        "full": 98,
+        "fullStop": 26.21027380952382,
+        "best1RemovedNetR": -0.1455452477729915
+      },
+      "deltaNetR": 0.026581883143143303,
+      "proximity": {
+        "exact": 0,
+        "plusMinus1": 0.035211267605633804,
+        "plusMinus3": 0.056338028169014086
+      },
+      "train": null
+    }
+  ],
+  "aggregate": {
+    "transferCells": 4,
+    "positiveTransfers": 1,
+    "pooledTransferClosed": 434,
+    "pooledTransferMeanNetR": -0.0863826467684252,
+    "pooledTransferBest1RemovedMeanNetR": -0.09922223518669586,
+    "btc2hTestMeanNetR": 0.08682855078007522,
+    "btc2hTestDeltaNetR": 0.10821205241642377,
+    "verdict": "REJECT G2"
+  }
+}

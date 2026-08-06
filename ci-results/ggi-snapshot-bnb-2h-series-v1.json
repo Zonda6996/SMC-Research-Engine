@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "seriesId": "bnb-2h-2026-08-05-safe-sell",
+  "symbol": "BYBIT:BNBUSDT.P",
+  "timeframe": "2h",
+  "timezone": "+05:00",
+  "mode": "Safe",
+  "signal": {
+    "timestamp": "2026-08-05T07:00:00+05:00",
+    "direction": "SELL",
+    "shapeColumn": "Shapes[1]",
+    "open": 603.3,
+    "high": 605.4,
+    "low": 597.6,
+    "close": 598.4
+  },
+  "managementStateFromScreenshot": {
+    "entry": 598.1,
+    "add": 621.5,
+    "partial": 583.5,
+    "fullTarget": 562.4,
+    "state": "active"
+  },
+  "snapshots": [
+    {
+      "id": "snapshot-01",
+      "exportTimestamp": "2026-08-05T11:55:00+05:00",
+      "sourceFile": "ggi-snapshot-bnb-2h-2026-08-05-1155.csv",
+      "rows": 20128,
+      "firstBar": "2022-01-01T05:00:00+05:00",
+      "lastBar": "2026-08-05T11:00:00+05:00",
+      "lastBarClosed": false,
+      "sha256": "d3bf92669d4c9b8281f311dac8a27e16b2ba0a4e5b055b4aa6f4d41c316cb01b"
+    },
+    {
+      "id": "snapshot-02",
+      "exportTimestamp": "2026-08-05T13:07:00+05:00",
+      "sourceFile": "ggi-snapshot-bnb-2h-2026-08-05-1307.csv",
+      "rows": 20129,
+      "firstBar": "2022-01-01T05:00:00+05:00",
+      "lastBar": "2026-08-05T13:00:00+05:00",
+      "lastBarClosed": false,
+      "sha256": "3e137feeb784092f34d36c614b4a459cafcdb7df473916da6887941c77fed461"
+    }
+  ],
+  "comparisons": [
+    {
+      "older": "snapshot-01",
+      "newer": "snapshot-02",
+      "resultFile": "ggi-snapshot-diff-bnb-2h-01-02.json",
+      "ignoreNewestBars": 1,
+      "historicalChanges": 0,
+      "historicalShapeChanges": 0,
+      "historicalBandChanges": 0,
+      "historicalPriceChanges": 0,
+      "recentChanges": 1,
+      "verdict": "no-historical-change-detected-in-this-pair"
+    }
+  ],
+  "interpretation": [
+    "The 07:00 SELL remained unchanged in snapshot #2.",
+    "No closed historical OHLC, Shape, Mean, Inner or Outer value changed between snapshots.",
+    "Only the 11:00 candle changed while it was open, which is expected and excluded from the historical verdict.",
+    "This pair is a useful safety check but does not establish exact BE or stop execution semantics."
+  ],
+  "nextCollection": "Capture another CSV and Safe screenshot at the first management transition (Add, Partial, BE, Full or Stop); otherwise one control snapshot on the next day is sufficient."
+}
