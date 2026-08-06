@@ -18,7 +18,12 @@ export const DEFAULT_CORRECTED_GGI_REPLAY_CONFIG: CorrectedGgiReplayConfig = {
 	beBound: 'optimistic-initial-stop',
 	addEnabled: false,
 	partialFraction: 0.25,
-	maxHoldingBars: 20_000,
+	maxHoldingBars: 2_000,
+}
+
+export interface CorrectedGgiSignal {
+	signalIndex: number
+	side: CorrectedGgiSide
 }
 
 export interface CorrectedGgiTrade {
@@ -92,15 +97,15 @@ function pnlPct(side: CorrectedGgiSide, from: number, to: number, weight: number
 	return side * (to - from) / from * weight * 100
 }
 
-export function replayCorrectedGgiTrade(
+export function replayCorrectedSignalTrade(
 	rows: readonly ExactIndicatorRow[],
 	tr55: readonly (number | null)[],
 	signalIndex: number,
+	side: CorrectedGgiSide,
 	partial: Partial<CorrectedGgiReplayConfig> = {},
 ): CorrectedGgiTrade | null {
 	const config = { ...DEFAULT_CORRECTED_GGI_REPLAY_CONFIG, ...partial }
 	const signal = rows[signalIndex]
-	const side = signal == null ? null : ggiSide(signal)
 	const entryIndex = signalIndex + 1
 	const entryRow = rows[entryIndex]
 	const volatility = tr55[signalIndex]
@@ -207,19 +212,43 @@ export function replayCorrectedGgiTrade(
 	return finish('End mark', lastIndex, last.close)
 }
 
+export function replayCorrectedGgiTrade(
+	rows: readonly ExactIndicatorRow[],
+	tr55: readonly (number | null)[],
+	signalIndex: number,
+	partial: Partial<CorrectedGgiReplayConfig> = {},
+): CorrectedGgiTrade | null {
+	const signal = rows[signalIndex]
+	const side = signal == null ? null : ggiSide(signal)
+	return side == null ? null : replayCorrectedSignalTrade(rows, tr55, signalIndex, side, partial)
+}
+
+export function collectCorrectedSignalTrades(
+	rows: readonly ExactIndicatorRow[],
+	tr55: readonly (number | null)[],
+	signals: readonly CorrectedGgiSignal[],
+	partial: Partial<CorrectedGgiReplayConfig> = {},
+): CorrectedGgiTrade[] {
+	const trades: CorrectedGgiTrade[] = []
+	for (const signal of signals) {
+		const trade = replayCorrectedSignalTrade(rows, tr55, signal.signalIndex, signal.side, partial)
+		if (trade != null) trades.push(trade)
+	}
+	return trades
+}
+
 export function collectCorrectedGgiTrades(
 	rows: readonly ExactIndicatorRow[],
 	tr55: readonly (number | null)[],
 	partial: Partial<CorrectedGgiReplayConfig> = {},
 	warmupBars = 100,
 ): CorrectedGgiTrade[] {
-	const trades: CorrectedGgiTrade[] = []
+	const signals: CorrectedGgiSignal[] = []
 	for (let i = warmupBars; i < rows.length; i++) {
-		if (ggiSide(rows[i]!) == null) continue
-		const trade = replayCorrectedGgiTrade(rows, tr55, i, partial)
-		if (trade != null) trades.push(trade)
+		const side = ggiSide(rows[i]!)
+		if (side != null) signals.push({ signalIndex: i, side })
 	}
-	return trades
+	return collectCorrectedSignalTrades(rows, tr55, signals, partial)
 }
 
 export function applyOneWayCostBps(trade: CorrectedGgiTrade, oneWayCostBps: number): { netReturnPct: number; netR: number } {
