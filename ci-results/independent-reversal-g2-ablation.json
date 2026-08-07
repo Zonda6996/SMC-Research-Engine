@@ -1,0 +1,119 @@
+{
+  "protocolHash": "da1696b7f09ee068e79ddb7987f0309a5b1d99c451a728b7d61dcd0b38f63ba0",
+  "selectedVariant": "EXT_POOL_SEQ",
+  "selected": {
+    "trades": 60,
+    "meanNetR": 0.05600016571889499,
+    "medianNetR": 0.03690976199265537,
+    "profitFactor": 1.578459061315233,
+    "positiveNetRate": 0.6666666666666666,
+    "bestOnePercentRemovedR": 0.0422673753163149,
+    "turnover": 120,
+    "timeInMarketBars": 4308,
+    "netRPerUnitExposure": 0.0007799465977561976,
+    "maximumSequentialDrawdownR": 3.204255197353074
+  },
+  "controls": [
+    {
+      "id": "remove-sequence-gate",
+      "variant": "EXT_POOL",
+      "summary": {
+        "trades": 839,
+        "meanNetR": 0.018650158407113586,
+        "medianNetR": 0.02932548998654532,
+        "profitFactor": 1.132627086445885,
+        "positiveNetRate": 0.6460071513706794,
+        "bestOnePercentRemovedR": 0.007520962122867356,
+        "turnover": 1678,
+        "timeInMarketBars": 63924,
+        "netRPerUnitExposure": 0.00024478259970540483,
+        "maximumSequentialDrawdownR": 23.231483651657754
+      },
+      "deltaMeanNetR": 0.037350007311781404,
+      "deltaProfitFactor": 0.445831974869348
+    },
+    {
+      "id": "replace-extension-with-own1",
+      "variant": "OWN1_POOL",
+      "summary": {
+        "trades": 339,
+        "meanNetR": 0.038784414391603454,
+        "medianNetR": 0.02943895629720339,
+        "profitFactor": 1.3963717732767247,
+        "positiveNetRate": 0.696165191740413,
+        "bestOnePercentRemovedR": 0.026816439559874596,
+        "turnover": 678,
+        "timeInMarketBars": 22627,
+        "netRPerUnitExposure": 0.0005810720147944301,
+        "maximumSequentialDrawdownR": 9.97347891757469
+      },
+      "deltaMeanNetR": 0.017215751327291536,
+      "deltaProfitFactor": 0.18208728803850827
+    },
+    {
+      "id": "remove-pool-context",
+      "variant": "EXT",
+      "summary": {
+        "trades": 4057,
+        "meanNetR": 0.011150727628100253,
+        "medianNetR": 0.02957390970368183,
+        "profitFactor": 1.0859441409591601,
+        "positiveNetRate": 0.6453044121271876,
+        "bestOnePercentRemovedR": -0.00044782243367996304,
+        "turnover": 8114,
+        "timeInMarketBars": 317252,
+        "netRPerUnitExposure": 0.000142594852001572,
+        "maximumSequentialDrawdownR": 76.60652978762229
+      },
+      "deltaMeanNetR": 0.04484943809079474,
+      "deltaProfitFactor": 0.4925149203560728
+    },
+    {
+      "id": "matched-opportunity-null",
+      "variant": "MATCHED_NULL",
+      "summary": {
+        "trades": 801,
+        "meanNetR": -0.03295044789910353,
+        "medianNetR": 0.026226307975121682,
+        "profitFactor": 0.7981735580944589,
+        "positiveNetRate": 0.6229712858926342,
+        "bestOnePercentRemovedR": -0.045905634115328185,
+        "turnover": 1602,
+        "timeInMarketBars": 61797,
+        "netRPerUnitExposure": -0.00042709692650423045,
+        "maximumSequentialDrawdownR": 35.93462773754047
+      },
+      "deltaMeanNetR": 0.08895061361799853,
+      "deltaProfitFactor": 0.7802855032207741
+    },
+    {
+      "id": "legacy-g1-baseline",
+      "variant": "G1",
+      "summary": {
+        "trades": 908,
+        "meanNetR": 0.023924565401521464,
+        "medianNetR": 0.018055155605596653,
+        "profitFactor": 1.3333070268956753,
+        "positiveNetRate": 0.6607929515418502,
+        "bestOnePercentRemovedR": 0.014083113424941052,
+        "turnover": 1816,
+        "timeInMarketBars": 51177,
+        "netRPerUnitExposure": 0.00042447789797333743,
+        "maximumSequentialDrawdownR": 12.844844300293609
+      },
+      "deltaMeanNetR": 0.032075600317373526,
+      "deltaProfitFactor": 0.24515203441955769
+    }
+  ],
+  "cellStability": {
+    "positiveCells": 4,
+    "totalCells": 6,
+    "share": 0.6666666666666666
+  },
+  "findings": {
+    "sequenceAddsMeanR": true,
+    "beatsMatchedNull": true,
+    "bestOnePercentRemovedPositive": true
+  },
+  "verdict": "ABLATION_SUPPORTS_INTERACTION"
+}

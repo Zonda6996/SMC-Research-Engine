@@ -22,7 +22,11 @@
 		"research:ggi:own1:path": "tsx ci/research/runGgiOwn1PathRegimeAuditV1.ts",
 		"research:ggi:g2": "tsx ci/research/runGgiG2StateDetectorV1.ts",
 		"research:ggi:own2": "tsx ci/research/runGgiOwn2ExpectancyRankerV1.ts",
-		"research:ggi:econ0": "tsx ci/research/runGgiEcon0CommonReplayV1.ts"
+		"research:ggi:econ0": "tsx ci/research/runGgiEcon0CommonReplayV1.ts",
+		"research:reversal:g2": "tsx ci/research/runIndependentReversalG2.ts",
+		"research:reversal:g2:walk": "tsx ci/research/runIndependentReversalG2WalkForward.ts",
+		"research:reversal:g2:ablation": "tsx ci/research/runIndependentReversalG2Ablation.ts",
+		"research:reversal:g2:audit": "tsx ci/research/auditIndependentReversalG2Evidence.ts"
 	},
 	"keywords": [],
 	"author": "",

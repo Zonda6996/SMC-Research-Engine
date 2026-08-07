@@ -19,23 +19,10 @@ Bars: 22766 (2024-01-01..2026-08) | vendor arrows: 92 (BUY 48 / SELL 44)
 ## Extension-rule recall on vendor exact bands (distance-only, CSV has no volume)
 
 66/92 arrows (71.7%) satisfy close-stretched-to-inner-band/2.5%-from-Mean at the arrow bar.
-## Verdict (appended post-run)
 
-1. HEAD-TO-HEAD MATCH on vendor's own data: safe WR 91.8 vs his 89.2,
-   Stop 8.2 vs 10.8, Partial 46.6 vs 41.0, Full 45.2 vs 48.2; risk WR
-   90.3 vs 91.4, Stop 9.7 vs 8.6. Std add-rate 68% vs his 60.4%,
-   stop/full split 55/45 vs his 46/54. All within a few points, using
-   HIS exact bands and HIS exact 92 arrows - residual gap is our
-   trade-gate skipping ~10 more arrows than his (73/72/40 trades vs
-   83/81/48) and step being ~5-10% off per GEO3 CV.
-2. THE MONEY LINE: our replayed safe Total R = +5.1R over 2.5 YEARS of
-   LTC 1h. His own std table literally prints Total R = +5R. Two
-   independent measurements, same answer: the 90% WR machine makes
-   ~2R/year per chart before fees. At 0.1% taker round-trips this is
-   negative in practice.
-3. Extension-rule recall on his EXACT bands, distance-only (CSV has no
-   volume): 66/92 = 71.7% - consistent with the 73.3% measured on
-   telegram arrows via reconstruction. The signal identification holds
-   on ground-truth data.
-4. This closes the loop with ZERO reconstruction error: bands his, ar-
-   rows his, stats match, economics ~zero. Full-chapter QED.
+## Verdict
+
+1. HEAD-TO-HEAD MATCH on vendor data: safe/risk WR, Stop, Partial and Full shares are within a few percentage points of the vendor tables. The remaining trade-count gap comes from the approximate state gate and residual step error.
+2. THE MONEY LINE: replayed safe Total R is +5.1R over 2.5 years on LTC 1h. The vendor Standard table independently prints +5R. The roughly 90% WR machine therefore makes only about 2R per chart-year before fees.
+3. Extension recall on exact vendor bands is 71.7%, consistent with 73.3% on forward Telegram arrows. This validates the extension-family identification without band reconstruction error.
+4. Exact vendor bands, exact vendor arrows, near-matching outcome tables and near-zero economics close the reverse-engineering loop.

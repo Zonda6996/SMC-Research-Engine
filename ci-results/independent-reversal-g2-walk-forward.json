@@ -1,0 +1,70 @@
+{
+  "protocolHash": "da1696b7f09ee068e79ddb7987f0309a5b1d99c451a728b7d61dcd0b38f63ba0",
+  "selectedVariant": "EXT_POOL_SEQ",
+  "parentVerdict": "PROMISING_NOT_PROVEN",
+  "folds": [
+    {
+      "fold": 1,
+      "months": [
+        "2024-01",
+        "2024-02",
+        "2024-04",
+        "2024-05",
+        "2024-06",
+        "2024-07"
+      ],
+      "trades": 9,
+      "meanNetR": 0.07042037284704922,
+      "positiveMonths": 5,
+      "eligibleMonths": 8
+    },
+    {
+      "fold": 2,
+      "months": [
+        "2024-08",
+        "2024-09",
+        "2024-10",
+        "2024-11",
+        "2025-01",
+        "2025-02"
+      ],
+      "trades": 20,
+      "meanNetR": 0.08269652112066625,
+      "positiveMonths": 11,
+      "eligibleMonths": 17
+    },
+    {
+      "fold": 3,
+      "months": [
+        "2025-03",
+        "2025-04",
+        "2025-06",
+        "2025-08",
+        "2025-10",
+        "2025-11"
+      ],
+      "trades": 14,
+      "meanNetR": 0.07472195638013276,
+      "positiveMonths": 8,
+      "eligibleMonths": 12
+    },
+    {
+      "fold": 4,
+      "months": [
+        "2025-12",
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05"
+      ],
+      "trades": 17,
+      "meanNetR": 0.0015405162220631114,
+      "positiveMonths": 10,
+      "eligibleMonths": 14
+    }
+  ],
+  "positiveFolds": 4,
+  "foldConsistency": 1,
+  "verdict": "WALK_FORWARD_STABLE"
+}
