@@ -63,7 +63,7 @@ export function own2Raw(rows: readonly ExactIndicatorRow[]): Own2Signal[] {
 }
 
 /** Apply trade-state cooldown: no signal while trade open + N bars after exit. */
-export function own2WithState(rows: readonly ExactIndicatorRow[], tr55: readonly number[], raw: readonly Own2Signal[]): Own2Signal[] {
+export function own2WithState(rows: readonly ExactIndicatorRow[], tr55: readonly (number | null)[], raw: readonly Own2Signal[]): Own2Signal[] {
 	const out: Own2Signal[] = []
 	let blockedUntil = -1
 	for (const s of raw) {

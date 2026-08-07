@@ -13,6 +13,8 @@ export interface FundingFetchOptions {
 	fetchImpl?: typeof fetch
 	cacheDir?: string
 	useCache?: boolean
+	/** Skip monthly ZIP archives and use the paginated REST endpoint. */
+	preferApi?: boolean
 }
 
 interface BinanceFundingRow {
@@ -171,7 +173,8 @@ export async function fetchFundingHistory(
 	}
 
 	const fetchImpl = options.fetchImpl ?? fetch
-	const archived = untilMs - fromMs >= 31 * 86_400_000
+	const preferApi = options.preferApi === true
+	const archived = !preferApi && untilMs - fromMs >= 31 * 86_400_000
 		? await fetchArchivedFundingHistory(fetchImpl, normalizedSymbol, fromMs, untilMs)
 		: null
 	if (archived != null) {
@@ -180,6 +183,9 @@ export async function fetchFundingHistory(
 			writeFileSync(file, JSON.stringify({ schemaVersion: CACHE_SCHEMA_VERSION, symbol: normalizedSymbol, fromMs, untilMs, rows: archived }))
 		}
 		return archived
+	}
+	if (!preferApi && untilMs - fromMs >= 31 * 86_400_000) {
+		throw new Error(`Complete archived funding history is unavailable for ${normalizedSymbol}`)
 	}
 
 	const byTimestamp = new Map<number, IndependentReversalFundingPayment>()

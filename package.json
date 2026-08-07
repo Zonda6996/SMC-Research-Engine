@@ -26,7 +26,8 @@
 		"research:reversal:g2": "tsx ci/research/runIndependentReversalG2.ts",
 		"research:reversal:g2:walk": "tsx ci/research/runIndependentReversalG2WalkForward.ts",
 		"research:reversal:g2:ablation": "tsx ci/research/runIndependentReversalG2Ablation.ts",
-		"research:reversal:g2:audit": "tsx ci/research/auditIndependentReversalG2Evidence.ts"
+		"research:reversal:g2:audit": "tsx ci/research/auditIndependentReversalG2Evidence.ts",
+		"research:zonda:quick-profit": "tsx ci/research/runZondaQuickProfitabilityScan.ts"
 	},
 	"keywords": [],
 	"author": "",
