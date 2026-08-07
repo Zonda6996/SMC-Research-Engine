@@ -354,7 +354,7 @@ export async function runIndependentReversalG2Research() {
 		},
 		transfer: {
 			aggregate: Object.fromEntries(PRIMARY_VARIANTS.map((variant) => [variant, compact(transferAggregate[variant]!)])),
-			cells: transferCells.map((cell) => ({ symbol: cell.symbol, variant: cell.variant, ...compact(cell.evaluation), months: foldResults(transferData.find((data) => data.symbol === cell.symbol)!, cell.evaluation) })),
+			cells: transferCells.map((cell) => ({ symbol: cell.symbol, ...compact(cell.evaluation), months: foldResults(transferData.find((data) => data.symbol === cell.symbol)!, cell.evaluation) })),
 		},
 	}
 }
