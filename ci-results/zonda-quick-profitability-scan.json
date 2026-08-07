@@ -45087,5 +45087,62 @@
       "seq": false,
       "cluster": "2026-06-27-S"
     }
-  ]
+  ],
+  "coverage": {
+    "requestedSymbols": [
+      "BCHUSDT",
+      "ETCUSDT",
+      "UNIUSDT",
+      "FILUSDT",
+      "NEARUSDT",
+      "APTUSDT",
+      "ARBUSDT",
+      "OPUSDT",
+      "SUIUSDT",
+      "SEIUSDT",
+      "PEPEUSDT",
+      "RUNEUSDT",
+      "TAOUSDT",
+      "ENAUSDT",
+      "LDOUSDT",
+      "STXUSDT",
+      "SANDUSDT",
+      "MANAUSDT",
+      "AXSUSDT",
+      "DYDXUSDT",
+      "IMXUSDT",
+      "MKRUSDT",
+      "CRVUSDT",
+      "PENDLEUSDT",
+      "TIAUSDT",
+      "WIFUSDT"
+    ],
+    "requestedTimeframes": [
+      "1h",
+      "2h"
+    ],
+    "completeNull": true,
+    "completeBreadth": true,
+    "coveredBreadthSymbols": [
+      "ARBUSDT",
+      "AXSUSDT",
+      "CRVUSDT",
+      "DYDXUSDT",
+      "ENAUSDT",
+      "IMXUSDT",
+      "LDOUSDT",
+      "MANAUSDT",
+      "MKRUSDT",
+      "OPUSDT",
+      "PENDLEUSDT",
+      "RUNEUSDT",
+      "SANDUSDT",
+      "SEIUSDT",
+      "STXUSDT",
+      "SUIUSDT",
+      "TAOUSDT",
+      "TIAUSDT",
+      "WIFUSDT"
+    ]
+  }
 }
