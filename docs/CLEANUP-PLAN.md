@@ -157,3 +157,13 @@ Definition of done: в дереве остались только актуаль
   - НЕ КОММИТИТСЯ и остаётся локально untracked: temp/ (frozen baseline + вендорские xlsx, держим до Фазы 3). .postman/, postman/, .workbuddy-ai/, tmp/forward/, .cache — в .gitignore.
   - ОСТАЛОСЬ В ФАЗЕ 2 (после коммитов): (1) примирить main — `git checkout main; git merge research/independent-reversal-edge` (main получит всю работу; его уникальные коммиты 72360b8 ignore-cache + 4b184a4 shadcn сохранятся; конфликтов не ждём). (2) PUSH — ТОЛЬКО с явного согласия пользователя: `git push origin research/independent-reversal-edge` и `git push origin main` (+ по желанию `git push origin --tags` для archive/*). Последний push был 2026-08-07.
   - ФАЗА 3 (следующая): переписать доки СТРУКТУРНО (см. секцию Фаза 3), вторая чистка docs/, распил outputs/*.md + FINDINGS + .workbuddy-ai/memory в чистые доки, консолидация папок (scripts→tools, scratch→ci/research, temp→ci-results+data, outputs после распила), отвязка вендорских CSV от git при необходимости, починка scripts/auditReversalBenchmark.ts, разбор ci-results/ (247) и ci/research/ (~90 раннеров), закрытие утечки #2, посчитать forward (tmp/forward, ~3 недели).
+- 2026-08-12 Фаза 2, Партия 7 — ВЫПОЛНЕНО: 7 коммитов A→G созданы на research/independent-reversal-edge (ahead 7 vs origin, push НЕ делали):
+  - cb72f9e chore(cleanup): remove obsolete research artifacts, backtest outputs, pnpm lockfile
+  - a5b2b8a chore(data): drop re-exportable vendor CSVs, keep tg signals + manifest
+  - 531f290 docs: restructure - remove stale docs, add specs + cleanup plan
+  - b9794d8 feat(signals): reversal arrow engine + stackShare leak #1 fix
+  - 059dcbf test: arrow engine/replay/parity + funding, tf-routing
+  - 30d2597 feat(viz): signal arrows indicator + shadcn styling
+  - cedc5d6 chore(research): reversal benchmark script + runner/report updates
+  - Рабочее дерево чистое, кроме untracked temp/ (frozen baseline + вендорские xlsx — держим до Фазы 3).
+  - ОСТАЛОСЬ: примирить main (merge research->main) + PUSH (только с явного согласия).
