@@ -2,29 +2,30 @@
 
 Период: 2024-01-01 — 2026-08-01. FROZEN-1 без подбора параметров: own2Raw 1h/2h + RELAXED 4h pool + STATIC2 (step=5.5×ATR200/1.17, TP/SL=2×step, без добора/партиала, timeout 14 дней).
 Базовая экономика: 7 bps one-way + Binance USD-M funding proxy по фактическому удержанию. Кластер: сторона × UTC-день.
-Покрытие запуска: полный Null-universe (6 transfer-монет × 1h/2h) и полный заранее заданный breadth-universe (20 монет × 1h/2h); у PEPE архивные свечи отсутствовали, поэтому сделки получены по 19 breadth-монетам.
+Покрытие запуска: null=полное, breadth=полное; символы=BCHUSDT, ETCUSDT, UNIUSDT, FILUSDT, NEARUSDT, APTUSDT, ARBUSDT, OPUSDT, SUIUSDT, SEIUSDT, PEPEUSDT, RUNEUSDT, TAOUSDT, ENAUSDT, LDOUSDT, STXUSDT, SANDUSDT, MANAUSDT, AXSUSDT, DYDXUSDT, IMXUSDT, MKRUSDT, CRVUSDT, PENDLEUSDT, TIAUSDT, WIFUSDT, TF=1h, 2h.
 
 ## Решение
 
-- Null B / SEQ: **THINS_ONLY**; преимущество SEQ = -0.1721R.
-- BREADTH1: **CLOSE**; raw n=2175, clusters=655, cluster-equal mean=0.0357R.
+- Null B / SEQ: **INCONCLUSIVE** — exact equal-count не достигнут, вывод запрещён.
+- BREADTH1: **CLOSE**; raw n=272, clusters=181, cluster-equal mean=0.0374R.
+- Parity QA: исправленный state-first replay оставил 338 сделок из 4552 state-gated (7.43%); прежние 2175 breadth-сделок относились к ошибочной более частой стратегии.
 - Планка не пройдена: FROZEN-1 закрывается честно.
 
 ## 1. Null B для SEQ (equal-count, side + month + TF)
 
 | Slice | Trades | Clusters | Mean net R | Cluster-equal mean R | PF | Positive | Funding R |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| SEQ real | 40 | 38 | 0.0372 | 0.0305 | 1.092 | 47.5% | 0.3473 |
-| non-SEQ matched control | 40 | 37 | 0.2093 | 0.2117 | 1.642 | 57.5% | 0.2663 |
+| SEQ real | 3 | 3 | -0.1426 | -0.1426 | 0.600 | 33.3% | -0.0212 |
+| non-SEQ matched control | 2 | 2 | -0.0095 | -0.0095 | 0.981 | 50.0% | 0.0010 |
 
-Exact equal-count: **да**. SEQ минус control: **-0.1721R**.
+Exact equal-count: **нет (3 vs 2)**. SEQ минус control: **-**.
 
 ## 2. ECON1-base
 
 | Slice | Trades | Clusters | Mean net R | Cluster-equal mean R | PF | Positive | Funding R |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Null-universe FROZEN-1 | 635 | 330 | 0.0308 | 0.0281 | 1.079 | 51.8% | 3.9926 |
-| Unseen breadth FROZEN-1 | 2175 | 655 | 0.0169 | 0.0357 | 1.043 | 51.9% | 3.8780 |
+| Null-universe FROZEN-1 | 66 | 55 | 0.0874 | 0.0807 | 1.253 | 59.1% | 0.2401 |
+| Unseen breadth FROZEN-1 | 272 | 181 | 0.0174 | 0.0374 | 1.044 | 51.1% | -0.0129 |
 
 Funding включён в каждую сделку только для settlement строго после entry и строго до exit. Источник — Binance USD-M proxy, не точная история BingX.
 
@@ -35,9 +36,27 @@ Funding включён в каждую сделку только для settleme
 
 | Slice | Trades | Clusters | Mean net R | Cluster-equal mean R | PF | Positive | Funding R |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| ALL | 2175 | 655 | 0.0169 | 0.0357 | 1.043 | 51.9% | 3.8780 |
-| 1h | 1332 | 576 | 0.0119 | 0.0344 | 1.028 | 51.2% | 2.0973 |
-| 2h | 843 | 423 | 0.0246 | 0.0049 | 1.073 | 53.0% | 1.7807 |
+| ALL | 272 | 181 | 0.0174 | 0.0374 | 1.044 | 51.1% | -0.0129 |
+| 1h | 184 | 144 | -0.0043 | 0.0167 | 0.990 | 48.9% | 0.0807 |
+| 2h | 88 | 70 | 0.0629 | 0.0611 | 1.193 | 55.7% | -0.0936 |
+
+## 4. QA-воронка FROZEN-1
+
+Порядок parity: raw signal → STATIC2 replay/state occupancy → RELAXED context. Отклонённый контекстом replayable-сигнал всё равно блокирует поток до exit + 3 bars, как в IMP2.
+
+| Funnel stage | Count | % of previous stage |
+|---|---:|---:|
+| own2Raw (including warmup) | 53053 | - |
+| after warmup + date window | 50675 | 95.52% |
+| admitted by raw state gate | 4552 | 8.98% |
+| replayable (occupies state) | 4552 | 100.00% |
+| near pool ±50% | 4037 | 88.69% |
+| rank < 2/3 | 1040 | 25.76% |
+| swept ≤48h | 463 | 44.52% |
+| entry within ±25% | 338 | 73.00% |
+| final RELAXED trades | 338 | 100.00% |
+
+Итоговая доля RELAXED среди state-gated: **7.43%**.
 
 ## Ограничения
 
@@ -48,6 +67,6 @@ Funding включён в каждую сделку только для settleme
 
 ## Предупреждения данных
 
-- PEPEUSDT 1h: insufficient candles (0/0)
-- PEPEUSDT 2h: insufficient candles (0/0)
+- PEPEUSDT 1h: insufficient candles (known unavailable in Binance USD-M archive)
+- PEPEUSDT 2h: insufficient candles (known unavailable in Binance USD-M archive)
 

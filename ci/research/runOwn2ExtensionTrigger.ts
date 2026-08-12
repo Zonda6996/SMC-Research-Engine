@@ -19,6 +19,8 @@
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { detectArrowSignalsFromBands } from '../../src/core/signals/ArrowSignalEngine.js'
+import type { ApexBand } from '../../src/core/signals/ApexEngine.js'
 import { trueRangeSma } from './lib/ggiCorrectedReplay.js'
 import { replayVar1Trade, type Var1Config } from './runVar1ExitSweep.js'
 import { buildRows } from './runFwd1TelegramForwardAudit.js'
@@ -37,29 +39,21 @@ interface FwdTrade { symbol: string; tfMin: number; side: 1 | -1; timeMs: number
 
 export interface Own2Signal { idx: number; side: 1 | -1 }
 
-/** OWN2 signal generator WITHOUT trade-state (raw condition only). */
+const rowsAsBands = (rows: readonly ExactIndicatorRow[]): ApexBand[] => rows.map((row) => ({
+	mean: row.mean,
+	s: row.mean > 0 ? Math.abs(row.upperInner - row.mean) / row.mean : Number.NaN,
+	redLo: row.upperInner,
+	redHi: row.upperOuter,
+	greenHi: row.lowerInner,
+	greenLo: row.lowerOuter,
+}))
+
+/** OWN2 signal generator WITHOUT trade-state (raw condition only), shared with production. */
 export function own2Raw(rows: readonly ExactIndicatorRow[]): Own2Signal[] {
-	const out: Own2Signal[] = []
-	for (let i = 21; i < rows.length; i++) {
-		const r = rows[i]!
-		if (!Number.isFinite(r.mean) || !Number.isFinite(r.upperInner) || !Number.isFinite(r.lowerInner) || r.mean <= 0) continue
-		let volSum = 0, volN = 0
-		for (let k = i - 20; k < i; k++) { volSum += rows[k]!.volume; volN++ }
-		const volRatio = volSum > 0 ? r.volume / (volSum / volN) : 0
-		if (volRatio < VOL_MIN) continue
-		const distMeanPct = (Math.abs(r.close - r.mean) / r.mean) * 100
-		if (distMeanPct < DIST_MIN) continue
-		for (const side of [1, -1] as const) {
-			const half = side === 1 ? r.mean - r.lowerInner : r.upperInner - r.mean
-			if (half <= 0) continue
-			const band = side === 1 ? r.lowerInner : r.upperInner
-			const pen = side === 1 ? (band - r.close) / half : (r.close - band) / half
-			// extension must be on the correct side of Mean for a reversal signal
-			const correctSide = side === 1 ? r.close < r.mean : r.close > r.mean
-			if (correctSide && pen >= PEN_MIN) out.push({ idx: i, side })
-		}
-	}
-	return out
+	return detectArrowSignalsFromBands(rows, rowsAsBands(rows)).candidates.map((signal) => ({
+		idx: signal.signalIndex,
+		side: signal.side === 'long' ? 1 : -1,
+	}))
 }
 
 /** Apply trade-state cooldown: no signal while trade open + N bars after exit. */
