@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "seriesId": "bnb-2h-2026-08-05-sell",
+  "symbol": "BYBIT:BNBUSDT.P",
+  "timeframe": "2h",
+  "timezone": "+05:00",
+  "signal": {
+    "timestamp": "2026-08-05T07:00:00+05:00",
+    "direction": "SELL",
+    "shapeColumn": "Shapes[1]"
+  },
+  "snapshot": {
+    "id": "snapshot-01",
+    "exportTimestamp": "2026-08-05T11:55:00+05:00",
+    "sourceFile": "ggi-snapshot-bnb-2h-2026-08-05-1155.csv",
+    "rows": 20128,
+    "firstBar": "2022-01-01T05:00:00+05:00",
+    "lastBar": "2026-08-05T11:00:00+05:00",
+    "lastBarClosed": false,
+    "sha256": "d3bf92669d4c9b8281f311dac8a27e16b2ba0a4e5b055b4aa6f4d41c316cb01b"
+  },
+  "visibleLevelsAtLastBar": {
+    "close": 600.8,
+    "mean": 583.4738426574827,
+    "upperOuter": 621.4558622133654,
+    "upperInner": 605.3384331781151,
+    "lowerInner": 562.3989927058161,
+    "lowerOuter": 547.8132008490162
+  },
+  "signalRow": {
+    "timestamp": "2026-08-05T07:00:00+05:00",
+    "open": 603.3,
+    "high": 605.4,
+    "low": 597.6,
+    "close": 598.4,
+    "buy": false,
+    "sell": true
+  },
+  "managementStateFromScreenshot": {
+    "entry": 598.1,
+    "add": 621.5,
+    "partial": 583.5,
+    "fullTarget": 562.4,
+    "state": "active"
+  },
+  "notes": [
+    "This is the first usable snapshot; it was taken after signal appearance rather than immediately at signal close.",
+    "The final visible row is the open 2h candle at 11:00 +05; comparisons should ignore the newest open bar initially.",
+    "The 07:00 signal is present in the export as the second Shapes column with value 1."
+  ]
+}

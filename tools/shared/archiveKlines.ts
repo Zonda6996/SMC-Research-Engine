@@ -21,6 +21,27 @@ const BASE_URL = 'https://data.binance.vision/data'
 const DEFAULT_CACHE_DIR = join(dirname(fileURLToPath(import.meta.url)), '../../tmp/viz-archive-cache')
 const DAY_MS = 86_400_000
 
+function utcDayId(timestamp: number): string {
+	const d = new Date(timestamp)
+	return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
+}
+
+/** UTC-дни, пересекающие внутренние разрывы ряда; границы до/после истории не считаются. */
+export function internalGapDays(candles: readonly Candle[], timeframeMs: number): string[] {
+	const days = new Set<string>()
+	const sorted = [...candles].sort((a, b) => a.timestamp - b.timestamp)
+	for (let i = 1; i < sorted.length; i++) {
+		const missingFrom = sorted[i - 1]!.timestamp + timeframeMs
+		const missingUntil = sorted[i]!.timestamp
+		for (let t = missingFrom; t < missingUntil; t = Date.UTC(
+			new Date(t).getUTCFullYear(),
+			new Date(t).getUTCMonth(),
+			new Date(t).getUTCDate() + 1,
+		)) days.add(utcDayId(t))
+	}
+	return [...days].sort()
+}
+
 export interface ArchiveOptions {
 	/** Подмена сети для тестов; по умолчанию — глобальный fetch. */
 	fetchImpl?: typeof fetch
@@ -207,5 +228,19 @@ export async function fetchArchiveKlines(
 	const tfMs = TF_MS[tf]!
 	const byTs = new Map<number, Candle>()
 	for (const part of results) for (const c of part) if (c.timestamp >= fromMs && c.timestamp + tfMs <= until) byTs.set(c.timestamp, c)
-	return [...byTs.values()].sort((a, b) => a.timestamp - b.timestamp)
+
+	// У Binance иногда месячный ZIP внутренне неполон, хотя соответствующие дневные ZIP
+	// существуют. Такой дефект особенно опасен для исследований: границы окна выглядят
+	// полными, но внутри незаметно теряются дни. Добираем только UTC-дни обнаруженных
+	// внутренних разрывов и не синтезируем свечи.
+	let merged = [...byTs.values()].sort((a, b) => a.timestamp - b.timestamp)
+	const repairDays = internalGapDays(merged, tfMs)
+	if (repairDays.length > 0) {
+		const repaired = await Promise.all(repairDays.map((day) => loadPeriod(sym, tf, market, 'daily', day, opts)))
+		for (const part of repaired) for (const c of part ?? []) {
+			if (c.timestamp >= fromMs && c.timestamp + tfMs <= until) byTs.set(c.timestamp, c)
+		}
+		merged = [...byTs.values()].sort((a, b) => a.timestamp - b.timestamp)
+	}
+	return merged
 }

@@ -1,0 +1,122 @@
+# ============================================================================
+# INSTALL — ONE TIME, BY A HUMAN.
+#
+# Copy this file to  .github/workflows/research.yml  and commit it.
+# Do it from the REPO ROOT (where package.json and SPEC.md are visible):
+#   Add file -> Create new file -> paste the path .github/workflows/research.yml
+# Check the breadcrumbs above the editor: they must read
+#   SMC-Research-Engine / .github / workflows / research.yml
+# If you see "ci /" in there, you are inside a folder — go back to the root.
+#
+# WHY THIS FILE IS HERE INSTEAD OF THERE: the Notion AI GitHub connection has
+# no "workflow" write scope, so an agent cannot create or edit anything under
+# .github/workflows/. That boundary is deliberate — write access there means
+# arbitrary code execution on runners with access to your secrets.
+#
+# AFTER INSTALLING, THIS FILE SHOULD NEVER NEED TO CHANGE AGAIN.
+# It is a thin shell: checkout -> node -> cache -> npm ci -> bash ci/run.sh.
+# WHAT it computes is decided by ci/task.json and ci/run.sh, which are ordinary
+# files an agent can edit freely. A push to ci/** starts a run by itself.
+#
+# Once this runs green, the old geo-probe.yml can be deleted — this replaces it.
+# ============================================================================
+
+name: research
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'ci/**'
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task to run (overrides ci/task.json): gate | geo-probe | viz-shots | research'
+        required: false
+        default: ''
+      args:
+        description: 'Extra args passed through to ci/run.sh as $ARGS'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+# Long research runs must not be killed by an unrelated later push.
+concurrency:
+  group: research-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    # GitHub's hard ceiling for a job is 6h; stay just under it.
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      # Task name and flags come from ci/task.json, overridable by dispatch input.
+      - name: Read task config
+        id: cfg
+        env:
+          IN_TASK: ${{ inputs.task }}
+        run: |
+          TASK="$IN_TASK"
+          if [ -z "$TASK" ] && [ -f ci/task.json ]; then TASK=$(jq -r '.task // "gate"' ci/task.json); fi
+          [ -z "$TASK" ] && TASK=gate
+          PW=false
+          if [ -f ci/task.json ]; then PW=$(jq -r '.needsPlaywright // false' ci/task.json); fi
+          echo "task=$TASK" >> "$GITHUB_OUTPUT"
+          echo "playwright=$PW" >> "$GITHUB_OUTPUT"
+          echo "task=$TASK playwright=$PW"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      # Binance archives are immutable: download once, reuse forever.
+      # Rolling key — every run saves a fresh snapshot, restore-keys picks the
+      # newest previous one.
+      - name: Cache Binance archives
+        uses: actions/cache@v4
+        with:
+          path: .cache/binance
+          key: binance-v1-${{ github.run_id }}
+          restore-keys: |
+            binance-v1-
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium for Playwright
+        if: steps.cfg.outputs.playwright == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run task
+        env:
+          TASK: ${{ steps.cfg.outputs.task }}
+          ARGS: ${{ inputs.args }}
+          CACHE_DIR: .cache/binance
+        run: bash ci/run.sh
+
+      # Artifacts for the human (30 days, no repo bloat).
+      - name: Upload results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-results-${{ github.run_id }}
+          path: ci-results/
+          if-no-files-found: ignore
+          retention-days: 30
+
+      # Committed copy is how the agent reads results (it has no Actions access).
+      - name: Commit results back
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A ci-results
+          if git diff --cached --quiet; then echo "no result changes"; exit 0; fi
+          git commit -m "ci(${{ steps.cfg.outputs.task }}): results [skip ci]"
+          git pull --rebase --autostash origin "${{ github.ref_name }}" || true
+          git push origin "HEAD:${{ github.ref_name }}"

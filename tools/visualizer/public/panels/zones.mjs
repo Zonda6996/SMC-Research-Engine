@@ -135,14 +135,14 @@ export function renderZones() {
 		p1: c.near, p2: c.far, side: c.direction,
 		focused: zid(c) === focusId, dim: !!focusId && zid(c) !== focusId,
 		alpha: Math.min(1, (c.stackShare ?? 1) * (c.__role === 'local' ? 0.7 : 1)),
-		label: `${fmtTf(zoneTf(c))}${c.__role ? (c.__role === 'swing' ? '·СВИНГ' : c.__role === 'local' ? '·ЛОК' : '·СРЕД') : ''} ${c.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(c.near)} · ${LIFE_RU[c.lifecycleState] || c.lifecycleState}`,
+		label: `${fmtTf(zoneTf(c))}${c.__role ? (c.__role === 'swing' ? '·СВИНГ' : c.__role === 'local' ? '·ЛОК' : '·СРЕД') : ''} ${c.direction === 'long' ? 'LONG' : 'SHORT'} ${fmtP(c.near)} · ${LIFE_RU[c.lifecycleState] || c.lifecycleState}`, 
 	}))
 	if ($('myZonesShow').checked) {
 		for (const z of myList()) rects.push({
 			id: z.id, manual: true, side: z.side,
 			t1: time(S.data.candles[0].timestamp), t2: time(last),
 			p1: z.side === 'long' ? z.hi : z.lo, p2: z.side === 'long' ? z.lo : z.hi,
-			label: `МОЯ ${fmtTf(S.data?.dataset?.timeframe)} ${fmtP(z.lo)}–${fmtP(z.hi)}${z.note ? ' · ' + z.note : ''}`,
+			label: `МОЯ ${fmtTf(S.data?.dataset?.timeframe)} ${fmtP(z.lo)}–${fmtP(z.hi)}${z.note ? ' · ' + z.note : ''}`, 
 		})
 	}
 	const focused = xs.find((x) => zid(x) === focusId)

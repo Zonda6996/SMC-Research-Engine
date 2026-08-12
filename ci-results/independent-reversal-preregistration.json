@@ -1,0 +1,72 @@
+{
+  "generation": "independent-reversal-edge-g1",
+  "status": "preregistered-before-results",
+  "objective": "Build a causal proprietary reversal indicator selected by net profitability, not vendor-label fidelity.",
+  "families": ["P", "L", "S", "V", "C"],
+  "signal": {
+    "arm": "first Inner-band breach per side",
+    "penetrationInnerWidth": 0.25,
+    "recoveryInnerWidth": 0.5,
+    "favorableBodyAtr": 0.2,
+    "maxEpisodeBars": 96,
+    "liquidityDistanceAtr": 0.75,
+    "peakRelativeVolume": 1.5,
+    "confirmationVolumeMax": 1,
+    "confirmationVolumePeakRatio": 0.7,
+    "oneSignalPerEpisode": true,
+    "episodeEnd": ["mean recovery", "opposite Inner breach", "expiry"]
+  },
+  "execution": {
+    "entry": "next-bar-open",
+    "takerFeeRate": 0.0005,
+    "makerFeeRate": 0.0002,
+    "marketSlippageRate": 0.0002,
+    "stopBufferAtr": 0.15,
+    "riskAtrRange": [0.5, 3],
+    "targetR": 2,
+    "timeStopBars": 48,
+    "ambiguousBar": "stop-first",
+    "funding": "actual signed payments strictly between entry and exit"
+  },
+  "development": {
+    "symbols": ["BTC/USDT", "ETH/USDT", "SOL/USDT", "XRP/USDT"],
+    "timeframe": "15m",
+    "fit": ["2021-01-01", "2023-01-01"],
+    "signalValidation": ["2023-01-01", "2024-01-01"],
+    "managementValidation": ["2024-01-01", "2025-01-01"]
+  },
+  "portability": {
+    "timeframes": ["5m", "1h"],
+    "rule": "no retuning"
+  },
+  "sealed": {
+    "symbols": ["BNB/USDT", "DOGE/USDT", "ADA/USDT", "LINK/USDT", "AVAX/USDT", "SUI/USDT", "NEAR/USDT", "APT/USDT", "LTC/USDT"],
+    "timeframes": ["5m", "15m", "1h"],
+    "from": "2025-01-01",
+    "until": "freeze at the last complete archive before sealed execution",
+    "rule": "open once after complete configuration freeze"
+  },
+  "statistics": {
+    "blockBootstrapRuns": 10000,
+    "block": "symbol-timeframe calendar week",
+    "familyCorrection": "Holm-Bonferroni",
+    "tailCheck": "remove best 1% trades",
+    "neighbors": "one-at-a-time only; no Cartesian grid"
+  },
+  "promotionGates": {
+    "minValidationTrades": 200,
+    "minExpectancyR": 0.08,
+    "minProfitFactor": 1.15,
+    "maxPortfolioDrawdownPct": 15,
+    "minNonNegativeCellShare": 0.7,
+    "maxSingleSymbolContribution": 0.35,
+    "baseAndStressCostsPositive": true,
+    "bootstrapLowerExpectancyAboveZero": true
+  },
+  "prohibited": [
+    "vendor-label optimization",
+    "timeframe-specific tuning in generation G1",
+    "opening sealed results before config freeze",
+    "production detectReversals/UI/strategy changes before promotion gates"
+  ]
+}

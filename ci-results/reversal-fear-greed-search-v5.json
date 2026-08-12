@@ -1,0 +1,3014 @@
+{
+  "protocol": {
+    "gridSize": 60000,
+    "selection": "BTC fit -> top300 validation -> sealed; groups untouched"
+  },
+  "winner": {
+    "config": {
+      "weights": [
+        1,
+        1,
+        2,
+        2
+      ],
+      "smooth": 3,
+      "arm": 20,
+      "release": 25,
+      "cooldown": 56,
+      "innerMemory": 256,
+      "directional": true
+    },
+    "fit": [
+      {
+        "datasetId": "btc-perp-15m",
+        "metrics": {
+          "tp": 4,
+          "fp": 73,
+          "fn": 28,
+          "precision": 0.05194805194805195,
+          "recall": 0.125,
+          "f1": 0.07339449541284404,
+          "predictions": 77,
+          "truth": 32
+        }
+      },
+      {
+        "datasetId": "btc-perp-1h",
+        "metrics": {
+          "tp": 5,
+          "fp": 51,
+          "fn": 18,
+          "precision": 0.08928571428571429,
+          "recall": 0.21739130434782608,
+          "f1": 0.12658227848101267,
+          "predictions": 56,
+          "truth": 23
+        }
+      }
+    ],
+    "fitAggregate": {
+      "tp": 9,
+      "fp": 124,
+      "fn": 46,
+      "precision": 0.06766917293233082,
+      "recall": 0.16363636363636364,
+      "f1": 0.09574468085106383,
+      "predictions": 133,
+      "truth": 55
+    },
+    "objective": -0.8076923076923077,
+    "validation": [
+      {
+        "datasetId": "btc-perp-15m",
+        "metrics": {
+          "tp": 3,
+          "fp": 40,
+          "fn": 13,
+          "precision": 0.06976744186046512,
+          "recall": 0.1875,
+          "f1": 0.1016949152542373,
+          "predictions": 43,
+          "truth": 16
+        }
+      },
+      {
+        "datasetId": "btc-perp-1h",
+        "metrics": {
+          "tp": 2,
+          "fp": 23,
+          "fn": 8,
+          "precision": 0.08,
+          "recall": 0.2,
+          "f1": 0.11428571428571428,
+          "predictions": 25,
+          "truth": 10
+        }
+      }
+    ],
+    "validationAggregate": {
+      "tp": 5,
+      "fp": 63,
+      "fn": 21,
+      "precision": 0.07352941176470588,
+      "recall": 0.19230769230769232,
+      "f1": 0.10638297872340426,
+      "predictions": 68,
+      "truth": 26
+    }
+  },
+  "sealed": {
+    "slices": [
+      {
+        "datasetId": "btc-perp-15m",
+        "metrics": {
+          "tp": 2,
+          "fp": 38,
+          "fn": 19,
+          "precision": 0.05,
+          "recall": 0.09523809523809523,
+          "f1": 0.06557377049180328,
+          "predictions": 40,
+          "truth": 21
+        }
+      },
+      {
+        "datasetId": "btc-perp-1h",
+        "metrics": {
+          "tp": 1,
+          "fp": 29,
+          "fn": 10,
+          "precision": 0.03333333333333333,
+          "recall": 0.09090909090909091,
+          "f1": 0.04878048780487805,
+          "predictions": 30,
+          "truth": 11
+        }
+      }
+    ],
+    "aggregate": {
+      "tp": 3,
+      "fp": 67,
+      "fn": 29,
+      "precision": 0.04285714285714286,
+      "recall": 0.09375,
+      "f1": 0.058823529411764705,
+      "predictions": 70,
+      "truth": 32
+    }
+  },
+  "futures": {
+    "slices": [
+      {
+        "datasetId": "eth-perp-15m",
+        "metrics": {
+          "tp": 12,
+          "fp": 177,
+          "fn": 63,
+          "precision": 0.06349206349206349,
+          "recall": 0.16,
+          "f1": 0.09090909090909091,
+          "predictions": 189,
+          "truth": 75
+        }
+      },
+      {
+        "datasetId": "btc-perp-5m",
+        "metrics": {
+          "tp": 6,
+          "fp": 222,
+          "fn": 75,
+          "precision": 0.02631578947368421,
+          "recall": 0.07407407407407407,
+          "f1": 0.038834951456310676,
+          "predictions": 228,
+          "truth": 81
+        }
+      },
+      {
+        "datasetId": "btc-perp-4h",
+        "metrics": {
+          "tp": 4,
+          "fp": 87,
+          "fn": 34,
+          "precision": 0.04395604395604396,
+          "recall": 0.10526315789473684,
+          "f1": 0.06201550387596899,
+          "predictions": 91,
+          "truth": 38
+        }
+      }
+    ],
+    "aggregate": {
+      "tp": 22,
+      "fp": 486,
+      "fn": 172,
+      "precision": 0.04330708661417323,
+      "recall": 0.1134020618556701,
+      "f1": 0.06267806267806268,
+      "predictions": 508,
+      "truth": 194
+    }
+  },
+  "spot": {
+    "slices": [
+      {
+        "datasetId": "sol-spot-15m",
+        "metrics": {
+          "tp": 8,
+          "fp": 208,
+          "fn": 55,
+          "precision": 0.037037037037037035,
+          "recall": 0.12698412698412698,
+          "f1": 0.05734767025089606,
+          "predictions": 216,
+          "truth": 63
+        }
+      }
+    ],
+    "aggregate": {
+      "tp": 8,
+      "fp": 208,
+      "fn": 55,
+      "precision": 0.037037037037037035,
+      "recall": 0.12698412698412698,
+      "f1": 0.05734767025089606,
+      "predictions": 216,
+      "truth": 63
+    }
+  },
+  "gate": {
+    "passed": false
+  },
+  "top": [
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 256,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 73,
+            "fn": 28,
+            "precision": 0.05194805194805195,
+            "recall": 0.125,
+            "f1": 0.07339449541284404,
+            "predictions": 77,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 5,
+            "fp": 51,
+            "fn": 18,
+            "precision": 0.08928571428571429,
+            "recall": 0.21739130434782608,
+            "f1": 0.12658227848101267,
+            "predictions": 56,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 9,
+        "fp": 124,
+        "fn": 46,
+        "precision": 0.06766917293233082,
+        "recall": 0.16363636363636364,
+        "f1": 0.09574468085106383,
+        "predictions": 133,
+        "truth": 55
+      },
+      "objective": -0.8076923076923077,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 40,
+            "fn": 13,
+            "precision": 0.06976744186046512,
+            "recall": 0.1875,
+            "f1": 0.1016949152542373,
+            "predictions": 43,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 2,
+            "fp": 23,
+            "fn": 8,
+            "precision": 0.08,
+            "recall": 0.2,
+            "f1": 0.11428571428571428,
+            "predictions": 25,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 5,
+        "fp": 63,
+        "fn": 21,
+        "precision": 0.07352941176470588,
+        "recall": 0.19230769230769232,
+        "f1": 0.10638297872340426,
+        "predictions": 68,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 192,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 73,
+            "fn": 29,
+            "precision": 0.039473684210526314,
+            "recall": 0.09375,
+            "f1": 0.05555555555555555,
+            "predictions": 76,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 5,
+            "fp": 48,
+            "fn": 18,
+            "precision": 0.09433962264150944,
+            "recall": 0.21739130434782608,
+            "f1": 0.13157894736842105,
+            "predictions": 53,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 121,
+        "fn": 47,
+        "precision": 0.06201550387596899,
+        "recall": 0.14545454545454545,
+        "f1": 0.08695652173913043,
+        "predictions": 129,
+        "truth": 55
+      },
+      "objective": -0.8076923076923077,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 39,
+            "fn": 13,
+            "precision": 0.07142857142857142,
+            "recall": 0.1875,
+            "f1": 0.10344827586206896,
+            "predictions": 42,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 2,
+            "fp": 22,
+            "fn": 8,
+            "precision": 0.08333333333333333,
+            "recall": 0.2,
+            "f1": 0.11764705882352941,
+            "predictions": 24,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 5,
+        "fp": 61,
+        "fn": 21,
+        "precision": 0.07575757575757576,
+        "recall": 0.19230769230769232,
+        "f1": 0.10869565217391304,
+        "predictions": 66,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 72,
+        "innerMemory": 192,
+        "directional": false
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 71,
+            "fn": 29,
+            "precision": 0.04054054054054054,
+            "recall": 0.09375,
+            "f1": 0.05660377358490566,
+            "predictions": 74,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 5,
+            "fp": 47,
+            "fn": 18,
+            "precision": 0.09615384615384616,
+            "recall": 0.21739130434782608,
+            "f1": 0.13333333333333333,
+            "predictions": 52,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 118,
+        "fn": 47,
+        "precision": 0.06349206349206349,
+        "recall": 0.14545454545454545,
+        "f1": 0.08839779005524862,
+        "predictions": 126,
+        "truth": 55
+      },
+      "objective": -0.8076923076923077,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 2,
+            "fp": 36,
+            "fn": 14,
+            "precision": 0.05263157894736842,
+            "recall": 0.125,
+            "f1": 0.07407407407407407,
+            "predictions": 38,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 21,
+            "fn": 7,
+            "precision": 0.125,
+            "recall": 0.3,
+            "f1": 0.17647058823529413,
+            "predictions": 24,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 5,
+        "fp": 57,
+        "fn": 21,
+        "precision": 0.08064516129032258,
+        "recall": 0.19230769230769232,
+        "f1": 0.11363636363636363,
+        "predictions": 62,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 5,
+        "arm": 25,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 192,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 71,
+            "fn": 28,
+            "precision": 0.05333333333333334,
+            "recall": 0.125,
+            "f1": 0.07476635514018691,
+            "predictions": 75,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 43,
+            "fn": 19,
+            "precision": 0.0851063829787234,
+            "recall": 0.17391304347826086,
+            "f1": 0.11428571428571428,
+            "predictions": 47,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 114,
+        "fn": 47,
+        "precision": 0.06557377049180328,
+        "recall": 0.14545454545454545,
+        "f1": 0.0903954802259887,
+        "predictions": 122,
+        "truth": 55
+      },
+      "objective": -0.8076923076923077,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 2,
+            "fp": 35,
+            "fn": 14,
+            "precision": 0.05405405405405406,
+            "recall": 0.125,
+            "f1": 0.07547169811320754,
+            "predictions": 37,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 22,
+            "fn": 7,
+            "precision": 0.12,
+            "recall": 0.3,
+            "f1": 0.17142857142857143,
+            "predictions": 25,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 5,
+        "fp": 57,
+        "fn": 21,
+        "precision": 0.08064516129032258,
+        "recall": 0.19230769230769232,
+        "f1": 0.11363636363636363,
+        "predictions": 62,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 5,
+        "arm": 30,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 192,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 71,
+            "fn": 28,
+            "precision": 0.05333333333333334,
+            "recall": 0.125,
+            "f1": 0.07476635514018691,
+            "predictions": 75,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 43,
+            "fn": 19,
+            "precision": 0.0851063829787234,
+            "recall": 0.17391304347826086,
+            "f1": 0.11428571428571428,
+            "predictions": 47,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 114,
+        "fn": 47,
+        "precision": 0.06557377049180328,
+        "recall": 0.14545454545454545,
+        "f1": 0.0903954802259887,
+        "predictions": 122,
+        "truth": 55
+      },
+      "objective": -0.8076923076923077,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 2,
+            "fp": 35,
+            "fn": 14,
+            "precision": 0.05405405405405406,
+            "recall": 0.125,
+            "f1": 0.07547169811320754,
+            "predictions": 37,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 22,
+            "fn": 7,
+            "precision": 0.12,
+            "recall": 0.3,
+            "f1": 0.17142857142857143,
+            "predictions": 25,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 5,
+        "fp": 57,
+        "fn": 21,
+        "precision": 0.08064516129032258,
+        "recall": 0.19230769230769232,
+        "f1": 0.11363636363636363,
+        "predictions": 62,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 64,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 63,
+            "fn": 28,
+            "precision": 0.05970149253731343,
+            "recall": 0.125,
+            "f1": 0.08080808080808081,
+            "predictions": 67,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 40,
+            "fn": 20,
+            "precision": 0.06976744186046512,
+            "recall": 0.13043478260869565,
+            "f1": 0.09090909090909091,
+            "predictions": 43,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 7,
+        "fp": 103,
+        "fn": 48,
+        "precision": 0.06363636363636363,
+        "recall": 0.12727272727272726,
+        "f1": 0.08484848484848485,
+        "predictions": 110,
+        "truth": 55
+      },
+      "objective": -0.8076923076923077,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 0,
+            "fp": 39,
+            "fn": 16,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "predictions": 39,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 5,
+            "fp": 18,
+            "fn": 5,
+            "precision": 0.21739130434782608,
+            "recall": 0.5,
+            "f1": 0.30303030303030304,
+            "predictions": 23,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 5,
+        "fp": 57,
+        "fn": 21,
+        "precision": 0.08064516129032258,
+        "recall": 0.19230769230769232,
+        "f1": 0.11363636363636363,
+        "predictions": 62,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "smooth": 3,
+        "arm": 25,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 64,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 64,
+            "fn": 28,
+            "precision": 0.058823529411764705,
+            "recall": 0.125,
+            "f1": 0.08,
+            "predictions": 68,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 41,
+            "fn": 20,
+            "precision": 0.06818181818181818,
+            "recall": 0.13043478260869565,
+            "f1": 0.08955223880597014,
+            "predictions": 44,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 7,
+        "fp": 105,
+        "fn": 48,
+        "precision": 0.0625,
+        "recall": 0.12727272727272726,
+        "f1": 0.08383233532934131,
+        "predictions": 112,
+        "truth": 55
+      },
+      "objective": -0.8076923076923077,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 0,
+            "fp": 39,
+            "fn": 16,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "predictions": 39,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 5,
+            "fp": 19,
+            "fn": 5,
+            "precision": 0.20833333333333334,
+            "recall": 0.5,
+            "f1": 0.29411764705882354,
+            "predictions": 24,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 5,
+        "fp": 58,
+        "fn": 21,
+        "precision": 0.07936507936507936,
+        "recall": 0.19230769230769232,
+        "f1": 0.11235955056179775,
+        "predictions": 63,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "smooth": 3,
+        "arm": 30,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 64,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 64,
+            "fn": 28,
+            "precision": 0.058823529411764705,
+            "recall": 0.125,
+            "f1": 0.08,
+            "predictions": 68,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 41,
+            "fn": 20,
+            "precision": 0.06818181818181818,
+            "recall": 0.13043478260869565,
+            "f1": 0.08955223880597014,
+            "predictions": 44,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 7,
+        "fp": 105,
+        "fn": 48,
+        "precision": 0.0625,
+        "recall": 0.12727272727272726,
+        "f1": 0.08383233532934131,
+        "predictions": 112,
+        "truth": 55
+      },
+      "objective": -0.8076923076923077,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 0,
+            "fp": 39,
+            "fn": 16,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "predictions": 39,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 5,
+            "fp": 19,
+            "fn": 5,
+            "precision": 0.20833333333333334,
+            "recall": 0.5,
+            "f1": 0.29411764705882354,
+            "predictions": 24,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 5,
+        "fp": 58,
+        "fn": 21,
+        "precision": 0.07936507936507936,
+        "recall": 0.19230769230769232,
+        "f1": 0.11235955056179775,
+        "predictions": 63,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 192,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 5,
+            "fp": 59,
+            "fn": 27,
+            "precision": 0.078125,
+            "recall": 0.15625,
+            "f1": 0.10416666666666667,
+            "predictions": 64,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 40,
+            "fn": 19,
+            "precision": 0.09090909090909091,
+            "recall": 0.17391304347826086,
+            "f1": 0.11940298507462686,
+            "predictions": 44,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 9,
+        "fp": 99,
+        "fn": 46,
+        "precision": 0.08333333333333333,
+        "recall": 0.16363636363636364,
+        "f1": 0.11042944785276074,
+        "predictions": 108,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 30,
+            "fn": 13,
+            "precision": 0.09090909090909091,
+            "recall": 0.1875,
+            "f1": 0.12244897959183673,
+            "predictions": 33,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 20,
+            "fn": 9,
+            "precision": 0.047619047619047616,
+            "recall": 0.1,
+            "f1": 0.06451612903225806,
+            "predictions": 21,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 50,
+        "fn": 22,
+        "precision": 0.07407407407407407,
+        "recall": 0.15384615384615385,
+        "f1": 0.1,
+        "predictions": 54,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 256,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 5,
+            "fp": 62,
+            "fn": 27,
+            "precision": 0.07462686567164178,
+            "recall": 0.15625,
+            "f1": 0.10101010101010101,
+            "predictions": 67,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 42,
+            "fn": 19,
+            "precision": 0.08695652173913043,
+            "recall": 0.17391304347826086,
+            "f1": 0.11594202898550725,
+            "predictions": 46,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 9,
+        "fp": 104,
+        "fn": 46,
+        "precision": 0.07964601769911504,
+        "recall": 0.16363636363636364,
+        "f1": 0.10714285714285714,
+        "predictions": 113,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 30,
+            "fn": 13,
+            "precision": 0.09090909090909091,
+            "recall": 0.1875,
+            "f1": 0.12244897959183673,
+            "predictions": 33,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 21,
+            "fn": 9,
+            "precision": 0.045454545454545456,
+            "recall": 0.1,
+            "f1": 0.0625,
+            "predictions": 22,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 51,
+        "fn": 22,
+        "precision": 0.07272727272727272,
+        "recall": 0.15384615384615385,
+        "f1": 0.09876543209876543,
+        "predictions": 55,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 5,
+        "arm": 25,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 128,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 5,
+            "fp": 69,
+            "fn": 27,
+            "precision": 0.06756756756756757,
+            "recall": 0.15625,
+            "f1": 0.09433962264150944,
+            "predictions": 74,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 40,
+            "fn": 19,
+            "precision": 0.09090909090909091,
+            "recall": 0.17391304347826086,
+            "f1": 0.11940298507462686,
+            "predictions": 44,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 9,
+        "fp": 109,
+        "fn": 46,
+        "precision": 0.07627118644067797,
+        "recall": 0.16363636363636364,
+        "f1": 0.10404624277456648,
+        "predictions": 118,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 1,
+            "fp": 36,
+            "fn": 15,
+            "precision": 0.02702702702702703,
+            "recall": 0.0625,
+            "f1": 0.03773584905660377,
+            "predictions": 37,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 21,
+            "fn": 7,
+            "precision": 0.125,
+            "recall": 0.3,
+            "f1": 0.17647058823529413,
+            "predictions": 24,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 57,
+        "fn": 22,
+        "precision": 0.06557377049180328,
+        "recall": 0.15384615384615385,
+        "f1": 0.09195402298850575,
+        "predictions": 61,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 5,
+        "arm": 30,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 128,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 5,
+            "fp": 69,
+            "fn": 27,
+            "precision": 0.06756756756756757,
+            "recall": 0.15625,
+            "f1": 0.09433962264150944,
+            "predictions": 74,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 40,
+            "fn": 19,
+            "precision": 0.09090909090909091,
+            "recall": 0.17391304347826086,
+            "f1": 0.11940298507462686,
+            "predictions": 44,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 9,
+        "fp": 109,
+        "fn": 46,
+        "precision": 0.07627118644067797,
+        "recall": 0.16363636363636364,
+        "f1": 0.10404624277456648,
+        "predictions": 118,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 1,
+            "fp": 36,
+            "fn": 15,
+            "precision": 0.02702702702702703,
+            "recall": 0.0625,
+            "f1": 0.03773584905660377,
+            "predictions": 37,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 21,
+            "fn": 7,
+            "precision": 0.125,
+            "recall": 0.3,
+            "f1": 0.17647058823529413,
+            "predictions": 24,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 57,
+        "fn": 22,
+        "precision": 0.06557377049180328,
+        "recall": 0.15384615384615385,
+        "f1": 0.09195402298850575,
+        "predictions": 61,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 128,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 69,
+            "fn": 28,
+            "precision": 0.0547945205479452,
+            "recall": 0.125,
+            "f1": 0.0761904761904762,
+            "predictions": 73,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 45,
+            "fn": 19,
+            "precision": 0.08163265306122448,
+            "recall": 0.17391304347826086,
+            "f1": 0.1111111111111111,
+            "predictions": 49,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 114,
+        "fn": 47,
+        "precision": 0.06557377049180328,
+        "recall": 0.14545454545454545,
+        "f1": 0.0903954802259887,
+        "predictions": 122,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 2,
+            "fp": 39,
+            "fn": 14,
+            "precision": 0.04878048780487805,
+            "recall": 0.125,
+            "f1": 0.07017543859649122,
+            "predictions": 41,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 2,
+            "fp": 22,
+            "fn": 8,
+            "precision": 0.08333333333333333,
+            "recall": 0.2,
+            "f1": 0.11764705882352941,
+            "predictions": 24,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 61,
+        "fn": 22,
+        "precision": 0.06153846153846154,
+        "recall": 0.15384615384615385,
+        "f1": 0.08791208791208792,
+        "predictions": 65,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 64,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 49,
+            "fn": 28,
+            "precision": 0.07547169811320754,
+            "recall": 0.125,
+            "f1": 0.09411764705882353,
+            "predictions": 53,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 33,
+            "fn": 19,
+            "precision": 0.10810810810810811,
+            "recall": 0.17391304347826086,
+            "f1": 0.13333333333333333,
+            "predictions": 37,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 82,
+        "fn": 47,
+        "precision": 0.08888888888888889,
+        "recall": 0.14545454545454545,
+        "f1": 0.1103448275862069,
+        "predictions": 90,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 27,
+            "fn": 13,
+            "precision": 0.1,
+            "recall": 0.1875,
+            "f1": 0.13043478260869565,
+            "predictions": 30,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 16,
+            "fn": 9,
+            "precision": 0.058823529411764705,
+            "recall": 0.1,
+            "f1": 0.07407407407407407,
+            "predictions": 17,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 43,
+        "fn": 22,
+        "precision": 0.0851063829787234,
+        "recall": 0.15384615384615385,
+        "f1": 0.1095890410958904,
+        "predictions": 47,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 128,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 58,
+            "fn": 28,
+            "precision": 0.06451612903225806,
+            "recall": 0.125,
+            "f1": 0.0851063829787234,
+            "predictions": 62,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 38,
+            "fn": 19,
+            "precision": 0.09523809523809523,
+            "recall": 0.17391304347826086,
+            "f1": 0.12307692307692308,
+            "predictions": 42,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 96,
+        "fn": 47,
+        "precision": 0.07692307692307693,
+        "recall": 0.14545454545454545,
+        "f1": 0.10062893081761007,
+        "predictions": 104,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 30,
+            "fn": 13,
+            "precision": 0.09090909090909091,
+            "recall": 0.1875,
+            "f1": 0.12244897959183673,
+            "predictions": 33,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 20,
+            "fn": 9,
+            "precision": 0.047619047619047616,
+            "recall": 0.1,
+            "f1": 0.06451612903225806,
+            "predictions": 21,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 50,
+        "fn": 22,
+        "precision": 0.07407407407407407,
+        "recall": 0.15384615384615385,
+        "f1": 0.1,
+        "predictions": 54,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 256,
+        "directional": false
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 66,
+            "fn": 28,
+            "precision": 0.05714285714285714,
+            "recall": 0.125,
+            "f1": 0.0784313725490196,
+            "predictions": 70,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 46,
+            "fn": 19,
+            "precision": 0.08,
+            "recall": 0.17391304347826086,
+            "f1": 0.1095890410958904,
+            "predictions": 50,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 112,
+        "fn": 47,
+        "precision": 0.06666666666666667,
+        "recall": 0.14545454545454545,
+        "f1": 0.09142857142857143,
+        "predictions": 120,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 32,
+            "fn": 13,
+            "precision": 0.08571428571428572,
+            "recall": 0.1875,
+            "f1": 0.11764705882352941,
+            "predictions": 35,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 22,
+            "fn": 9,
+            "precision": 0.043478260869565216,
+            "recall": 0.1,
+            "f1": 0.06060606060606061,
+            "predictions": 23,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 54,
+        "fn": 22,
+        "precision": 0.06896551724137931,
+        "recall": 0.15384615384615385,
+        "f1": 0.09523809523809523,
+        "predictions": 58,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 25,
+        "release": 25,
+        "cooldown": 72,
+        "innerMemory": 192,
+        "directional": false
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 2,
+            "fp": 75,
+            "fn": 30,
+            "precision": 0.025974025974025976,
+            "recall": 0.0625,
+            "f1": 0.03669724770642202,
+            "predictions": 77,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 6,
+            "fp": 47,
+            "fn": 17,
+            "precision": 0.11320754716981132,
+            "recall": 0.2608695652173913,
+            "f1": 0.15789473684210525,
+            "predictions": 53,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 122,
+        "fn": 47,
+        "precision": 0.06153846153846154,
+        "recall": 0.14545454545454545,
+        "f1": 0.08648648648648649,
+        "predictions": 130,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 1,
+            "fp": 38,
+            "fn": 15,
+            "precision": 0.02564102564102564,
+            "recall": 0.0625,
+            "f1": 0.03636363636363636,
+            "predictions": 39,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 22,
+            "fn": 7,
+            "precision": 0.12,
+            "recall": 0.3,
+            "f1": 0.17142857142857143,
+            "predictions": 25,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 60,
+        "fn": 22,
+        "precision": 0.0625,
+        "recall": 0.15384615384615385,
+        "f1": 0.08888888888888889,
+        "predictions": 64,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 25,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 64,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 51,
+            "fn": 28,
+            "precision": 0.07272727272727272,
+            "recall": 0.125,
+            "f1": 0.09195402298850575,
+            "predictions": 55,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 33,
+            "fn": 19,
+            "precision": 0.10810810810810811,
+            "recall": 0.17391304347826086,
+            "f1": 0.13333333333333333,
+            "predictions": 37,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 84,
+        "fn": 47,
+        "precision": 0.08695652173913043,
+        "recall": 0.14545454545454545,
+        "f1": 0.10884353741496598,
+        "predictions": 92,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 27,
+            "fn": 13,
+            "precision": 0.1,
+            "recall": 0.1875,
+            "f1": 0.13043478260869565,
+            "predictions": 30,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 16,
+            "fn": 9,
+            "precision": 0.058823529411764705,
+            "recall": 0.1,
+            "f1": 0.07407407407407407,
+            "predictions": 17,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 43,
+        "fn": 22,
+        "precision": 0.0851063829787234,
+        "recall": 0.15384615384615385,
+        "f1": 0.1095890410958904,
+        "predictions": 47,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 25,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 192,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 64,
+            "fn": 28,
+            "precision": 0.058823529411764705,
+            "recall": 0.125,
+            "f1": 0.08,
+            "predictions": 68,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 40,
+            "fn": 19,
+            "precision": 0.09090909090909091,
+            "recall": 0.17391304347826086,
+            "f1": 0.11940298507462686,
+            "predictions": 44,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 104,
+        "fn": 47,
+        "precision": 0.07142857142857142,
+        "recall": 0.14545454545454545,
+        "f1": 0.09580838323353294,
+        "predictions": 112,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 30,
+            "fn": 13,
+            "precision": 0.09090909090909091,
+            "recall": 0.1875,
+            "f1": 0.12244897959183673,
+            "predictions": 33,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 20,
+            "fn": 9,
+            "precision": 0.047619047619047616,
+            "recall": 0.1,
+            "f1": 0.06451612903225806,
+            "predictions": 21,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 50,
+        "fn": 22,
+        "precision": 0.07407407407407407,
+        "recall": 0.15384615384615385,
+        "f1": 0.1,
+        "predictions": 54,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 25,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 256,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 67,
+            "fn": 28,
+            "precision": 0.056338028169014086,
+            "recall": 0.125,
+            "f1": 0.07766990291262135,
+            "predictions": 71,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 42,
+            "fn": 19,
+            "precision": 0.08695652173913043,
+            "recall": 0.17391304347826086,
+            "f1": 0.11594202898550725,
+            "predictions": 46,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 109,
+        "fn": 47,
+        "precision": 0.06837606837606838,
+        "recall": 0.14545454545454545,
+        "f1": 0.09302325581395349,
+        "predictions": 117,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 30,
+            "fn": 13,
+            "precision": 0.09090909090909091,
+            "recall": 0.1875,
+            "f1": 0.12244897959183673,
+            "predictions": 33,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 21,
+            "fn": 9,
+            "precision": 0.045454545454545456,
+            "recall": 0.1,
+            "f1": 0.0625,
+            "predictions": 22,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 51,
+        "fn": 22,
+        "precision": 0.07272727272727272,
+        "recall": 0.15384615384615385,
+        "f1": 0.09876543209876543,
+        "predictions": 55,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 30,
+        "release": 25,
+        "cooldown": 72,
+        "innerMemory": 192,
+        "directional": false
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 2,
+            "fp": 75,
+            "fn": 30,
+            "precision": 0.025974025974025976,
+            "recall": 0.0625,
+            "f1": 0.03669724770642202,
+            "predictions": 77,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 6,
+            "fp": 47,
+            "fn": 17,
+            "precision": 0.11320754716981132,
+            "recall": 0.2608695652173913,
+            "f1": 0.15789473684210525,
+            "predictions": 53,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 122,
+        "fn": 47,
+        "precision": 0.06153846153846154,
+        "recall": 0.14545454545454545,
+        "f1": 0.08648648648648649,
+        "predictions": 130,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 1,
+            "fp": 38,
+            "fn": 15,
+            "precision": 0.02564102564102564,
+            "recall": 0.0625,
+            "f1": 0.03636363636363636,
+            "predictions": 39,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 22,
+            "fn": 7,
+            "precision": 0.12,
+            "recall": 0.3,
+            "f1": 0.17142857142857143,
+            "predictions": 25,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 60,
+        "fn": 22,
+        "precision": 0.0625,
+        "recall": 0.15384615384615385,
+        "f1": 0.08888888888888889,
+        "predictions": 64,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 30,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 64,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 51,
+            "fn": 28,
+            "precision": 0.07272727272727272,
+            "recall": 0.125,
+            "f1": 0.09195402298850575,
+            "predictions": 55,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 33,
+            "fn": 19,
+            "precision": 0.10810810810810811,
+            "recall": 0.17391304347826086,
+            "f1": 0.13333333333333333,
+            "predictions": 37,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 84,
+        "fn": 47,
+        "precision": 0.08695652173913043,
+        "recall": 0.14545454545454545,
+        "f1": 0.10884353741496598,
+        "predictions": 92,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 27,
+            "fn": 13,
+            "precision": 0.1,
+            "recall": 0.1875,
+            "f1": 0.13043478260869565,
+            "predictions": 30,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 16,
+            "fn": 9,
+            "precision": 0.058823529411764705,
+            "recall": 0.1,
+            "f1": 0.07407407407407407,
+            "predictions": 17,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 43,
+        "fn": 22,
+        "precision": 0.0851063829787234,
+        "recall": 0.15384615384615385,
+        "f1": 0.1095890410958904,
+        "predictions": 47,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 30,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 192,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 64,
+            "fn": 28,
+            "precision": 0.058823529411764705,
+            "recall": 0.125,
+            "f1": 0.08,
+            "predictions": 68,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 40,
+            "fn": 19,
+            "precision": 0.09090909090909091,
+            "recall": 0.17391304347826086,
+            "f1": 0.11940298507462686,
+            "predictions": 44,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 104,
+        "fn": 47,
+        "precision": 0.07142857142857142,
+        "recall": 0.14545454545454545,
+        "f1": 0.09580838323353294,
+        "predictions": 112,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 30,
+            "fn": 13,
+            "precision": 0.09090909090909091,
+            "recall": 0.1875,
+            "f1": 0.12244897959183673,
+            "predictions": 33,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 20,
+            "fn": 9,
+            "precision": 0.047619047619047616,
+            "recall": 0.1,
+            "f1": 0.06451612903225806,
+            "predictions": 21,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 50,
+        "fn": 22,
+        "precision": 0.07407407407407407,
+        "recall": 0.15384615384615385,
+        "f1": 0.1,
+        "predictions": 54,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 3,
+        "arm": 30,
+        "release": 25,
+        "cooldown": 80,
+        "innerMemory": 256,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 67,
+            "fn": 28,
+            "precision": 0.056338028169014086,
+            "recall": 0.125,
+            "f1": 0.07766990291262135,
+            "predictions": 71,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 42,
+            "fn": 19,
+            "precision": 0.08695652173913043,
+            "recall": 0.17391304347826086,
+            "f1": 0.11594202898550725,
+            "predictions": 46,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 109,
+        "fn": 47,
+        "precision": 0.06837606837606838,
+        "recall": 0.14545454545454545,
+        "f1": 0.09302325581395349,
+        "predictions": 117,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 30,
+            "fn": 13,
+            "precision": 0.09090909090909091,
+            "recall": 0.1875,
+            "f1": 0.12244897959183673,
+            "predictions": 33,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 1,
+            "fp": 21,
+            "fn": 9,
+            "precision": 0.045454545454545456,
+            "recall": 0.1,
+            "f1": 0.0625,
+            "predictions": 22,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 51,
+        "fn": 22,
+        "precision": 0.07272727272727272,
+        "recall": 0.15384615384615385,
+        "f1": 0.09876543209876543,
+        "predictions": 55,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 5,
+        "arm": 25,
+        "release": 25,
+        "cooldown": 60,
+        "innerMemory": 192,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 70,
+            "fn": 29,
+            "precision": 0.0410958904109589,
+            "recall": 0.09375,
+            "f1": 0.05714285714285714,
+            "predictions": 73,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 5,
+            "fp": 42,
+            "fn": 18,
+            "precision": 0.10638297872340426,
+            "recall": 0.21739130434782608,
+            "f1": 0.14285714285714285,
+            "predictions": 47,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 112,
+        "fn": 47,
+        "precision": 0.06666666666666667,
+        "recall": 0.14545454545454545,
+        "f1": 0.09142857142857143,
+        "predictions": 120,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 2,
+            "fp": 33,
+            "fn": 14,
+            "precision": 0.05714285714285714,
+            "recall": 0.125,
+            "f1": 0.0784313725490196,
+            "predictions": 35,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 2,
+            "fp": 21,
+            "fn": 8,
+            "precision": 0.08695652173913043,
+            "recall": 0.2,
+            "f1": 0.12121212121212122,
+            "predictions": 23,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 54,
+        "fn": 22,
+        "precision": 0.06896551724137931,
+        "recall": 0.15384615384615385,
+        "f1": 0.09523809523809523,
+        "predictions": 58,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          2,
+          2
+        ],
+        "smooth": 5,
+        "arm": 30,
+        "release": 25,
+        "cooldown": 60,
+        "innerMemory": 192,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 70,
+            "fn": 29,
+            "precision": 0.0410958904109589,
+            "recall": 0.09375,
+            "f1": 0.05714285714285714,
+            "predictions": 73,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 5,
+            "fp": 42,
+            "fn": 18,
+            "precision": 0.10638297872340426,
+            "recall": 0.21739130434782608,
+            "f1": 0.14285714285714285,
+            "predictions": 47,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 8,
+        "fp": 112,
+        "fn": 47,
+        "precision": 0.06666666666666667,
+        "recall": 0.14545454545454545,
+        "f1": 0.09142857142857143,
+        "predictions": 120,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 2,
+            "fp": 33,
+            "fn": 14,
+            "precision": 0.05714285714285714,
+            "recall": 0.125,
+            "f1": 0.0784313725490196,
+            "predictions": 35,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 2,
+            "fp": 21,
+            "fn": 8,
+            "precision": 0.08695652173913043,
+            "recall": 0.2,
+            "f1": 0.12121212121212122,
+            "predictions": 23,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 54,
+        "fn": 22,
+        "precision": 0.06896551724137931,
+        "recall": 0.15384615384615385,
+        "f1": 0.09523809523809523,
+        "predictions": 58,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "smooth": 3,
+        "arm": 15,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 128,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 58,
+            "fn": 29,
+            "precision": 0.04918032786885246,
+            "recall": 0.09375,
+            "f1": 0.06451612903225806,
+            "predictions": 61,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 40,
+            "fn": 19,
+            "precision": 0.09090909090909091,
+            "recall": 0.17391304347826086,
+            "f1": 0.11940298507462686,
+            "predictions": 44,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 7,
+        "fp": 98,
+        "fn": 48,
+        "precision": 0.06666666666666667,
+        "recall": 0.12727272727272726,
+        "f1": 0.0875,
+        "predictions": 105,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 0,
+            "fp": 33,
+            "fn": 16,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "predictions": 33,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 22,
+            "fn": 6,
+            "precision": 0.15384615384615385,
+            "recall": 0.4,
+            "f1": 0.2222222222222222,
+            "predictions": 26,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 55,
+        "fn": 22,
+        "precision": 0.06779661016949153,
+        "recall": 0.15384615384615385,
+        "f1": 0.09411764705882353,
+        "predictions": 59,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 52,
+        "innerMemory": 64,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 64,
+            "fn": 28,
+            "precision": 0.058823529411764705,
+            "recall": 0.125,
+            "f1": 0.08,
+            "predictions": 68,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 42,
+            "fn": 20,
+            "precision": 0.06666666666666667,
+            "recall": 0.13043478260869565,
+            "f1": 0.08823529411764706,
+            "predictions": 45,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 7,
+        "fp": 106,
+        "fn": 48,
+        "precision": 0.061946902654867256,
+        "recall": 0.12727272727272726,
+        "f1": 0.08333333333333333,
+        "predictions": 113,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 0,
+            "fp": 42,
+            "fn": 16,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "predictions": 42,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 20,
+            "fn": 6,
+            "precision": 0.16666666666666666,
+            "recall": 0.4,
+            "f1": 0.23529411764705882,
+            "predictions": 24,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 62,
+        "fn": 22,
+        "precision": 0.06060606060606061,
+        "recall": 0.15384615384615385,
+        "f1": 0.08695652173913043,
+        "predictions": 66,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "smooth": 3,
+        "arm": 20,
+        "release": 25,
+        "cooldown": 56,
+        "innerMemory": 128,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 3,
+            "fp": 73,
+            "fn": 29,
+            "precision": 0.039473684210526314,
+            "recall": 0.09375,
+            "f1": 0.05555555555555555,
+            "predictions": 76,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 45,
+            "fn": 19,
+            "precision": 0.08163265306122448,
+            "recall": 0.17391304347826086,
+            "f1": 0.1111111111111111,
+            "predictions": 49,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 7,
+        "fp": 118,
+        "fn": 48,
+        "precision": 0.056,
+        "recall": 0.12727272727272726,
+        "f1": 0.07777777777777778,
+        "predictions": 125,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 0,
+            "fp": 43,
+            "fn": 16,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "predictions": 43,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 24,
+            "fn": 6,
+            "precision": 0.14285714285714285,
+            "recall": 0.4,
+            "f1": 0.21052631578947367,
+            "predictions": 28,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 67,
+        "fn": 22,
+        "precision": 0.056338028169014086,
+        "recall": 0.15384615384615385,
+        "f1": 0.08247422680412371,
+        "predictions": 71,
+        "truth": 26
+      }
+    },
+    {
+      "config": {
+        "weights": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "smooth": 3,
+        "arm": 25,
+        "release": 25,
+        "cooldown": 52,
+        "innerMemory": 64,
+        "directional": true
+      },
+      "fit": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 4,
+            "fp": 65,
+            "fn": 28,
+            "precision": 0.057971014492753624,
+            "recall": 0.125,
+            "f1": 0.07920792079207921,
+            "predictions": 69,
+            "truth": 32
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 3,
+            "fp": 43,
+            "fn": 20,
+            "precision": 0.06521739130434782,
+            "recall": 0.13043478260869565,
+            "f1": 0.08695652173913043,
+            "predictions": 46,
+            "truth": 23
+          }
+        }
+      ],
+      "fitAggregate": {
+        "tp": 7,
+        "fp": 108,
+        "fn": 48,
+        "precision": 0.06086956521739131,
+        "recall": 0.12727272727272726,
+        "f1": 0.08235294117647059,
+        "predictions": 115,
+        "truth": 55
+      },
+      "objective": -0.8461538461538461,
+      "validation": [
+        {
+          "datasetId": "btc-perp-15m",
+          "metrics": {
+            "tp": 0,
+            "fp": 42,
+            "fn": 16,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "predictions": 42,
+            "truth": 16
+          }
+        },
+        {
+          "datasetId": "btc-perp-1h",
+          "metrics": {
+            "tp": 4,
+            "fp": 21,
+            "fn": 6,
+            "precision": 0.16,
+            "recall": 0.4,
+            "f1": 0.22857142857142856,
+            "predictions": 25,
+            "truth": 10
+          }
+        }
+      ],
+      "validationAggregate": {
+        "tp": 4,
+        "fp": 63,
+        "fn": 22,
+        "precision": 0.05970149253731343,
+        "recall": 0.15384615384615385,
+        "f1": 0.08602150537634409,
+        "predictions": 67,
+        "truth": 26
+      }
+    }
+  ]
+}

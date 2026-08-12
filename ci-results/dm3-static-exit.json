@@ -1,0 +1,159 @@
+{
+  "shaBtc": "71798120df33f56ac54bdcd7bd027830bc549e0acc5fd256eada1a8902cb56c3",
+  "shaXrp": "e3f6b54e2fb623f829bd21583cf9c1e8a96d7552bc6814a56053351173787c9f",
+  "config": {
+    "stopMult": 12,
+    "warmup": 100
+  },
+  "calibration": {
+    "V1_moving_moving": {
+      "tally": {
+        "long": {
+          "trades": 50,
+          "partial": 8,
+          "stop": 5,
+          "full": 37,
+          "end": 1
+        },
+        "short": {
+          "trades": 39,
+          "partial": 4,
+          "stop": 1,
+          "full": 34,
+          "end": 1
+        }
+      },
+      "meanR": 0.11372909940297599,
+      "wr": 0.9325842696629213,
+      "d": 20.005901505901505
+    },
+    "V2_movP_staticTPwick": {
+      "tally": {
+        "long": {
+          "trades": 50,
+          "partial": 14,
+          "stop": 5,
+          "full": 31,
+          "end": 1
+        },
+        "short": {
+          "trades": 39,
+          "partial": 11,
+          "stop": 1,
+          "full": 27,
+          "end": 1
+        }
+      },
+      "meanR": 0.15398259278412627,
+      "wr": 0.9325842696629213,
+      "d": 3.430046805046805
+    },
+    "V3_movP_staticTPclose": {
+      "tally": {
+        "long": {
+          "trades": 50,
+          "partial": 14,
+          "stop": 5,
+          "full": 31,
+          "end": 1
+        },
+        "short": {
+          "trades": 39,
+          "partial": 11,
+          "stop": 1,
+          "full": 27,
+          "end": 1
+        }
+      },
+      "meanR": 0.15398259278412627,
+      "wr": 0.9325842696629213,
+      "d": 3.430046805046805
+    },
+    "V4_statP_staticTPwick": {
+      "tally": {
+        "long": {
+          "trades": 50,
+          "partial": 9,
+          "stop": 10,
+          "full": 31,
+          "end": 1
+        },
+        "short": {
+          "trades": 39,
+          "partial": 8,
+          "stop": 4,
+          "full": 27,
+          "end": 1
+        }
+      },
+      "meanR": 0.17325933858276346,
+      "wr": 0.8426966292134831,
+      "d": 7.5722171347171345
+    },
+    "V5_statP_staticTPclose": {
+      "tally": {
+        "long": {
+          "trades": 50,
+          "partial": 9,
+          "stop": 10,
+          "full": 31,
+          "end": 1
+        },
+        "short": {
+          "trades": 39,
+          "partial": 8,
+          "stop": 4,
+          "full": 27,
+          "end": 1
+        }
+      },
+      "meanR": 0.17325933858276346,
+      "wr": 0.8426966292134831,
+      "d": 7.5722171347171345
+    },
+    "V6_tp_partial_then_close": {
+      "tally": {
+        "long": {
+          "trades": 50,
+          "partial": 0,
+          "stop": 19,
+          "full": 31,
+          "end": 1
+        },
+        "short": {
+          "trades": 39,
+          "partial": 0,
+          "stop": 12,
+          "full": 27,
+          "end": 1
+        }
+      },
+      "meanR": 0.18741372776815943,
+      "wr": 0.651685393258427,
+      "d": 77.53902116402116
+    }
+  },
+  "winner": "V2_movP_staticTPwick",
+  "oos": {
+    "tally": {
+      "long": {
+        "trades": 29,
+        "partial": 11,
+        "stop": 2,
+        "full": 16,
+        "end": 1
+      },
+      "short": {
+        "trades": 33,
+        "partial": 11,
+        "stop": 3,
+        "full": 19,
+        "end": 0
+      }
+    },
+    "meanR": 0.019334800795700303,
+    "wr": 0.9193548387096774,
+    "d": 2.3534188034188035
+  },
+  "verdict": "OOS CONFIRMED (D=2.35)"
+}

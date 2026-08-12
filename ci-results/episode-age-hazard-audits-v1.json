@@ -1,0 +1,714 @@
+{
+  "hazardSummaries": [
+    {
+      "datasetId": "btc-perp-15m",
+      "direction": "both",
+      "episodes": 53,
+      "labeledEpisodes": 25,
+      "overallHazard": 0.011488970588235295,
+      "bins": [
+        {
+          "from": 0,
+          "toExclusive": 8,
+          "events": 4,
+          "exposureBars": 408,
+          "hazard": 0.00980392156862745,
+          "ratioToOverall": 0.8533333333333333
+        },
+        {
+          "from": 8,
+          "toExclusive": 16,
+          "events": 4,
+          "exposureBars": 355,
+          "hazard": 0.011267605633802818,
+          "ratioToOverall": 0.9807323943661972
+        },
+        {
+          "from": 16,
+          "toExclusive": 24,
+          "events": 5,
+          "exposureBars": 277,
+          "hazard": 0.018050541516245487,
+          "ratioToOverall": 1.5711191335740071
+        },
+        {
+          "from": 24,
+          "toExclusive": 32,
+          "events": 6,
+          "exposureBars": 208,
+          "hazard": 0.028846153846153848,
+          "ratioToOverall": 2.5107692307692306
+        },
+        {
+          "from": 32,
+          "toExclusive": 48,
+          "events": 1,
+          "exposureBars": 304,
+          "hazard": 0.003289473684210526,
+          "ratioToOverall": 0.2863157894736842
+        },
+        {
+          "from": 48,
+          "toExclusive": 64,
+          "events": 2,
+          "exposureBars": 231,
+          "hazard": 0.008658008658008658,
+          "ratioToOverall": 0.7535930735930736
+        },
+        {
+          "from": 64,
+          "toExclusive": 96,
+          "events": 2,
+          "exposureBars": 227,
+          "hazard": 0.00881057268722467,
+          "ratioToOverall": 0.7668722466960353
+        },
+        {
+          "from": 96,
+          "toExclusive": 128,
+          "events": 1,
+          "exposureBars": 103,
+          "hazard": 0.009708737864077669,
+          "ratioToOverall": 0.8450485436893203
+        },
+        {
+          "from": 128,
+          "toExclusive": 192,
+          "events": 0,
+          "exposureBars": 63,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 192,
+          "toExclusive": 257,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        }
+      ],
+      "maxRatio": 2.5107692307692306,
+      "maxRatioBin": "24-31"
+    },
+    {
+      "datasetId": "btc-perp-15m",
+      "direction": "long",
+      "episodes": 22,
+      "labeledEpisodes": 11,
+      "overallHazard": 0.011247443762781187,
+      "bins": [
+        {
+          "from": 0,
+          "toExclusive": 8,
+          "events": 1,
+          "exposureBars": 172,
+          "hazard": 0.005813953488372093,
+          "ratioToOverall": 0.5169133192389006
+        },
+        {
+          "from": 8,
+          "toExclusive": 16,
+          "events": 3,
+          "exposureBars": 137,
+          "hazard": 0.021897810218978103,
+          "ratioToOverall": 1.946914399469144
+        },
+        {
+          "from": 16,
+          "toExclusive": 24,
+          "events": 2,
+          "exposureBars": 109,
+          "hazard": 0.01834862385321101,
+          "ratioToOverall": 1.6313594662218516
+        },
+        {
+          "from": 24,
+          "toExclusive": 32,
+          "events": 2,
+          "exposureBars": 83,
+          "hazard": 0.024096385542168676,
+          "ratioToOverall": 2.1423877327491785
+        },
+        {
+          "from": 32,
+          "toExclusive": 48,
+          "events": 1,
+          "exposureBars": 123,
+          "hazard": 0.008130081300813009,
+          "ratioToOverall": 0.7228381374722839
+        },
+        {
+          "from": 48,
+          "toExclusive": 64,
+          "events": 2,
+          "exposureBars": 93,
+          "hazard": 0.021505376344086023,
+          "ratioToOverall": 1.9120234604105573
+        },
+        {
+          "from": 64,
+          "toExclusive": 96,
+          "events": 0,
+          "exposureBars": 103,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 96,
+          "toExclusive": 128,
+          "events": 0,
+          "exposureBars": 95,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 128,
+          "toExclusive": 192,
+          "events": 0,
+          "exposureBars": 63,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 192,
+          "toExclusive": 257,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        }
+      ],
+      "maxRatio": 2.1423877327491785,
+      "maxRatioBin": "24-31"
+    },
+    {
+      "datasetId": "btc-perp-15m",
+      "direction": "short",
+      "episodes": 31,
+      "labeledEpisodes": 14,
+      "overallHazard": 0.011686143572621035,
+      "bins": [
+        {
+          "from": 0,
+          "toExclusive": 8,
+          "events": 3,
+          "exposureBars": 236,
+          "hazard": 0.012711864406779662,
+          "ratioToOverall": 1.087772397094431
+        },
+        {
+          "from": 8,
+          "toExclusive": 16,
+          "events": 1,
+          "exposureBars": 218,
+          "hazard": 0.0045871559633027525,
+          "ratioToOverall": 0.39252948885976413
+        },
+        {
+          "from": 16,
+          "toExclusive": 24,
+          "events": 3,
+          "exposureBars": 168,
+          "hazard": 0.017857142857142856,
+          "ratioToOverall": 1.5280612244897958
+        },
+        {
+          "from": 24,
+          "toExclusive": 32,
+          "events": 4,
+          "exposureBars": 125,
+          "hazard": 0.032,
+          "ratioToOverall": 2.7382857142857144
+        },
+        {
+          "from": 32,
+          "toExclusive": 48,
+          "events": 0,
+          "exposureBars": 181,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 48,
+          "toExclusive": 64,
+          "events": 0,
+          "exposureBars": 138,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 64,
+          "toExclusive": 96,
+          "events": 2,
+          "exposureBars": 124,
+          "hazard": 0.016129032258064516,
+          "ratioToOverall": 1.3801843317972349
+        },
+        {
+          "from": 96,
+          "toExclusive": 128,
+          "events": 1,
+          "exposureBars": 8,
+          "hazard": 0.125,
+          "ratioToOverall": 10.696428571428571
+        },
+        {
+          "from": 128,
+          "toExclusive": 192,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 192,
+          "toExclusive": 257,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        }
+      ],
+      "maxRatio": 2.7382857142857144,
+      "maxRatioBin": "24-31"
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "direction": "both",
+      "episodes": 35,
+      "labeledEpisodes": 18,
+      "overallHazard": 0.013062409288824383,
+      "bins": [
+        {
+          "from": 0,
+          "toExclusive": 8,
+          "events": 5,
+          "exposureBars": 265,
+          "hazard": 0.018867924528301886,
+          "ratioToOverall": 1.4444444444444444
+        },
+        {
+          "from": 8,
+          "toExclusive": 16,
+          "events": 5,
+          "exposureBars": 213,
+          "hazard": 0.023474178403755867,
+          "ratioToOverall": 1.7970787689097547
+        },
+        {
+          "from": 16,
+          "toExclusive": 24,
+          "events": 1,
+          "exposureBars": 174,
+          "hazard": 0.005747126436781609,
+          "ratioToOverall": 0.4399744572158365
+        },
+        {
+          "from": 24,
+          "toExclusive": 32,
+          "events": 1,
+          "exposureBars": 159,
+          "hazard": 0.006289308176100629,
+          "ratioToOverall": 0.4814814814814815
+        },
+        {
+          "from": 32,
+          "toExclusive": 48,
+          "events": 2,
+          "exposureBars": 260,
+          "hazard": 0.007692307692307693,
+          "ratioToOverall": 0.5888888888888889
+        },
+        {
+          "from": 48,
+          "toExclusive": 64,
+          "events": 2,
+          "exposureBars": 158,
+          "hazard": 0.012658227848101266,
+          "ratioToOverall": 0.9690576652601969
+        },
+        {
+          "from": 64,
+          "toExclusive": 96,
+          "events": 1,
+          "exposureBars": 141,
+          "hazard": 0.0070921985815602835,
+          "ratioToOverall": 0.5429472025216706
+        },
+        {
+          "from": 96,
+          "toExclusive": 128,
+          "events": 1,
+          "exposureBars": 8,
+          "hazard": 0.125,
+          "ratioToOverall": 9.569444444444445
+        },
+        {
+          "from": 128,
+          "toExclusive": 192,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 192,
+          "toExclusive": 257,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        }
+      ],
+      "maxRatio": 1.7970787689097547,
+      "maxRatioBin": "8-15"
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "direction": "long",
+      "episodes": 17,
+      "labeledEpisodes": 10,
+      "overallHazard": 0.014265335235378032,
+      "bins": [
+        {
+          "from": 0,
+          "toExclusive": 8,
+          "events": 4,
+          "exposureBars": 126,
+          "hazard": 0.031746031746031744,
+          "ratioToOverall": 2.225396825396825
+        },
+        {
+          "from": 8,
+          "toExclusive": 16,
+          "events": 2,
+          "exposureBars": 98,
+          "hazard": 0.02040816326530612,
+          "ratioToOverall": 1.430612244897959
+        },
+        {
+          "from": 16,
+          "toExclusive": 24,
+          "events": 0,
+          "exposureBars": 88,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 24,
+          "toExclusive": 32,
+          "events": 1,
+          "exposureBars": 87,
+          "hazard": 0.011494252873563218,
+          "ratioToOverall": 0.8057471264367816
+        },
+        {
+          "from": 32,
+          "toExclusive": 48,
+          "events": 1,
+          "exposureBars": 145,
+          "hazard": 0.006896551724137931,
+          "ratioToOverall": 0.48344827586206895
+        },
+        {
+          "from": 48,
+          "toExclusive": 64,
+          "events": 1,
+          "exposureBars": 98,
+          "hazard": 0.01020408163265306,
+          "ratioToOverall": 0.7153061224489795
+        },
+        {
+          "from": 64,
+          "toExclusive": 96,
+          "events": 1,
+          "exposureBars": 54,
+          "hazard": 0.018518518518518517,
+          "ratioToOverall": 1.298148148148148
+        },
+        {
+          "from": 96,
+          "toExclusive": 128,
+          "events": 0,
+          "exposureBars": 5,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 128,
+          "toExclusive": 192,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 192,
+          "toExclusive": 257,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        }
+      ],
+      "maxRatio": 2.225396825396825,
+      "maxRatioBin": "0-7"
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "direction": "short",
+      "episodes": 18,
+      "labeledEpisodes": 8,
+      "overallHazard": 0.011816838995568686,
+      "bins": [
+        {
+          "from": 0,
+          "toExclusive": 8,
+          "events": 1,
+          "exposureBars": 139,
+          "hazard": 0.007194244604316547,
+          "ratioToOverall": 0.6088129496402878
+        },
+        {
+          "from": 8,
+          "toExclusive": 16,
+          "events": 3,
+          "exposureBars": 115,
+          "hazard": 0.02608695652173913,
+          "ratioToOverall": 2.2076086956521737
+        },
+        {
+          "from": 16,
+          "toExclusive": 24,
+          "events": 1,
+          "exposureBars": 86,
+          "hazard": 0.011627906976744186,
+          "ratioToOverall": 0.9840116279069767
+        },
+        {
+          "from": 24,
+          "toExclusive": 32,
+          "events": 0,
+          "exposureBars": 72,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 32,
+          "toExclusive": 48,
+          "events": 1,
+          "exposureBars": 115,
+          "hazard": 0.008695652173913044,
+          "ratioToOverall": 0.7358695652173912
+        },
+        {
+          "from": 48,
+          "toExclusive": 64,
+          "events": 1,
+          "exposureBars": 60,
+          "hazard": 0.016666666666666666,
+          "ratioToOverall": 1.4104166666666667
+        },
+        {
+          "from": 64,
+          "toExclusive": 96,
+          "events": 0,
+          "exposureBars": 87,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 96,
+          "toExclusive": 128,
+          "events": 1,
+          "exposureBars": 3,
+          "hazard": 0.3333333333333333,
+          "ratioToOverall": 28.20833333333333
+        },
+        {
+          "from": 128,
+          "toExclusive": 192,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        },
+        {
+          "from": 192,
+          "toExclusive": 257,
+          "events": 0,
+          "exposureBars": 0,
+          "hazard": 0,
+          "ratioToOverall": 0
+        }
+      ],
+      "maxRatio": 2.2076086956521737,
+      "maxRatioBin": "8-15"
+    }
+  ],
+  "gapShapes": [
+    {
+      "datasetId": "btc-perp-15m",
+      "totalGaps": 68,
+      "minGap": 57,
+      "histogram50to100": {
+        "57": 1,
+        "61": 1,
+        "62": 1,
+        "69": 1,
+        "75": 1,
+        "76": 1,
+        "77": 1,
+        "82": 2,
+        "88": 1,
+        "89": 2,
+        "90": 1,
+        "94": 1,
+        "98": 1
+      },
+      "massAtFloor53to56": 0,
+      "massAt57to70": 4,
+      "gapsBelow80": 7
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "totalGaps": 43,
+      "minGap": 58,
+      "histogram50to100": {
+        "58": 1,
+        "60": 1,
+        "67": 1,
+        "69": 1,
+        "71": 1,
+        "74": 1,
+        "83": 2,
+        "87": 1,
+        "96": 1
+      },
+      "massAtFloor53to56": 0,
+      "massAt57to70": 4,
+      "gapsBelow80": 6
+    },
+    {
+      "datasetId": "eth-perp-15m",
+      "totalGaps": 74,
+      "minGap": 57,
+      "histogram50to100": {
+        "57": 1,
+        "63": 1,
+        "64": 1,
+        "67": 1,
+        "73": 1,
+        "74": 1,
+        "76": 1,
+        "77": 1,
+        "79": 1,
+        "80": 1,
+        "83": 1,
+        "85": 1,
+        "87": 1,
+        "89": 1,
+        "90": 2,
+        "100": 1
+      },
+      "massAtFloor53to56": 0,
+      "massAt57to70": 4,
+      "gapsBelow80": 9
+    },
+    {
+      "datasetId": "sol-spot-15m",
+      "totalGaps": 62,
+      "minGap": 60,
+      "histogram50to100": {
+        "60": 1,
+        "65": 1,
+        "66": 1,
+        "69": 1,
+        "70": 1,
+        "80": 1,
+        "81": 1,
+        "83": 1,
+        "85": 1,
+        "98": 1
+      },
+      "massAtFloor53to56": 0,
+      "massAt57to70": 5,
+      "gapsBelow80": 5
+    },
+    {
+      "datasetId": "btc-perp-5m",
+      "totalGaps": 80,
+      "minGap": 52,
+      "histogram50to100": {
+        "52": 1,
+        "53": 1,
+        "64": 1,
+        "65": 1,
+        "86": 1,
+        "91": 1,
+        "93": 1,
+        "94": 1,
+        "96": 1
+      },
+      "massAtFloor53to56": 1,
+      "massAt57to70": 2,
+      "gapsBelow80": 4
+    },
+    {
+      "datasetId": "btc-perp-4h",
+      "totalGaps": 37,
+      "minGap": 56,
+      "histogram50to100": {
+        "56": 1,
+        "57": 2,
+        "64": 1,
+        "66": 1,
+        "76": 1,
+        "81": 1,
+        "96": 1
+      },
+      "massAtFloor53to56": 1,
+      "massAt57to70": 4,
+      "gapsBelow80": 6
+    }
+  ],
+  "coincidences": [
+    {
+      "pair": "btc-perp-15m vs btc-perp-5m",
+      "overlapFromUtc": "2026-05-25T08:50:00.000Z",
+      "overlapToUtc": "2026-07-31T19:45:00.000Z",
+      "htfLabelsInOverlap": 34,
+      "ltfLabelsInOverlap": 81,
+      "windowHtfBars": 2,
+      "observedHits": 5,
+      "observedRate": 0.14705882352941177,
+      "expectedRate": 0.025200248936042287,
+      "clusteringCoefficient": 5.83560995380022
+    },
+    {
+      "pair": "btc-perp-1h vs btc-perp-15m",
+      "overlapFromUtc": "2026-02-28T23:15:00.000Z",
+      "overlapToUtc": "2026-07-31T21:00:00.000Z",
+      "htfLabelsInOverlap": 16,
+      "ltfLabelsInOverlap": 69,
+      "windowHtfBars": 2,
+      "observedHits": 0,
+      "observedRate": 0,
+      "expectedRate": 0.037818001314062086,
+      "clusteringCoefficient": 0
+    },
+    {
+      "pair": "btc-perp-4h vs btc-perp-1h",
+      "overlapFromUtc": "2025-06-20T02:00:00.000Z",
+      "overlapToUtc": "2026-07-31T16:00:00.000Z",
+      "htfLabelsInOverlap": 12,
+      "ltfLabelsInOverlap": 44,
+      "windowHtfBars": 2,
+      "observedHits": 3,
+      "observedRate": 0.25,
+      "expectedRate": 0.03935168319675969,
+      "clusteringCoefficient": 6.352968404171987
+    }
+  ]
+}

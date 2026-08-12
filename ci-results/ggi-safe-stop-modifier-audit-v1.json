@@ -1,0 +1,939 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-04T10:21:05.231Z",
+  "scope": "exploratory causal Safe-stop modifier audit; one-feature linear families fitted on original four observations; current validation batch used only to rank/falsify; selected family frozen for a future independent package",
+  "baseline": {
+    "multiplierFromOriginalDevelopment": 12.291783009421197,
+    "formula": "SafeDistance = 12.291783 × SMA(TR,55)",
+    "validationMaeMultiplier": 1.2368075571519992,
+    "validationMaxAbsErrorMultiplier": 3.083731843130769
+  },
+  "rows": [
+    {
+      "id": "ondo-15m",
+      "asset": "ONDO",
+      "timeframe": "15m",
+      "timeframeMinutes": 15,
+      "file": "C:/Users/Никита/Downloads/BYBIT_ONDOUSDT.P, 15 (1).csv",
+      "signalTime": "2026-08-03T08:45:00+05:00",
+      "direction": "BUY",
+      "entry": 0.3715,
+      "safeDistance": 0.0256,
+      "atr55Reported": 0.002089090909090912,
+      "development": true,
+      "signalIndex": 267,
+      "targetMultiplier": 12.254134029590933,
+      "features": {
+        "volatilityRatio14to55": 0.9026482655725474,
+        "volatilityRatio55to100": 1.0200639204545465,
+        "outerWidthOverAtr55": 18.454615007121046,
+        "innerWidthOverAtr55": 10.762226856674173,
+        "outerExpansion20": 1.0401074367222627,
+        "directionalMeanGapAtr55": 6.429300843603409,
+        "directionalInnerGapAtr55": 1.1267463765963572,
+        "adverseSwing20OverAtr55": 1.4360313315926887,
+        "currentTrOverAtr55": 2.3455178416013966,
+        "range5OverRange20": 0.7894736842105264
+      }
+    },
+    {
+      "id": "avax-1h",
+      "asset": "AVAX",
+      "timeframe": "1h",
+      "timeframeMinutes": 60,
+      "file": "C:/Users/Никита/Downloads/BYBIT_AVAXUSDT.P, 60.csv",
+      "signalTime": "2026-08-02T02:00:00+05:00",
+      "direction": "BUY",
+      "entry": 6.184,
+      "safeDistance": 0.621,
+      "atr55Reported": 0.04978181818181817,
+      "development": true,
+      "signalIndex": 261,
+      "targetMultiplier": 12.474433893352815,
+      "features": {
+        "volatilityRatio14to55": 1.076124386935198,
+        "volatilityRatio55to100": 0.9466023613199874,
+        "outerWidthOverAtr55": 19.84807817710858,
+        "innerWidthOverAtr55": 11.570550005354505,
+        "outerExpansion20": 0.9646670781099106,
+        "directionalMeanGapAtr55": 4.945688304464695,
+        "directionalInnerGapAtr55": -0.710093698275755,
+        "adverseSwing20OverAtr55": 2.9930606281957646,
+        "currentTrOverAtr55": 0.9039444850255649,
+        "range5OverRange20": 2.0968074150360483
+      }
+    },
+    {
+      "id": "ltc-2h",
+      "asset": "LTC",
+      "timeframe": "2h",
+      "timeframeMinutes": 120,
+      "file": "C:/Users/Никита/Downloads/BYBIT_LTCUSDT.P, 120.csv",
+      "signalTime": "2026-08-02T05:00:00+05:00",
+      "direction": "BUY",
+      "entry": 44.54,
+      "safeDistance": 5.09,
+      "atr55Reported": 0.4070909090909092,
+      "development": true,
+      "signalIndex": 282,
+      "targetMultiplier": 12.503349709691822,
+      "features": {
+        "volatilityRatio14to55": 0.7755375486505456,
+        "volatilityRatio55to100": 1.0535479013739877,
+        "outerWidthOverAtr55": 19.162673163901815,
+        "innerWidthOverAtr55": 11.169359597656108,
+        "outerExpansion20": 0.9802823501864647,
+        "directionalMeanGapAtr55": 3.222351874180332,
+        "directionalInnerGapAtr55": -2.2239601401737947,
+        "adverseSwing20OverAtr55": 2.333631085305929,
+        "currentTrOverAtr55": 1.4001786511835643,
+        "range5OverRange20": 1.04733727810651
+      }
+    },
+    {
+      "id": "bnb-spot-15m",
+      "asset": "BNB",
+      "timeframe": "15m",
+      "timeframeMinutes": 15,
+      "file": "C:/Users/Никита/Downloads/BINANCE_BNBUSDT, 15.csv",
+      "signalTime": "2026-08-03T03:45:00+05:00",
+      "direction": "SELL",
+      "entry": 588.33,
+      "safeDistance": 11.69,
+      "atr55Reported": 0.9794545454545435,
+      "development": true,
+      "signalIndex": 252,
+      "targetMultiplier": 11.935214405049216,
+      "features": {
+        "volatilityRatio14to55": 1.0333739955978753,
+        "volatilityRatio55to100": 0.9494518664739655,
+        "outerWidthOverAtr55": 19.979113616557292,
+        "innerWidthOverAtr55": 11.654122735533353,
+        "outerExpansion20": 0.9896831635618046,
+        "directionalMeanGapAtr55": 4.878771242901944,
+        "directionalInnerGapAtr55": -0.9767848141041343,
+        "adverseSwing20OverAtr55": 2.7157972897716456,
+        "currentTrOverAtr55": 0.5717467978466133,
+        "range5OverRange20": 1.2143549951503376
+      }
+    },
+    {
+      "id": "aave-2h",
+      "asset": "AAVE",
+      "timeframe": "2h",
+      "timeframeMinutes": 120,
+      "file": "C:/Users/Никита/Downloads/BYBIT_AAVEUSDT.P, 120.csv",
+      "signalTime": "2026-08-02T05:00:00+05:00",
+      "direction": "BUY",
+      "entry": 92.29,
+      "safeDistance": 17.27,
+      "atr55Reported": 1.6554545454545446,
+      "anomalous": true,
+      "development": false,
+      "signalIndex": 281,
+      "targetMultiplier": 10.432180120812745,
+      "features": {
+        "volatilityRatio14to55": 0.7740644857613553,
+        "volatilityRatio55to100": 1.0934310075657514,
+        "outerWidthOverAtr55": 18.767983403627714,
+        "innerWidthOverAtr55": 10.917594076021098,
+        "outerExpansion20": 1.0152966592644588,
+        "directionalMeanGapAtr55": 2.982573555586232,
+        "directionalInnerGapAtr55": -2.223085648719508,
+        "adverseSwing20OverAtr55": 2.0840197693574987,
+        "currentTrOverAtr55": 0.5194947830862163,
+        "range5OverRange20": 0.8661588683351433
+      }
+    },
+    {
+      "id": "link-2h",
+      "asset": "LINK",
+      "timeframe": "2h",
+      "timeframeMinutes": 120,
+      "file": "C:/Users/Никита/Downloads/BYBIT_LINKUSDT.P, 120.csv",
+      "signalTime": "2026-08-02T05:00:00+05:00",
+      "direction": "BUY",
+      "entry": 8.153,
+      "safeDistance": 1.037,
+      "atr55Reported": 0.0884,
+      "development": false,
+      "signalIndex": 281,
+      "targetMultiplier": 11.730769230769237,
+      "features": {
+        "volatilityRatio14to55": 0.6787330316742077,
+        "volatilityRatio55to100": 1.0771292798830263,
+        "outerWidthOverAtr55": 19.17223761670347,
+        "innerWidthOverAtr55": 11.171320897316836,
+        "outerExpansion20": 0.9867230156946295,
+        "directionalMeanGapAtr55": 2.7015881033062223,
+        "directionalInnerGapAtr55": -2.7198849757341805,
+        "adverseSwing20OverAtr55": 3.0316742081448056,
+        "currentTrOverAtr55": 1.266968325791837,
+        "range5OverRange20": 1.3062997827661094
+      }
+    },
+    {
+      "id": "dash-1h",
+      "asset": "DASH",
+      "timeframe": "1h",
+      "timeframeMinutes": 60,
+      "file": "C:/Users/Никита/Downloads/BYBIT_DASHUSDT.P, 60.csv",
+      "signalTime": "2026-08-01T14:00:00+05:00",
+      "direction": "SELL",
+      "entry": 31.39,
+      "safeDistance": 3.67,
+      "atr55Reported": 0.2930909090909096,
+      "development": false,
+      "signalIndex": 247,
+      "targetMultiplier": 12.52171215880891,
+      "features": {
+        "volatilityRatio14to55": 1.3818238213399543,
+        "volatilityRatio55to100": 0.9360936093609369,
+        "outerWidthOverAtr55": 20.150170103864756,
+        "innerWidthOverAtr55": 11.74205560044875,
+        "outerExpansion20": 1.0017978812794903,
+        "directionalMeanGapAtr55": 3.657245676858999,
+        "directionalInnerGapAtr55": -2.380257266993805,
+        "adverseSwing20OverAtr55": 2.7636476426799033,
+        "currentTrOverAtr55": 1.6035980148883429,
+        "range5OverRange20": 1.2413793103448265
+      }
+    },
+    {
+      "id": "pepe-15m",
+      "asset": "1000PEPE",
+      "timeframe": "15m",
+      "timeframeMinutes": 15,
+      "file": "C:/Users/Никита/Downloads/BYBIT_1000PEPEUSDT.P, 15.csv",
+      "signalTime": "2026-08-03T12:15:00+05:00",
+      "direction": "BUY",
+      "entry": 0.002832,
+      "safeDistance": 0.000151,
+      "atr55Reported": 0.000011563636363636376,
+      "development": false,
+      "signalIndex": 273,
+      "targetMultiplier": 13.058176100628918,
+      "features": {
+        "volatilityRatio14to55": 0.9636118598382732,
+        "volatilityRatio55to100": 0.8623144193614004,
+        "outerWidthOverAtr55": 22.438942948664902,
+        "innerWidthOverAtr55": 13.086507813271423,
+        "outerExpansion20": 0.9532376949286059,
+        "directionalMeanGapAtr55": 5.9863392760921785,
+        "directionalInnerGapAtr55": -0.47160522639474567,
+        "adverseSwing20OverAtr55": 1.1242138364779855,
+        "currentTrOverAtr55": 1.2106918238993805,
+        "range5OverRange20": 1.0316742081448005
+      }
+    },
+    {
+      "id": "pepe-1h",
+      "asset": "1000PEPE",
+      "timeframe": "1h",
+      "timeframeMinutes": 60,
+      "file": "C:/Users/Никита/Downloads/BYBIT_1000PEPEUSDT.P, 60.csv",
+      "signalTime": "2026-08-02T13:00:00+05:00",
+      "direction": "SELL",
+      "entry": 0.002912,
+      "safeDistance": 0.00033,
+      "atr55Reported": 0.00003089090909090916,
+      "development": false,
+      "signalIndex": 268,
+      "targetMultiplier": 10.682754561506746,
+      "features": {
+        "volatilityRatio14to55": 1.1468931304128474,
+        "volatilityRatio55to100": 1.0422034106244658,
+        "outerWidthOverAtr55": 18.07450239668595,
+        "innerWidthOverAtr55": 10.531654066488295,
+        "outerExpansion20": 0.9887602439973131,
+        "directionalMeanGapAtr55": 4.9100160330741645,
+        "directionalInnerGapAtr55": -0.5108343341447661,
+        "adverseSwing20OverAtr55": 1.5214832254267097,
+        "currentTrOverAtr55": 1.6833431430253043,
+        "range5OverRange20": 1.1814345991561168
+      }
+    },
+    {
+      "id": "doge-30m",
+      "asset": "DOGE",
+      "timeframe": "30m",
+      "timeframeMinutes": 30,
+      "file": "C:/Users/Никита/Downloads/BYBIT_DOGEUSDT.P, 30.csv",
+      "signalTime": "2026-08-03T05:00:00+05:00",
+      "direction": "SELL",
+      "entry": 0.07035,
+      "safeDistance": 0.00348,
+      "atr55Reported": 0.00025672727272727435,
+      "development": false,
+      "signalIndex": 272,
+      "targetMultiplier": 13.555240793201047,
+      "features": {
+        "volatilityRatio14to55": 1.2714993929583174,
+        "volatilityRatio55to100": 1.0356081997873072,
+        "outerWidthOverAtr55": 18.87660263605391,
+        "innerWidthOverAtr55": 11.009895977815942,
+        "outerExpansion20": 0.988033330737141,
+        "directionalMeanGapAtr55": 1.8870673373755287,
+        "directionalInnerGapAtr55": -3.673553189676829,
+        "adverseSwing20OverAtr55": 4.2457507082153,
+        "currentTrOverAtr55": 2.4929178470254865,
+        "range5OverRange20": 1.4502529510961222
+      }
+    },
+    {
+      "id": "inj-1h",
+      "asset": "INJ",
+      "timeframe": "1h",
+      "timeframeMinutes": 60,
+      "file": "C:/Users/Никита/Downloads/BYBIT_INJUSDT.P, 60.csv",
+      "signalTime": "2026-08-03T01:00:00+05:00",
+      "direction": "SELL",
+      "entry": 5.142,
+      "safeDistance": 0.445,
+      "atr55Reported": 0.048327272727272816,
+      "development": false,
+      "signalIndex": 282,
+      "targetMultiplier": 9.208051166290428,
+      "features": {
+        "volatilityRatio14to55": 1.0390465441255494,
+        "volatilityRatio55to100": 0.8785179554130657,
+        "outerWidthOverAtr55": 20.735272743894708,
+        "innerWidthOverAtr55": 12.081377608749415,
+        "outerExpansion20": 0.9632697244493629,
+        "directionalMeanGapAtr55": 6.28953132768437,
+        "directionalInnerGapAtr55": 0.06675901236754517,
+        "adverseSwing20OverAtr55": 0.37246049661399055,
+        "currentTrOverAtr55": 0.9311512415349855,
+        "range5OverRange20": 1.345565749235471
+      }
+    },
+    {
+      "id": "tao-15m",
+      "asset": "TAO",
+      "timeframe": "15m",
+      "timeframeMinutes": 15,
+      "file": "C:/Users/Никита/Downloads/BYBIT_TAOUSDT.P, 15.csv",
+      "signalTime": "2026-08-03T09:15:00+05:00",
+      "direction": "BUY",
+      "entry": 190.49,
+      "safeDistance": 8.02,
+      "atr55Reported": 0.5969090909090912,
+      "development": false,
+      "signalIndex": 369,
+      "targetMultiplier": 13.435881815412726,
+      "features": {
+        "volatilityRatio14to55": 1.0386841303685623,
+        "volatilityRatio55to100": 1.0397301705436186,
+        "outerWidthOverAtr55": 17.982027650652064,
+        "innerWidthOverAtr55": 10.488621985394113,
+        "outerExpansion20": 1.0217351897774547,
+        "directionalMeanGapAtr55": 3.7329878218333934,
+        "directionalInnerGapAtr55": -1.468733569372369,
+        "adverseSwing20OverAtr55": 2.1778860798050745,
+        "currentTrOverAtr55": 1.0889430399025373,
+        "range5OverRange20": 0.8805031446540917
+      }
+    }
+  ],
+  "featureAudit": [
+    {
+      "feature": "directionalMeanGapAtr55",
+      "fit": {
+        "intercept": 12.666599169363778,
+        "slope": -0.07697966716145058
+      },
+      "developmentCorrelation": -0.384337550462505,
+      "validationCorrelation": -0.5704607495546409,
+      "developmentMaeMultiplier": 0.17790928893955638,
+      "validationMaeMultiplier": 1.1982459849196745,
+      "validationMaxAbsErrorMultiplier": 2.9743819748666915,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": 3.117831226801404,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.45863181636393,
+          "error": 0.7278625855946927
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 12.385065614431518,
+          "error": -0.13664654437739188
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 12.205772764374682,
+          "error": -0.8524033362542358
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.288627769380343,
+          "error": 1.6058732078735964
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.521333353821365,
+          "error": -1.033907439379682
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.18243314115712,
+          "error": 2.9743819748666915
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.379235009321295,
+          "error": -1.0566468060914307
+        }
+      ]
+    },
+    {
+      "feature": "directionalInnerGapAtr55",
+      "fit": {
+        "intercept": 12.25606695438993,
+        "slope": -0.0513144701987092
+      },
+      "developmentCorrelation": -0.27033279140115735,
+      "validationCorrelation": -0.6047659125854037,
+      "developmentMaeMultiplier": 0.18548787228730568,
+      "validationMaeMultiplier": 1.2065014811305086,
+      "validationMaxAbsErrorMultiplier": 3.0445900847488723,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": 2.4503469311973225,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.395636410921158,
+          "error": 0.664867180151921
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 12.378208594982343,
+          "error": -0.1435035638265667
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 12.280267126725319,
+          "error": -0.7779089739035996
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.282280147605878,
+          "error": 1.5995255860991318
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.444573390064974,
+          "error": -1.1106674031360733
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.2526412510393,
+          "error": 3.0445900847488723
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.331434239365331,
+          "error": -1.104447576047395
+        }
+      ]
+    },
+    {
+      "feature": "currentTrOverAtr55",
+      "fit": {
+        "intercept": 12.16843772131211,
+        "slope": 0.09449234066402033
+      },
+      "developmentCorrelation": 0.27810113334078257,
+      "validationCorrelation": 0.41863937876941953,
+      "developmentMaeMultiplier": 0.2115930860509465,
+      "validationMaeMultiplier": 1.2204827759373735,
+      "validationMaxAbsErrorMultiplier": 3.0483732153465315,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": 1.3199127964755308,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.288156523963355,
+          "error": 0.5573872931941182
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 12.319965451223085,
+          "error": -0.20174670758582458
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 12.282838825575153,
+          "error": -0.775337275053765
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.327500755037299,
+          "error": 1.644746193530553
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.403999363760658,
+          "error": -1.1512414294403897
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.25642438163696,
+          "error": 3.0483732153465315
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.271334498002293,
+          "error": -1.1645473174104328
+        }
+      ]
+    },
+    {
+      "feature": "adverseSwing20OverAtr55",
+      "fit": {
+        "intercept": 12.260956488251503,
+        "slope": 0.013009001439307322
+      },
+      "developmentCorrelation": 0.033632101109889734,
+      "validationCorrelation": 0.6450406209767837,
+      "developmentMaeMultiplier": 0.19328784318697068,
+      "validationMaeMultiplier": 1.2312020708825444,
+      "validationMaxAbsErrorMultiplier": 3.0577506610976126,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": 0.45322218780442514,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.30039554238877,
+          "error": 0.5696263116195333
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 12.296908784412864,
+          "error": -0.22480337439604625
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 12.275581387668336,
+          "error": -0.7825947129605826
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.28074946572096,
+          "error": 1.5979949042142145
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.316189465325616,
+          "error": -1.2390513278754316
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.26580182738804,
+          "error": 3.0577506610976126
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.289288611398336,
+          "error": -1.1465932040143905
+        }
+      ]
+    },
+    {
+      "feature": "range5OverRange20",
+      "fit": {
+        "intercept": 12.102815629875076,
+        "slope": 0.1468285601906501
+      },
+      "developmentCorrelation": 0.31743697967809276,
+      "validationCorrelation": -0.3400009382865466,
+      "developmentMaeMultiplier": 0.17295161016205407,
+      "validationMaeMultiplier": 1.2476410687994177,
+      "validationMaxAbsErrorMultiplier": 3.0923319451867464,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": -0.8759254085061396,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.294617746155984,
+          "error": 0.5638485153867467
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 12.285085566663469,
+          "error": -0.23662659214544135
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 12.254294868442805,
+          "error": -0.8038812321861126
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.276283971028587,
+          "error": 1.5935294095218406
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.315754182596761,
+          "error": -1.2394866106042866
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.300383111477174,
+          "error": 3.0923319451867464
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.232098638847976,
+          "error": -1.20378317656475
+        }
+      ]
+    },
+    {
+      "feature": "outerExpansion20",
+      "fit": {
+        "intercept": 14.923741737698553,
+        "slope": -2.6486851561130607
+      },
+      "developmentCorrelation": -0.32920136708505765,
+      "validationCorrelation": 0.3983539893366537,
+      "developmentMaeMultiplier": 0.18358411403408414,
+      "validationMaeMultiplier": 1.2490543604420352,
+      "validationMaxAbsErrorMultiplier": 3.1642923509259795,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": -0.9901947331431904,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.310223132833073,
+          "error": 0.5794539020638361
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 12.270294560128052,
+          "error": -0.2514175986808578
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 12.398915204893724,
+          "error": -0.6592608957351942
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.304827156468141,
+          "error": 1.622072594961395
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.306752520830141,
+          "error": -1.2484882723709063
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.372343517216407,
+          "error": 3.1642923509259795
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.217486907056648,
+          "error": -1.2183949083560783
+        }
+      ]
+    },
+    {
+      "feature": "outerWidthOverAtr55",
+      "fit": {
+        "intercept": 14.113466819443389,
+        "slope": -0.094089794952606
+      },
+      "developmentCorrelation": -0.25179647426081997,
+      "validationCorrelation": -0.07856332485649503,
+      "developmentMaeMultiplier": 0.21068177939031463,
+      "validationMaeMultiplier": 1.2650964684293575,
+      "validationMaxAbsErrorMultiplier": 2.9544380923935485,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": -2.287252460075462,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.309554913305119,
+          "error": 0.5787856825358819
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 12.217541446110623,
+          "error": -0.3041707126982871
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 12.002191278450283,
+          "error": -1.055984822178635
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.412840595068822,
+          "error": 1.7300860335620758
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.337371148015254,
+          "error": -1.217869645185793
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.162489258683976,
+          "error": 2.9544380923935485
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.421541524961444,
+          "error": -1.0143402904512815
+        }
+      ]
+    },
+    {
+      "feature": "innerWidthOverAtr55",
+      "fit": {
+        "intercept": 14.17733606013698,
+        "slope": -0.16702473449487654
+      },
+      "developmentCorrelation": -0.26092387360203134,
+      "validationCorrelation": -0.07333653625692797,
+      "developmentMaeMultiplier": 0.21061942332550831,
+      "validationMaeMultiplier": 1.2667208282486142,
+      "validationMaxAbsErrorMultiplier": 2.9513960064128355,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": -2.418587348018497,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.31144915330557,
+          "error": 0.5806799225363335
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 12.21612234104795,
+          "error": -0.3055898177609606
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 11.991565567160194,
+          "error": -1.0666105334687241
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.418289335889886,
+          "error": 1.7355347743831402
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.338411107626063,
+          "error": -1.216829685574984
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.159447172703263,
+          "error": 2.9513960064128355
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.425476757809404,
+          "error": -1.0104050576033217
+        }
+      ]
+    },
+    {
+      "feature": "volatilityRatio55to100",
+      "fit": {
+        "intercept": 10.077634646214099,
+        "slope": 2.2310676369541587
+      },
+      "developmentCorrelation": 0.4510211469373124,
+      "validationCorrelation": 0.23672405556383233,
+      "developmentMaeMultiplier": 0.18002189523727674,
+      "validationMaeMultiplier": 1.2739455135873037,
+      "validationMaxAbsErrorMultiplier": 2.829616458728898,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": -3.002727159981311,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.480782923376857,
+          "error": 0.7500136926076202
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 12.166122803218894,
+          "error": -0.35558935559001625
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 12.001516440130235,
+          "error": -1.056659660498683
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.40286094678159,
+          "error": 1.7201063852748444
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.388146585323916,
+          "error": -1.1670942078771311
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.037667625019326,
+          "error": 2.829616458728898
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.397342980878793,
+          "error": -1.0385388345339326
+        }
+      ]
+    },
+    {
+      "feature": "volatilityRatio14to55",
+      "fit": {
+        "intercept": 13.005292637166086,
+        "slope": -0.7535048759935699
+      },
+      "developmentCorrelation": -0.3904656852625329,
+      "validationCorrelation": 0.1863943869096906,
+      "developmentMaeMultiplier": 0.18121731293400645,
+      "validationMaeMultiplier": 1.3276614559180164,
+      "validationMaxAbsErrorMultiplier": 3.0143148334927883,
+      "baselineValidationMaeMultiplier": 1.2368075571519992,
+      "baselineValidationMaxAbsErrorMultiplier": 3.083731843130769,
+      "validationImprovementPct": -7.345839556092848,
+      "predictions": [
+        {
+          "id": "link-2h",
+          "actual": 11.730769230769237,
+          "predicted": 12.493863988301673,
+          "error": 0.7630947575324356
+        },
+        {
+          "id": "dash-1h",
+          "actual": 12.52171215880891,
+          "predicted": 11.964081650022363,
+          "error": -0.5576305087865467
+        },
+        {
+          "id": "pepe-15m",
+          "actual": 13.058176100628918,
+          "predicted": 12.279206402212715,
+          "error": -0.7789696984162031
+        },
+        {
+          "id": "pepe-1h",
+          "actual": 10.682754561506746,
+          "predicted": 12.141103071156476,
+          "error": 1.4583485096497295
+        },
+        {
+          "id": "doge-30m",
+          "actual": 13.555240793201047,
+          "predicted": 12.04721164474913,
+          "error": -1.508029148451918
+        },
+        {
+          "id": "inj-1h",
+          "actual": 9.208051166290428,
+          "predicted": 12.222365999783216,
+          "error": 3.0143148334927883
+        },
+        {
+          "id": "tao-15m",
+          "actual": 13.435881815412726,
+          "predicted": 12.222639080316233,
+          "error": -1.2132427350964932
+        }
+      ]
+    }
+  ],
+  "frozenForNextIndependentPackage": {
+    "status": "candidate_not_validated",
+    "feature": "directionalMeanGapAtr55",
+    "intercept": 12.666599169363778,
+    "slope": -0.07697966716145058,
+    "formula": "SafeDistance = ATR55 × (12.666599 + -0.076980 × directionalMeanGapAtr55)",
+    "selectionWarning": "Chosen after inspecting the current validation batch; must not be claimed as validated until tested unchanged on 8–12 new matched setups.",
+    "acceptanceGate": "On the next package, reduce MAE versus the fixed ATR55 baseline by at least 25%, avoid direction/timeframe bias, and keep max absolute distance error below 12% on clean observations."
+  }
+}

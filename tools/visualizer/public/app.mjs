@@ -12,7 +12,7 @@ import { renderZones, wireZonesPanel, moveZoneFocus, zoneHoverHtml } from './pan
 import { renderConfirmation, wireConfirmationPanel, moveConfirmation } from './panels/confirmation.mjs'
 import { renderLab, wireLabPanel, moveLab, exitLabVisuals } from './panels/lab.mjs'
 import { renderConfigPanel, setEngineDefaults, wireConfigPanel } from './panels/config.mjs'
-import { drawIndicatorLayers, wireIndicatorSettings } from './panels/indicators.mjs'
+import { drawIndicatorLayers, selectSignalArrowAt, signalArrowTooltip, updateSignalArrowHud, wireIndicatorSettings } from './panels/indicators.mjs'
 import { wirePalette, openPalette, closePalette, paletteOpen, setPaletteSymbols } from './lib/palette.mjs'
 
 // ---- Режимы ----
@@ -71,11 +71,12 @@ export function redraw() {
 	if (!S.data) return
 	const safe = (f) => { try { f() } catch (e) { console.error('render step failed:', e) } }
 	if (S.mode === 'zones') safe(renderZones)
-	else if (S.mode === 'conf') { safe(renderConfirmation); return }
-	else if (S.mode === 'lab') { safe(renderLab); return }
+	else if (S.mode === 'conf') { safe(renderConfirmation); safe(() => updateSignalArrowHud(getTimeRange())); return }
+	else if (S.mode === 'lab') { safe(renderLab); safe(() => updateSignalArrowHud(getTimeRange())); return }
 	else safe(renderTradesMode)
 	const cs = S.data.candles || []
 	if (cs.length) safe(() => drawIndicatorLayers(cs, time(cs[0].timestamp), time(cs[cs.length - 1].timestamp), S.data?.indicators?.main))
+	safe(() => updateSignalArrowHud(getTimeRange()))
 }
 
 // ---- Тултипы и hover-карточки ----
@@ -102,7 +103,7 @@ function onCrosshair(p) {
 	let html = null
 	if (S.mode === 'trades') {
 		const i = S.data?.candles.findIndex((c) => time(c.timestamp) === p.time)
-		html = tradeTooltip(i)
+		html = signalArrowTooltip(p.time) || tradeTooltip(i)
 	}
 	if (!html && S.hmOn) html = hmBandTooltip(price)
 	if (!html) { tip.classList.add('hidden'); return }
@@ -113,10 +114,17 @@ function onCrosshair(p) {
 }
 
 function onChartClick(p) {
-	if (S.mode !== 'zones' || !p.time || !p.point) return
+	if (!p.time || !p.point) return
+	if (S.mode === 'trades' && selectSignalArrowAt(p.time)) return
+	if (S.mode !== 'zones') return
 	const price = priceAt(p.point.y)
 	const r = price != null ? rectAt(p.time, price) : null
 	if (r) { S.poiFocusId = S.poiFocusId === r.id ? null : r.id; renderZones() }
+}
+
+function onChartPan() {
+	drawHmProfile()
+	updateSignalArrowHud(getTimeRange())
 }
 
 // ---- Загрузка ----
@@ -140,10 +148,10 @@ async function load() {
 		S.confZonesMode = false
 		S.lab = { ...S.lab, index: 0, cursorAt: 0, revealed: false, order: [] }
 		deactivateModeSilent()
-		initChart(onCrosshair, onChartClick, drawHmProfile)
+		initChart(onCrosshair, onChartClick, onChartPan)
 		setCandles(S.data.candles, true)
 		$('version').textContent = `${json.liquidityPoi?.version || ''} · ${json.strategy.version}`
-		$('dataset').textContent = `${json.dataset.symbol} · ${json.dataset.timeframe} · ${json.dataset.candleCount} свечей${json.dataset.ltfSimplifiedCount ? ` · simplified ${json.dataset.simplifiedTf}: ${json.dataset.ltfSimplifiedCount}` : ''}${json.dataset.ltfConfCount ? ` · refined ${json.dataset.refinedTf ?? json.dataset.confTf}: ${json.dataset.ltfConfCount}${json.dataset.fullLtf ? ' (архивы' + (json.dataset.ltfConfFrom ? ' с ' + new Date(json.dataset.ltfConfFrom).toISOString().slice(0, 10) : '') + ')' : ''}` : ''}${json.dataset.until ? ` · до ${json.dataset.until.slice(0, 10)}` : ''} · ${json.finalTrend}`
+		$('dataset').textContent = `${json.dataset.symbol} · ${json.dataset.timeframe} · SOURCE: ${json.dataset.source === 'fixture' ? 'BTC/USDT 15m FIXTURE' : 'BINANCE FUTURES'} · ${json.dataset.candleCount} свечей${json.dataset.ltfSimplifiedCount ? ` · simplified ${json.dataset.simplifiedTf}: ${json.dataset.ltfSimplifiedCount}` : ''}${json.dataset.ltfConfCount ? ` · refined ${json.dataset.refinedTf ?? json.dataset.confTf}: ${json.dataset.ltfConfCount}${json.dataset.fullLtf ? ' (архивы' + (json.dataset.ltfConfFrom ? ' с ' + new Date(json.dataset.ltfConfFrom).toISOString().slice(0, 10) : '') + ')' : ''}` : ''}${json.dataset.until ? ` · до ${json.dataset.until.slice(0, 10)}` : ''} · ${json.finalTrend}`
 		setEngineDefaults(json.engineDefaults)
 		renderFunnel()
 		redraw()
@@ -303,7 +311,7 @@ async function loadSymbols() {
 }
 
 function init() {
-	initChart(onCrosshair, onChartClick, drawHmProfile)
+	initChart(onCrosshair, onChartClick, onChartPan)
 	wireStatsPanel()
 	wireHeatmapPanel(redraw)
 	wireZonesPanel(activateMode, deactivateMode)

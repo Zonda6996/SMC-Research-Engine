@@ -13,6 +13,7 @@ export const cls = (v) => v > 0 ? 'pos' : v < 0 ? 'neg' : ''
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
 export const dt = (ms) => new Date(ms).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
 export const dshort = (ms) => new Date(ms).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })
+export const fmtTf = (tf) => String(tf ?? '—').toUpperCase()
 
 /** Палитра графика (согласована с токенами styles.css). */
 export const C = {

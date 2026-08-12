@@ -1,0 +1,45 @@
+{
+ "table": {
+  "safe": {
+   "n": 73,
+   "stop": 6,
+   "pS": 5,
+   "pBe": 29,
+   "full": 33,
+   "open": 0,
+   "sumR": 5.053741488577472,
+   "nR": 73,
+   "add": 29,
+   "long": 39,
+   "short": 34
+  },
+  "risk": {
+   "n": 72,
+   "stop": 7,
+   "pS": 14,
+   "pBe": 17,
+   "full": 34,
+   "open": 0,
+   "sumR": 5.1054074527953155,
+   "nR": 72,
+   "add": 39,
+   "long": 35,
+   "short": 37
+  },
+  "std": {
+   "n": 40,
+   "stop": 22,
+   "pS": 0,
+   "pBe": 0,
+   "full": 18,
+   "open": 0,
+   "sumR": -1.5999999999999976,
+   "nR": 40,
+   "add": 27,
+   "long": 21,
+   "short": 19
+  }
+ },
+ "arrows": 92,
+ "extensionRecall": 66
+}

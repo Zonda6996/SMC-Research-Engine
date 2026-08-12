@@ -16,7 +16,7 @@ function buildCommands() {
 	const out = [
 		cmd('Данные', 'Загрузить данные', () => document.dispatchEvent(new CustomEvent('viz:reload')), 'Enter'),
 		cmd('Данные', 'Случайный исторический период', () => $('randomPeriod').click()),
-		...['15m', '30m', '1h', '4h', '1d', '1w'].map((tf) => cmd('Таймфрейм', `ТФ ${tf}`, () => {
+		...['1m', '3m', '5m', '15m', '30m', '45m', '1h', '2h', '3h', '4h', '1d', '1w'].map((tf) => cmd('Таймфрейм', `ТФ ${tf}`, () => {
 			document.querySelector(`#tfGroup [data-tf="${tf}"]`)?.click()
 		})),
 		cmd('Панели', 'Зоны ликвидности (POI)', () => $('poiZoneToggle').click()),

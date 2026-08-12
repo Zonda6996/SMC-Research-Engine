@@ -3,7 +3,7 @@
 
 import { S } from '../lib/state.mjs'
 import { $, fmtP, fmtN, time } from '../lib/format.mjs'
-import { chart, candlesSeries, line } from '../lib/chart.mjs'
+import { chart, candlesSeries, heatmapPrim } from '../lib/chart.mjs'
 
 export const HM_TF_DEFAULTS = {
 	'15m': { w: '0', g: '0.0025' }, '30m': { w: '0', g: '0.0025' }, '1h': { w: '0', g: '0.0025' },
@@ -91,8 +91,8 @@ export function renderHeatmap() {
 	if (!S.data) return
 	// В режиме подтверждения на графике 15m-свечи — полосы heatmap (4h-таймлайн) сюда не рисуем:
 	// смешение шкал времени ломало график и вешало рендер (7-й QA).
-	if (S.mode === 'conf' && !S.confZonesMode) { S.hmShownBands = []; drawHmProfile(); return }
-	if (!S.hmOn) { $('hmStatus').textContent = '—'; S.hmShownBands = []; drawHmProfile(); return }
+	if (S.mode === 'conf' && !S.confZonesMode) { heatmapPrim.setBands([]); S.hmShownBands = []; drawHmProfile(); return }
+	if (!S.hmOn) { $('hmStatus').textContent = '—'; heatmapPrim.setBands([]); S.hmShownBands = []; drawHmProfile(); return }
 	const raw = hmPools()
 	const gap = Number($('hmGroup').value)
 	const pools = hmMergePools(raw, gap)
@@ -105,16 +105,9 @@ export function renderHeatmap() {
 		list.forEach((p, i) => dw.set(p, ((i + 1) / list.length) * (0.5 + 0.5 * Math.sqrt(hmNotional(p) / (maxN || 1)))))
 	}
 	const shown = pools.filter((p) => dw.get(p) >= minW).sort((a, b) => dw.get(a) - dw.get(b)).slice(-400)
-	for (const p of shown) {
-		const w = dw.get(p)
-		const alpha = (0.08 + 0.8 * w * w).toFixed(3)
-		const width = Math.max(2, Math.min(10, 2 + Math.round(8 * Math.pow(w, 1.5))))
-		line([
-			{ time: time(p.startAt), value: p.extremePrice },
-			{ time: time(p.status === 'swept' && p.sweptAt ? p.sweptAt : last), value: p.extremePrice },
-		], { color: `rgba(${p.side === 'sell-side' ? '244,80,106' : '47,208,140'},${alpha})`, lineWidth: width, autoscaleInfoProvider: () => null })
-	}
-	S.hmShownBands = shown.map((p) => ({ p, w: dw.get(p) }))
+	S.hmShownBands = shown.map((p) => ({ p, w: dw.get(p), t1: time(p.startAt), t2: time(p.status === 'swept' && p.sweptAt ? p.sweptAt : last) }))
+	// Один canvas primitive вместо до 400 LineSeries: меньше layout/GC и стабильный pan FPS.
+	heatmapPrim.setBands(S.hmShownBands)
 	const close = S.data.candles[S.data.candles.length - 1].close
 	const up = S.hmShownBands.filter((x) => x.p.status === 'active' && x.p.side === 'sell-side' && x.p.extremePrice > close && x.w >= 0.75).sort((a, b) => a.p.extremePrice - b.p.extremePrice)[0]
 	const dn = S.hmShownBands.filter((x) => x.p.status === 'active' && x.p.side === 'buy-side' && x.p.extremePrice < close && x.w >= 0.75).sort((a, b) => b.p.extremePrice - a.p.extremePrice)[0]

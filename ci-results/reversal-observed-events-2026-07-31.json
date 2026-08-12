@@ -1,0 +1,51 @@
+{
+  "status": "manual-observation-dataset-v0.2",
+  "timezone": "Asia/Almaty (UTC+5)",
+  "year": 2026,
+  "source": "User TradingView screenshots supplied 2026-07-31 plus transcribed missing screenshots 12-18",
+  "warning": "These are observed labels and plans, not proof of the hidden vendor trigger formula. Outcome is never a detector feature.",
+  "events": [
+    {"id":"btc-12","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"15m","localAt":"2026-07-26T09:00:00+05:00","utcAt":"2026-07-26T04:00:00Z","direction":"short","mode":"safe","signalPresent":true,"sourceKind":"user-transcription","screenshotAvailable":false},
+    {"id":"btc-13-buy","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"15m","localAt":"2026-07-23T20:15:00+05:00","utcAt":"2026-07-23T15:15:00Z","direction":"long","mode":"safe","signalPresent":true,"sourceKind":"user-transcription","screenshotAvailable":false},
+    {"id":"btc-13-sell","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"15m","localAt":"2026-07-24T12:15:00+05:00","utcAt":"2026-07-24T07:15:00Z","direction":"short","mode":"safe","signalPresent":true,"sourceKind":"user-transcription","screenshotAvailable":false},
+    {"id":"btc-14","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"1h","localAt":"2026-07-25T17:00:00+05:00","utcAt":"2026-07-25T12:00:00Z","direction":"long","mode":"safe","signalPresent":true,"sourceKind":"user-transcription","screenshotAvailable":false},
+    {"id":"btc-15","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"1h","localAt":"2026-07-15T06:00:00+05:00","utcAt":"2026-07-15T01:00:00Z","direction":"short","mode":"safe","signalPresent":true,"sourceKind":"user-transcription","screenshotAvailable":false},
+    {"id":"btc-16","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"1h","localAt":"2026-07-01T06:00:00+05:00","utcAt":"2026-07-01T01:00:00Z","direction":"long","mode":"safe","signalPresent":true,"sourceKind":"user-transcription","screenshotAvailable":false},
+    {"id":"btc-17-safe","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"1h","localAt":"2026-07-28T19:00:00+05:00","utcAt":"2026-07-28T14:00:00Z","direction":"long","mode":"safe","signalPresent":true,"sourceKind":"user-transcription","screenshotAvailable":false},
+    {"id":"btc-18-risk","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"1h","localAt":"2026-07-28T19:00:00+05:00","utcAt":"2026-07-28T14:00:00Z","direction":"long","mode":"risk","signalPresent":true,"sameSignalAs":"btc-17-safe","sourceKind":"user-transcription","screenshotAvailable":false},
+
+    {"id":"eth-safe-sell","symbol":"ETHUSDT","feed":"Binance Spot","timeframe":"1h","localAt":"2026-07-22T19:00:00+05:00","utcAt":"2026-07-22T14:00:00Z","direction":"short","mode":"safe","signalPresent":true,"outcome":"partial-only","sourceKind":"screenshot","screenshotIndex":1,"confidence":"high"},
+    {"id":"eth-safe-buy","symbol":"ETHUSDT","feed":"Binance Spot","timeframe":"45m","localAt":"2026-07-24T06:30:00+05:00","utcAt":"2026-07-24T01:30:00Z","direction":"long","mode":"safe","signalPresent":true,"outcome":"full","sourceKind":"screenshot","screenshotIndex":2,"confidence":"high"},
+    {"id":"sol-safe-sell-30m","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"30m","localAt":"2026-07-15T10:00:00+05:00","utcAt":"2026-07-15T05:00:00Z","direction":"short","mode":"safe","signalPresent":true,"outcome":"partial-only","sourceKind":"screenshot","screenshotIndex":3,"confidence":"high"},
+    {"id":"sol-safe-buy-active","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"5m","localAt":"2026-07-31T09:25:00+05:00","utcAt":"2026-07-31T04:25:00Z","direction":"long","mode":"safe","signalPresent":true,"outcome":"active","sourceKind":"screenshot","screenshotIndex":4,"confidence":"high"},
+    {"id":"sol-risk-buy-active","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"5m","localAt":"2026-07-31T09:25:00+05:00","utcAt":"2026-07-31T04:25:00Z","direction":"long","mode":"risk","signalPresent":true,"sameSignalAs":"sol-safe-buy-active","outcome":"active","sourceKind":"screenshot","screenshotIndex":5,"confidence":"high"},
+    {"id":"sol-standard-buy-active","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"5m","localAt":"2026-07-31T09:25:00+05:00","utcAt":"2026-07-31T04:25:00Z","direction":"long","mode":"standard","signalPresent":true,"sameSignalAs":"sol-safe-buy-active","outcome":"active","sourceKind":"screenshot","screenshotIndex":6,"confidence":"high","notes":"Standard plan differs; user inferred fixed 1:2 R:R measured from average entry after add."},
+    {"id":"sol-5m-no-signal-window","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"5m","localWindow":{"from":"2026-07-20T00:00:00+05:00","to":"2026-07-21T23:59:59+05:00"},"direction":null,"mode":"safe","signalPresent":false,"sourceKind":"screenshot","screenshotIndex":8,"confidence":"medium","notes":"Matched negative window: Apex bands visible but user reports no Reversal signal on the shown segment."},
+    {"id":"sol-safe-sell-5m","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"5m","localAt":"2026-07-25T06:50:00+05:00","utcAt":"2026-07-25T01:50:00Z","direction":"short","mode":"safe","signalPresent":true,"sourceKind":"screenshot","screenshotIndex":9,"confidence":"high","notes":"Price does not visibly touch the drawn overbought fill; this may be because trigger uses hidden/lagged state or the visual Apex reconstruction is not exact."}
+  ],
+  "modeFacts": [
+    "Safe and Risk signal timestamps coincide in all supplied direct comparisons; their add/stop geometry differs.",
+    "The 2026-07-31 SOL 5m signal is present in Safe, Risk and Standard, so Standard is not globally exclusive.",
+    "A prior BTC observation reported no Standard signal where Safe/Risk did; Standard eligibility therefore remains unresolved and may depend on whether a fixed 1:2 plan is feasible.",
+    "Safe/Risk use dynamic partial at Apex mean, break-even after partial, and dynamic full at the opposite Apex zone; Risk shortens add/stop.",
+    "Standard uses fixed entry/add/stop/take; observed plan is consistent with approximately 1:2 reward/risk from average entry after add."
+  ],
+  "statisticsFacts": [
+    "Vendor Winrate counts Partial and Full fix as wins: Winrate = (Partial + Full fix) / Trades.",
+    "For honest comparison show Stop versus Full fix separately; the displayed Winrate is not equivalent to fully profitable trades.",
+    "Statistics change with mode, asset, timeframe and feed; user reports Bybit Futures can be slightly better than Binance Spot."
+  ],
+  "apexAnchors": [
+    {"id":"btc-range-4h","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"4h","localAt":"2026-07-11T13:00:00+05:00","utcAt":"2026-07-11T08:00:00Z","ohlc":{"open":64162.18,"high":64300.00,"low":64129.99,"close":64198.00},"mean":61687.97,"redLo":66449.51,"redHi":70074.02,"greenHi":57267.63,"greenLo":54305.52,"screenshotIndex":10},
+    {"id":"btc-range-1h","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"1h","localAt":"2026-07-11T13:00:00+05:00","utcAt":"2026-07-11T08:00:00Z","ohlc":{"open":64162.18,"high":64300.00,"low":64153.87,"close":64265.98},"mean":63242.05,"redLo":65439.45,"redHi":67055.62,"greenHi":61118.43,"greenLo":59645.36,"screenshotIndex":11},
+    {"id":"btc-range-15m","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"15m","localAt":"2026-07-11T13:00:00+05:00","utcAt":"2026-07-11T08:00:00Z","ohlc":{"open":64162.18,"high":64250.00,"low":64153.87,"close":64230.77},"mean":64145.72,"redLo":64886.09,"redHi":65420.15,"greenHi":63413.80,"greenLo":62896.12,"screenshotIndex":12},
+    {"id":"btc-dump-4h","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"4h","localAt":"2026-07-24T13:00:00+05:00","utcAt":"2026-07-24T08:00:00Z","ohlc":{"open":65499.94,"high":65508.17,"low":64857.14,"close":65083.43},"mean":64326.63,"redLo":67972.89,"redHi":70703.23,"greenHi":60875.97,"greenLo":58525.12,"screenshotIndex":13},
+    {"id":"btc-dump-1h","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"1h","localAt":"2026-07-24T13:00:00+05:00","utcAt":"2026-07-24T08:00:00Z","ohlc":{"open":65499.94,"high":65508.17,"low":65302.18,"close":65302.18},"mean":65739.16,"redLo":67472.66,"redHi":68738.78,"greenHi":64050.20,"greenLo":62870.44,"screenshotIndex":14},
+    {"id":"btc-dump-15m","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"15m","localAt":"2026-07-24T13:00:00+05:00","utcAt":"2026-07-24T08:00:00Z","ohlc":{"open":65499.94,"high":65508.17,"low":65425.98,"close":65438.95},"mean":65129.26,"redLo":65879.01,"redHi":66419.82,"greenHi":64388.04,"greenLo":63863.76,"screenshotIndex":15},
+    {"id":"btc-dump-5m","symbol":"BTCUSDT","feed":"Binance Spot","timeframe":"5m","localAt":"2026-07-24T13:00:00+05:00","utcAt":"2026-07-24T08:00:00Z","ohlc":{"open":65499.94,"high":65508.17,"low":65436.12,"close":65436.13},"mean":65292.69,"redLo":65652.60,"redHi":65910.89,"greenHi":64934.75,"greenLo":64680.29,"screenshotIndex":16},
+    {"id":"sol-4tf-4h","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"4h","localAt":"2026-07-25T17:00:00+05:00","utcAt":"2026-07-25T12:00:00Z","ohlc":{"open":73.92,"high":74.31,"low":73.78,"close":74.18},"mean":77.12,"redLo":82.92,"redHi":87.33,"greenHi":71.73,"greenLo":68.11,"screenshotIndex":17},
+    {"id":"sol-4tf-1h","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"1h","localAt":"2026-07-25T17:00:00+05:00","utcAt":"2026-07-25T12:00:00Z","ohlc":{"open":73.92,"high":73.99,"low":73.85,"close":73.97},"mean":76.47,"redLo":79.08,"redHi":81.00,"greenHi":73.94,"greenLo":72.19,"screenshotIndex":18},
+    {"id":"sol-4tf-15m","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"15m","localAt":"2026-07-25T17:00:00+05:00","utcAt":"2026-07-25T12:00:00Z","ohlc":{"open":73.92,"high":73.94,"low":73.87,"close":73.92},"mean":74.03,"redLo":74.92,"redHi":75.56,"greenHi":73.15,"greenLo":72.53,"screenshotIndex":19},
+    {"id":"sol-4tf-5m","symbol":"SOLUSDT","feed":"Binance Spot","timeframe":"5m","localAt":"2026-07-25T17:00:00+05:00","utcAt":"2026-07-25T12:00:00Z","ohlc":{"open":73.92,"high":73.94,"low":73.90,"close":73.92},"mean":73.97,"redLo":74.35,"redHi":74.62,"greenHi":73.60,"greenLo":73.34,"screenshotIndex":20}
+  ]
+}

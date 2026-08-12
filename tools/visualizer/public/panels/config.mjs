@@ -129,7 +129,7 @@ export function setEngineDefaults(d) {
 
 function collectUiState() {
 	const ids = ['poiDirection', 'poiLifecycle', 'poiPriority', 'poiMinStack', 'hmSide', 'hmMinWeight', 'hmGroup', 'hmAge', 'limit']
-	const checks = ['poiActiveOnly', 'poiLiqOnly', 'hmShowSwept', 'showEvents', 'showProtected']
+	const checks = ['poiActiveOnly', 'poiLiqOnly', 'hmShowSwept', 'showBosChoch', 'showProtected', 'showDeep', 'showOte']
 	const out = { fields: {}, checks: {}, engine: stored() }
 	for (const id of ids) out.fields[id] = $(id)?.value
 	for (const id of checks) out.checks[id] = $(id)?.checked

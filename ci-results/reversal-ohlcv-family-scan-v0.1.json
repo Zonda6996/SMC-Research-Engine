@@ -1,0 +1,687 @@
+{
+  "meta": {
+    "from": 1782345600000,
+    "until": 1785542400000,
+    "market": "spot"
+  },
+  "report": [
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "directional",
+      "label": "directional candle",
+      "n": 3,
+      "hit": 3,
+      "recall": 1
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "rsi-extreme",
+      "label": "RSI14 extreme",
+      "n": 3,
+      "hit": 1,
+      "recall": 0.3333333333333333
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "rsi-recovery",
+      "label": "RSI14 recovery",
+      "n": 3,
+      "hit": 1,
+      "recall": 0.3333333333333333
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "stoch-extreme",
+      "label": "Stochastic14 extreme",
+      "n": 3,
+      "hit": 1,
+      "recall": 0.3333333333333333
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "stoch-recovery",
+      "label": "Stochastic14 recovery",
+      "n": 3,
+      "hit": 2,
+      "recall": 0.6666666666666666
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "mfi-extreme",
+      "label": "MFI14 extreme",
+      "n": 3,
+      "hit": 2,
+      "recall": 0.6666666666666666
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "cci-extreme",
+      "label": "CCI20 extreme",
+      "n": 3,
+      "hit": 1,
+      "recall": 0.3333333333333333
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "range-extreme",
+      "label": "rolling range20 extreme",
+      "n": 3,
+      "hit": 1,
+      "recall": 0.3333333333333333
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "impulse-reversal",
+      "label": "12-bar impulse reversal",
+      "n": 3,
+      "hit": 2,
+      "recall": 0.6666666666666666
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "body-contraction",
+      "label": "body contraction vs previous",
+      "n": 3,
+      "hit": 2,
+      "recall": 0.6666666666666666
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "wick-reversal",
+      "label": "counter-wick > 50%",
+      "n": 3,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "volume-spike",
+      "label": "volume z-score > 2",
+      "n": 3,
+      "hit": 1,
+      "recall": 0.3333333333333333
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "15m",
+      "family": "volume-dryup",
+      "label": "volume below mean",
+      "n": 3,
+      "hit": 2,
+      "recall": 0.6666666666666666
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "directional",
+      "label": "directional candle",
+      "n": 5,
+      "hit": 5,
+      "recall": 1
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "rsi-extreme",
+      "label": "RSI14 extreme",
+      "n": 5,
+      "hit": 1,
+      "recall": 0.2
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "rsi-recovery",
+      "label": "RSI14 recovery",
+      "n": 5,
+      "hit": 2,
+      "recall": 0.4
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "stoch-extreme",
+      "label": "Stochastic14 extreme",
+      "n": 5,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "stoch-recovery",
+      "label": "Stochastic14 recovery",
+      "n": 5,
+      "hit": 1,
+      "recall": 0.2
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "mfi-extreme",
+      "label": "MFI14 extreme",
+      "n": 5,
+      "hit": 3,
+      "recall": 0.6
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "cci-extreme",
+      "label": "CCI20 extreme",
+      "n": 5,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "range-extreme",
+      "label": "rolling range20 extreme",
+      "n": 5,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "impulse-reversal",
+      "label": "12-bar impulse reversal",
+      "n": 5,
+      "hit": 1,
+      "recall": 0.2
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "body-contraction",
+      "label": "body contraction vs previous",
+      "n": 5,
+      "hit": 3,
+      "recall": 0.6
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "wick-reversal",
+      "label": "counter-wick > 50%",
+      "n": 5,
+      "hit": 1,
+      "recall": 0.2
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "volume-spike",
+      "label": "volume z-score > 2",
+      "n": 5,
+      "hit": 1,
+      "recall": 0.2
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tf": "1h",
+      "family": "volume-dryup",
+      "label": "volume below mean",
+      "n": 5,
+      "hit": 2,
+      "recall": 0.4
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "directional",
+      "label": "directional candle",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "rsi-extreme",
+      "label": "RSI14 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "rsi-recovery",
+      "label": "RSI14 recovery",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "stoch-extreme",
+      "label": "Stochastic14 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "stoch-recovery",
+      "label": "Stochastic14 recovery",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "mfi-extreme",
+      "label": "MFI14 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "cci-extreme",
+      "label": "CCI20 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "range-extreme",
+      "label": "rolling range20 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "impulse-reversal",
+      "label": "12-bar impulse reversal",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "body-contraction",
+      "label": "body contraction vs previous",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "wick-reversal",
+      "label": "counter-wick > 50%",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "volume-spike",
+      "label": "volume z-score > 2",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tf": "1h",
+      "family": "volume-dryup",
+      "label": "volume below mean",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "directional",
+      "label": "directional candle",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "rsi-extreme",
+      "label": "RSI14 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "rsi-recovery",
+      "label": "RSI14 recovery",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "stoch-extreme",
+      "label": "Stochastic14 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "stoch-recovery",
+      "label": "Stochastic14 recovery",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "mfi-extreme",
+      "label": "MFI14 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "cci-extreme",
+      "label": "CCI20 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "range-extreme",
+      "label": "rolling range20 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "impulse-reversal",
+      "label": "12-bar impulse reversal",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "body-contraction",
+      "label": "body contraction vs previous",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "wick-reversal",
+      "label": "counter-wick > 50%",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "volume-spike",
+      "label": "volume z-score > 2",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "30m",
+      "family": "volume-dryup",
+      "label": "volume below mean",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "directional",
+      "label": "directional candle",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "rsi-extreme",
+      "label": "RSI14 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "rsi-recovery",
+      "label": "RSI14 recovery",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "stoch-extreme",
+      "label": "Stochastic14 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "stoch-recovery",
+      "label": "Stochastic14 recovery",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "mfi-extreme",
+      "label": "MFI14 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "cci-extreme",
+      "label": "CCI20 extreme",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "range-extreme",
+      "label": "rolling range20 extreme",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "impulse-reversal",
+      "label": "12-bar impulse reversal",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "body-contraction",
+      "label": "body contraction vs previous",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "wick-reversal",
+      "label": "counter-wick > 50%",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "volume-spike",
+      "label": "volume z-score > 2",
+      "n": 1,
+      "hit": 0,
+      "recall": 0
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tf": "5m",
+      "family": "volume-dryup",
+      "label": "volume below mean",
+      "n": 1,
+      "hit": 1,
+      "recall": 1
+    }
+  ],
+  "aggregate": [
+    {
+      "family": "directional",
+      "label": "directional candle",
+      "n": 11,
+      "hit": 11,
+      "recall": 1
+    },
+    {
+      "family": "stoch-recovery",
+      "label": "Stochastic14 recovery",
+      "n": 11,
+      "hit": 6,
+      "recall": 0.5454545454545454
+    },
+    {
+      "family": "body-contraction",
+      "label": "body contraction vs previous",
+      "n": 11,
+      "hit": 6,
+      "recall": 0.5454545454545454
+    },
+    {
+      "family": "mfi-extreme",
+      "label": "MFI14 extreme",
+      "n": 11,
+      "hit": 5,
+      "recall": 0.45454545454545453
+    },
+    {
+      "family": "volume-dryup",
+      "label": "volume below mean",
+      "n": 11,
+      "hit": 5,
+      "recall": 0.45454545454545453
+    },
+    {
+      "family": "rsi-recovery",
+      "label": "RSI14 recovery",
+      "n": 11,
+      "hit": 3,
+      "recall": 0.2727272727272727
+    },
+    {
+      "family": "impulse-reversal",
+      "label": "12-bar impulse reversal",
+      "n": 11,
+      "hit": 3,
+      "recall": 0.2727272727272727
+    },
+    {
+      "family": "volume-spike",
+      "label": "volume z-score > 2",
+      "n": 11,
+      "hit": 3,
+      "recall": 0.2727272727272727
+    },
+    {
+      "family": "rsi-extreme",
+      "label": "RSI14 extreme",
+      "n": 11,
+      "hit": 2,
+      "recall": 0.18181818181818182
+    },
+    {
+      "family": "range-extreme",
+      "label": "rolling range20 extreme",
+      "n": 11,
+      "hit": 2,
+      "recall": 0.18181818181818182
+    },
+    {
+      "family": "wick-reversal",
+      "label": "counter-wick > 50%",
+      "n": 11,
+      "hit": 2,
+      "recall": 0.18181818181818182
+    },
+    {
+      "family": "stoch-extreme",
+      "label": "Stochastic14 extreme",
+      "n": 11,
+      "hit": 1,
+      "recall": 0.09090909090909091
+    },
+    {
+      "family": "cci-extreme",
+      "label": "CCI20 extreme",
+      "n": 11,
+      "hit": 1,
+      "recall": 0.09090909090909091
+    }
+  ]
+}

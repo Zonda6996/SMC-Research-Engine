@@ -1,0 +1,737 @@
+{
+  "protocol": {
+    "symbols": [
+      "BTC/USDT",
+      "ETH/USDT",
+      "SOL/USDT",
+      "XRP/USDT",
+      "BNB/USDT",
+      "DOGE/USDT",
+      "ADA/USDT",
+      "LINK/USDT"
+    ],
+    "from": "2020-07-01T00:00:00.000Z",
+    "until": "2026-07-30T00:00:00.000Z",
+    "split": "2025-01-01T00:00:00.000Z",
+    "zoneTf": "1h",
+    "confirmationTf": "15m",
+    "costPricePct": 0.001,
+    "selection": "max train mean net R after removing best 1%; test unseen",
+    "sameEntries": true,
+    "conservativeIntrabar": true
+  },
+  "rows": [
+    {
+      "variant": "time-80-e2e",
+      "family": "time",
+      "train": {
+        "n": 3887,
+        "wr": 0.749935683046051,
+        "mean": 0.0492198760078921,
+        "sum": 191.31765804267658,
+        "pf": 1.1934802741987396,
+        "maxDd": 22.049199513875266,
+        "meanTrim1": 0.012550345867562027,
+        "meanHold": 82.83020324157448
+      },
+      "test": {
+        "n": 1466,
+        "wr": 0.772169167803547,
+        "mean": 0.08174129027114431,
+        "sum": 119.83273153749755,
+        "pf": 1.3591649491605131,
+        "maxDd": 14.747794971135292,
+        "meanTrim1": 0.041334759306576485,
+        "meanHold": 106.26944065484311
+      }
+    }
+  ],
+  "selected": [
+    {
+      "variant": "time-80-e2e",
+      "family": "time",
+      "train": {
+        "n": 3887,
+        "wr": 0.749935683046051,
+        "mean": 0.0492198760078921,
+        "sum": 191.31765804267658,
+        "pf": 1.1934802741987396,
+        "maxDd": 22.049199513875266,
+        "meanTrim1": 0.012550345867562027,
+        "meanHold": 82.83020324157448
+      },
+      "test": {
+        "n": 1466,
+        "wr": 0.772169167803547,
+        "mean": 0.08174129027114431,
+        "sum": 119.83273153749755,
+        "pf": 1.3591649491605131,
+        "maxDd": 14.747794971135292,
+        "meanTrim1": 0.041334759306576485,
+        "meanHold": 106.26944065484311
+      }
+    }
+  ],
+  "slices": [
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "symbol:BTC/USDT",
+      "stats": {
+        "n": 394,
+        "wr": 0.748730964467005,
+        "mean": 0.0670272051255478,
+        "sum": 26.408718819465832,
+        "pf": 1.2575767902391466,
+        "maxDd": 10.40339614556504,
+        "meanTrim1": 0.04037702368875156,
+        "meanHold": 109.12182741116752
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "symbol:ETH/USDT",
+      "stats": {
+        "n": 418,
+        "wr": 0.7607655502392344,
+        "mean": 0.053846567290146044,
+        "sum": 22.507865127281047,
+        "pf": 1.2233499068115958,
+        "maxDd": 12.858368929783307,
+        "meanTrim1": 0.015794411901380638,
+        "meanHold": 103.05263157894737
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "symbol:SOL/USDT",
+      "stats": {
+        "n": 594,
+        "wr": 0.7525252525252525,
+        "mean": 0.07594019742136962,
+        "sum": 45.108477268293555,
+        "pf": 1.307964078494372,
+        "maxDd": 13.889496851014904,
+        "meanTrim1": 0.026731906192708637,
+        "meanHold": 53.47306397306397
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "symbol:XRP/USDT",
+      "stats": {
+        "n": 472,
+        "wr": 0.7690677966101694,
+        "mean": 0.055518674605649146,
+        "sum": 26.204814413866398,
+        "pf": 1.2328432064032924,
+        "maxDd": 12.322670323018826,
+        "meanTrim1": 0.017582010588459467,
+        "meanHold": 80.1292372881356
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "symbol:BNB/USDT",
+      "stats": {
+        "n": 439,
+        "wr": 0.7425968109339408,
+        "mean": 0.04881241526716067,
+        "sum": 21.428650302283536,
+        "pf": 1.1897256264490186,
+        "maxDd": 9.764632273551248,
+        "meanTrim1": 0.012727392067532383,
+        "meanHold": 107.67881548974943
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "symbol:DOGE/USDT",
+      "stats": {
+        "n": 469,
+        "wr": 0.7377398720682303,
+        "mean": -0.008874186000367911,
+        "sum": -4.1619932341725505,
+        "pf": 0.9668198246961781,
+        "maxDd": 19.43535750175872,
+        "meanTrim1": -0.04148022347944647,
+        "meanHold": 77.65458422174841
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "symbol:ADA/USDT",
+      "stats": {
+        "n": 529,
+        "wr": 0.7655954631379962,
+        "mean": 0.09039351229368717,
+        "sum": 47.81816800336051,
+        "pf": 1.3774620148296681,
+        "maxDd": 8.270629568169781,
+        "meanTrim1": 0.05334107062153898,
+        "meanHold": 81.06616257088847
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "symbol:LINK/USDT",
+      "stats": {
+        "n": 572,
+        "wr": 0.7255244755244755,
+        "mean": 0.010494680668353651,
+        "sum": 6.002957342298289,
+        "pf": 1.0371838165011054,
+        "maxDd": 17.73660621236196,
+        "meanTrim1": -0.028691592682149315,
+        "meanHold": 69.46153846153847
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "direction:long",
+      "stats": {
+        "n": 1689,
+        "wr": 0.7448194197750148,
+        "mean": 0.04831339335555971,
+        "sum": 81.60132137754034,
+        "pf": 1.1846701892037796,
+        "maxDd": 40.62006136496819,
+        "meanTrim1": 0.012426548059404748,
+        "meanHold": 85.54055654233274
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "direction:short",
+      "stats": {
+        "n": 2198,
+        "wr": 0.7538671519563239,
+        "mean": 0.04991644070297386,
+        "sum": 109.71633666513654,
+        "pf": 1.200597907262151,
+        "maxDd": 29.51328492103339,
+        "meanTrim1": 0.012740437791755,
+        "meanHold": 80.74749772520474
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2021-H1",
+      "stats": {
+        "n": 538,
+        "wr": 0.7323420074349443,
+        "mean": 0.06628569439988471,
+        "sum": 35.66170358713798,
+        "pf": 1.2458830371318879,
+        "maxDd": 16.504478086658608,
+        "meanTrim1": 0.00626641068168622,
+        "meanHold": 50.30297397769517
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2021-H2",
+      "stats": {
+        "n": 571,
+        "wr": 0.7460595446584939,
+        "mean": 0.05443412421873204,
+        "sum": 31.081884928895995,
+        "pf": 1.2103189909138103,
+        "maxDd": 14.318298834593907,
+        "meanTrim1": 0.015527563521630077,
+        "meanHold": 67.19789842381786
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2022-H1",
+      "stats": {
+        "n": 580,
+        "wr": 0.7275862068965517,
+        "mean": 0.025206226023268215,
+        "sum": 14.619611093495566,
+        "pf": 1.0909804247681536,
+        "maxDd": 18.278585068638346,
+        "meanTrim1": -0.0033748582565880326,
+        "meanHold": 69.6396551724138
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2022-H2",
+      "stats": {
+        "n": 486,
+        "wr": 0.7757201646090535,
+        "mean": 0.09023509584912892,
+        "sum": 43.854256582676655,
+        "pf": 1.3984974250079505,
+        "maxDd": 21.31320192927624,
+        "meanTrim1": 0.05584491685805134,
+        "meanHold": 98.52057613168725
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2023-H1",
+      "stats": {
+        "n": 345,
+        "wr": 0.808695652173913,
+        "mean": 0.1229308495546456,
+        "sum": 42.41114309635273,
+        "pf": 1.6309466197727347,
+        "maxDd": 7.551927109856599,
+        "meanTrim1": 0.08740606307582593,
+        "meanHold": 104.64057971014493
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2023-H2",
+      "stats": {
+        "n": 325,
+        "wr": 0.7538461538461538,
+        "mean": 0.01943691738057489,
+        "sum": 6.316998148686839,
+        "pf": 1.077665652302064,
+        "maxDd": 10.991845096534746,
+        "meanTrim1": -0.015976375089605727,
+        "meanHold": 126.62461538461538
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2024-H1",
+      "stats": {
+        "n": 465,
+        "wr": 0.7354838709677419,
+        "mean": -0.02162337288857713,
+        "sum": -10.054868393188366,
+        "pf": 0.9207857366200359,
+        "maxDd": 19.672303935258068,
+        "meanTrim1": -0.04650887250273843,
+        "meanHold": 85.8989247311828
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2024-H2",
+      "stats": {
+        "n": 577,
+        "wr": 0.7452339688041595,
+        "mean": 0.04753367244128122,
+        "sum": 27.426928998619264,
+        "pf": 1.1831177780329247,
+        "maxDd": 18.693618095219108,
+        "meanTrim1": 0.010749187227270583,
+        "meanHold": 88.49046793760832
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2025-H1",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2025-H2",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2026-H1",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "train",
+      "slice": "half:2026-H2",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "symbol:BTC/USDT",
+      "stats": {
+        "n": 99,
+        "wr": 0.7070707070707071,
+        "mean": -0.03747590389078085,
+        "sum": -3.7101144851873045,
+        "pf": 0.8680093167689854,
+        "maxDd": 8.590230585755029,
+        "meanTrim1": -0.059637555821532906,
+        "meanHold": 213.14141414141415
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "symbol:ETH/USDT",
+      "stats": {
+        "n": 158,
+        "wr": 0.7721518987341772,
+        "mean": 0.04495188566894233,
+        "sum": 7.102397935692888,
+        "pf": 1.1958636815291777,
+        "maxDd": 3.956593334748277,
+        "meanTrim1": 0.015816031693593382,
+        "meanHold": 109.51898734177215
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "symbol:SOL/USDT",
+      "stats": {
+        "n": 185,
+        "wr": 0.8,
+        "mean": 0.13262808778477564,
+        "sum": 24.536196240183493,
+        "pf": 1.691590356210444,
+        "maxDd": 4.138291150778073,
+        "meanTrim1": 0.10053646844904224,
+        "meanHold": 76.18378378378378
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "symbol:XRP/USDT",
+      "stats": {
+        "n": 211,
+        "wr": 0.7772511848341233,
+        "mean": 0.11201747828862399,
+        "sum": 23.635687918899663,
+        "pf": 1.4985204378384633,
+        "maxDd": 6.31506725458228,
+        "meanTrim1": 0.03823917306199957,
+        "meanHold": 95.22274881516587
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "symbol:BNB/USDT",
+      "stats": {
+        "n": 148,
+        "wr": 0.7297297297297297,
+        "mean": 0.02315873517332076,
+        "sum": 3.4274928056514726,
+        "pf": 1.0871814347652717,
+        "maxDd": 8.48148008131256,
+        "meanTrim1": -0.00788375915933831,
+        "meanHold": 207.3783783783784
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "symbol:DOGE/USDT",
+      "stats": {
+        "n": 193,
+        "wr": 0.7357512953367875,
+        "mean": 0.021626435148391254,
+        "sum": 4.173901983639512,
+        "pf": 1.0800492673431414,
+        "maxDd": 9.996903293266296,
+        "meanTrim1": -0.025371134262073568,
+        "meanHold": 83.46113989637306
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "symbol:ADA/USDT",
+      "stats": {
+        "n": 244,
+        "wr": 0.7868852459016393,
+        "mean": 0.10664913350983868,
+        "sum": 26.022388576400637,
+        "pf": 1.4944281963344332,
+        "maxDd": 7.679374455813647,
+        "meanTrim1": 0.05138536234541022,
+        "meanHold": 79.54918032786885
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "symbol:LINK/USDT",
+      "stats": {
+        "n": 228,
+        "wr": 0.8157894736842105,
+        "mean": 0.15195079193954905,
+        "sum": 34.644780562217186,
+        "pf": 1.8191276816354571,
+        "maxDd": 3.771770421971488,
+        "meanTrim1": 0.11263874546479553,
+        "meanHold": 74.51754385964912
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "direction:long",
+      "stats": {
+        "n": 679,
+        "wr": 0.7422680412371134,
+        "mean": 0.009885311592267207,
+        "sum": 6.712126571149433,
+        "pf": 1.0387294350869738,
+        "maxDd": 29.52806011902753,
+        "meanTrim1": -0.020017266835127185,
+        "meanHold": 112.37407952871871
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "direction:short",
+      "stats": {
+        "n": 787,
+        "wr": 0.7979669631512071,
+        "mean": 0.14373647390895564,
+        "sum": 113.12060496634808,
+        "pf": 1.7055289352628429,
+        "maxDd": 15.035135836221873,
+        "meanTrim1": 0.09476119181667125,
+        "meanHold": 101.002541296061
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2021-H1",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2021-H2",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2022-H1",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2022-H2",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2023-H1",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2023-H2",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2024-H1",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2024-H2",
+      "stats": {
+        "n": 0,
+        "wr": 0,
+        "mean": 0,
+        "sum": 0,
+        "pf": null,
+        "maxDd": 0,
+        "meanTrim1": 0,
+        "meanHold": 0
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2025-H1",
+      "stats": {
+        "n": 512,
+        "wr": 0.765625,
+        "mean": 0.10532554800306645,
+        "sum": 53.926680577570025,
+        "pf": 1.4504155106793668,
+        "maxDd": 10.903980638801393,
+        "meanTrim1": 0.052031515392113495,
+        "meanHold": 93.71875
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2025-H2",
+      "stats": {
+        "n": 476,
+        "wr": 0.8025210084033614,
+        "mean": 0.11442743848622747,
+        "sum": 54.467460719444276,
+        "pf": 1.5674183602210876,
+        "maxDd": 9.85774783463583,
+        "meanTrim1": 0.07489020500931091,
+        "meanHold": 93.9873949579832
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2026-H1",
+      "stats": {
+        "n": 414,
+        "wr": 0.7584541062801933,
+        "mean": 0.0334297295632203,
+        "sum": 13.839908039173205,
+        "pf": 1.1340057027266437,
+        "maxDd": 14.747794971135278,
+        "meanTrim1": -0.00028759403438693607,
+        "meanHold": 118.42270531400966
+      }
+    },
+    {
+      "variant": "time-80-e2e",
+      "period": "test",
+      "slice": "half:2026-H2",
+      "stats": {
+        "n": 64,
+        "wr": 0.6875,
+        "mean": -0.037520590604530946,
+        "sum": -2.4013177986899805,
+        "pf": 0.8360414079117366,
+        "maxDd": 9.068169278041061,
+        "meanTrim1": -0.06558787639639198,
+        "meanHold": 219.40625
+      }
+    }
+  ]
+}

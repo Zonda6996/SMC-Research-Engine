@@ -1,0 +1,5 @@
+const num=(x,fallback=0)=>Number.isFinite(Number(x))?Number(x):fallback
+export function withZoneRank(item,zone){return{...item,zoneActive:Boolean(zone?.active),zoneValid:Boolean(zone?.valid),zoneLifecycleState:zone?.lifecycleState??null,zoneLastContributionAt:zone?.lastContributionAt??item.knownAt??0}}
+export function zoneDistance(item,price){if(!Number.isFinite(Number(price)))return Number.POSITIVE_INFINITY;const p=Number(price),lo=Math.min(num(item.near),num(item.far)),hi=Math.max(num(item.near),num(item.far));return p<lo?lo-p:p>hi?p-hi:0}
+function current(item,now){if(item.outcome==='open'||item.rejectionReason==='data-end')return true;return Boolean(item.zoneActive&&item.zoneValid&&!item.spentReason&&(item.endAt==null||num(item.endAt)>=num(now))) }
+export function sortZoneTrades(items,price,now){return[...items].sort((a,b)=>Number(current(b,now))-Number(current(a,now))||zoneDistance(a,price)-zoneDistance(b,price)||num(b.zoneLastContributionAt,b.knownAt)-num(a.zoneLastContributionAt,a.knownAt)||num(b.entryAt??b.touchAt??b.knownAt)-num(a.entryAt??a.touchAt??a.knownAt)||String(a.poiId??'').localeCompare(String(b.poiId??'')))}

@@ -1,0 +1,204 @@
+{
+  "version": "ggi-own2-expectancy-ranker-v1",
+  "protocol": {
+    "sha": "61f4eed2e5d1732a34c69ab48b5f3a3e0994d7c30fef215f1787e7fb31ee29e0",
+    "fitSplit": 10065,
+    "validationSplit": 14091,
+    "costBpsPerSide": 6,
+    "retentionLevels": [
+      0.1,
+      0.2,
+      0.35
+    ],
+    "featureNames": [
+      "bodyRatio",
+      "episodeAge",
+      "recoveryInner",
+      "directionalCloseLocation",
+      "meanGapInner",
+      "innerWidthRatio",
+      "extensionRatio",
+      "directionalMeanSlope"
+    ]
+  },
+  "fit": {
+    "candidates": 1455,
+    "globalMean": 0.029811345535767586
+  },
+  "validation": [
+    {
+      "retention": 0.1,
+      "cutoff": 0.06276478262470493,
+      "summary": {
+        "signals": 40,
+        "closed": 40,
+        "meanGrossR": 0.1031941153545787,
+        "meanNetR": 0.09317888929116419,
+        "pfNet": 1.3306671872613387,
+        "winRate": 0.65,
+        "partial": 10,
+        "stop": 4,
+        "full": 26,
+        "best1RemovedNetR": 0.07389242426350326
+      }
+    },
+    {
+      "retention": 0.2,
+      "cutoff": 0.05087683826284204,
+      "summary": {
+        "signals": 62,
+        "closed": 62,
+        "meanGrossR": 0.07989176301699565,
+        "meanNetR": 0.0698912710950576,
+        "pfNet": 1.2347272073252085,
+        "winRate": 0.6290322580645161,
+        "partial": 17,
+        "stop": 6,
+        "full": 39,
+        "best1RemovedNetR": 0.05738514405394357
+      }
+    },
+    {
+      "retention": 0.35,
+      "cutoff": 0.03788925513805964,
+      "summary": {
+        "signals": 90,
+        "closed": 90,
+        "meanGrossR": 0.12445773036190029,
+        "meanNetR": 0.11459199623060203,
+        "pfNet": 1.4230157196418256,
+        "winRate": 0.6666666666666666,
+        "partial": 22,
+        "stop": 8,
+        "full": 60,
+        "best1RemovedNetR": 0.1069373280198614
+      }
+    }
+  ],
+  "winner": {
+    "retention": 0.35,
+    "cutoff": 0.03788925513805964,
+    "summary": {
+      "signals": 90,
+      "closed": 90,
+      "meanGrossR": 0.12445773036190029,
+      "meanNetR": 0.11459199623060203,
+      "pfNet": 1.4230157196418256,
+      "winRate": 0.6666666666666666,
+      "partial": 22,
+      "stop": 8,
+      "full": 60,
+      "best1RemovedNetR": 0.1069373280198614
+    }
+  },
+  "test": {
+    "broad": {
+      "signals": 215,
+      "closed": 194,
+      "meanGrossR": 0.025413829306591307,
+      "meanNetR": 0.013079147008026431,
+      "pfNet": 1.0407101380298285,
+      "winRate": 0.6030927835051546,
+      "partial": 61,
+      "stop": 16,
+      "full": 117,
+      "best1RemovedNetR": 0.0033528338781428856
+    },
+    "selected": {
+      "signals": 118,
+      "closed": 104,
+      "meanGrossR": 0.03708368050826617,
+      "meanNetR": 0.024463795793203215,
+      "pfNet": 1.0728179389039871,
+      "winRate": 0.5961538461538461,
+      "partial": 30,
+      "stop": 12,
+      "full": 62,
+      "best1RemovedNetR": 0.0056985309930408555
+    },
+    "null": {
+      "signals": 118,
+      "closed": 109,
+      "meanGrossR": 0.03724157014302622,
+      "meanNetR": 0.025252408849598642,
+      "pfNet": 1.0861648876523082,
+      "winRate": 0.6330275229357798,
+      "partial": 33,
+      "stop": 7,
+      "full": 69,
+      "best1RemovedNetR": 0.008817404320294417
+    },
+    "selectedSignals": 118
+  },
+  "transfers": [
+    {
+      "id": "xrp-3m",
+      "summary": {
+        "signals": 469,
+        "closed": 465,
+        "meanGrossR": -0.07291212323942706,
+        "meanNetR": -0.16267264698709935,
+        "pfNet": 0.6205145007732554,
+        "winRate": 0.5053763440860215,
+        "partial": 187,
+        "stop": 43,
+        "full": 235,
+        "best1RemovedNetR": -0.17515483832524
+      },
+      "signals": 469
+    },
+    {
+      "id": "ondo-2h",
+      "summary": {
+        "signals": 238,
+        "closed": 224,
+        "meanGrossR": 0.04659516222511263,
+        "meanNetR": 0.04186765060435887,
+        "pfNet": 1.1348145544915134,
+        "winRate": 0.5982142857142857,
+        "partial": 77,
+        "stop": 13,
+        "full": 134,
+        "best1RemovedNetR": 0.030525072516935706
+      },
+      "signals": 238
+    },
+    {
+      "id": "ondo-15m",
+      "summary": {
+        "signals": 345,
+        "closed": 333,
+        "meanGrossR": 0.1309818339345879,
+        "meanNetR": 0.11408743655253213,
+        "pfNet": 1.418940023883873,
+        "winRate": 0.6576576576576577,
+        "partial": 95,
+        "stop": 19,
+        "full": 219,
+        "best1RemovedNetR": 0.10398531836435301
+      },
+      "signals": 345
+    },
+    {
+      "id": "btc-15m",
+      "summary": {
+        "signals": 445,
+        "closed": 439,
+        "meanGrossR": -0.032654946216617076,
+        "meanNetR": -0.07208178649830141,
+        "pfNet": 0.8112192553194081,
+        "winRate": 0.5489749430523918,
+        "partial": 151,
+        "stop": 47,
+        "full": 241,
+        "best1RemovedNetR": -0.08366616170266332
+      },
+      "signals": 445
+    }
+  ],
+  "aggregate": {
+    "pooledTransferMeanNetR": -0.041011098572474966,
+    "positiveTransfers": 2,
+    "verdict": "REJECT OWN2 V1"
+  }
+}

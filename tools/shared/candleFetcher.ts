@@ -18,6 +18,7 @@ export const MAX_CANDLES_LTF = 60_000
 
 export const TF_MS: Record<string, number> = {
 	'1m': 60_000,
+	'3m': 180_000,
 	'5m': 300_000,
 	'15m': 900_000,
 	'30m': 1_800_000,
@@ -32,14 +33,24 @@ export const TF_MS: Record<string, number> = {
 
 export type MarketKind = 'spot' | 'futures'
 
-/**
- * §14.1 (решение пользователя, 25.07.2026): лестница «ТФ зоны → ТФ уточнённого подтверждения».
- * Включены связки 1D→1h, 4h→15m (исходная), 1h→5m; 1W→4h отложена (недельных баров ~360 за всю
- * историю — shelfFreshBars=300 теряет смысл, N зон мизерный). Константы движков остаются В БАРАХ
- * своего ТФ без пер-ТФ скейлинга: фазы метода — структурная работа, а не время; соотношение
- * conf-баров на бар зоны почти константно по лестнице (24:1 / 16:1 / 12:1).
- */
-export const CONFIRMATION_TF: Record<string, string> = { '1d': '1h', '4h': '15m', '1h': '5m' }
+/** §14.1: первый TF после `/` — упрощённое подтверждение. */
+export const SIMPLIFIED_CONFIRMATION_TF: Readonly<Record<string, string>> = {
+	'1w': '1d',
+	'1d': '4h',
+	'4h': '1h',
+	'1h': '15m',
+}
+
+/** §14.1: второй TF после `/` — уточнённое подтверждение. */
+export const REFINED_CONFIRMATION_TF: Readonly<Record<string, string>> = {
+	'1w': '4h',
+	'1d': '1h',
+	'4h': '15m',
+	'1h': '5m',
+}
+
+/** @deprecated Использовать REFINED_CONFIRMATION_TF с явным названием режима. */
+export const CONFIRMATION_TF = REFINED_CONFIRMATION_TF
 
 /**
  * Постраничная загрузка: Binance отдаёт максимум 1000 свечей за запрос,
@@ -65,27 +76,34 @@ export async function fetchCandlesPaginated(
 	const tfMs = TF_MS[timeframe]
 	if (!tfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
 
+	// Для 45m и 3h (не поддерживаются Binance API) качаем младший ТФ и агрегируем
+	let fetchTf = timeframe
+	let multiplier = 1
+	if (timeframe === '45m') { fetchTf = '15m'; multiplier = 3 }
+	if (timeframe === '3h') { fetchTf = '1h'; multiplier = 3 }
+	const fetchTfMs = TF_MS[fetchTf]!
+
 	const { default: ccxt } = await import('ccxt')
 	const exchange = market === 'futures' ? new ccxt.binanceusdm() : new ccxt.binance()
 	const end = untilMs ?? Date.now()
-	const since = Math.max(0, end - capped * tfMs)
+	const since = Math.max(0, end - (capped * multiplier * fetchTfMs))
 
 	// Страницы известны заранее (окно since..end фиксировано), поэтому качаем
 	// их параллельными пачками и дедуплицируем по timestamp: у коротких
 	// историй ранние страницы возвращают один и тот же левый край данных.
 	const pageStarts: number[] = []
-	for (let cursor = since; cursor < end; cursor += BINANCE_PAGE_LIMIT * tfMs) pageStarts.push(cursor)
+	for (let cursor = since; cursor < end; cursor += BINANCE_PAGE_LIMIT * fetchTfMs) pageStarts.push(cursor)
 	const byTs = new Map<number, number[]>()
 	const PARALLEL_PAGES = 6
 	for (let i = 0; i < pageStarts.length; i += PARALLEL_PAGES) {
 		const pages = await Promise.all(pageStarts.slice(i, i + PARALLEL_PAGES).map((start) =>
-			exchange.fetchOHLCV(symbol, timeframe, start, BINANCE_PAGE_LIMIT)))
+			exchange.fetchOHLCV(symbol, fetchTf, start, BINANCE_PAGE_LIMIT)))
 		for (const page of pages) for (const row of page as number[][]) byTs.set(Number(row[0]), row as number[])
 	}
 	const all = [...byTs.values()].sort((a, b) => Number(a[0]!) - Number(b[0]!))
 
 	const bounded = all.filter((row) => Number(row[0]) < end)
-	return bounded.slice(-capped).map(([timestamp, open, high, low, close, volume]) => ({
+	let rawCandles = bounded.map(([timestamp, open, high, low, close, volume]) => ({
 		timestamp: Number(timestamp),
 		open: Number(open),
 		high: Number(high),
@@ -93,6 +111,11 @@ export async function fetchCandlesPaginated(
 		close: Number(close),
 		volume: Number(volume),
 	}))
+	
+	if (multiplier > 1) {
+		rawCandles = aggregateCandles(rawCandles, fetchTf, timeframe)
+	}
+	return rawCandles.slice(-capped)
 }
 
 /**

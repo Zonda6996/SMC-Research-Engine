@@ -1,0 +1,76 @@
+{
+  "generation": "independent-reversal-edge-g2",
+  "version": "independent-reversal-g2-protocol-1.0-preregistered",
+  "createdBeforeFirstG2ProfitabilityRun": true,
+  "discoveryWarning": "ZC5 and OWN2b are development-only observations, not holdout evidence",
+  "variants": ["EXT", "EXT_POOL", "OWN1_POOL", "EXT_POOL_SEQ", "G1", "MATCHED_NULL"],
+  "candidate": {
+    "warmupBars": 220,
+    "extensionPenetrationMin": -0.35,
+    "extensionDistanceMeanPctMin": 3,
+    "extensionRelativeVolumeMin": 1.4,
+    "relativeVolumePeriod": 20,
+    "own1BodySmaPeriod": 20,
+    "own1BodyMultiple": 1.5,
+    "own1MeanDroughtBars": 10,
+    "own1SideCooldownBars": 40,
+    "opportunityCooldownBars": 3
+  },
+  "pool": {
+    "contextTimeframeMinutes": 240,
+    "minimumHistoryBars": 300,
+    "minimumAgeHours": 48,
+    "sweepRecencyHours": 24,
+    "maximumNotionalRank": 0.6666666666666666,
+    "requireStrictBandEntry": true
+  },
+  "sequence": {
+    "lookbacks": [8, 16, 32],
+    "minimumScore": 3,
+    "failedContinuationLookback": 8,
+    "meanSlopeLookback": 8,
+    "contractionLookback": 16
+  },
+  "execution": {
+    "entry": "next-bar-open",
+    "stopMultiplier": 12,
+    "partialFraction": 0.25,
+    "breakEven": "next-bar-entry",
+    "full": "moving-opposite-inner-close",
+    "ambiguousBar": "stop-first",
+    "maxHoldingBars": 2000,
+    "baseOneWayCostBps": 6,
+    "stressOneWayCostBps": [9, 12],
+    "addEnabledPrimary": false
+  },
+  "validation": {
+    "discoverySymbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "BNBUSDT", "DOGEUSDT", "ADAUSDT", "LINKUSDT", "LTCUSDT", "AVAXUSDT", "DOTUSDT", "ATOMUSDT"],
+    "transferSymbols": ["BCHUSDT", "ETCUSDT", "UNIUSDT", "FILUSDT", "NEARUSDT", "APTUSDT"],
+    "baseTimeframe": "1h",
+    "contextTimeframe": "4h",
+    "transferFrom": "2024-01-01",
+    "transferUntil": "2026-08-01",
+    "monthBlockFolds": 4,
+    "minimumFoldMonths": 4,
+    "sealedRule": "single-open-after-config-hash"
+  },
+  "gates": {
+    "minimumOosTrades": 100,
+    "minimumMeanNetR": 0.05,
+    "minimumProfitFactor": 1.2,
+    "minimumStressMeanNetR": 0,
+    "minimumStressProfitFactor": 1.05,
+    "minimumNullAdvantageR": 0.04,
+    "minimumNonNegativeCellShare": 0.7,
+    "minimumPositiveTransferCells": 3,
+    "maximumSingleSymbolPositiveContribution": 0.35,
+    "maximumPortfolioDrawdownPct": 15,
+    "minimumBestOnePercentRemovedR": 0
+  },
+  "prohibitions": {
+    "symbolOrTimeframeFeatures": true,
+    "postHocVariantAddition": true,
+    "productionWiringBeforePromotion": true,
+    "sealedDataForWinnerSelection": true
+  }
+}

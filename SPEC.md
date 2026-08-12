@@ -1593,3 +1593,145 @@ ADA 45m risk (единственный минусовой пример, кото
 | `tmp/diag/ggiZone2.ts`, `tmp/diag/ggiSystem.ts` | `tmp/diag/apex.ts`, `tmp/diag/reversal.ts` |
 
 Версии движков после переименования бампаются: `apex-1.0-vendor-params`, `reversal-1.0-outer-edge`. В `SimplifiedConfirmationEngine` версия становится `simplified-confirmation-0.6-apex-veto`, пресеты — `SIMPLIFIED_APEX_VETO_PRESET` (бывший `..._V4`, вето по заходу в зону) и `SIMPLIFIED_REVERSAL_VETO_PRESET` (бывший `..._VENDOR_SIGNAL_PRESET`, вето по сигналу).
+
+
+## 16.33 Zonda Apex и Zonda Reversal — разделение движков и калиброванные полосы (29.07.2026)
+
+Приватное имя удалено из исполняемого кода и интерфейса. Полосы называются **Zonda Apex**, сигналы — **Zonda Reversal**; это два независимо включаемых слоя и два отдельных блока payload.
+
+### Apex: apex-1.0-calibrated-log-alma
+
+По 14 историческим якорям Binance Spot BTC 5m/15m/4h и ETH 1h установлено: mean = ALMA(hlc3, 200, 0.85, 6); границы логарифмические: mean × exp(±k×s), где k=5.6/9.6. Средняя переносится на внешние BTC 15m / ETH 1h с ошибкой 0.024% / 0.269%. Закрытая мера ширины восстановлена устойчивой аппроксимацией s = ALMA(TR/close, 122, 0.625, 3.5); максимальная наблюдаемая cross-symbol ошибка ширины около 4%, поэтому это не объявляется точной формулой вендора.
+
+### Reversal: reversal-1.0-directional-candle
+
+Reversal больше не равен касанию полосы. Край Apex взводит ожидание, после чего BUY разрешён только на бычьей свече (close>open), SELL — только на медвежьей (close<open). После сигнала сторона перевзводится возвратом к средней. Это минимальная модель по наблюдениям пользователя; дополнительные фильтры не вводились без данных. Результаты §16.29–16.30 подлежат повторной проверке, потому что прежняя реализация ставила метку непосредственно по касанию края.
+
+### Совместимость
+
+Временный GgiZoneEngine.ts удалён после перевода потребителей. SimplifiedConfirmationEngine получил поля apexVetoBars/apexParams, версию simplified-confirmation-0.6-apex-veto и пресеты SIMPLIFIED_APEX_VETO_PRESET / SIMPLIFIED_REVERSAL_VETO_PRESET. Дефолт вето остаётся выключенным; дефолты POI, heatmap и подтверждений не менялись.
+
+
+## 16.34 TV-настройки Zonda Apex / Reversal (29.07.2026)
+
+Apex и Reversal имеют независимые слои. Apex получает реальные server-side входы source/lookback/kInner/kOuter; канон остаётся hlc3/200/5.6/9.6. Стиль каждой из пяти линий, двух заливок и меток ценовой шкалы меняется без пересчёта и хранится локально. Reversal отдельно управляет BUY/SELL и режимом Safe/Standard/Risk; режим пока не меняет триггер до отдельной калибровки. Боковая панель 420 px, при узком desktop не меньше 400 px.
+
+
+## 16.35 Независимые слои Apex/Reversal и дизайн-система (30.07.2026)
+
+Apex/Reversal вынесены из Подтверждения в самостоятельную TV-style секцию. Inputs пересчитываются явно, Style применяется сразу; пять линий имеют отдельные видимость, системный цвет и толщину. Общий renderer восстанавливает слои после trades/zones/heatmap. Safe/Standard/Risk до калибровки не меняет триггер.
+
+
+## 16.36 Снап MTF-зон к шкале отображаемых свечей (30.07.2026)
+
+Визуальные t1/t2 слоёных зон снапаются к ближайшим существующим timestamps текущей candle series: начало вперёд, конец назад. Модельные времена и торговая логика не изменяются.
+
+
+### §16.37 — Индикаторы на фактическом ряду графика
+
+- Zonda Apex и Zonda Reversal считаются отдельно для основного ряда, ряда текущего подтверждения и каждого MTF-слоя.
+- Renderer получает payload именно того ряда свечей, который сейчас показан; перенос сигналов между ТФ запрещён.
+- Пользовательские Apex overrides едины для всех рядов и применяются одновременно к полосам и Reversal.
+- Timestamp каждой полосы и сигнала обязан принадлежать исходному ряду соответствующего payload.
+
+
+### §16.38 — Порядок сделок от текущих зон
+
+- Навигация уточнённого и упрощённого подтверждения показывает сначала открытые сделки, живые попытки и сделки активных валидных зон.
+- Внутри этой группы порядок: минимальная дистанция текущей цены до диапазона зоны → более свежее последнее пополнение полки → более новое событие сделки → стабильный идентификатор зоны.
+- Закрытые исторические зоны не скрываются и идут после актуальных; порогов расстояния и иных новых magic numbers нет.
+
+
+### §16.39 — Явные таймфреймы зон
+
+- Каждая движковая зона показывает ТФ зоны в списке, подписи прямоугольника и карточке деталей, включая контекстные зоны текущего графика.
+- Уточнённое и упрощённое подтверждение показывают пару «ТФ зоны → ТФ подтверждения» в статусе, прямоугольнике и деталях сделки.
+- Формат TF единый и заметный: 1D, 4H, 1H, 15M, 5M; геометрия и логика движков не меняются.
+
+
+## 16.40 Archive OI: полная история heatmap без Binance API (30.07.2026)
+
+- Binance USD-M `daily/metrics` доступен через `data.binance.vision`; `monthly/metrics` отсутствует (404).
+- Добавлен `tools/shared/archiveMetrics.ts`: parser по именам колонок, дневной дисковый кэш, retry/fail-soft и каузальное выравнивание последней точки `<=` времени свечи. Нативный шаг metrics — 5m; перенос протухает после двух шагов.
+- CI на 2026-05-01..2026-07-29, 15m: BTC/ETH/SOL/XRP получили 99.99% покрытия (8543/8544 свечи каждый). OI-hybrid изменил число полос относительно volume fallback на всех активах.
+- В visualizer свежий API-ряд имеет приоритет на перекрытии, архив заполняет остальную историю; ошибка архива сохраняет API/volume fallback. Формула и дефолты `liquidity-heatmap-2.0-oi-hybrid` пока не менялись.
+- Это доказательство data path, не predictive edge. До bump 2.1 нужен magnet hit-rate против distance-matched control.
+
+## 16.41 Zonda Reversal baseline: edge не подтверждён (30.07.2026)
+
+- Архивы Futures 2023-01-01..2026-07-29; BTC/ETH/SOL/XRP; 5m/15m/1h; split 2025-01-01; round-trip cost 0.10%.
+- Проверены 14 комбинаций inner/outer edge, touch/directional/reclaim confirmation и mean/inner re-arm. Отбор только по train.
+- Все 14 комбинаций отрицательны net уже на train и остаются отрицательными на untouched test. Текущий `outer/directional/mean`, horizon 12: train −0.105% (n=2991), test −0.199% (n=2151).
+- Лучший train-вариант `outer/touch/inner`: train −0.051%, test −0.211%. Safe/Standard/Risk не маппить и production defaults не менять: точная vendor-формула неизвестна, исследовательский edge отсутствует.
+
+
+## 16.42 Post-partial time-stop: exit-only edge подтверждён, включение отложено (30.07.2026)
+
+- Протокол: BTC/ETH/SOL/XRP/BNB/DOGE/ADA/LINK; 1h зоны → 15m simplified; 2021–2024 train, 2025–2026 untouched test; 5305 одинаковых входов и стопов; cost 0.10% цены; same-bar stop раньше цели.
+- Baseline 12R зависит от хвоста: train E +0.076R, но ex-top1% −0.016R; test +0.104R, ex-top1% +0.010R; DD 49.410R.
+- После исправления семантики таймер считается от бара PARTIAL. Train выбрал 80 полных 15m-баров: train +0.063R, ex-top1% +0.020R; untouched test +0.089R, ex-top1% +0.046R, PF 1.389, DD 13.424R. Диапазон 64–128 остаётся положительным, поэтому результат не является одиночным пиком.
+- Движок v0.7 поддерживает postPartialTimeStopBars и outcome/event TIME. 0 выключает механику; существующие дефолты и пресеты не изменены.
+- Включение в SIMPLIFIED_APEX_VETO_PRESET отложено: exit-only replay замораживал входы, а более ранний выход при reentry может породить дополнительные входы. Сначала нужен отдельный end-to-end replay с реальным жизненным циклом зоны.
+
+
+## 16.43 Post-partial time-stop включён в Apex-пресет после end-to-end проверки (30.07.2026)
+
+- End-to-end replay включил postPartialTimeStopBars=80 непосредственно в SimplifiedConfirmationEngine, поэтому раннее освобождение позиции могло создавать дополнительные re-entry. Число сделок изменилось с 3856/1449 до 3887/1463 (train/test).
+- Результат с реальным lifecycle: train E +0.049R, ex-top1% +0.013R; untouched test E +0.082R, ex-top1% +0.041R, PF 1.358, DD 14.748R.
+- Против baseline 12R raw test mean и PF ниже (+0.104R, PF 1.457), но tail-robust test mean выше (+0.041R против +0.010R), а DD ниже в 3.35 раза (14.748R против 49.410R). Train ex-top1% меняет знак с −0.016R на +0.013R.
+- SIMPLIFIED_APEX_VETO_PRESET включает 80 баров. Для канонической связки 1h→15m это 20 часов после PARTIAL. SIMPLIFIED_CONFIRMATION_CONFIG остаётся с 0, а SIMPLIFIED_HIGH_WR_PRESET не изменён.
+- Версия: simplified-confirmation-0.8-time-stop-preset.
+
+## 16.44 Раздельный routing simplified/refined по §14.1 (30.07.2026)
+
+- Исправлена архитектурная ошибка: один `CONFIRMATION_TF` использовался одновременно для обоих движков. Теперь `SIMPLIFIED_CONFIRMATION_TF` содержит первый TF после `/`, `REFINED_CONFIRMATION_TF` — второй: 1W→1D/4h, 1D→4h/1h, 4h→1h/15m, 1h→15m/5m.
+- Visualizer server строит раздельные candle series, results и indicator payload для simplified/refined; панель выбирает их по `confEngine`. Тесты фиксируют все четыре строки и server/UI wiring.
+- Старый end-to-end результат 1h-зон на 15m confirmation воспроизведён только как контроль старого протокола: train n=3887, E +0.049R, ex-top1% +0.013R; test n=1466, E +0.082R, ex-top1% +0.041R, PF 1.359, DD 14.748R. Небольшое отличие test n от прежних 1463 связано с правой границей данных 30.07.2026, а не с новым TF routing.
+- Этот контроль НЕ является новым результатом corrected 1h→15m simplified ladder на общей логике проекта — он как раз соответствует этой строке. Для 4h→1h, 1D→4h и 1W→1D нужны отдельные replay; 80 баров означают соответственно 80 часов, 320 часов и 80 дней после partial. До этих replay переносить старую оценку time-stop на другие строки запрещено.
+- Browser QA: Deep/OTE markers выключены по умолчанию, BOS/CHoCH включён, protected отдельно; duplicate DOM id и JS errors отсутствуют. TIME проверен на синтетической сделке с реальной подменой ряда.
+- Баг последовательности Zones→Heatmap→Confirmation→закрыть Heatmap→закрыть Confirmation формализован. На fixture и синтетическом LTF текущая версия корректно вернула `mainShown=true` и исходный range; реальный визуальный дефект не объявлен исправленным и требует сохранённого payload, на котором проявляется.
+
+## 16.45 Восстановление chart range, Heatmap primitive и новые наблюдения Apex/Reversal (30.07.2026)
+
+- Исправлена сопутствующая ошибка: до подмены candle series сохранялся logical range в индексах баров, а после Confirmation те же индексы применялись к main series другого размера/TF. Теперь сохраняется timestamp visible range; browser regression 500 main bars → 2000 confirmation bars → main дал drift 0. Однако повторный пользовательский QA на реальных данных показал, что визуальный Б1 остался. Следовательно, это не полный root cause; Б1 остаётся открытым и по просьбе пользователя временно отложен.
+- Heatmap больше не создаёт до 400 отдельных `LineSeries`; все полосы рисуются одним canvas primitive. На fixture 38 bands не увеличили overlay-series count (14→14), headless rAF показал 62 кадра за секунду. Это исправляет архитектурный источник лагов, но не является гарантией FPS для любой машины/истории.
+- Новый BTC Spot TV anchor: 27.07.2026 01:00 Казахстан = 26.07 20:00 UTC, одинаковый bar-open на 4h/1h/15m/5m. Текущая Apex approximation дала mean error −0.205% / +0.058% / +0.002% / +0.017%, width error +1.45% / +5.53% / +7.98% / −0.95%. Feed сравнен spot-to-spot, поэтому futures basis здесь исключён. Defaults не меняются по одной дате.
+- Гайд автора подтверждает менеджмент Reversal: Safe/Risk используют dynamic partial на Apex mean, BE после partial и dynamic full на противоположной Apex zone; Risk сокращает add/stop. Standard фиксирует entry/add/stop/take и не двигает уровни. Эти правила относятся к trade plan/position manager и не раскрывают signal formula; detector остаётся отдельной задачей.
+
+## 16.46 Apex sigma=4: cross-symbol/cross-TF OOS и воспроизводимые exact exports (01.08.2026)
+
+- На exact Bybit BTCUSDT.P 15m/1h выбран кандидат ширины `ALMA(TR/close, 122, 0.625, 4)`: средний width MAE 1.93% против 2.16% у sigma=3.5.
+- Без повторного подбора sigma=4 улучшила width MAE на каждом новом наборе: ETH Futures 15m 2.38→2.13%, SOL Spot 15m 2.06→1.84%, BTC Futures 5m 2.31→2.13%, BTC Futures 4h 1.68→1.55%. Mean-параметры не менялись.
+- Production Apex обновлён до `apex-1.2-cross-oos-sigma-4`; `devSigma=4`. Геометрия линий, серверный payload и UI-контракт не менялись.
+- Шесть точных экспортов теперь лежат в `data/vendor-exports/` с SHA-256 manifest. Общий parser проверяет header, chronology, шаг TF, band order, labels, counts, UTC range и hash. Совокупность: 61 820 строк и 268 BUY/SELL; SOL Spot остаётся отдельным market-kind срезом.
+- Regression `tests/apexOosRegression.test.ts` запрещает возврат к sigma=3.5, пока sigma=4 выигрывает на всех четырёх OOS-наборах. Эти данные подтверждают точность Apex, но сами по себе не доказывают торговый edge.
+
+## 16.47 Reversal state-machine search v1: хронология подтверждена, production gate не пройден (01.08.2026)
+
+- Общий parser и one-to-one event matcher применены ко всем 61 820 строкам / 268 exact labels. Grid содержит 3564 симметричные каузальные машины `arm → bounded pending → confirm → emit once → lock → re-arm`.
+- Протокол: первые 50% BTC Futures 15m/1h — fit; только top-200 переходят на следующие 25% validation; последние 25% запечатаны до выбора family. ETH Futures 15m и BTC Futures 5m/4h остаются untouched group holdouts; SOL Spot 15m считается отдельно.
+- Выбранная на validation машина: `inner+rsi35 arm`, pending 8 баров, directional recovery ≥0.25 inner-half-width, re-arm после двух neutral-band closes.
+- Exact-bar: fit precision 9.30% / recall 28.57%; validation 9.62% / 31.25%; sealed BTC 15m/1h 9.80% / 23.81%. Untouched Futures aggregate 5.60% / 18.07%; BTC 4h провалился до 2.41% / 5.26%. SOL Spot отдельно: 6.85% / 27.03%.
+- Signal count остаётся завышенным в 2.18–3.56 раза на Futures holdouts. Production gate (каждый Futures holdout: precision ≥15%, recall ≥40%, count ratio 0.5–2.0) — **FAIL**.
+- Следствие: production `detectReversals()` и `REVERSAL_VERSION` не меняются. Исследовательская машина остаётся в `ReversalStateMachineResearch.ts`; добавление ещё условий без нового наблюдаемого state source запрещено. Fidelity-результат не используется как доказательство прибыльности.
+- Создан независимый каузальный feature snapshot `ZondaEdgeFeatures.ts`: Apex, Reversal freshness, liquidity shelf, BOS/CHoCH+sweeps, Fib только после `createdAtIndex/knownAt`, volume/regime. Это foundation для отдельной walk-forward ablation поверх существующей зонной системы, а не production-фильтр.
+
+## 16.48 Reversal v2: long-memory episode и причина, почему reconstruction продолжается через export (01.08.2026)
+
+- Пользователь отклонил остановку Reversal после v1; исследование продолжено более выразительной каузальной моделью, а не возвратом к single-bar thresholds.
+- Inner-zone episode определён от первого касания экспортированной Inner-линии до закрытия через mean. На всех шести наборах положительные episodes длиннее отрицательных; label появляется далеко после первого касания: median offset 14–29 баров, p90 55–91. Outer touch не различает классы (positive/negative outer share близки, а на BTC1h/BTC5m у negatives даже выше). Это подтверждает long memory и опровергает outer-edge trigger.
+- V2 проверил 55 080 causal episode machines: inner/oscillator arm, RSI/Stoch/composite state, dwell до 32 баров, episode memory 64/128/256, threshold/fast-slow/recovery confirmation, mean/opposite/cooldown re-arm. Протокол 50% fit → top-300 на 25% validation → один sealed 25%; group holdouts не участвовали в выборе.
+- Победитель validation: inner episode + Stoch<15 arm + cross 25 + cooldown 64. Но sealed collapsed до precision 3.03% / recall 4.76%; untouched Futures aggregate 6.89% / 12.65%, SOL Spot 5.81% / 13.51%. Gate снова FAIL, production не меняется.
+- Это не основание бросать Reversal. Это конкретное доказательство: в доступных CSV-полях OHLC + Apex lines + final Shapes не наблюдается ключевая internal state series. Следующий информативный шаг — повторный TV export тех же BTC Futures 15m/1h с каждым доступным числовым plot/Data Window series GGI Buy/Sell (fear/greed, smoothed score, thresholds, raw buy/sell, state/counters, HTF request series). Запрос зафиксирован в `ci-results/reversal-next-export-request-v2.md`.
+
+## 16.49 Reversal loop v3–v6: exact Outer, global cooldown, repaint audit и настоящий Volume (01.08.2026)
+
+- Получены расширенные exact exports с обеими Outer: BTC Futures 15m 14,683 rows/69 labels, BTC 1h 9,764/44, ETH Futures 15m 16,990/75, SOL Spot 15m 17,865/63. Вместе с BTC5m/4h теперь 86,420 rows / 370 labels. На пересечении старых/новых файлов label diffs=0; линии отличаются не более ~0.0011%, поэтому historical repaint/settings drift не обнаружен.
+- Exact Outer дал сильное отрицательное доказательство: среди всех 370 labels current/previous Outer touch=0. Median close на shape-баре уже находится примерно 0.66–0.74 Inner half-width от mean. Outer формирует предыдущее состояние, но не является trigger.
+- Across all datasets minimum gap между соседними сигналами 52–60 баров; V4 global cooldown выбрал 72 бара и улучшил Futures OOS до 10.38% precision / 17.01% recall, но sealed collapse 21.92→7.69% F1 и BTC4h 5.66/7.89% не прошли critic gate.
+- Backplotted centered-pivot гипотеза проверена для price/Apex-distance/RSI/Stoch/composite, left/right 2–50. Лучший BTC development candidate price pivot 50/50 дал только 2.24% precision / 6.19% recall; обычный Pine pivot+negative offset исключён.
+- V5 OHLC-only fear/greed proxy (momentum, volatility, Apex distance, score arm/release/cooldown) также FAIL: Futures OOS 4.33% / 11.34%.
+- Так как TV CSV не содержал Volume, он восстановлен через официальный Bybit V5 `/v5/market/kline`: 100% timestamp coverage всех шести рядов, mean close drift 0.000001–0.000007%, max 0.012–0.069%. Значит, это тот же feed и volume пригоден для reconstruction.
+- V6 staged volume-aware score (momentum + signed relative volume + signed range volatility + Apex distance) после исправления нормировки и отдельного critic audit также FAIL: sealed 0 signals; Futures OOS aggregate 6.25% precision / 5.67% recall. Победитель выбрал только signed range volatility, а volume weight=0 — стандартная OHLCV fear/greed family не объясняет vendor labels.
+- Automated strict critic `auditReversalSearchArtifacts.ts` отклоняет V1–V6 по sealed collapse, holdout precision/recall и/или count ratio. Внешний critic-agent вызывался, но среда вернула 403; этот факт не скрывается.
+- Production Reversal по-прежнему не меняется. Следующий reconstruction step требует **новой наблюдаемой internal series** самого GGI Buy/Sell (score/threshold/raw condition/state) либо доступа к Pine/source. Дальнейшие массовые OHLCV grids без такого источника запрещены как multiple-testing churn.

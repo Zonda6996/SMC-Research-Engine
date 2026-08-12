@@ -1,0 +1,257 @@
+{
+  "meta": {
+    "symbol": "SOLUSDT",
+    "tf": "5m",
+    "market": "spot",
+    "window": {
+      "from": 1784444400000,
+      "to": 1784563200000
+    }
+  },
+  "reports": [
+    {
+      "n": 48,
+      "move": 0.01,
+      "bodyRatio": 1,
+      "maxBars": 8,
+      "requireStoch": false,
+      "requireRsi": false,
+      "positiveN": 11,
+      "positiveHits": 1,
+      "recall": 0.09090909090909091,
+      "totalSignals": 225,
+      "noSignalWindowSignals": 8,
+      "noSignalWindow": [
+        {
+          "at": 1784504700000,
+          "dir": "short"
+        },
+        {
+          "at": 1784507100000,
+          "dir": "short"
+        },
+        {
+          "at": 1784509800000,
+          "dir": "short"
+        },
+        {
+          "at": 1784525100000,
+          "dir": "long"
+        },
+        {
+          "at": 1784529600000,
+          "dir": "long"
+        },
+        {
+          "at": 1784547600000,
+          "dir": "short"
+        },
+        {
+          "at": 1784548200000,
+          "dir": "short"
+        },
+        {
+          "at": 1784549400000,
+          "dir": "short"
+        }
+      ]
+    },
+    {
+      "n": 48,
+      "move": 0.01,
+      "bodyRatio": 1,
+      "maxBars": 16,
+      "requireStoch": false,
+      "requireRsi": false,
+      "positiveN": 11,
+      "positiveHits": 1,
+      "recall": 0.09090909090909091,
+      "totalSignals": 228,
+      "noSignalWindowSignals": 8,
+      "noSignalWindow": [
+        {
+          "at": 1784504700000,
+          "dir": "short"
+        },
+        {
+          "at": 1784507100000,
+          "dir": "short"
+        },
+        {
+          "at": 1784509800000,
+          "dir": "short"
+        },
+        {
+          "at": 1784525100000,
+          "dir": "long"
+        },
+        {
+          "at": 1784529600000,
+          "dir": "long"
+        },
+        {
+          "at": 1784547600000,
+          "dir": "short"
+        },
+        {
+          "at": 1784548200000,
+          "dir": "short"
+        },
+        {
+          "at": 1784549400000,
+          "dir": "short"
+        }
+      ]
+    },
+    {
+      "n": 48,
+      "move": 0.006,
+      "bodyRatio": 1,
+      "maxBars": 8,
+      "requireStoch": false,
+      "requireRsi": false,
+      "positiveN": 11,
+      "positiveHits": 3,
+      "recall": 0.2727272727272727,
+      "totalSignals": 349,
+      "noSignalWindowSignals": 15,
+      "noSignalWindow": [
+        {
+          "at": 1784463600000,
+          "dir": "long"
+        },
+        {
+          "at": 1784485800000,
+          "dir": "long"
+        },
+        {
+          "at": 1784499600000,
+          "dir": "short"
+        },
+        {
+          "at": 1784504100000,
+          "dir": "short"
+        },
+        {
+          "at": 1784504700000,
+          "dir": "short"
+        },
+        {
+          "at": 1784507100000,
+          "dir": "short"
+        },
+        {
+          "at": 1784509800000,
+          "dir": "short"
+        },
+        {
+          "at": 1784525100000,
+          "dir": "long"
+        },
+        {
+          "at": 1784529600000,
+          "dir": "long"
+        },
+        {
+          "at": 1784541300000,
+          "dir": "short"
+        },
+        {
+          "at": 1784547600000,
+          "dir": "short"
+        },
+        {
+          "at": 1784548200000,
+          "dir": "short"
+        },
+        {
+          "at": 1784549400000,
+          "dir": "short"
+        },
+        {
+          "at": 1784558400000,
+          "dir": "long"
+        },
+        {
+          "at": 1784562900000,
+          "dir": "short"
+        }
+      ]
+    },
+    {
+      "n": 48,
+      "move": 0.006,
+      "bodyRatio": 1,
+      "maxBars": 16,
+      "requireStoch": false,
+      "requireRsi": false,
+      "positiveN": 11,
+      "positiveHits": 3,
+      "recall": 0.2727272727272727,
+      "totalSignals": 353,
+      "noSignalWindowSignals": 15,
+      "noSignalWindow": [
+        {
+          "at": 1784463600000,
+          "dir": "long"
+        },
+        {
+          "at": 1784485800000,
+          "dir": "long"
+        },
+        {
+          "at": 1784499600000,
+          "dir": "short"
+        },
+        {
+          "at": 1784504100000,
+          "dir": "short"
+        },
+        {
+          "at": 1784504700000,
+          "dir": "short"
+        },
+        {
+          "at": 1784507100000,
+          "dir": "short"
+        },
+        {
+          "at": 1784509800000,
+          "dir": "short"
+        },
+        {
+          "at": 1784525100000,
+          "dir": "long"
+        },
+        {
+          "at": 1784529600000,
+          "dir": "long"
+        },
+        {
+          "at": 1784541300000,
+          "dir": "short"
+        },
+        {
+          "at": 1784547600000,
+          "dir": "short"
+        },
+        {
+          "at": 1784548200000,
+          "dir": "short"
+        },
+        {
+          "at": 1784549400000,
+          "dir": "short"
+        },
+        {
+          "at": 1784558400000,
+          "dir": "long"
+        },
+        {
+          "at": 1784562900000,
+          "dir": "short"
+        }
+      ]
+    }
+  ]
+}

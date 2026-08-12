@@ -1,0 +1,114 @@
+{
+  "shaCalib": "61f4eed2e5d1732a34c69ab48b5f3a3e0994d7c30fef215f1787e7fb31ee29e0",
+  "config": {
+    "cooldown": 40,
+    "draws": 200,
+    "seed": 1337
+  },
+  "arrows": {
+    "n": 89,
+    "meanR": 0.150901304478156,
+    "wr": 0.9325842696629213
+  },
+  "calibRandom": {
+    "mean": 0.0003754134117631578,
+    "p5": -0.08932839399560662,
+    "p95": 0.07994738241988635
+  },
+  "rules": [
+    {
+      "name": "S1_wick_outer/k1.25",
+      "stretch": "S1_wick_outer",
+      "k": 1.25,
+      "n": 62,
+      "meanR": -0.10649293273311466,
+      "wr": 0.7096774193548387,
+      "capture": -0.6708271329848868,
+      "qualified": true
+    },
+    {
+      "name": "S1_wick_outer/k1.75",
+      "stretch": "S1_wick_outer",
+      "k": 1.75,
+      "n": 60,
+      "meanR": -0.11542914792501065,
+      "wr": 0.7,
+      "capture": -0.8133304228348006,
+      "qualified": true
+    },
+    {
+      "name": "S1_wick_outer/k2.5",
+      "stretch": "S1_wick_outer",
+      "k": 2.5,
+      "n": 56,
+      "meanR": -0.12534490542613203,
+      "wr": 0.7142857142857143,
+      "capture": -0.9645137031564988,
+      "qualified": true
+    },
+    {
+      "name": "S2_close_outer/k1.25",
+      "stretch": "S2_close_outer",
+      "k": 1.25,
+      "n": 44,
+      "meanR": -0.2265529739903713,
+      "wr": 0.7272727272727273,
+      "capture": -1.4909604757682853,
+      "qualified": true
+    },
+    {
+      "name": "S2_close_outer/k1.75",
+      "stretch": "S2_close_outer",
+      "k": 1.75,
+      "n": 42,
+      "meanR": -0.23750425396940936,
+      "wr": 0.7380952380952381,
+      "capture": -1.6176450504788014,
+      "qualified": true
+    },
+    {
+      "name": "S2_close_outer/k2.5",
+      "stretch": "S2_close_outer",
+      "k": 2.5,
+      "n": 39,
+      "meanR": -0.19391641541524932,
+      "wr": 0.7435897435897436,
+      "capture": -1.5492076155513563,
+      "qualified": true
+    },
+    {
+      "name": "S3_twobar_outer/k1.25",
+      "stretch": "S3_twobar_outer",
+      "k": 1.25,
+      "n": 62,
+      "meanR": -0.10649293273311466,
+      "wr": 0.7096774193548387,
+      "capture": -0.7815022643855912,
+      "qualified": true
+    },
+    {
+      "name": "S3_twobar_outer/k1.75",
+      "stretch": "S3_twobar_outer",
+      "k": 1.75,
+      "n": 60,
+      "meanR": -0.11542914792501065,
+      "wr": 0.7,
+      "capture": -0.7868314307328792,
+      "qualified": true
+    },
+    {
+      "name": "S3_twobar_outer/k2.5",
+      "stretch": "S3_twobar_outer",
+      "k": 2.5,
+      "n": 56,
+      "meanR": -0.12534490542613203,
+      "wr": 0.7142857142857143,
+      "capture": -0.9971594687519747,
+      "qualified": true
+    }
+  ],
+  "winner": "S1_wick_outer/k1.25",
+  "oos": [],
+  "pooledCapture": null,
+  "verdict": "FAILURE (best calibration C=-0.671 < 0.6: hidden state carries the bulk of the arrows' value)"
+}

@@ -5,7 +5,7 @@ import type { LiquidityPoiCandidate } from '../src/core/confirmation/LiquidityPo
 import type { StructureEvent } from '../src/models/events/StructureEvent.js'
 import {
 	detectSimplifiedConfirmation, SIMPLIFIED_CONFIRMATION_VERSION, SIMPLIFIED_HIGH_WR_PRESET,
-	buildRegimeTimeline, regimeAt, SIMPLIFIED_CONFIRMATION_CONFIG, SIMPLIFIED_HIGH_WR_PRESET_V4, SIMPLIFIED_VENDOR_SIGNAL_PRESET,
+	buildRegimeTimeline, regimeAt, SIMPLIFIED_CONFIRMATION_CONFIG, SIMPLIFIED_APEX_VETO_PRESET, SIMPLIFIED_REVERSAL_VETO_PRESET,
 } from '../src/core/confirmation/SimplifiedConfirmationEngine.js'
 
 function makePoi(overrides: Partial<LiquidityPoiCandidate> = {}): LiquidityPoiCandidate {
@@ -26,7 +26,7 @@ const bar = (ts: number, o: number, h: number, l: number, c: number): Candle => 
 const away = (n: number, start: number) => Array.from({ length: n }, (_, k) => bar(start + k, 110, 111, 109, 110)) // выше зоны → взводит
 
 it('simplified v0.1: касание → первая направленная свеча → вход; частичка → БУ → фулл', () => {
-	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.5-zone-visit-veto')
+	assert.equal(SIMPLIFIED_CONFIRMATION_VERSION, 'simplified-confirmation-0.8-time-stop-preset')
 	const ltf: Candle[] = [
 		...away(7, 0),
 		bar(7, 105, 106, 95, 94),        // заход в зону, МЕДВЕЖЬЯ — не триггер
@@ -200,16 +200,82 @@ it('v0.3: пресет высокого вин рейта не трогает к
 	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.fullAtMovePct, 0.175)
 })
 
-it('v0.4: инвертированный GGI-фильтр выключен по умолчанию и виден в пресете v4', () => {
-	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.ggiExcludeBars, 0)
-	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.ggiExcludeBars, 200)
+it('v0.4: инвертированный Apex-фильтр выключен по умолчанию и виден в пресете v4', () => {
+	assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.apexVetoBars, 0)
+	assert.equal(SIMPLIFIED_APEX_VETO_PRESET.apexVetoBars, 200)
 	// пресет v4 наследует профиль выхода v3
-	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.partialAtR, 0.40)
-	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.fullAtR, 12)
-	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.maxChaseAtr, 1.0)
+	assert.equal(SIMPLIFIED_APEX_VETO_PRESET.partialAtR, 0.40)
+	assert.equal(SIMPLIFIED_APEX_VETO_PRESET.fullAtR, 12)
+	assert.equal(SIMPLIFIED_APEX_VETO_PRESET.maxChaseAtr, 1.0)
 	// вето работает по ЗАХОДУ в зону (внутренний край), а не по сигналу вендора
-	assert.equal(SIMPLIFIED_HIGH_WR_PRESET_V4.ggiParams?.signalMode, 'inner')
+	assert.equal(SIMPLIFIED_APEX_VETO_PRESET.apexParams?.signalMode, 'inner')
 	// вариант «как у вендора» — внешний край и короткое окно
-	assert.equal(SIMPLIFIED_VENDOR_SIGNAL_PRESET.ggiExcludeBars, 50)
-	assert.equal(SIMPLIFIED_VENDOR_SIGNAL_PRESET.ggiParams?.signalMode, 'outer')
+	assert.equal(SIMPLIFIED_REVERSAL_VETO_PRESET.apexVetoBars, 50)
+	assert.equal(SIMPLIFIED_REVERSAL_VETO_PRESET.apexParams?.signalMode, 'outer')
+})
+
+
+// ─────────────────────────── v0.7 post-partial time-stop ───────────────────────────
+
+it('v0.7: time-stop начинается только после partial и закрывает LONG по close через N полных баров', () => {
+  const ltf: Candle[] = [
+    ...away(7, 0),
+    bar(7, 96, 106, 95, 100),
+    bar(8, 100, 104.5, 99, 104.4),
+    ...Array.from({ length: 80 }, (_, i) => bar(9 + i, 105, 105.2, 104.8, 105)),
+  ]
+  const [r] = detectSimplifiedConfirmation([makePoi()], ltf, {
+    targetMode: 'r', partialAtR: 0.4, fullAtR: 12, partialFraction: 0.25,
+    postPartialTimeStopBars: 80,
+  })
+  const e = r!.entries[0]!
+  assert.equal(e.outcome, 'time')
+  assert.deepEqual(e.events.map(x => x.state), ['PARTIAL', 'TIME'])
+  assert.equal(e.events[1]!.at, 88)
+  const expectedMove = 0.011 + 0.05 * 0.75
+  assert.ok(Math.abs(e.grossMovePct! - expectedMove) < 1e-9)
+})
+
+it('v0.7: без partial time-stop не срабатывает; SHORT зеркален', () => {
+  const noPartial: Candle[] = [
+    ...away(7, 0), bar(7, 96, 106, 95, 100),
+    ...Array.from({ length: 100 }, (_, i) => bar(8 + i, 102, 104, 101, 102)),
+  ]
+  const [open] = detectSimplifiedConfirmation([makePoi()], noPartial, {
+    targetMode: 'r', partialAtR: 0.4, fullAtR: 12, partialFraction: 0.25,
+    postPartialTimeStopBars: 80,
+  })
+  assert.equal(open!.entries[0]!.outcome, 'open')
+
+  const longBars: Candle[] = [
+    ...away(7, 0), bar(7, 96, 106, 95, 100), bar(8, 100, 104.5, 99, 104.4),
+    ...Array.from({ length: 80 }, (_, i) => bar(9 + i, 105, 105.2, 104.8, 105)),
+  ]
+  const mirror = (b: Candle): Candle => ({ timestamp: b.timestamp, open: 200-b.open, high: 200-b.low, low: 200-b.high, close: 200-b.close, volume: b.volume })
+  const [short] = detectSimplifiedConfirmation([makePoi({ direction: 'short', near: 100, far: 110 })], longBars.map(mirror), {
+    targetMode: 'r', partialAtR: 0.4, fullAtR: 12, partialFraction: 0.25,
+    postPartialTimeStopBars: 80,
+  })
+  assert.equal(short!.entries[0]!.outcome, 'time')
+  assert.deepEqual(short!.entries[0]!.events.map(x => x.state), ['PARTIAL', 'TIME'])
+})
+
+it('v0.7: на граничном баре сохраняется консервативный порядок stop → full → time', () => {
+  const ltf: Candle[] = [
+    ...away(7, 0), bar(7, 96, 106, 95, 100), bar(8, 100, 104.5, 99, 104.4),
+    ...Array.from({ length: 79 }, (_, i) => bar(9 + i, 105, 105.2, 104.8, 105)),
+    bar(88, 105, 112, 100.1, 105),
+  ]
+  const [r] = detectSimplifiedConfirmation([makePoi()], ltf, {
+    targetMode: 'r', partialAtR: 0.4, fullAtR: 1, partialFraction: 0.25,
+    postPartialTimeStopBars: 80,
+  })
+  assert.equal(r!.entries[0]!.outcome, 'full')
+  assert.deepEqual(r!.entries[0]!.events.map(x => x.state), ['PARTIAL', 'FULL'])
+})
+
+it('v0.8: базовый конфиг совместим, Apex-пресет включает проверенный time-stop', () => {
+  assert.equal(SIMPLIFIED_CONFIRMATION_CONFIG.postPartialTimeStopBars, 0)
+  assert.equal(SIMPLIFIED_HIGH_WR_PRESET.postPartialTimeStopBars, undefined)
+  assert.equal(SIMPLIFIED_APEX_VETO_PRESET.postPartialTimeStopBars, 80)
 })

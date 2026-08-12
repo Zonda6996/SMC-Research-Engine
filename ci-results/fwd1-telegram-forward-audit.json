@@ -1,0 +1,8774 @@
+{
+ "trades": [
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769630494000,
+   "channel": "hourly",
+   "date": "2026-01-28T20:01:34.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769724006000,
+   "channel": "hourly",
+   "date": "2026-01-29T22:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7834956788485737
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769749205000,
+   "channel": "hourly",
+   "date": "2026-01-30T05:00:05.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769749206000,
+   "channel": "hourly",
+   "date": "2026-01-30T05:00:06.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769749232000,
+   "channel": "hourly",
+   "date": "2026-01-30T05:00:32.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999996
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1769774413000,
+   "channel": "hourly",
+   "date": "2026-01-30T12:00:13.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1769774414000,
+   "channel": "hourly",
+   "date": "2026-01-30T12:00:14.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1769774416000,
+   "channel": "hourly",
+   "date": "2026-01-30T12:00:16.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1769774417000,
+   "channel": "hourly",
+   "date": "2026-01-30T12:00:17.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8353679454614581
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769799608000,
+   "channel": "hourly",
+   "date": "2026-01-30T19:00:08.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769799610000,
+   "channel": "hourly",
+   "date": "2026-01-30T19:00:10.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999994
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769799611000,
+   "channel": "hourly",
+   "date": "2026-01-30T19:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8096017075108288
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769857203000,
+   "channel": "hourly",
+   "date": "2026-01-31T11:00:03.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769857204000,
+   "channel": "hourly",
+   "date": "2026-01-31T11:00:04.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769886010000,
+   "channel": "hourly",
+   "date": "2026-01-31T19:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6489024478500582
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1769889611000,
+   "channel": "hourly",
+   "date": "2026-01-31T20:00:11.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769893205000,
+   "channel": "hourly",
+   "date": "2026-01-31T21:00:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7372871706248683
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769893205000,
+   "channel": "hourly",
+   "date": "2026-01-31T21:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7859643726105604
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769997605000,
+   "channel": "hourly",
+   "date": "2026-02-02T02:00:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7293375436413401
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769997608000,
+   "channel": "hourly",
+   "date": "2026-02-02T02:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.48225856857248534
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769997608000,
+   "channel": "hourly",
+   "date": "2026-02-02T02:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7439034104350477
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769997608000,
+   "channel": "hourly",
+   "date": "2026-02-02T02:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7132786484338385
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769997609000,
+   "channel": "hourly",
+   "date": "2026-02-02T02:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.718067580399227
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769997612000,
+   "channel": "hourly",
+   "date": "2026-02-02T02:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5639936558836895
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1769997612000,
+   "channel": "hourly",
+   "date": "2026-02-02T02:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.43269794351929175
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770004808000,
+   "channel": "hourly",
+   "date": "2026-02-02T04:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7053602941457893
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770004811000,
+   "channel": "hourly",
+   "date": "2026-02-02T04:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8574532915727238
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770004814000,
+   "channel": "hourly",
+   "date": "2026-02-02T04:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7223359182664132
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770015607000,
+   "channel": "hourly",
+   "date": "2026-02-02T07:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7161180877376064
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770015609000,
+   "channel": "hourly",
+   "date": "2026-02-02T07:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7195558760702403
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770015612000,
+   "channel": "hourly",
+   "date": "2026-02-02T07:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6995222528914142
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770015612000,
+   "channel": "hourly",
+   "date": "2026-02-02T07:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5644171123675154
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770022811000,
+   "channel": "hourly",
+   "date": "2026-02-02T09:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.713900280104099
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770022811000,
+   "channel": "hourly",
+   "date": "2026-02-02T09:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7020112850719058
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770026410000,
+   "channel": "hourly",
+   "date": "2026-02-02T10:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7076354898275692
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770026411000,
+   "channel": "hourly",
+   "date": "2026-02-02T10:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.47033039833309725
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770051613000,
+   "channel": "hourly",
+   "date": "2026-02-02T17:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.801014253974139
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770134405000,
+   "channel": "hourly",
+   "date": "2026-02-03T16:00:05.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770134407000,
+   "channel": "hourly",
+   "date": "2026-02-03T16:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7524159785462718
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770134408000,
+   "channel": "hourly",
+   "date": "2026-02-03T16:00:08.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770134411000,
+   "channel": "hourly",
+   "date": "2026-02-03T16:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7541249881899084
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770134411000,
+   "channel": "hourly",
+   "date": "2026-02-03T16:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7397772929497018
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770134416000,
+   "channel": "hourly",
+   "date": "2026-02-03T16:00:16.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7447114970376089
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770134417000,
+   "channel": "hourly",
+   "date": "2026-02-03T16:00:17.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7529152744760993
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770134419000,
+   "channel": "hourly",
+   "date": "2026-02-03T16:00:19.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7546187020525773
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770148806000,
+   "channel": "hourly",
+   "date": "2026-02-03T20:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7460871723159219
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770148809000,
+   "channel": "hourly",
+   "date": "2026-02-03T20:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7251131791560725
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770152409000,
+   "channel": "hourly",
+   "date": "2026-02-03T21:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7631025807689302
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770152410000,
+   "channel": "hourly",
+   "date": "2026-02-03T21:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7770886726333543
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770228021000,
+   "channel": "hourly",
+   "date": "2026-02-04T18:00:21.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770231607000,
+   "channel": "hourly",
+   "date": "2026-02-04T19:00:07.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770231610000,
+   "channel": "hourly",
+   "date": "2026-02-04T19:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4523361807005256
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770231610000,
+   "channel": "hourly",
+   "date": "2026-02-04T19:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.742741694583018
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770231614000,
+   "channel": "hourly",
+   "date": "2026-02-04T19:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7198845573237559
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770235211000,
+   "channel": "hourly",
+   "date": "2026-02-04T20:00:11.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770379208000,
+   "channel": "hourly",
+   "date": "2026-02-06T12:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5669289634880673
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770379211000,
+   "channel": "hourly",
+   "date": "2026-02-06T12:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5511264553524173
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770379213000,
+   "channel": "hourly",
+   "date": "2026-02-06T12:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5349041970008727
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770393615000,
+   "channel": "hourly",
+   "date": "2026-02-06T16:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.3863839927989249
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770818416000,
+   "channel": "hourly",
+   "date": "2026-02-11T14:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6656576848137298
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770832806000,
+   "channel": "hourly",
+   "date": "2026-02-11T18:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5540170919465038
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770832813000,
+   "channel": "hourly",
+   "date": "2026-02-11T18:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5986634015129949
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770836410000,
+   "channel": "hourly",
+   "date": "2026-02-11T19:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5650396491542864
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770836410000,
+   "channel": "hourly",
+   "date": "2026-02-11T19:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5871942202890288
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770836411000,
+   "channel": "hourly",
+   "date": "2026-02-11T19:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5211368544862346
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1770836412000,
+   "channel": "hourly",
+   "date": "2026-02-11T19:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5157443616581041
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770854411000,
+   "channel": "hourly",
+   "date": "2026-02-12T00:00:11.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770854411000,
+   "channel": "hourly",
+   "date": "2026-02-12T00:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7981665735327479
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770854417000,
+   "channel": "hourly",
+   "date": "2026-02-12T00:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.705715376435549
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770854417000,
+   "channel": "hourly",
+   "date": "2026-02-12T00:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6507539139693321
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770955204000,
+   "channel": "hourly",
+   "date": "2026-02-13T04:00:04.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1770955205000,
+   "channel": "hourly",
+   "date": "2026-02-13T04:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771128002000,
+   "channel": "hourly",
+   "date": "2026-02-15T04:00:02.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.9683642882989713
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771138806000,
+   "channel": "hourly",
+   "date": "2026-02-15T07:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6175445460611982
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771146003000,
+   "channel": "hourly",
+   "date": "2026-02-15T09:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 1.1996498743688242
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771250409000,
+   "channel": "hourly",
+   "date": "2026-02-16T14:00:09.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999999
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771250410000,
+   "channel": "hourly",
+   "date": "2026-02-16T14:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.3952965149353601
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771250411000,
+   "channel": "hourly",
+   "date": "2026-02-16T14:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.3434755328841417
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771275605000,
+   "channel": "hourly",
+   "date": "2026-02-16T21:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.48017592811785875
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1771344017000,
+   "channel": "hourly",
+   "date": "2026-02-17T16:00:17.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6217515760743995
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771513263000,
+   "channel": "hourly",
+   "date": "2026-02-19T15:01:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.781042725079928
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1771545606000,
+   "channel": "hourly",
+   "date": "2026-02-20T00:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.626227802006081
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1771545610000,
+   "channel": "hourly",
+   "date": "2026-02-20T00:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5637993395700394
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1771560006000,
+   "channel": "hourly",
+   "date": "2026-02-20T04:00:06.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1771560015000,
+   "channel": "hourly",
+   "date": "2026-02-20T04:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6294891253871937
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771570812000,
+   "channel": "hourly",
+   "date": "2026-02-20T07:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6869139172689445
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1771603205000,
+   "channel": "hourly",
+   "date": "2026-02-20T16:00:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7401224201466673
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1771603208000,
+   "channel": "hourly",
+   "date": "2026-02-20T16:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6809003469848719
+  },
+  {
+   "symbol": "TWTUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1771632012000,
+   "channel": "hourly",
+   "date": "2026-02-21T00:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7496527604052406
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771664407000,
+   "channel": "hourly",
+   "date": "2026-02-21T09:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8784137184594172
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771743602000,
+   "channel": "hourly",
+   "date": "2026-02-22T07:00:02.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5058880323024679
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771822811000,
+   "channel": "hourly",
+   "date": "2026-02-23T05:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7068081762962458
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771945205000,
+   "channel": "hourly",
+   "date": "2026-02-24T15:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6263178944028494
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771945211000,
+   "channel": "hourly",
+   "date": "2026-02-24T15:00:11.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1771948806000,
+   "channel": "hourly",
+   "date": "2026-02-24T16:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6003069641217151
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771948806000,
+   "channel": "hourly",
+   "date": "2026-02-24T16:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5434749480877525
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771948810000,
+   "channel": "hourly",
+   "date": "2026-02-24T16:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5893628429833835
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771948815000,
+   "channel": "hourly",
+   "date": "2026-02-24T16:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.620776101207065
+  },
+  {
+   "symbol": "WIFUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771948860000,
+   "channel": "hourly",
+   "date": "2026-02-24T16:01:00.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6182281348271939
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771952406000,
+   "channel": "hourly",
+   "date": "2026-02-24T17:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5577262116119427
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771952407000,
+   "channel": "hourly",
+   "date": "2026-02-24T17:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5555787210229645
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771952412000,
+   "channel": "hourly",
+   "date": "2026-02-24T17:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4388162715981775
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1771956012000,
+   "channel": "hourly",
+   "date": "2026-02-24T18:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.744255456199023
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1771995611000,
+   "channel": "hourly",
+   "date": "2026-02-25T05:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5147253565228815
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1772042414000,
+   "channel": "hourly",
+   "date": "2026-02-25T18:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6579291365606281
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1772049615000,
+   "channel": "hourly",
+   "date": "2026-02-25T20:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 1.0174051587812691
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1772064006000,
+   "channel": "hourly",
+   "date": "2026-02-26T00:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7067452005362886
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1772064008000,
+   "channel": "hourly",
+   "date": "2026-02-26T00:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7702999816450102
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1772064016000,
+   "channel": "hourly",
+   "date": "2026-02-26T00:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5707062760571193
+  },
+  {
+   "symbol": "TWTUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1772179229000,
+   "channel": "hourly",
+   "date": "2026-02-27T08:00:29.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7499439189023732
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1772193616000,
+   "channel": "hourly",
+   "date": "2026-02-27T12:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.46518788708626985
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1772265614000,
+   "channel": "hourly",
+   "date": "2026-02-28T08:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8247959109256946
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1772276428000,
+   "channel": "hourly",
+   "date": "2026-02-28T11:00:28.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7082248851663553
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1772283603000,
+   "channel": "hourly",
+   "date": "2026-02-28T13:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8378237953867306
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1772283604000,
+   "channel": "hourly",
+   "date": "2026-02-28T13:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.9594579405912416
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1772287207000,
+   "channel": "hourly",
+   "date": "2026-02-28T14:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7458611740599574
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1772341204000,
+   "channel": "hourly",
+   "date": "2026-03-01T05:00:04.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6934832211294456
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1772719211000,
+   "channel": "hourly",
+   "date": "2026-03-05T14:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6424254190600056
+  },
+  {
+   "symbol": "WIFUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1772895606000,
+   "channel": "hourly",
+   "date": "2026-03-07T15:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7596484171340239
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773039606000,
+   "channel": "hourly",
+   "date": "2026-03-09T07:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6868583683955218
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773043214000,
+   "channel": "hourly",
+   "date": "2026-03-09T08:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6884235142606429
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1773057613000,
+   "channel": "hourly",
+   "date": "2026-03-09T12:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7295188228022089
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773158409000,
+   "channel": "hourly",
+   "date": "2026-03-10T16:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.673750701982702
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773165609000,
+   "channel": "hourly",
+   "date": "2026-03-10T18:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5201387872558457
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1773216010000,
+   "channel": "hourly",
+   "date": "2026-03-11T08:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5856753709470394
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773252015000,
+   "channel": "hourly",
+   "date": "2026-03-11T18:00:15.000Z",
+   "outcome": "Partial",
+   "grossR": -0.684369318832379
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773284410000,
+   "channel": "hourly",
+   "date": "2026-03-12T03:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.701401615363479
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773295209000,
+   "channel": "hourly",
+   "date": "2026-03-12T06:00:09.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773352810000,
+   "channel": "hourly",
+   "date": "2026-03-12T22:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7171971101634526
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773414007000,
+   "channel": "hourly",
+   "date": "2026-03-13T15:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7271223794415975
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773414010000,
+   "channel": "hourly",
+   "date": "2026-03-13T15:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6111408816388315
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773414013000,
+   "channel": "hourly",
+   "date": "2026-03-13T15:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6340739860227281
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773414013000,
+   "channel": "hourly",
+   "date": "2026-03-13T15:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6882166723177779
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773417607000,
+   "channel": "hourly",
+   "date": "2026-03-13T16:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8649331857546106
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773417609000,
+   "channel": "hourly",
+   "date": "2026-03-13T16:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7176923301272374
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773424804000,
+   "channel": "hourly",
+   "date": "2026-03-13T18:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6033548939292174
+  },
+  {
+   "symbol": "TWTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773579603000,
+   "channel": "hourly",
+   "date": "2026-03-15T13:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5369239524624263
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773619206000,
+   "channel": "hourly",
+   "date": "2026-03-16T00:00:06.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999989
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773619207000,
+   "channel": "hourly",
+   "date": "2026-03-16T00:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8293680545212525
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773648004000,
+   "channel": "hourly",
+   "date": "2026-03-16T08:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7370535459193792
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773648005000,
+   "channel": "hourly",
+   "date": "2026-03-16T08:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7788045345225811
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773651608000,
+   "channel": "hourly",
+   "date": "2026-03-16T09:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8811673014738639
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773651612000,
+   "channel": "hourly",
+   "date": "2026-03-16T09:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8871955912540875
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773655208000,
+   "channel": "hourly",
+   "date": "2026-03-16T10:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7276620163105583
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773662406000,
+   "channel": "hourly",
+   "date": "2026-03-16T12:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6221286667266129
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773673213000,
+   "channel": "hourly",
+   "date": "2026-03-16T15:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7220594217948685
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773676806000,
+   "channel": "hourly",
+   "date": "2026-03-16T16:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.673381151502775
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773676809000,
+   "channel": "hourly",
+   "date": "2026-03-16T16:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.826387483308516
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773687603000,
+   "channel": "hourly",
+   "date": "2026-03-16T19:00:03.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999989
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773687619000,
+   "channel": "hourly",
+   "date": "2026-03-16T19:00:19.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7182925445995423
+  },
+  {
+   "symbol": "TWTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773712860000,
+   "channel": "hourly",
+   "date": "2026-03-17T02:01:00.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6886054067676708
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773716409000,
+   "channel": "hourly",
+   "date": "2026-03-17T03:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6586306622947523
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773720006000,
+   "channel": "hourly",
+   "date": "2026-03-17T04:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8613385581501167
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773720007000,
+   "channel": "hourly",
+   "date": "2026-03-17T04:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6384035845262417
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773720016000,
+   "channel": "hourly",
+   "date": "2026-03-17T04:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.437085574445734
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773727216000,
+   "channel": "hourly",
+   "date": "2026-03-17T06:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.618319052904022
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773795609000,
+   "channel": "hourly",
+   "date": "2026-03-18T01:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.46283671767940066
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773835213000,
+   "channel": "hourly",
+   "date": "2026-03-18T12:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6672977064329841
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773835217000,
+   "channel": "hourly",
+   "date": "2026-03-18T12:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4086806116622965
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1773835218000,
+   "channel": "hourly",
+   "date": "2026-03-18T12:00:18.000Z",
+   "outcome": "Stop",
+   "grossR": -1.000000000000001
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1773835222000,
+   "channel": "hourly",
+   "date": "2026-03-18T12:00:22.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000004
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774141202000,
+   "channel": "hourly",
+   "date": "2026-03-22T01:00:02.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7046765412932178
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774141204000,
+   "channel": "hourly",
+   "date": "2026-03-22T01:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7592509505080492
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774141205000,
+   "channel": "hourly",
+   "date": "2026-03-22T01:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7004833728731945
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774141207000,
+   "channel": "hourly",
+   "date": "2026-03-22T01:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7118193764380985
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774141207000,
+   "channel": "hourly",
+   "date": "2026-03-22T01:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7352971417756291
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774141207000,
+   "channel": "hourly",
+   "date": "2026-03-22T01:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7235489156966817
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774148402000,
+   "channel": "hourly",
+   "date": "2026-03-22T03:00:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7374292589154392
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774148403000,
+   "channel": "hourly",
+   "date": "2026-03-22T03:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6782475073166826
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774148405000,
+   "channel": "hourly",
+   "date": "2026-03-22T03:00:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7504240180713452
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774148405000,
+   "channel": "hourly",
+   "date": "2026-03-22T03:00:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7345319352923116
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774148406000,
+   "channel": "hourly",
+   "date": "2026-03-22T03:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.742671533267117
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774148460000,
+   "channel": "hourly",
+   "date": "2026-03-22T03:01:00.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.632314269970134
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774159205000,
+   "channel": "hourly",
+   "date": "2026-03-22T06:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5673236208516959
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774184406000,
+   "channel": "hourly",
+   "date": "2026-03-22T13:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.707988534648256
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774216808000,
+   "channel": "hourly",
+   "date": "2026-03-22T22:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.68626959505445
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774220450000,
+   "channel": "hourly",
+   "date": "2026-03-22T23:00:50.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7994394035070886
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774231204000,
+   "channel": "hourly",
+   "date": "2026-03-23T02:00:04.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6745326157390746
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1774252815000,
+   "channel": "hourly",
+   "date": "2026-03-23T08:00:15.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7723589052965231
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774263605000,
+   "channel": "hourly",
+   "date": "2026-03-23T11:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7768293040564401
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774263606000,
+   "channel": "hourly",
+   "date": "2026-03-23T11:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8075277216583886
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774263643000,
+   "channel": "hourly",
+   "date": "2026-03-23T11:00:43.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6885781512680054
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774267207000,
+   "channel": "hourly",
+   "date": "2026-03-23T12:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7848681453270967
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774267215000,
+   "channel": "hourly",
+   "date": "2026-03-23T12:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7095822998376111
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1774332009000,
+   "channel": "hourly",
+   "date": "2026-03-24T06:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.527662743422516
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1774353608000,
+   "channel": "hourly",
+   "date": "2026-03-24T12:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7256099528786739
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1774418408000,
+   "channel": "hourly",
+   "date": "2026-03-25T06:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7496325823058382
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1774425613000,
+   "channel": "hourly",
+   "date": "2026-03-25T08:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6312218256317487
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1774443607000,
+   "channel": "hourly",
+   "date": "2026-03-25T13:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5913377127974165
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1774447218000,
+   "channel": "hourly",
+   "date": "2026-03-25T14:00:18.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6181485608029048
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1774486806000,
+   "channel": "hourly",
+   "date": "2026-03-26T01:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.702556199310668
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774558807000,
+   "channel": "hourly",
+   "date": "2026-03-26T21:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8725959151358323
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774558810000,
+   "channel": "hourly",
+   "date": "2026-03-26T21:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6543589598297856
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774569615000,
+   "channel": "hourly",
+   "date": "2026-03-27T00:00:15.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1774602016000,
+   "channel": "hourly",
+   "date": "2026-03-27T09:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6043055497395292
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1774612811000,
+   "channel": "hourly",
+   "date": "2026-03-27T12:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7516762864315941
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774612813000,
+   "channel": "hourly",
+   "date": "2026-03-27T12:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8406745820025079
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1774612814000,
+   "channel": "hourly",
+   "date": "2026-03-27T12:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7443028945712366
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1774620016000,
+   "channel": "hourly",
+   "date": "2026-03-27T14:00:16.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7498180117692754
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774627219000,
+   "channel": "hourly",
+   "date": "2026-03-27T16:00:19.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7874703456267625
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774648801000,
+   "channel": "hourly",
+   "date": "2026-03-27T22:00:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6744517489680577
+  },
+  {
+   "symbol": "TWTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774684811000,
+   "channel": "hourly",
+   "date": "2026-03-28T08:00:11.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "TWTUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1774728008000,
+   "channel": "hourly",
+   "date": "2026-03-28T20:00:08.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774753217000,
+   "channel": "hourly",
+   "date": "2026-03-29T03:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7470751821064571
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774756808000,
+   "channel": "hourly",
+   "date": "2026-03-29T04:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7872707892966426
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774821610000,
+   "channel": "hourly",
+   "date": "2026-03-29T22:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.613959924355822
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774828807000,
+   "channel": "hourly",
+   "date": "2026-03-30T00:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7253578319070639
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774828815000,
+   "channel": "hourly",
+   "date": "2026-03-30T00:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6999461430612945
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774828817000,
+   "channel": "hourly",
+   "date": "2026-03-30T00:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6077226323667051
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832406000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4870810269834096
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832407000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.3541712169210769
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832408000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6919041628000729
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832409000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5048430241133617
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832410000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5196141560531856
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832412000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7749744977512544
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832412000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6863885686198223
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832413000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6619977074047892
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832415000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.56482332854417
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774832437000,
+   "channel": "hourly",
+   "date": "2026-03-30T01:00:37.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4567928104875218
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774836006000,
+   "channel": "hourly",
+   "date": "2026-03-30T02:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5999767770975553
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774836014000,
+   "channel": "hourly",
+   "date": "2026-03-30T02:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6800207947368199
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843206000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6667239178493083
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843207000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.48217579365323976
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843207000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5815535883303042
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843207000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6285884891210893
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843210000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6036440283605135
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843211000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5282206180119705
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1774843216000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7216891909315112
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843216000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.56153078770006
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843217000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6480495556082223
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843217000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6258282214200751
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843220000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:00:20.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.520676657928913
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774843261000,
+   "channel": "hourly",
+   "date": "2026-03-30T04:01:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5472906136036932
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1774850412000,
+   "channel": "hourly",
+   "date": "2026-03-30T06:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.44850370493104924
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1774857610000,
+   "channel": "hourly",
+   "date": "2026-03-30T08:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.46687980561698483
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1774872016000,
+   "channel": "hourly",
+   "date": "2026-03-30T12:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5441423014067691
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1774965617000,
+   "channel": "hourly",
+   "date": "2026-03-31T14:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6248413207942708
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1774969213000,
+   "channel": "hourly",
+   "date": "2026-03-31T15:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7144985857027893
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1775044817000,
+   "channel": "hourly",
+   "date": "2026-04-01T12:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.2740240029582099
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1775059210000,
+   "channel": "hourly",
+   "date": "2026-04-01T16:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7735407961253504
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775066411000,
+   "channel": "hourly",
+   "date": "2026-04-01T18:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6813971878289115
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1775152815000,
+   "channel": "hourly",
+   "date": "2026-04-02T18:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5505732080205994
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1775181614000,
+   "channel": "hourly",
+   "date": "2026-04-03T02:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5657051419465943
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775221212000,
+   "channel": "hourly",
+   "date": "2026-04-03T13:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7357754519358075
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1775246458000,
+   "channel": "hourly",
+   "date": "2026-04-03T20:00:58.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.596357434491233
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1775278815000,
+   "channel": "hourly",
+   "date": "2026-04-04T05:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6972262867447855
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775311205000,
+   "channel": "hourly",
+   "date": "2026-04-04T14:00:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8048085030550947
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1775332807000,
+   "channel": "hourly",
+   "date": "2026-04-04T20:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6432687036522675
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775332810000,
+   "channel": "hourly",
+   "date": "2026-04-04T20:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6448684993367607
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1775401206000,
+   "channel": "hourly",
+   "date": "2026-04-05T15:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.866573672300977
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1775404810000,
+   "channel": "hourly",
+   "date": "2026-04-05T16:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8726555918093102
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1775404851000,
+   "channel": "hourly",
+   "date": "2026-04-05T16:00:51.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6766220758388887
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1775412006000,
+   "channel": "hourly",
+   "date": "2026-04-05T18:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7911260514654288
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1775419203000,
+   "channel": "hourly",
+   "date": "2026-04-05T20:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7705439022023406
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1775430012000,
+   "channel": "hourly",
+   "date": "2026-04-05T23:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8325747601304776
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1775433610000,
+   "channel": "hourly",
+   "date": "2026-04-06T00:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7563867778905727
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775437215000,
+   "channel": "hourly",
+   "date": "2026-04-06T01:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.3983133660021038
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775480408000,
+   "channel": "hourly",
+   "date": "2026-04-06T13:00:08.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999993
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1775552417000,
+   "channel": "hourly",
+   "date": "2026-04-07T09:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6014339723147761
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1775592020000,
+   "channel": "hourly",
+   "date": "2026-04-07T20:00:20.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7558323317887516
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775606414000,
+   "channel": "hourly",
+   "date": "2026-04-08T00:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.688271627405316
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1775606416000,
+   "channel": "hourly",
+   "date": "2026-04-08T00:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.22751016799406
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775606416000,
+   "channel": "hourly",
+   "date": "2026-04-08T00:00:16.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6712720939014574
+  },
+  {
+   "symbol": "WIFUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775606429000,
+   "channel": "hourly",
+   "date": "2026-04-08T00:00:29.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7742420504867231
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775606454000,
+   "channel": "hourly",
+   "date": "2026-04-08T00:00:54.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6303638631809765
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775610053000,
+   "channel": "hourly",
+   "date": "2026-04-08T01:00:53.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6506495106725146
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775656815000,
+   "channel": "hourly",
+   "date": "2026-04-08T14:00:15.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7755322313450312
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1775692807000,
+   "channel": "hourly",
+   "date": "2026-04-09T00:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7650393774072767
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775775609000,
+   "channel": "hourly",
+   "date": "2026-04-09T23:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7352134243325699
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775782810000,
+   "channel": "hourly",
+   "date": "2026-04-10T01:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7350864850476075
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1775815207000,
+   "channel": "hourly",
+   "date": "2026-04-10T10:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6351812044374371
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775836817000,
+   "channel": "hourly",
+   "date": "2026-04-10T16:00:17.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7107181277858134
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1775858404000,
+   "channel": "hourly",
+   "date": "2026-04-10T22:00:04.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7084607926399157
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776056407000,
+   "channel": "hourly",
+   "date": "2026-04-13T05:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.40743538523235373
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1776067205000,
+   "channel": "hourly",
+   "date": "2026-04-13T08:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7257581506032229
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776070808000,
+   "channel": "hourly",
+   "date": "2026-04-13T09:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.307892621733045
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1776081607000,
+   "channel": "hourly",
+   "date": "2026-04-13T12:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7255810338939336
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776092419000,
+   "channel": "hourly",
+   "date": "2026-04-13T15:00:19.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4950059993312507
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776128412000,
+   "channel": "hourly",
+   "date": "2026-04-14T01:00:12.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000004
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776128413000,
+   "channel": "hourly",
+   "date": "2026-04-14T01:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.30336750904098536
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776135609000,
+   "channel": "hourly",
+   "date": "2026-04-14T03:00:09.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999994
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776139207000,
+   "channel": "hourly",
+   "date": "2026-04-14T04:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7410547698718729
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776171615000,
+   "channel": "hourly",
+   "date": "2026-04-14T13:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6558535039157752
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776178806000,
+   "channel": "hourly",
+   "date": "2026-04-14T15:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6971422944790402
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776186009000,
+   "channel": "hourly",
+   "date": "2026-04-14T17:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.711825072277945
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776196807000,
+   "channel": "hourly",
+   "date": "2026-04-14T20:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.770058328278921
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776196811000,
+   "channel": "hourly",
+   "date": "2026-04-14T20:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5067828533444441
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776276017000,
+   "channel": "hourly",
+   "date": "2026-04-15T18:00:17.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8389545987943136
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776297612000,
+   "channel": "hourly",
+   "date": "2026-04-16T00:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6355948338593608
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1776297616000,
+   "channel": "hourly",
+   "date": "2026-04-16T00:00:16.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999999
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776333609000,
+   "channel": "hourly",
+   "date": "2026-04-16T10:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.779393279446587
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776348015000,
+   "channel": "hourly",
+   "date": "2026-04-16T14:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4441417305394935
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776348017000,
+   "channel": "hourly",
+   "date": "2026-04-16T14:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.45913247432952065
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776348018000,
+   "channel": "hourly",
+   "date": "2026-04-16T14:00:18.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7971232699861026
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776348026000,
+   "channel": "hourly",
+   "date": "2026-04-16T14:00:26.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7814489074944042
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776362410000,
+   "channel": "hourly",
+   "date": "2026-04-16T18:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6817731733976855
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776394829000,
+   "channel": "hourly",
+   "date": "2026-04-17T03:00:29.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7217138586946092
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776398406000,
+   "channel": "hourly",
+   "date": "2026-04-17T04:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7066021662745048
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776405633000,
+   "channel": "hourly",
+   "date": "2026-04-17T06:00:33.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7178358487351337
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776420006000,
+   "channel": "hourly",
+   "date": "2026-04-17T10:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6864284476054926
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776420009000,
+   "channel": "hourly",
+   "date": "2026-04-17T10:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7421407781292138
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776427214000,
+   "channel": "hourly",
+   "date": "2026-04-17T12:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7227364427376686
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776438022000,
+   "channel": "hourly",
+   "date": "2026-04-17T15:00:22.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6775064619048906
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776441616000,
+   "channel": "hourly",
+   "date": "2026-04-17T16:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8508747553170488
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776441622000,
+   "channel": "hourly",
+   "date": "2026-04-17T16:00:22.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5575211844968666
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776456007000,
+   "channel": "hourly",
+   "date": "2026-04-17T20:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5929974258550625
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776456014000,
+   "channel": "hourly",
+   "date": "2026-04-17T20:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6607228766296951
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776456016000,
+   "channel": "hourly",
+   "date": "2026-04-17T20:00:16.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6591567830725331
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1776470415000,
+   "channel": "hourly",
+   "date": "2026-04-18T00:00:15.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6520028729217558
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776474060000,
+   "channel": "hourly",
+   "date": "2026-04-18T01:01:00.000Z",
+   "outcome": "Partial",
+   "grossR": -0.716083035160872
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1776484803000,
+   "channel": "hourly",
+   "date": "2026-04-18T04:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7670314590142358
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776502809000,
+   "channel": "hourly",
+   "date": "2026-04-18T09:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5575227819703703
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776502810000,
+   "channel": "hourly",
+   "date": "2026-04-18T09:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5589335990531188
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776513612000,
+   "channel": "hourly",
+   "date": "2026-04-18T12:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7052432857007576
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776520807000,
+   "channel": "hourly",
+   "date": "2026-04-18T14:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7249043255306011
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1776610804000,
+   "channel": "hourly",
+   "date": "2026-04-19T15:00:04.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7430942471928746
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776618007000,
+   "channel": "hourly",
+   "date": "2026-04-19T17:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.37366493571841025
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776636007000,
+   "channel": "hourly",
+   "date": "2026-04-19T22:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.70670087896107
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776697215000,
+   "channel": "hourly",
+   "date": "2026-04-20T15:00:15.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7532604803152987
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776700807000,
+   "channel": "hourly",
+   "date": "2026-04-20T16:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7921144265221931
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1776711616000,
+   "channel": "hourly",
+   "date": "2026-04-20T19:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.538105122353769
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1776787216000,
+   "channel": "hourly",
+   "date": "2026-04-21T16:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5661694173678632
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1776873608000,
+   "channel": "hourly",
+   "date": "2026-04-22T16:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7233014472701418
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776884414000,
+   "channel": "hourly",
+   "date": "2026-04-22T19:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4911605412520225
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1776891609000,
+   "channel": "hourly",
+   "date": "2026-04-22T21:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7195832054715499
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777006813000,
+   "channel": "hourly",
+   "date": "2026-04-24T05:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6095723828631522
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1777032006000,
+   "channel": "hourly",
+   "date": "2026-04-24T12:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7219975061870082
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777122006000,
+   "channel": "hourly",
+   "date": "2026-04-25T13:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7690439297618897
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777183205000,
+   "channel": "hourly",
+   "date": "2026-04-26T06:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7186982938615021
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1777197603000,
+   "channel": "hourly",
+   "date": "2026-04-26T10:00:03.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6844720496773014
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777197604000,
+   "channel": "hourly",
+   "date": "2026-04-26T10:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6141862984460311
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1777204804000,
+   "channel": "hourly",
+   "date": "2026-04-26T12:00:04.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6994692250473241
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777262409000,
+   "channel": "hourly",
+   "date": "2026-04-27T04:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8052122625643541
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1777269613000,
+   "channel": "hourly",
+   "date": "2026-04-27T06:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6930801469514046
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1777276811000,
+   "channel": "hourly",
+   "date": "2026-04-27T08:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7034085341205276
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777280413000,
+   "channel": "hourly",
+   "date": "2026-04-27T09:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7205633098059289
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777356007000,
+   "channel": "hourly",
+   "date": "2026-04-28T06:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.47778999320711885
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1777381213000,
+   "channel": "hourly",
+   "date": "2026-04-28T13:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8231248539716025
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1777395630000,
+   "channel": "hourly",
+   "date": "2026-04-28T17:00:30.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5805338393757422
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1777399228000,
+   "channel": "hourly",
+   "date": "2026-04-28T18:00:28.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.666952180057801
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777446010000,
+   "channel": "hourly",
+   "date": "2026-04-29T07:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4826376715989644
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777460409000,
+   "channel": "hourly",
+   "date": "2026-04-29T11:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6393096007975604
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777489213000,
+   "channel": "hourly",
+   "date": "2026-04-29T19:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7683040811685311
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1777496409000,
+   "channel": "hourly",
+   "date": "2026-04-29T21:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.46625865146718737
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1777500021000,
+   "channel": "hourly",
+   "date": "2026-04-29T22:00:21.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4228301192969253
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1777564817000,
+   "channel": "hourly",
+   "date": "2026-04-30T16:00:17.000Z",
+   "outcome": "Partial",
+   "grossR": -0.88868523740935
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1777640411000,
+   "channel": "hourly",
+   "date": "2026-05-01T13:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5732983825773726
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1777687205000,
+   "channel": "hourly",
+   "date": "2026-05-02T02:00:05.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000004
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777741203000,
+   "channel": "hourly",
+   "date": "2026-05-02T17:00:03.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000007
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1777744807000,
+   "channel": "hourly",
+   "date": "2026-05-02T18:00:07.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000007
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1777752006000,
+   "channel": "hourly",
+   "date": "2026-05-02T20:00:06.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999992
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777766405000,
+   "channel": "hourly",
+   "date": "2026-05-03T00:00:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6680490856054323
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1777766413000,
+   "channel": "hourly",
+   "date": "2026-05-03T00:00:13.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777770004000,
+   "channel": "hourly",
+   "date": "2026-05-03T01:00:04.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7188999214825346
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1777780805000,
+   "channel": "hourly",
+   "date": "2026-05-03T04:00:05.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777806024000,
+   "channel": "hourly",
+   "date": "2026-05-03T11:00:24.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7552306126239435
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777809608000,
+   "channel": "hourly",
+   "date": "2026-05-03T12:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6842660215539608
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777816803000,
+   "channel": "hourly",
+   "date": "2026-05-03T14:00:03.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999996
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777827603000,
+   "channel": "hourly",
+   "date": "2026-05-03T17:00:03.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6932727985345198
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1777831208000,
+   "channel": "hourly",
+   "date": "2026-05-03T18:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6631573065346877
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1777838411000,
+   "channel": "hourly",
+   "date": "2026-05-03T20:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6452114695841702
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777878004000,
+   "channel": "hourly",
+   "date": "2026-05-04T07:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8270996196327359
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777878008000,
+   "channel": "hourly",
+   "date": "2026-05-04T07:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7030369810682674
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1777881619000,
+   "channel": "hourly",
+   "date": "2026-05-04T08:00:19.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999994
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777989612000,
+   "channel": "hourly",
+   "date": "2026-05-05T14:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7586711079025318
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1777989628000,
+   "channel": "hourly",
+   "date": "2026-05-05T14:00:28.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999996
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778018406000,
+   "channel": "hourly",
+   "date": "2026-05-05T22:00:06.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778043607000,
+   "channel": "hourly",
+   "date": "2026-05-06T05:00:07.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1778054406000,
+   "channel": "hourly",
+   "date": "2026-05-06T08:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.664393458413441
+  },
+  {
+   "symbol": "KASUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778068821000,
+   "channel": "hourly",
+   "date": "2026-05-06T12:00:21.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6000121496545114
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778076011000,
+   "channel": "hourly",
+   "date": "2026-05-06T14:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.36402771848375914
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778083208000,
+   "channel": "hourly",
+   "date": "2026-05-06T16:00:08.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778090411000,
+   "channel": "hourly",
+   "date": "2026-05-06T18:00:11.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778097620000,
+   "channel": "hourly",
+   "date": "2026-05-06T20:00:20.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1778112011000,
+   "channel": "hourly",
+   "date": "2026-05-07T00:00:11.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778169612000,
+   "channel": "hourly",
+   "date": "2026-05-07T16:00:12.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778230812000,
+   "channel": "hourly",
+   "date": "2026-05-08T09:00:12.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999996
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778234409000,
+   "channel": "hourly",
+   "date": "2026-05-08T10:00:09.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778234413000,
+   "channel": "hourly",
+   "date": "2026-05-08T10:00:13.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000007
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778238014000,
+   "channel": "hourly",
+   "date": "2026-05-08T11:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.41259544940600656
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778245217000,
+   "channel": "hourly",
+   "date": "2026-05-08T13:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.3338981388254451
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778245219000,
+   "channel": "hourly",
+   "date": "2026-05-08T13:00:19.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5958822553450089
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778259612000,
+   "channel": "hourly",
+   "date": "2026-05-08T17:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5043431592427106
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778299208000,
+   "channel": "hourly",
+   "date": "2026-05-09T04:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.668714134063235
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778313607000,
+   "channel": "hourly",
+   "date": "2026-05-09T08:00:07.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1778328016000,
+   "channel": "hourly",
+   "date": "2026-05-09T12:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6777276119699764
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778335204000,
+   "channel": "hourly",
+   "date": "2026-05-09T14:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5662099714213177
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778392803000,
+   "channel": "hourly",
+   "date": "2026-05-10T06:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.3290832950455095
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778400004000,
+   "channel": "hourly",
+   "date": "2026-05-10T08:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5733215518363435
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778425205000,
+   "channel": "hourly",
+   "date": "2026-05-10T15:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5640585791100975
+  },
+  {
+   "symbol": "POLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778425231000,
+   "channel": "hourly",
+   "date": "2026-05-10T15:00:31.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4925297569705876
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1778428815000,
+   "channel": "hourly",
+   "date": "2026-05-10T16:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5991326089130458
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778432408000,
+   "channel": "hourly",
+   "date": "2026-05-10T17:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7176815869159758
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778443208000,
+   "channel": "hourly",
+   "date": "2026-05-10T20:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7490537215114592
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778443233000,
+   "channel": "hourly",
+   "date": "2026-05-10T20:00:33.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5748354687604406
+  },
+  {
+   "symbol": "WIFUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778443235000,
+   "channel": "hourly",
+   "date": "2026-05-10T20:00:35.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7140463850772328
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778446807000,
+   "channel": "hourly",
+   "date": "2026-05-10T21:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4932363341594209
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778446807000,
+   "channel": "hourly",
+   "date": "2026-05-10T21:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5168670667496877
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778446815000,
+   "channel": "hourly",
+   "date": "2026-05-10T21:00:15.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778450409000,
+   "channel": "hourly",
+   "date": "2026-05-10T22:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5712144399255129
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778472016000,
+   "channel": "hourly",
+   "date": "2026-05-11T04:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5370766546864785
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778472025000,
+   "channel": "hourly",
+   "date": "2026-05-11T04:00:25.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5123748244521759
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778486404000,
+   "channel": "hourly",
+   "date": "2026-05-11T08:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4882670491803245
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778497214000,
+   "channel": "hourly",
+   "date": "2026-05-11T11:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6830012686377037
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778500820000,
+   "channel": "hourly",
+   "date": "2026-05-11T12:00:20.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5604793636134507
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778526008000,
+   "channel": "hourly",
+   "date": "2026-05-11T19:00:08.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778547614000,
+   "channel": "hourly",
+   "date": "2026-05-12T01:00:14.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000004
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778583615000,
+   "channel": "hourly",
+   "date": "2026-05-12T11:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.43604712569026455
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778590813000,
+   "channel": "hourly",
+   "date": "2026-05-12T13:00:13.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778601609000,
+   "channel": "hourly",
+   "date": "2026-05-12T16:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.46957784697677857
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1778601612000,
+   "channel": "hourly",
+   "date": "2026-05-12T16:00:12.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778760010000,
+   "channel": "hourly",
+   "date": "2026-05-14T12:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5559810554946758
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778760015000,
+   "channel": "hourly",
+   "date": "2026-05-14T12:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5546607368964068
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1778788812000,
+   "channel": "hourly",
+   "date": "2026-05-14T20:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.2785408118494261
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1778788815000,
+   "channel": "hourly",
+   "date": "2026-05-14T20:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7740392002047042
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778857214000,
+   "channel": "hourly",
+   "date": "2026-05-15T15:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6959273207086986
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778864407000,
+   "channel": "hourly",
+   "date": "2026-05-15T17:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8604860188253982
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778864410000,
+   "channel": "hourly",
+   "date": "2026-05-15T17:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4314213618626453
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778868021000,
+   "channel": "hourly",
+   "date": "2026-05-15T18:00:21.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8270423890775768
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778932811000,
+   "channel": "hourly",
+   "date": "2026-05-16T12:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7543617576601435
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778932813000,
+   "channel": "hourly",
+   "date": "2026-05-16T12:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7507051261581796
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778932814000,
+   "channel": "hourly",
+   "date": "2026-05-16T12:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7486145945612698
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778936405000,
+   "channel": "hourly",
+   "date": "2026-05-16T13:00:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8075883714774901
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778936405000,
+   "channel": "hourly",
+   "date": "2026-05-16T13:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7485308536390871
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778936408000,
+   "channel": "hourly",
+   "date": "2026-05-16T13:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7438307081702583
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778936412000,
+   "channel": "hourly",
+   "date": "2026-05-16T13:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7407310914161399
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778936435000,
+   "channel": "hourly",
+   "date": "2026-05-16T13:00:35.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7440646783003996
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778940005000,
+   "channel": "hourly",
+   "date": "2026-05-16T14:00:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.72386619194225
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1778990413000,
+   "channel": "hourly",
+   "date": "2026-05-17T04:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7384606163957281
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779022805000,
+   "channel": "hourly",
+   "date": "2026-05-17T13:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.554879476085818
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1779076822000,
+   "channel": "hourly",
+   "date": "2026-05-18T04:00:22.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7064490504608556
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779120010000,
+   "channel": "hourly",
+   "date": "2026-05-18T16:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4689137236017226
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1779134422000,
+   "channel": "hourly",
+   "date": "2026-05-18T20:00:22.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8441628984453826
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1779148839000,
+   "channel": "hourly",
+   "date": "2026-05-19T00:00:39.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6392861049503541
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779156007000,
+   "channel": "hourly",
+   "date": "2026-05-19T02:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6784176436845284
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 240,
+   "side": 1,
+   "timeMs": 1779163210000,
+   "channel": "hourly",
+   "date": "2026-05-19T04:00:10.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779206422000,
+   "channel": "hourly",
+   "date": "2026-05-19T16:00:22.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.2628260965567347
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1779249618000,
+   "channel": "hourly",
+   "date": "2026-05-20T04:00:18.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7173553297970532
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779307215000,
+   "channel": "hourly",
+   "date": "2026-05-20T20:00:15.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6929562658295331
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779350418000,
+   "channel": "hourly",
+   "date": "2026-05-21T08:00:18.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6956623322507981
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779361216000,
+   "channel": "hourly",
+   "date": "2026-05-21T11:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6167873429986228
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1779364808000,
+   "channel": "hourly",
+   "date": "2026-05-21T12:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5930319233420145
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779364820000,
+   "channel": "hourly",
+   "date": "2026-05-21T12:00:20.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999997
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1779372011000,
+   "channel": "hourly",
+   "date": "2026-05-21T14:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7309353515786889
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779393612000,
+   "channel": "hourly",
+   "date": "2026-05-21T20:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6788116928714171
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779422414000,
+   "channel": "hourly",
+   "date": "2026-05-22T04:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5291659547130582
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779436811000,
+   "channel": "hourly",
+   "date": "2026-05-22T08:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6924703343889479
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779458421000,
+   "channel": "hourly",
+   "date": "2026-05-22T14:00:21.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.766985446803015
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779458425000,
+   "channel": "hourly",
+   "date": "2026-05-22T14:00:25.000Z",
+   "outcome": "Partial",
+   "grossR": -0.690740817292456
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779465608000,
+   "channel": "hourly",
+   "date": "2026-05-22T16:00:08.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1779472809000,
+   "channel": "hourly",
+   "date": "2026-05-22T18:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7376594794651805
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1779472815000,
+   "channel": "hourly",
+   "date": "2026-05-22T18:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6706686674004315
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779476421000,
+   "channel": "hourly",
+   "date": "2026-05-22T19:00:21.000Z",
+   "outcome": "Partial",
+   "grossR": -0.682118481497146
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779480009000,
+   "channel": "hourly",
+   "date": "2026-05-22T20:00:09.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779480021000,
+   "channel": "hourly",
+   "date": "2026-05-22T20:00:21.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7201402670918202
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1779480026000,
+   "channel": "hourly",
+   "date": "2026-05-22T20:00:26.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779480032000,
+   "channel": "hourly",
+   "date": "2026-05-22T20:00:32.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.37318225514530223
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1779487204000,
+   "channel": "hourly",
+   "date": "2026-05-22T22:00:04.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7173993772220542
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1779487206000,
+   "channel": "hourly",
+   "date": "2026-05-22T22:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7316568406452248
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1779487226000,
+   "channel": "hourly",
+   "date": "2026-05-22T22:00:26.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7305151442112183
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779631207000,
+   "channel": "hourly",
+   "date": "2026-05-24T14:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7390066598459448
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779634805000,
+   "channel": "hourly",
+   "date": "2026-05-24T15:00:05.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000004
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779645604000,
+   "channel": "hourly",
+   "date": "2026-05-24T18:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5292507928493855
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779681608000,
+   "channel": "hourly",
+   "date": "2026-05-25T04:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.541194852291976
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1779724806000,
+   "channel": "hourly",
+   "date": "2026-05-25T16:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.46697173778702267
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779728409000,
+   "channel": "hourly",
+   "date": "2026-05-25T17:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.48921188755225303
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779750013000,
+   "channel": "hourly",
+   "date": "2026-05-25T23:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5928571095178048
+  },
+  {
+   "symbol": "WLDUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1779760814000,
+   "channel": "hourly",
+   "date": "2026-05-26T02:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7176197855832375
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779800413000,
+   "channel": "hourly",
+   "date": "2026-05-26T13:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6794112511387146
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779807623000,
+   "channel": "hourly",
+   "date": "2026-05-26T15:00:23.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7422057466309533
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1779811217000,
+   "channel": "hourly",
+   "date": "2026-05-26T16:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5736798178811853
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779811220000,
+   "channel": "hourly",
+   "date": "2026-05-26T16:00:20.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6131016786863226
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779814814000,
+   "channel": "hourly",
+   "date": "2026-05-26T17:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7133694906056238
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779814817000,
+   "channel": "hourly",
+   "date": "2026-05-26T17:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6343087617153342
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1779818423000,
+   "channel": "hourly",
+   "date": "2026-05-26T18:00:23.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4987390943087342
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1779825622000,
+   "channel": "hourly",
+   "date": "2026-05-26T20:00:22.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5051745317029896
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1779825624000,
+   "channel": "hourly",
+   "date": "2026-05-26T20:00:24.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.47259692338314524
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 240,
+   "side": -1,
+   "timeMs": 1779840015000,
+   "channel": "hourly",
+   "date": "2026-05-27T00:00:15.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1779991216000,
+   "channel": "hourly",
+   "date": "2026-05-28T18:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6586560984540406
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780005606000,
+   "channel": "hourly",
+   "date": "2026-05-28T22:00:06.000Z",
+   "outcome": "Stop",
+   "grossR": -0.999999999999999
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780020007000,
+   "channel": "hourly",
+   "date": "2026-05-29T02:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7728019743241886
+  },
+  {
+   "symbol": "UNIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780070418000,
+   "channel": "hourly",
+   "date": "2026-05-29T16:00:18.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "ZECUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780077609000,
+   "channel": "hourly",
+   "date": "2026-05-29T18:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7296303223518438
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1780077614000,
+   "channel": "hourly",
+   "date": "2026-05-29T18:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5680166447223617
+  },
+  {
+   "symbol": "TONUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1780279208000,
+   "channel": "hourly",
+   "date": "2026-06-01T02:00:08.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780336817000,
+   "channel": "hourly",
+   "date": "2026-06-01T18:00:17.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780336820000,
+   "channel": "hourly",
+   "date": "2026-06-01T18:00:20.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "APEUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1780340414000,
+   "channel": "hourly",
+   "date": "2026-06-01T19:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6561026208523789
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780344027000,
+   "channel": "hourly",
+   "date": "2026-06-01T20:00:27.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000004
+  },
+  {
+   "symbol": "DOTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780398018000,
+   "channel": "hourly",
+   "date": "2026-06-02T11:00:18.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1780401602000,
+   "channel": "hourly",
+   "date": "2026-06-02T12:00:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6981389006536756
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780419625000,
+   "channel": "hourly",
+   "date": "2026-06-02T17:00:25.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7081440855505896
+  },
+  {
+   "symbol": "ENSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780423214000,
+   "channel": "hourly",
+   "date": "2026-06-02T18:00:14.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "AEROUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780423224000,
+   "channel": "hourly",
+   "date": "2026-06-02T18:00:24.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000002
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780434062000,
+   "channel": "hourly",
+   "date": "2026-06-02T21:01:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7129849921439533
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780444806000,
+   "channel": "hourly",
+   "date": "2026-06-03T00:00:06.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780444825000,
+   "channel": "hourly",
+   "date": "2026-06-03T00:00:25.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6686245379194459
+  },
+  {
+   "symbol": "ENSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780444829000,
+   "channel": "hourly",
+   "date": "2026-06-03T00:00:29.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999997
+  },
+  {
+   "symbol": "ZENUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780452012000,
+   "channel": "hourly",
+   "date": "2026-06-03T02:00:12.000Z",
+   "outcome": "no-data",
+   "grossR": null
+  },
+  {
+   "symbol": "IOTAUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780466417000,
+   "channel": "hourly",
+   "date": "2026-06-03T06:00:17.000Z",
+   "outcome": "Partial",
+   "grossR": -0.814070044190628
+  },
+  {
+   "symbol": "ARBUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780473602000,
+   "channel": "hourly",
+   "date": "2026-06-03T08:00:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.898321984109887
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780545603000,
+   "channel": "hourly",
+   "date": "2026-06-04T04:00:03.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780545606000,
+   "channel": "hourly",
+   "date": "2026-06-04T04:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8200206491418717
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780545617000,
+   "channel": "hourly",
+   "date": "2026-06-04T04:00:17.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8485992061871764
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780545630000,
+   "channel": "hourly",
+   "date": "2026-06-04T04:00:30.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7950755248595597
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780578003000,
+   "channel": "hourly",
+   "date": "2026-06-04T13:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.37095233231091573
+  },
+  {
+   "symbol": "TONUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780578007000,
+   "channel": "hourly",
+   "date": "2026-06-04T13:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "APEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780578007000,
+   "channel": "hourly",
+   "date": "2026-06-04T13:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4036379095597509
+  },
+  {
+   "symbol": "BNBUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780617603000,
+   "channel": "hourly",
+   "date": "2026-06-05T00:00:03.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780635615000,
+   "channel": "hourly",
+   "date": "2026-06-05T05:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.3835943616598721
+  },
+  {
+   "symbol": "FARTCOINUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780671608000,
+   "channel": "hourly",
+   "date": "2026-06-05T15:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7223552794046948
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780678824000,
+   "channel": "hourly",
+   "date": "2026-06-05T17:00:24.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7562879885364336
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780689600000,
+   "channel": "hourly",
+   "date": "2026-06-05T20:00:00.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780689615000,
+   "channel": "hourly",
+   "date": "2026-06-05T20:00:15.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780704003000,
+   "channel": "hourly",
+   "date": "2026-06-06T00:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6672820057684714
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780707600000,
+   "channel": "hourly",
+   "date": "2026-06-06T01:00:00.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5800081031878641
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780729206000,
+   "channel": "hourly",
+   "date": "2026-06-06T07:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7589189639176268
+  },
+  {
+   "symbol": "DASHUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780732807000,
+   "channel": "hourly",
+   "date": "2026-06-06T08:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780732809000,
+   "channel": "hourly",
+   "date": "2026-06-06T08:00:09.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780736401000,
+   "channel": "hourly",
+   "date": "2026-06-06T09:00:01.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780754460000,
+   "channel": "hourly",
+   "date": "2026-06-06T14:01:00.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6138783673513822
+  },
+  {
+   "symbol": "XMRUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780761604000,
+   "channel": "hourly",
+   "date": "2026-06-06T16:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5668720720255739
+  },
+  {
+   "symbol": "ENSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780790409000,
+   "channel": "hourly",
+   "date": "2026-06-07T00:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6677828414702982
+  },
+  {
+   "symbol": "NEARUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780797600000,
+   "channel": "hourly",
+   "date": "2026-06-07T02:00:00.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780891218000,
+   "channel": "hourly",
+   "date": "2026-06-08T04:00:18.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780905601000,
+   "channel": "hourly",
+   "date": "2026-06-08T08:00:01.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1780984806000,
+   "channel": "hourly",
+   "date": "2026-06-09T06:00:06.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1781056812000,
+   "channel": "hourly",
+   "date": "2026-06-10T02:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.522750716242473
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1781092808000,
+   "channel": "hourly",
+   "date": "2026-06-10T12:00:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7129777006598551
+  },
+  {
+   "symbol": "BSVUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1781164820000,
+   "channel": "hourly",
+   "date": "2026-06-11T08:00:20.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6605758359942734
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1781222407000,
+   "channel": "hourly",
+   "date": "2026-06-12T00:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1781280011000,
+   "channel": "hourly",
+   "date": "2026-06-12T16:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7544974943296839
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781395205000,
+   "channel": "hourly",
+   "date": "2026-06-14T00:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781402402000,
+   "channel": "hourly",
+   "date": "2026-06-14T02:00:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6502008561356696
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781402402000,
+   "channel": "hourly",
+   "date": "2026-06-14T02:00:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6502008561356696
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1781506823000,
+   "channel": "hourly",
+   "date": "2026-06-15T07:00:23.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7792383196168648
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1781510402000,
+   "channel": "hourly",
+   "date": "2026-06-15T08:00:02.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6454061142074714
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781510407000,
+   "channel": "hourly",
+   "date": "2026-06-15T08:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6363121917068583
+  },
+  {
+   "symbol": "DASHUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781532010000,
+   "channel": "hourly",
+   "date": "2026-06-15T14:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8002505663834399
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1781535605000,
+   "channel": "hourly",
+   "date": "2026-06-15T15:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8350595291505928
+  },
+  {
+   "symbol": "BNBUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781546415000,
+   "channel": "hourly",
+   "date": "2026-06-15T18:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.802104677017224
+  },
+  {
+   "symbol": "WIFUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781546418000,
+   "channel": "hourly",
+   "date": "2026-06-15T18:00:18.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7974427289354391
+  },
+  {
+   "symbol": "APEUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1781550012000,
+   "channel": "hourly",
+   "date": "2026-06-15T19:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7223248812761556
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1781553601000,
+   "channel": "hourly",
+   "date": "2026-06-15T20:00:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4923661272609303
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781611217000,
+   "channel": "hourly",
+   "date": "2026-06-16T12:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8583167210591444
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781618407000,
+   "channel": "hourly",
+   "date": "2026-06-16T14:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5911750863494454
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1781618424000,
+   "channel": "hourly",
+   "date": "2026-06-16T14:00:24.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4844292608635176
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781625625000,
+   "channel": "hourly",
+   "date": "2026-06-16T16:00:25.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4987669136587868
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781690415000,
+   "channel": "hourly",
+   "date": "2026-06-17T10:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5624178463010134
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781726402000,
+   "channel": "hourly",
+   "date": "2026-06-17T20:00:02.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4271513566445292
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781726418000,
+   "channel": "hourly",
+   "date": "2026-06-17T20:00:18.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.45457350625422144
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1781744406000,
+   "channel": "hourly",
+   "date": "2026-06-18T01:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8062557011224343
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781798405000,
+   "channel": "hourly",
+   "date": "2026-06-18T16:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5742912570812515
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1781802022000,
+   "channel": "hourly",
+   "date": "2026-06-18T17:00:22.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6966500843100554
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1781827211000,
+   "channel": "hourly",
+   "date": "2026-06-19T00:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7638261844404124
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1781859614000,
+   "channel": "hourly",
+   "date": "2026-06-19T09:00:14.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1781877602000,
+   "channel": "hourly",
+   "date": "2026-06-19T14:00:02.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "AEROUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1781956809000,
+   "channel": "hourly",
+   "date": "2026-06-20T12:00:09.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1781971211000,
+   "channel": "hourly",
+   "date": "2026-06-20T16:00:11.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1782057610000,
+   "channel": "hourly",
+   "date": "2026-06-21T16:00:10.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1782061204000,
+   "channel": "hourly",
+   "date": "2026-06-21T17:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6809490771993909
+  },
+  {
+   "symbol": "FETUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782093609000,
+   "channel": "hourly",
+   "date": "2026-06-22T02:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7882587096302303
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782093620000,
+   "channel": "hourly",
+   "date": "2026-06-22T02:00:20.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000004
+  },
+  {
+   "symbol": "ENSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782093620000,
+   "channel": "hourly",
+   "date": "2026-06-22T02:00:20.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1782151243000,
+   "channel": "hourly",
+   "date": "2026-06-22T18:00:43.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5296562962465755
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782216013000,
+   "channel": "hourly",
+   "date": "2026-06-23T12:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6455996636752812
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1782230424000,
+   "channel": "hourly",
+   "date": "2026-06-23T16:00:24.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7659696375269822
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782234021000,
+   "channel": "hourly",
+   "date": "2026-06-23T17:00:21.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999994
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782280814000,
+   "channel": "hourly",
+   "date": "2026-06-24T06:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4088405218786691
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782280817000,
+   "channel": "hourly",
+   "date": "2026-06-24T06:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7125383774856858
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782313209000,
+   "channel": "hourly",
+   "date": "2026-06-24T15:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5073034699223998
+  },
+  {
+   "symbol": "APEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782327605000,
+   "channel": "hourly",
+   "date": "2026-06-24T19:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5829569568523938
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782327605000,
+   "channel": "hourly",
+   "date": "2026-06-24T19:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5941566937177364
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782331213000,
+   "channel": "hourly",
+   "date": "2026-06-24T20:00:13.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782331229000,
+   "channel": "hourly",
+   "date": "2026-06-24T20:00:29.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7376958117746675
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782334804000,
+   "channel": "hourly",
+   "date": "2026-06-24T21:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5871969742731581
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782338405000,
+   "channel": "hourly",
+   "date": "2026-06-24T22:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.576999157952063
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782338411000,
+   "channel": "hourly",
+   "date": "2026-06-24T22:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6020369036345786
+  },
+  {
+   "symbol": "BNBUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782338413000,
+   "channel": "hourly",
+   "date": "2026-06-24T22:00:13.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782338423000,
+   "channel": "hourly",
+   "date": "2026-06-24T22:00:23.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7303836997012455
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782345619000,
+   "channel": "hourly",
+   "date": "2026-06-25T00:00:19.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782352808000,
+   "channel": "hourly",
+   "date": "2026-06-25T02:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5924829340935048
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782352817000,
+   "channel": "hourly",
+   "date": "2026-06-25T02:00:17.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782367218000,
+   "channel": "hourly",
+   "date": "2026-06-25T06:00:18.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5205532677148033
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782374422000,
+   "channel": "hourly",
+   "date": "2026-06-25T08:00:22.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782399607000,
+   "channel": "hourly",
+   "date": "2026-06-25T15:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782399623000,
+   "channel": "hourly",
+   "date": "2026-06-25T15:00:23.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782403204000,
+   "channel": "hourly",
+   "date": "2026-06-25T16:00:04.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ENAUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782403207000,
+   "channel": "hourly",
+   "date": "2026-06-25T16:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "INJUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782403211000,
+   "channel": "hourly",
+   "date": "2026-06-25T16:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8054642219104382
+  },
+  {
+   "symbol": "FARTCOINUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782403211000,
+   "channel": "hourly",
+   "date": "2026-06-25T16:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5403554859668542
+  },
+  {
+   "symbol": "ARBUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782403219000,
+   "channel": "hourly",
+   "date": "2026-06-25T16:00:19.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7315460841215025
+  },
+  {
+   "symbol": "SPXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782403220000,
+   "channel": "hourly",
+   "date": "2026-06-25T16:00:20.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.705800472119717
+  },
+  {
+   "symbol": "ZENUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782403221000,
+   "channel": "hourly",
+   "date": "2026-06-25T16:00:21.000Z",
+   "outcome": "no-data",
+   "grossR": null
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782403225000,
+   "channel": "hourly",
+   "date": "2026-06-25T16:00:25.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "NEARUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782403225000,
+   "channel": "hourly",
+   "date": "2026-06-25T16:00:25.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "WIFUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782446405000,
+   "channel": "hourly",
+   "date": "2026-06-26T04:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6515826176232279
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782446405000,
+   "channel": "hourly",
+   "date": "2026-06-26T04:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782453608000,
+   "channel": "hourly",
+   "date": "2026-06-26T06:00:08.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1782540001000,
+   "channel": "hourly",
+   "date": "2026-06-27T06:00:01.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1782543604000,
+   "channel": "hourly",
+   "date": "2026-06-27T07:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4575108821194644
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782828003000,
+   "channel": "hourly",
+   "date": "2026-06-30T14:00:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6388420101317631
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1782849614000,
+   "channel": "hourly",
+   "date": "2026-06-30T20:00:14.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782871215000,
+   "channel": "hourly",
+   "date": "2026-07-01T02:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6147097475995753
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1782871219000,
+   "channel": "hourly",
+   "date": "2026-07-01T02:00:19.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5157602527383595
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1782885605000,
+   "channel": "hourly",
+   "date": "2026-07-01T06:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6324772297612413
+  },
+  {
+   "symbol": "IOTAUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1782892816000,
+   "channel": "hourly",
+   "date": "2026-07-01T08:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5437324143391224
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783008022000,
+   "channel": "hourly",
+   "date": "2026-07-02T16:00:22.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783022409000,
+   "channel": "hourly",
+   "date": "2026-07-02T20:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4870394690337469
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783029602000,
+   "channel": "hourly",
+   "date": "2026-07-02T22:00:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7343313415980597
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783051219000,
+   "channel": "hourly",
+   "date": "2026-07-03T04:00:19.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6159644063700698
+  },
+  {
+   "symbol": "BSVUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783051220000,
+   "channel": "hourly",
+   "date": "2026-07-03T04:00:20.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783087206000,
+   "channel": "hourly",
+   "date": "2026-07-03T14:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6250770565541174
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783094407000,
+   "channel": "hourly",
+   "date": "2026-07-03T16:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "FARTCOINUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783094407000,
+   "channel": "hourly",
+   "date": "2026-07-03T16:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783094412000,
+   "channel": "hourly",
+   "date": "2026-07-03T16:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5518924403695048
+  },
+  {
+   "symbol": "UNIUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783108811000,
+   "channel": "hourly",
+   "date": "2026-07-03T20:00:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6895432921366652
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783119607000,
+   "channel": "hourly",
+   "date": "2026-07-03T23:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783130409000,
+   "channel": "hourly",
+   "date": "2026-07-04T02:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5687175784056778
+  },
+  {
+   "symbol": "SPXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783152003000,
+   "channel": "hourly",
+   "date": "2026-07-04T08:00:03.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783159202000,
+   "channel": "hourly",
+   "date": "2026-07-04T10:00:02.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783159203000,
+   "channel": "hourly",
+   "date": "2026-07-04T10:00:03.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XMRUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783177210000,
+   "channel": "hourly",
+   "date": "2026-07-04T15:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6927311294103257
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783180807000,
+   "channel": "hourly",
+   "date": "2026-07-04T16:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6405918746124463
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783191601000,
+   "channel": "hourly",
+   "date": "2026-07-04T19:00:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7245602502275168
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783209612000,
+   "channel": "hourly",
+   "date": "2026-07-05T00:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.631029034313007
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783209615000,
+   "channel": "hourly",
+   "date": "2026-07-05T00:00:15.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783209617000,
+   "channel": "hourly",
+   "date": "2026-07-05T00:00:17.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783216808000,
+   "channel": "hourly",
+   "date": "2026-07-05T02:00:08.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783220461000,
+   "channel": "hourly",
+   "date": "2026-07-05T03:01:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6807637020441679
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783224012000,
+   "channel": "hourly",
+   "date": "2026-07-05T04:00:12.000Z",
+   "outcome": "Stop",
+   "grossR": -1
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783346424000,
+   "channel": "hourly",
+   "date": "2026-07-06T14:00:24.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7549003310037704
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783353633000,
+   "channel": "hourly",
+   "date": "2026-07-06T16:00:33.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.45324785358003317
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783396809000,
+   "channel": "hourly",
+   "date": "2026-07-07T04:00:09.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783396809000,
+   "channel": "hourly",
+   "date": "2026-07-07T04:00:09.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "AEROUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783404055000,
+   "channel": "hourly",
+   "date": "2026-07-07T06:00:55.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5460820026022308
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783432821000,
+   "channel": "hourly",
+   "date": "2026-07-07T14:00:21.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999999
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783436411000,
+   "channel": "hourly",
+   "date": "2026-07-07T15:00:11.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783504820000,
+   "channel": "hourly",
+   "date": "2026-07-08T10:00:20.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ENSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783512026000,
+   "channel": "hourly",
+   "date": "2026-07-08T12:00:26.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6258773896126367
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783530047000,
+   "channel": "hourly",
+   "date": "2026-07-08T17:00:47.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783540817000,
+   "channel": "hourly",
+   "date": "2026-07-08T20:00:17.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783548013000,
+   "channel": "hourly",
+   "date": "2026-07-08T22:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6956847632919181
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783573212000,
+   "channel": "hourly",
+   "date": "2026-07-09T05:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5488494375530005
+  },
+  {
+   "symbol": "JUPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1783641620000,
+   "channel": "hourly",
+   "date": "2026-07-10T00:00:20.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783666821000,
+   "channel": "hourly",
+   "date": "2026-07-10T07:00:21.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.506232891855816
+  },
+  {
+   "symbol": "ENAUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1783785605000,
+   "channel": "hourly",
+   "date": "2026-07-11T16:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1783810816000,
+   "channel": "hourly",
+   "date": "2026-07-11T23:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6963228956554977
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783904461000,
+   "channel": "hourly",
+   "date": "2026-07-13T01:01:01.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999989
+  },
+  {
+   "symbol": "WIFUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1783922401000,
+   "channel": "hourly",
+   "date": "2026-07-13T06:00:01.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783962012000,
+   "channel": "hourly",
+   "date": "2026-07-13T17:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6962487491933332
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783969212000,
+   "channel": "hourly",
+   "date": "2026-07-13T19:00:12.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7185872112374082
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1783972832000,
+   "channel": "hourly",
+   "date": "2026-07-13T20:00:32.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783987204000,
+   "channel": "hourly",
+   "date": "2026-07-14T00:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5205524004847021
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783987218000,
+   "channel": "hourly",
+   "date": "2026-07-14T00:00:18.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7218801279151772
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784008807000,
+   "channel": "hourly",
+   "date": "2026-07-14T06:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784034021000,
+   "channel": "hourly",
+   "date": "2026-07-14T13:00:21.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5263111140915235
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784037642000,
+   "channel": "hourly",
+   "date": "2026-07-14T14:00:42.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8130593984025577
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784044814000,
+   "channel": "hourly",
+   "date": "2026-07-14T16:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8775729926093953
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784080810000,
+   "channel": "hourly",
+   "date": "2026-07-15T02:00:10.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999998
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784080819000,
+   "channel": "hourly",
+   "date": "2026-07-15T02:00:19.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784084409000,
+   "channel": "hourly",
+   "date": "2026-07-15T03:00:09.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784113205000,
+   "channel": "hourly",
+   "date": "2026-07-15T11:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784116819000,
+   "channel": "hourly",
+   "date": "2026-07-15T12:00:19.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784142015000,
+   "channel": "hourly",
+   "date": "2026-07-15T19:00:15.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784246425000,
+   "channel": "hourly",
+   "date": "2026-07-17T00:00:25.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6516639967767377
+  },
+  {
+   "symbol": "FARTCOINUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784296809000,
+   "channel": "hourly",
+   "date": "2026-07-17T14:00:09.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784296810000,
+   "channel": "hourly",
+   "date": "2026-07-17T14:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6060749105449131
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784354401000,
+   "channel": "hourly",
+   "date": "2026-07-18T06:00:01.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ENSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784394005000,
+   "channel": "hourly",
+   "date": "2026-07-18T17:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784408403000,
+   "channel": "hourly",
+   "date": "2026-07-18T21:00:03.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784469603000,
+   "channel": "hourly",
+   "date": "2026-07-19T14:00:03.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7763809785605523
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784487604000,
+   "channel": "hourly",
+   "date": "2026-07-19T19:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6801194616265774
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784520004000,
+   "channel": "hourly",
+   "date": "2026-07-20T04:00:04.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6994020887945368
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784520007000,
+   "channel": "hourly",
+   "date": "2026-07-20T04:00:07.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999997
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784530814000,
+   "channel": "hourly",
+   "date": "2026-07-20T07:00:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.686720529979042
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784534413000,
+   "channel": "hourly",
+   "date": "2026-07-20T08:00:13.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7934374265226188
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784534422000,
+   "channel": "hourly",
+   "date": "2026-07-20T08:00:22.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "GRTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784541621000,
+   "channel": "hourly",
+   "date": "2026-07-20T10:00:21.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7454452110328398
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784548821000,
+   "channel": "hourly",
+   "date": "2026-07-20T12:00:21.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7787512897354625
+  },
+  {
+   "symbol": "AEROUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784563211000,
+   "channel": "hourly",
+   "date": "2026-07-20T16:00:11.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784563223000,
+   "channel": "hourly",
+   "date": "2026-07-20T16:00:23.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "FARTCOINUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784638817000,
+   "channel": "hourly",
+   "date": "2026-07-21T13:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5049384651011326
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784642406000,
+   "channel": "hourly",
+   "date": "2026-07-21T14:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7263844215344412
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784642409000,
+   "channel": "hourly",
+   "date": "2026-07-21T14:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7670078399742407
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784653206000,
+   "channel": "hourly",
+   "date": "2026-07-21T17:00:06.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784671203000,
+   "channel": "hourly",
+   "date": "2026-07-21T22:00:03.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784707210000,
+   "channel": "hourly",
+   "date": "2026-07-22T08:00:10.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784725223000,
+   "channel": "hourly",
+   "date": "2026-07-22T13:00:23.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.46384509656799117
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784736007000,
+   "channel": "hourly",
+   "date": "2026-07-22T16:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ETHUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784743206000,
+   "channel": "hourly",
+   "date": "2026-07-22T18:00:06.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784775605000,
+   "channel": "hourly",
+   "date": "2026-07-23T03:00:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5916591733518692
+  },
+  {
+   "symbol": "UNIUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784793697000,
+   "channel": "hourly",
+   "date": "2026-07-23T08:01:37.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6966265658406263
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1784844001000,
+   "channel": "hourly",
+   "date": "2026-07-23T22:00:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.46106439486166545
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784854807000,
+   "channel": "hourly",
+   "date": "2026-07-24T01:00:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8035317925348134
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784865609000,
+   "channel": "hourly",
+   "date": "2026-07-24T04:00:09.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8397392787988863
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784905231000,
+   "channel": "hourly",
+   "date": "2026-07-24T15:00:31.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6821735715751418
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784908815000,
+   "channel": "hourly",
+   "date": "2026-07-24T16:00:15.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "WIFUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784908817000,
+   "channel": "hourly",
+   "date": "2026-07-24T16:00:17.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784916010000,
+   "channel": "hourly",
+   "date": "2026-07-24T18:00:10.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1784937601000,
+   "channel": "hourly",
+   "date": "2026-07-25T00:00:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5987669534648365
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785031202000,
+   "channel": "hourly",
+   "date": "2026-07-26T02:00:02.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1785081602000,
+   "channel": "hourly",
+   "date": "2026-07-26T16:00:02.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ETCUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1785096001000,
+   "channel": "hourly",
+   "date": "2026-07-26T20:00:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6114095150727934
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1785110416000,
+   "channel": "hourly",
+   "date": "2026-07-27T00:00:16.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.820117027625269
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1785121209000,
+   "channel": "hourly",
+   "date": "2026-07-27T03:00:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5770427936231299
+  },
+  {
+   "symbol": "APEUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1785142802000,
+   "channel": "hourly",
+   "date": "2026-07-27T09:00:02.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7589314206096518
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1785153604000,
+   "channel": "hourly",
+   "date": "2026-07-27T12:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5504316938396276
+  },
+  {
+   "symbol": "SUIUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785160808000,
+   "channel": "hourly",
+   "date": "2026-07-27T14:00:08.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1785175210000,
+   "channel": "hourly",
+   "date": "2026-07-27T18:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6300381342949968
+  },
+  {
+   "symbol": "XMRUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785175230000,
+   "channel": "hourly",
+   "date": "2026-07-27T18:00:30.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785204020000,
+   "channel": "hourly",
+   "date": "2026-07-28T02:00:20.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "QNTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785207618000,
+   "channel": "hourly",
+   "date": "2026-07-28T03:00:18.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "TRXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785211211000,
+   "channel": "hourly",
+   "date": "2026-07-28T04:00:11.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XRPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785254403000,
+   "channel": "hourly",
+   "date": "2026-07-28T16:00:03.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785254407000,
+   "channel": "hourly",
+   "date": "2026-07-28T16:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785254411000,
+   "channel": "hourly",
+   "date": "2026-07-28T16:00:11.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "BTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785254411000,
+   "channel": "hourly",
+   "date": "2026-07-28T16:00:11.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785254417000,
+   "channel": "hourly",
+   "date": "2026-07-28T16:00:17.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ENSUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785254436000,
+   "channel": "hourly",
+   "date": "2026-07-28T16:00:36.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ENSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785254436000,
+   "channel": "hourly",
+   "date": "2026-07-28T16:00:36.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785268809000,
+   "channel": "hourly",
+   "date": "2026-07-28T20:00:09.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785268834000,
+   "channel": "hourly",
+   "date": "2026-07-28T20:00:34.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ARBUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785312003000,
+   "channel": "hourly",
+   "date": "2026-07-29T08:00:03.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785312019000,
+   "channel": "hourly",
+   "date": "2026-07-29T08:00:19.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5991122416491141
+  },
+  {
+   "symbol": "JTOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785326421000,
+   "channel": "hourly",
+   "date": "2026-07-29T12:00:21.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785333614000,
+   "channel": "hourly",
+   "date": "2026-07-29T14:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6023643635089532
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785348005000,
+   "channel": "hourly",
+   "date": "2026-07-29T18:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785351619000,
+   "channel": "hourly",
+   "date": "2026-07-29T19:00:19.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785362432000,
+   "channel": "hourly",
+   "date": "2026-07-29T22:00:32.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785369624000,
+   "channel": "hourly",
+   "date": "2026-07-30T00:00:24.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785376806000,
+   "channel": "hourly",
+   "date": "2026-07-30T02:00:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7329820088244641
+  },
+  {
+   "symbol": "LDOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785376810000,
+   "channel": "hourly",
+   "date": "2026-07-30T02:00:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7214746170554202
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785384016000,
+   "channel": "hourly",
+   "date": "2026-07-30T04:00:16.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "FILUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785405607000,
+   "channel": "hourly",
+   "date": "2026-07-30T10:00:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785405612000,
+   "channel": "hourly",
+   "date": "2026-07-30T10:00:12.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XLMUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785405615000,
+   "channel": "hourly",
+   "date": "2026-07-30T10:00:15.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XMRUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1785456005000,
+   "channel": "hourly",
+   "date": "2026-07-31T00:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "BATUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785477660000,
+   "channel": "hourly",
+   "date": "2026-07-31T06:01:00.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "APEUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785538820000,
+   "channel": "hourly",
+   "date": "2026-07-31T23:00:20.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785564010000,
+   "channel": "hourly",
+   "date": "2026-08-01T06:00:10.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785614404000,
+   "channel": "hourly",
+   "date": "2026-08-01T20:00:04.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785621600000,
+   "channel": "hourly",
+   "date": "2026-08-01T22:00:00.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.764388609937438
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785636001000,
+   "channel": "hourly",
+   "date": "2026-08-02T02:00:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7055684493062453
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785636002000,
+   "channel": "hourly",
+   "date": "2026-08-02T02:00:02.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LINKUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785636002000,
+   "channel": "hourly",
+   "date": "2026-08-02T02:00:02.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "LTCUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785636008000,
+   "channel": "hourly",
+   "date": "2026-08-02T02:00:08.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ZENUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1785744026000,
+   "channel": "hourly",
+   "date": "2026-08-03T08:00:26.000Z",
+   "outcome": "no-data",
+   "grossR": null
+  },
+  {
+   "symbol": "APTUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1785826815000,
+   "channel": "hourly",
+   "date": "2026-08-04T07:00:15.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1785870005000,
+   "channel": "hourly",
+   "date": "2026-08-04T19:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "BNBUSDT",
+   "tfMin": 120,
+   "side": -1,
+   "timeMs": 1785902405000,
+   "channel": "hourly",
+   "date": "2026-08-05T04:00:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "tfMin": 120,
+   "side": 1,
+   "timeMs": 1785902415000,
+   "channel": "hourly",
+   "date": "2026-08-05T04:00:15.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "XPLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1785920451000,
+   "channel": "hourly",
+   "date": "2026-08-05T09:00:51.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "AXSUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1785938405000,
+   "channel": "hourly",
+   "date": "2026-08-05T14:00:05.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000009
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 30,
+   "side": 1,
+   "timeMs": 1780259402000,
+   "channel": "scalp",
+   "date": "2026-05-31T20:30:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6924738192238694
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1780333214000,
+   "channel": "scalp",
+   "date": "2026-06-01T17:00:14.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000004
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1780409704000,
+   "channel": "scalp",
+   "date": "2026-06-02T14:15:04.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6798931764707702
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1780443901000,
+   "channel": "scalp",
+   "date": "2026-06-02T23:45:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.600509192650339
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1780487105000,
+   "channel": "scalp",
+   "date": "2026-06-03T11:45:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6286162305227421
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1780501504000,
+   "channel": "scalp",
+   "date": "2026-06-03T15:45:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5720873160702658
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1780567214000,
+   "channel": "scalp",
+   "date": "2026-06-04T10:00:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5946462641205551
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1780573507000,
+   "channel": "scalp",
+   "date": "2026-06-04T11:45:07.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1780632902000,
+   "channel": "scalp",
+   "date": "2026-06-05T04:15:02.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.664218383426479
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1780641907000,
+   "channel": "scalp",
+   "date": "2026-06-05T06:45:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8361366061817578
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1780641911000,
+   "channel": "scalp",
+   "date": "2026-06-05T06:45:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.47563669270545994
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1780689608000,
+   "channel": "scalp",
+   "date": "2026-06-05T20:00:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.459401967130392
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1780690505000,
+   "channel": "scalp",
+   "date": "2026-06-05T20:15:05.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1780806600000,
+   "channel": "scalp",
+   "date": "2026-06-07T04:30:00.000Z",
+   "outcome": "Partial",
+   "grossR": -0.782318826128338
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1780824605000,
+   "channel": "scalp",
+   "date": "2026-06-07T09:30:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6656711570666158
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1780871405000,
+   "channel": "scalp",
+   "date": "2026-06-07T22:30:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7052874889660701
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1780920906000,
+   "channel": "scalp",
+   "date": "2026-06-08T12:15:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4518252271586229
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1780974904000,
+   "channel": "scalp",
+   "date": "2026-06-09T03:15:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7934153382352356
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781000107000,
+   "channel": "scalp",
+   "date": "2026-06-09T10:15:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6731886556580186
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781123409000,
+   "channel": "scalp",
+   "date": "2026-06-10T20:30:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6928474322801755
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1781209803000,
+   "channel": "scalp",
+   "date": "2026-06-11T20:30:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.504433530232598
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1781263806000,
+   "channel": "scalp",
+   "date": "2026-06-12T11:30:06.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000007
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781310602000,
+   "channel": "scalp",
+   "date": "2026-06-13T00:30:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6872026523376545
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1781360130000,
+   "channel": "scalp",
+   "date": "2026-06-13T14:15:30.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6511288062292026
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781422203000,
+   "channel": "scalp",
+   "date": "2026-06-14T07:30:03.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000018
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1781505903000,
+   "channel": "scalp",
+   "date": "2026-06-15T06:45:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5943318867557155
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781581506000,
+   "channel": "scalp",
+   "date": "2026-06-16T03:45:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7573793655753703
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1781596815000,
+   "channel": "scalp",
+   "date": "2026-06-16T08:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.49993333227338105
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1781615710000,
+   "channel": "scalp",
+   "date": "2026-06-16T13:15:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7183263947831765
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1781686807000,
+   "channel": "scalp",
+   "date": "2026-06-17T09:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.33083831618801857
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781750710000,
+   "channel": "scalp",
+   "date": "2026-06-18T02:45:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7470073393478155
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781765102000,
+   "channel": "scalp",
+   "date": "2026-06-18T06:45:02.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781799303000,
+   "channel": "scalp",
+   "date": "2026-06-18T16:15:03.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6947733913712714
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781861404000,
+   "channel": "scalp",
+   "date": "2026-06-19T09:30:04.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781863207000,
+   "channel": "scalp",
+   "date": "2026-06-19T10:00:07.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.9228158882536068
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1781874006000,
+   "channel": "scalp",
+   "date": "2026-06-19T13:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6577964070244638
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1781966700000,
+   "channel": "scalp",
+   "date": "2026-06-20T14:45:00.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6906746139018085
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782071160000,
+   "channel": "scalp",
+   "date": "2026-06-21T19:46:00.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8332827263859911
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782077408000,
+   "channel": "scalp",
+   "date": "2026-06-21T21:30:08.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7059549045315128
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782088210000,
+   "channel": "scalp",
+   "date": "2026-06-22T00:30:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6517822159976974
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1782137713000,
+   "channel": "scalp",
+   "date": "2026-06-22T14:15:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6892460112368523
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782175510000,
+   "channel": "scalp",
+   "date": "2026-06-23T00:45:10.000Z",
+   "outcome": "Partial",
+   "grossR": -0.820056794507052
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782205215000,
+   "channel": "scalp",
+   "date": "2026-06-23T09:00:15.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7222885444942946
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1782268215000,
+   "channel": "scalp",
+   "date": "2026-06-24T02:30:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5503508513461642
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782279006000,
+   "channel": "scalp",
+   "date": "2026-06-24T05:30:06.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7171207154725416
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1782282603000,
+   "channel": "scalp",
+   "date": "2026-06-24T06:30:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5064551359647133
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782302401000,
+   "channel": "scalp",
+   "date": "2026-06-24T12:00:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.522664182813076
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1782347403000,
+   "channel": "scalp",
+   "date": "2026-06-25T00:30:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4602330355787345
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1782373508000,
+   "channel": "scalp",
+   "date": "2026-06-25T07:45:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7066577711434829
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782416704000,
+   "channel": "scalp",
+   "date": "2026-06-25T19:45:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.594500830121763
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782597604000,
+   "channel": "scalp",
+   "date": "2026-06-27T22:00:04.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6454064681594506
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782599405000,
+   "channel": "scalp",
+   "date": "2026-06-27T22:30:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.706630260189362
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782610205000,
+   "channel": "scalp",
+   "date": "2026-06-28T01:30:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6447891748387156
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782668709000,
+   "channel": "scalp",
+   "date": "2026-06-28T17:45:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6670997011230397
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1782715502000,
+   "channel": "scalp",
+   "date": "2026-06-29T06:45:02.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6279970777429813
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782842410000,
+   "channel": "scalp",
+   "date": "2026-06-30T18:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7494525082974827
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1782869410000,
+   "channel": "scalp",
+   "date": "2026-07-01T01:30:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.62118954979328
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1782950423000,
+   "channel": "scalp",
+   "date": "2026-07-02T00:00:23.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1782997213000,
+   "channel": "scalp",
+   "date": "2026-07-02T13:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5795918440894955
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783002619000,
+   "channel": "scalp",
+   "date": "2026-07-02T14:30:19.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6973731338169423
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783125906000,
+   "channel": "scalp",
+   "date": "2026-07-04T00:45:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5376855955746994
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783126806000,
+   "channel": "scalp",
+   "date": "2026-07-04T01:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5108970619742614
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783143901000,
+   "channel": "scalp",
+   "date": "2026-07-04T05:45:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6174143819395473
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783196102000,
+   "channel": "scalp",
+   "date": "2026-07-04T20:15:02.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5887404949660465
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1783341001000,
+   "channel": "scalp",
+   "date": "2026-07-06T12:30:01.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6477584381802188
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783377008000,
+   "channel": "scalp",
+   "date": "2026-07-06T22:30:08.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5033451520085256
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783387815000,
+   "channel": "scalp",
+   "date": "2026-07-07T01:30:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6227901911719367
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1783473307000,
+   "channel": "scalp",
+   "date": "2026-07-08T01:15:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7964235483850858
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1783480505000,
+   "channel": "scalp",
+   "date": "2026-07-08T03:15:05.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.24426813869499248
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783519229000,
+   "channel": "scalp",
+   "date": "2026-07-08T14:00:29.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1783526413000,
+   "channel": "scalp",
+   "date": "2026-07-08T16:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5877466191219428
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783582213000,
+   "channel": "scalp",
+   "date": "2026-07-09T07:30:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6733603403485888
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783666812000,
+   "channel": "scalp",
+   "date": "2026-07-10T07:00:12.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5300270899957457
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783669502000,
+   "channel": "scalp",
+   "date": "2026-07-10T07:45:02.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8576890665989307
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783674913000,
+   "channel": "scalp",
+   "date": "2026-07-10T09:15:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7279002627049058
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783685710000,
+   "channel": "scalp",
+   "date": "2026-07-10T12:15:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8540060258922335
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783804525000,
+   "channel": "scalp",
+   "date": "2026-07-11T21:15:25.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5136304839275172
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1783838714000,
+   "channel": "scalp",
+   "date": "2026-07-12T06:45:14.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6802760624697298
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1783849509000,
+   "channel": "scalp",
+   "date": "2026-07-12T09:45:09.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5521327869665195
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1783913403000,
+   "channel": "scalp",
+   "date": "2026-07-13T03:30:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.630279234126229
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1783922416000,
+   "channel": "scalp",
+   "date": "2026-07-13T06:00:16.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1783947606000,
+   "channel": "scalp",
+   "date": "2026-07-13T13:00:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5083882474043393
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1783978203000,
+   "channel": "scalp",
+   "date": "2026-07-13T21:30:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.47280945572604755
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784034911000,
+   "channel": "scalp",
+   "date": "2026-07-14T13:15:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6338521575567642
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784036703000,
+   "channel": "scalp",
+   "date": "2026-07-14T13:45:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6621915389501422
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784044823000,
+   "channel": "scalp",
+   "date": "2026-07-14T16:00:23.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999988
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": -1,
+   "timeMs": 1784124015000,
+   "channel": "scalp",
+   "date": "2026-07-15T14:00:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5431179941813714
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1784136625000,
+   "channel": "scalp",
+   "date": "2026-07-15T17:30:25.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7142542504754645
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1784197811000,
+   "channel": "scalp",
+   "date": "2026-07-16T10:30:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8980531708945851
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1784202304000,
+   "channel": "scalp",
+   "date": "2026-07-16T11:45:04.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000033
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784242817000,
+   "channel": "scalp",
+   "date": "2026-07-16T23:00:17.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6499713636911514
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1784283311000,
+   "channel": "scalp",
+   "date": "2026-07-17T10:15:11.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7582595872658696
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1784481301000,
+   "channel": "scalp",
+   "date": "2026-07-19T17:15:01.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6407320064197951
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784556032000,
+   "channel": "scalp",
+   "date": "2026-07-20T14:00:32.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.44410546825096364
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784569561000,
+   "channel": "scalp",
+   "date": "2026-07-20T17:46:01.000Z",
+   "outcome": "Partial",
+   "grossR": -0.8204497697744321
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784573113000,
+   "channel": "scalp",
+   "date": "2026-07-20T18:45:13.000Z",
+   "outcome": "Stop",
+   "grossR": -0.9999999999999993
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784640627000,
+   "channel": "scalp",
+   "date": "2026-07-21T13:30:27.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5598434817034801
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784729706000,
+   "channel": "scalp",
+   "date": "2026-07-22T14:15:06.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6074597362108484
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1784837715000,
+   "channel": "scalp",
+   "date": "2026-07-23T20:15:15.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4325600741485177
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1784857503000,
+   "channel": "scalp",
+   "date": "2026-07-24T01:45:03.000Z",
+   "outcome": "Partial",
+   "grossR": -0.712684762345543
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1784898013000,
+   "channel": "scalp",
+   "date": "2026-07-24T13:00:13.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6542708789909977
+  },
+  {
+   "symbol": "SOLUSDT",
+   "tfMin": 60,
+   "side": 1,
+   "timeMs": 1784941202000,
+   "channel": "scalp",
+   "date": "2026-07-25T01:00:02.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1784962811000,
+   "channel": "scalp",
+   "date": "2026-07-25T07:00:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.8122809408540475
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785005103000,
+   "channel": "scalp",
+   "date": "2026-07-25T18:45:03.000Z",
+   "outcome": "Partial",
+   "grossR": -0.6920643094908719
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1785079828000,
+   "channel": "scalp",
+   "date": "2026-07-26T15:30:28.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.5468688443862507
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785112211000,
+   "channel": "scalp",
+   "date": "2026-07-27T00:30:11.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.6333336069282962
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785123014000,
+   "channel": "scalp",
+   "date": "2026-07-27T03:30:14.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7322860540012898
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785139210000,
+   "channel": "scalp",
+   "date": "2026-07-27T08:00:10.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7245463183071793
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1785205816000,
+   "channel": "scalp",
+   "date": "2026-07-28T02:30:16.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7219418279699485
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1785241803000,
+   "channel": "scalp",
+   "date": "2026-07-28T12:30:03.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785428103000,
+   "channel": "scalp",
+   "date": "2026-07-30T16:15:03.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.4526035738724231
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785452417000,
+   "channel": "scalp",
+   "date": "2026-07-30T23:00:17.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1785494707000,
+   "channel": "scalp",
+   "date": "2026-07-31T10:45:07.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7272035242444845
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1785508219000,
+   "channel": "scalp",
+   "date": "2026-07-31T14:30:19.000Z",
+   "outcome": "Full fix",
+   "grossR": 0.7078189549030893
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1785512702000,
+   "channel": "scalp",
+   "date": "2026-07-31T15:45:02.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1785547805000,
+   "channel": "scalp",
+   "date": "2026-08-01T01:30:05.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7682213025134028
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1785596432000,
+   "channel": "scalp",
+   "date": "2026-08-01T15:00:32.000Z",
+   "outcome": "Stop",
+   "grossR": -1.0000000000000009
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785668418000,
+   "channel": "scalp",
+   "date": "2026-08-02T11:00:18.000Z",
+   "outcome": "Partial",
+   "grossR": -0.7648848114337623
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": 1,
+   "timeMs": 1785729604000,
+   "channel": "scalp",
+   "date": "2026-08-03T04:00:04.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "OPUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785779108000,
+   "channel": "scalp",
+   "date": "2026-08-03T17:45:08.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "CRVUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785787230000,
+   "channel": "scalp",
+   "date": "2026-08-03T20:00:30.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785830427000,
+   "channel": "scalp",
+   "date": "2026-08-04T08:00:27.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "tfMin": 15,
+   "side": -1,
+   "timeMs": 1785911406000,
+   "channel": "scalp",
+   "date": "2026-08-05T06:30:06.000Z",
+   "outcome": "End mark",
+   "grossR": null
+  }
+ ]
+}

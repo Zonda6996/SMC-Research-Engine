@@ -175,6 +175,10 @@ export interface LiquidityPoiCandidate {
 	stackNotional: number
 	/** §16.14: доля стека от сильнейшего АКТИВНОГО стека той же стороны на конец истории (0..1+,
 	 * у мёртвых зон может превышать 1) — дисплей-метрика «сила полки» для фильтра слабых зон в UI. */
+	// ⚠️ НЕ ПРИЧИННО (look-ahead): знаменатель = сильнейший активный стек на КОНЕЦ истории.
+	// Только для UI-отображения силы полки. НЕЛЬЗЯ как causal-фильтр в бэктесте/сигнале/ML-фиче
+	// (см. docs/ARROW_FILTERS_SPEC.md). Для причинного порога нормируй stackNotional на сильнейший
+	// активный стек, известный на момент сигнала (пример: scratch/auditStackSizeCausal.ts).
 	stackShare: number
 	geometryKnownAt: number
 	lineageSupersededAt: number | null

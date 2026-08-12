@@ -1,0 +1,328 @@
+{
+  "config": {
+    "stopMult": 12,
+    "warmup": 100,
+    "minSubbars": 6,
+    "envelopeTol": 0.0005,
+    "pseudoShift": 37
+  },
+  "perDataset": [
+    {
+      "id": "btc-2h",
+      "sha2h": "f2d6e56db50a34a649cee5950ab38c74368f9594342b5ecaec1fe87d3d940c52",
+      "sha15m": "9798b630854817cfaa8c38760286cb6d01a2d12063b296bc9128897ce06883fe",
+      "alignment": {
+        "covered": 2566,
+        "aligned": 2565,
+        "violations": 1
+      },
+      "realIncluded": 11,
+      "realTotal": 42,
+      "pseudoIncluded": 11,
+      "real": {
+        "B0_none": {
+          "n": 11,
+          "wr": 0.45454545454545453,
+          "stop": 1,
+          "partial": 4,
+          "full": 6,
+          "end": 0,
+          "meanR": -0.14702567215381218,
+          "medianR": -0.09018953217475782,
+          "ambiguousShare": 0
+        },
+        "B1_wick_avg": {
+          "n": 11,
+          "wr": 0.6363636363636364,
+          "stop": 1,
+          "partial": 10,
+          "full": 0,
+          "end": 0,
+          "meanR": -0.06567551011015599,
+          "medianR": 0.04234765014405387,
+          "ambiguousShare": 0
+        },
+        "B2_wick_entry": {
+          "n": 11,
+          "wr": 0.6363636363636364,
+          "stop": 1,
+          "partial": 10,
+          "full": 0,
+          "end": 0,
+          "meanR": -0.06567551011015599,
+          "medianR": 0.04234765014405387,
+          "ambiguousShare": 0
+        },
+        "B3_close_entry": {
+          "n": 11,
+          "wr": 0.5454545454545454,
+          "stop": 1,
+          "partial": 10,
+          "full": 0,
+          "end": 0,
+          "meanR": -0.11299631281620096,
+          "medianR": 0.013947735804420918,
+          "ambiguousShare": 0
+        }
+      },
+      "pseudo": {
+        "B0_none": {
+          "n": 11,
+          "wr": 0.5454545454545454,
+          "stop": 2,
+          "partial": 2,
+          "full": 7,
+          "end": 0,
+          "meanR": -0.11519512735217247,
+          "medianR": 0.10109307650165583,
+          "ambiguousShare": 0
+        },
+        "B1_wick_avg": {
+          "n": 11,
+          "wr": 0.6363636363636364,
+          "stop": 2,
+          "partial": 8,
+          "full": 1,
+          "end": 0,
+          "meanR": -0.09959556606821961,
+          "medianR": 0.01457807485533296,
+          "ambiguousShare": 0
+        },
+        "B2_wick_entry": {
+          "n": 11,
+          "wr": 0.6363636363636364,
+          "stop": 2,
+          "partial": 8,
+          "full": 1,
+          "end": 0,
+          "meanR": -0.09959556606821961,
+          "medianR": 0.01457807485533296,
+          "ambiguousShare": 0
+        },
+        "B3_close_entry": {
+          "n": 11,
+          "wr": 0.45454545454545453,
+          "stop": 2,
+          "partial": 7,
+          "full": 2,
+          "end": 0,
+          "meanR": -0.08805787820952228,
+          "medianR": -0.0019194242412043194,
+          "ambiguousShare": 0
+        }
+      }
+    },
+    {
+      "id": "ondo-2h",
+      "sha2h": "aaa953cedb33958e8141a166d1262af88d2d862887084ee1f628e962cf261e5d",
+      "sha15m": "5d5c7907e0505b7b228c317a24368fd7c09c88944faf5249da7a68217b3fafb3",
+      "alignment": {
+        "covered": 1834,
+        "aligned": 1833,
+        "violations": 1
+      },
+      "realIncluded": 6,
+      "realTotal": 46,
+      "pseudoIncluded": 6,
+      "real": {
+        "B0_none": {
+          "n": 6,
+          "wr": 0.6666666666666666,
+          "stop": 1,
+          "partial": 1,
+          "full": 4,
+          "end": 0,
+          "meanR": 0.05241539579723039,
+          "medianR": 0.33886518983316655,
+          "ambiguousShare": 0
+        },
+        "B1_wick_avg": {
+          "n": 6,
+          "wr": 0.6666666666666666,
+          "stop": 1,
+          "partial": 3,
+          "full": 2,
+          "end": 0,
+          "meanR": 0.035882765096852544,
+          "medianR": 0.05042216383193293,
+          "ambiguousShare": 0
+        },
+        "B2_wick_entry": {
+          "n": 6,
+          "wr": 0.6666666666666666,
+          "stop": 1,
+          "partial": 3,
+          "full": 2,
+          "end": 0,
+          "meanR": 0.035882765096852544,
+          "medianR": 0.05042216383193293,
+          "ambiguousShare": 0
+        },
+        "B3_close_entry": {
+          "n": 6,
+          "wr": 0.6666666666666666,
+          "stop": 1,
+          "partial": 3,
+          "full": 2,
+          "end": 0,
+          "meanR": 0.02338096718243567,
+          "medianR": 0.04744963461221824,
+          "ambiguousShare": 0
+        }
+      },
+      "pseudo": {
+        "B0_none": {
+          "n": 6,
+          "wr": 0.6666666666666666,
+          "stop": 1,
+          "partial": 1,
+          "full": 4,
+          "end": 0,
+          "meanR": -0.0921591612422462,
+          "medianR": 0.203453535843997,
+          "ambiguousShare": 0
+        },
+        "B1_wick_avg": {
+          "n": 6,
+          "wr": 0.16666666666666666,
+          "stop": 1,
+          "partial": 5,
+          "full": 0,
+          "end": 0,
+          "meanR": -0.178415628087889,
+          "medianR": -0.012926554307601534,
+          "ambiguousShare": 0
+        },
+        "B2_wick_entry": {
+          "n": 6,
+          "wr": 0.16666666666666666,
+          "stop": 1,
+          "partial": 5,
+          "full": 0,
+          "end": 0,
+          "meanR": -0.178415628087889,
+          "medianR": -0.012926554307601534,
+          "ambiguousShare": 0
+        },
+        "B3_close_entry": {
+          "n": 6,
+          "wr": 0.16666666666666666,
+          "stop": 1,
+          "partial": 5,
+          "full": 0,
+          "end": 0,
+          "meanR": -0.18652305046043727,
+          "medianR": -0.022231314614664863,
+          "ambiguousShare": 0
+        }
+      }
+    }
+  ],
+  "pooled": {
+    "real": {
+      "B0_none": {
+        "n": 17,
+        "wr": 0.5294117647058824,
+        "stop": 2,
+        "partial": 5,
+        "full": 10,
+        "end": 0,
+        "meanR": -0.07663470699462073,
+        "medianR": 0.24225178552660576,
+        "ambiguousShare": 0
+      },
+      "B1_wick_avg": {
+        "n": 17,
+        "wr": 0.6470588235294118,
+        "stop": 2,
+        "partial": 13,
+        "full": 2,
+        "end": 0,
+        "meanR": -0.02983141297827056,
+        "medianR": 0.04580128533073181,
+        "ambiguousShare": 0
+      },
+      "B2_wick_entry": {
+        "n": 17,
+        "wr": 0.6470588235294118,
+        "stop": 2,
+        "partial": 13,
+        "full": 2,
+        "end": 0,
+        "meanR": -0.02983141297827056,
+        "medianR": 0.04580128533073181,
+        "ambiguousShare": 0
+      },
+      "B3_close_entry": {
+        "n": 17,
+        "wr": 0.5882352941176471,
+        "stop": 2,
+        "partial": 13,
+        "full": 2,
+        "end": 0,
+        "meanR": -0.06486315516962327,
+        "medianR": 0.028078910592427765,
+        "ambiguousShare": 0
+      }
+    },
+    "pseudo": {
+      "B0_none": {
+        "n": 17,
+        "wr": 0.5882352941176471,
+        "stop": 3,
+        "partial": 3,
+        "full": 11,
+        "end": 0,
+        "meanR": -0.10706478637219848,
+        "medianR": 0.13594198856072323,
+        "ambiguousShare": 0
+      },
+      "B1_wick_avg": {
+        "n": 17,
+        "wr": 0.47058823529411764,
+        "stop": 3,
+        "partial": 13,
+        "full": 1,
+        "end": 0,
+        "meanR": -0.12741441148692645,
+        "medianR": -0.007745175143477903,
+        "ambiguousShare": 0
+      },
+      "B2_wick_entry": {
+        "n": 17,
+        "wr": 0.47058823529411764,
+        "stop": 3,
+        "partial": 13,
+        "full": 1,
+        "end": 0,
+        "meanR": -0.12741441148692645,
+        "medianR": -0.007745175143477903,
+        "ambiguousShare": 0
+      },
+      "B3_close_entry": {
+        "n": 17,
+        "wr": 0.35294117647058826,
+        "stop": 3,
+        "partial": 12,
+        "full": 2,
+        "end": 0,
+        "meanR": -0.12281029194513936,
+        "medianR": -0.01823957812855191,
+        "ambiguousShare": 0
+      }
+    },
+    "ohlcMeans": {
+      "optimistic-initial-stop": -0.07663470699462065,
+      "next-bar-blended-be": -0.029831412978270612,
+      "next-bar-entry-be": -0.029831412978270612
+    },
+    "wOhlc": 0.046803294016350035,
+    "wLtf": 0.046803294016350167,
+    "classChanges": {
+      "b1VsEntryBe": 0,
+      "b0VsOptimistic": 0,
+      "total": 17
+    }
+  },
+  "verdict": "KILLED (ambiguity rate 0.0% < 15%: LTF resolves nothing material)"
+}

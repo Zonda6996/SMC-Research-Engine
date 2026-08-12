@@ -1,0 +1,1582 @@
+{
+  "config": {
+    "seed": 1337,
+    "nShifts": 10000,
+    "windowsMin": [
+      30,
+      60,
+      240
+    ],
+    "excludeMs": 14400000,
+    "nullModel": "common circular shift of LTF stream in wall-clock ms within overlap"
+  },
+  "h2": [
+    {
+      "datasetId": "btc-perp-15m",
+      "kind": "global",
+      "count": 68,
+      "minGap": 57,
+      "bins": {
+        "0-53": 0,
+        "54-57": 1,
+        "58-69": 3,
+        "70-99": 11,
+        "100-199": 25,
+        "200-399": 21,
+        "400-799": 7,
+        "800+": 0
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9852941176470589,
+        "P(gap>min+5)": 0.9558823529411765,
+        "P(gap>min+10)": 0.9558823529411765,
+        "P(gap>min+20)": 0.8970588235294118
+      }
+    },
+    {
+      "datasetId": "btc-perp-15m",
+      "kind": "buy-buy",
+      "count": 37,
+      "minGap": 61,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 1,
+        "70-99": 4,
+        "100-199": 7,
+        "200-399": 13,
+        "400-799": 8,
+        "800+": 4
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.972972972972973,
+        "P(gap>min+5)": 0.972972972972973,
+        "P(gap>min+10)": 0.972972972972973,
+        "P(gap>min+20)": 0.918918918918919
+      }
+    },
+    {
+      "datasetId": "btc-perp-15m",
+      "kind": "sell-sell",
+      "count": 30,
+      "minGap": 88,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 0,
+        "70-99": 1,
+        "100-199": 10,
+        "200-399": 7,
+        "400-799": 7,
+        "800+": 5
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9666666666666667,
+        "P(gap>min+5)": 0.9666666666666667,
+        "P(gap>min+10)": 0.9666666666666667,
+        "P(gap>min+20)": 0.9333333333333333
+      }
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "kind": "global",
+      "count": 43,
+      "minGap": 58,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 4,
+        "70-99": 6,
+        "100-199": 12,
+        "200-399": 15,
+        "400-799": 6,
+        "800+": 0
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9767441860465116,
+        "P(gap>min+5)": 0.9534883720930233,
+        "P(gap>min+10)": 0.9302325581395349,
+        "P(gap>min+20)": 0.8604651162790697
+      }
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "kind": "buy-buy",
+      "count": 26,
+      "minGap": 74,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 0,
+        "70-99": 2,
+        "100-199": 6,
+        "200-399": 7,
+        "400-799": 10,
+        "800+": 1
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9615384615384616,
+        "P(gap>min+5)": 0.9615384615384616,
+        "P(gap>min+10)": 0.9615384615384616,
+        "P(gap>min+20)": 0.9230769230769231
+      }
+    },
+    {
+      "datasetId": "btc-perp-1h",
+      "kind": "sell-sell",
+      "count": 16,
+      "minGap": 69,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 1,
+        "70-99": 1,
+        "100-199": 0,
+        "200-399": 2,
+        "400-799": 9,
+        "800+": 3
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9375,
+        "P(gap>min+5)": 0.875,
+        "P(gap>min+10)": 0.875,
+        "P(gap>min+20)": 0.875
+      }
+    },
+    {
+      "datasetId": "eth-perp-15m",
+      "kind": "global",
+      "count": 74,
+      "minGap": 57,
+      "bins": {
+        "0-53": 0,
+        "54-57": 1,
+        "58-69": 3,
+        "70-99": 12,
+        "100-199": 23,
+        "200-399": 27,
+        "400-799": 8,
+        "800+": 0
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9864864864864865,
+        "P(gap>min+5)": 0.9864864864864865,
+        "P(gap>min+10)": 0.9459459459459459,
+        "P(gap>min+20)": 0.8918918918918919
+      }
+    },
+    {
+      "datasetId": "eth-perp-15m",
+      "kind": "buy-buy",
+      "count": 45,
+      "minGap": 73,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 0,
+        "70-99": 5,
+        "100-199": 4,
+        "200-399": 20,
+        "400-799": 14,
+        "800+": 2
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9777777777777777,
+        "P(gap>min+5)": 0.9333333333333333,
+        "P(gap>min+10)": 0.9111111111111111,
+        "P(gap>min+20)": 0.8888888888888888
+      }
+    },
+    {
+      "datasetId": "eth-perp-15m",
+      "kind": "sell-sell",
+      "count": 28,
+      "minGap": 77,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 0,
+        "70-99": 2,
+        "100-199": 6,
+        "200-399": 7,
+        "400-799": 8,
+        "800+": 5
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9642857142857143,
+        "P(gap>min+5)": 0.9642857142857143,
+        "P(gap>min+10)": 0.9642857142857143,
+        "P(gap>min+20)": 0.9285714285714286
+      }
+    },
+    {
+      "datasetId": "sol-spot-15m",
+      "kind": "global",
+      "count": 62,
+      "minGap": 60,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 4,
+        "70-99": 6,
+        "100-199": 16,
+        "200-399": 20,
+        "400-799": 15,
+        "800+": 1
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9838709677419355,
+        "P(gap>min+5)": 0.967741935483871,
+        "P(gap>min+10)": 0.9193548387096774,
+        "P(gap>min+20)": 0.9032258064516129
+      }
+    },
+    {
+      "datasetId": "sol-spot-15m",
+      "kind": "buy-buy",
+      "count": 37,
+      "minGap": 65,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 3,
+        "70-99": 2,
+        "100-199": 4,
+        "200-399": 11,
+        "400-799": 12,
+        "800+": 5
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.972972972972973,
+        "P(gap>min+5)": 0.918918918918919,
+        "P(gap>min+10)": 0.918918918918919,
+        "P(gap>min+20)": 0.8918918918918919
+      }
+    },
+    {
+      "datasetId": "sol-spot-15m",
+      "kind": "sell-sell",
+      "count": 24,
+      "minGap": 85,
+      "bins": {
+        "0-53": 0,
+        "54-57": 0,
+        "58-69": 0,
+        "70-99": 1,
+        "100-199": 3,
+        "200-399": 4,
+        "400-799": 9,
+        "800+": 7
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9583333333333334,
+        "P(gap>min+5)": 0.9583333333333334,
+        "P(gap>min+10)": 0.9583333333333334,
+        "P(gap>min+20)": 0.9583333333333334
+      }
+    },
+    {
+      "datasetId": "btc-perp-5m",
+      "kind": "global",
+      "count": 80,
+      "minGap": 52,
+      "bins": {
+        "0-53": 2,
+        "54-57": 0,
+        "58-69": 2,
+        "70-99": 5,
+        "100-199": 29,
+        "200-399": 33,
+        "400-799": 9,
+        "800+": 0
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9875,
+        "P(gap>min+5)": 0.975,
+        "P(gap>min+10)": 0.975,
+        "P(gap>min+20)": 0.95
+      }
+    },
+    {
+      "datasetId": "btc-perp-5m",
+      "kind": "buy-buy",
+      "count": 43,
+      "minGap": 53,
+      "bins": {
+        "0-53": 1,
+        "54-57": 0,
+        "58-69": 1,
+        "70-99": 1,
+        "100-199": 8,
+        "200-399": 17,
+        "400-799": 7,
+        "800+": 8
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9767441860465116,
+        "P(gap>min+5)": 0.9767441860465116,
+        "P(gap>min+10)": 0.9767441860465116,
+        "P(gap>min+20)": 0.9534883720930233
+      }
+    },
+    {
+      "datasetId": "btc-perp-5m",
+      "kind": "sell-sell",
+      "count": 36,
+      "minGap": 52,
+      "bins": {
+        "0-53": 1,
+        "54-57": 0,
+        "58-69": 0,
+        "70-99": 1,
+        "100-199": 5,
+        "200-399": 14,
+        "400-799": 9,
+        "800+": 6
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9722222222222222,
+        "P(gap>min+5)": 0.9722222222222222,
+        "P(gap>min+10)": 0.9722222222222222,
+        "P(gap>min+20)": 0.9722222222222222
+      }
+    },
+    {
+      "datasetId": "btc-perp-4h",
+      "kind": "global",
+      "count": 37,
+      "minGap": 56,
+      "bins": {
+        "0-53": 0,
+        "54-57": 3,
+        "58-69": 2,
+        "70-99": 3,
+        "100-199": 14,
+        "200-399": 13,
+        "400-799": 2,
+        "800+": 0
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.972972972972973,
+        "P(gap>min+5)": 0.918918918918919,
+        "P(gap>min+10)": 0.8648648648648649,
+        "P(gap>min+20)": 0.8378378378378378
+      }
+    },
+    {
+      "datasetId": "btc-perp-4h",
+      "kind": "buy-buy",
+      "count": 17,
+      "minGap": 57,
+      "bins": {
+        "0-53": 0,
+        "54-57": 1,
+        "58-69": 0,
+        "70-99": 0,
+        "100-199": 3,
+        "200-399": 7,
+        "400-799": 4,
+        "800+": 2
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9411764705882353,
+        "P(gap>min+5)": 0.9411764705882353,
+        "P(gap>min+10)": 0.9411764705882353,
+        "P(gap>min+20)": 0.9411764705882353
+      }
+    },
+    {
+      "datasetId": "btc-perp-4h",
+      "kind": "sell-sell",
+      "count": 19,
+      "minGap": 56,
+      "bins": {
+        "0-53": 0,
+        "54-57": 1,
+        "58-69": 1,
+        "70-99": 1,
+        "100-199": 5,
+        "200-399": 3,
+        "400-799": 7,
+        "800+": 1
+      },
+      "survivalAfterMin": {
+        "P(gap>min+0)": 0.9473684210526315,
+        "P(gap>min+5)": 0.9473684210526315,
+        "P(gap>min+10)": 0.8947368421052632,
+        "P(gap>min+20)": 0.8947368421052632
+      }
+    }
+  ],
+  "pairReports": [
+    {
+      "pair": "P1: 15m(HTF) vs 5m(LTF)",
+      "scope": "pairwise-overlap",
+      "overlapFromUtc": "2026-05-25T08:50:00.000Z",
+      "overlapToUtc": "2026-07-31T19:45:00.000Z",
+      "htfEvents": 34,
+      "ltfEvents": 81,
+      "windows": {
+        "±30m": {
+          "same": {
+            "observedHits": 5,
+            "observedRate": 0.14705882352941177,
+            "nullMean": 0.8556,
+            "nullQuantiles": {
+              "q50": 1,
+              "q90": 2,
+              "q95": 3,
+              "q99": 3
+            },
+            "pValue": 0.0010998900109989002,
+            "enrichment": 5.84385226741468,
+            "oneToOneHits": 5,
+            "loo": {
+              "minEnrichment": 4.7835446065534555,
+              "maxEnrichment": 6.052536012589275,
+              "maxP": 0.007599240075992401
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.8364,
+            "nullQuantiles": {
+              "q50": 1,
+              "q90": 2,
+              "q95": 3,
+              "q99": 3
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1779975900000,
+              "ltfAt": 1779975900000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1780675200000,
+              "ltfAt": 1780674300000,
+              "direction": "long",
+              "deltaMs": -900000
+            },
+            {
+              "htfAt": 1781208900000,
+              "ltfAt": 1781207700000,
+              "direction": "short",
+              "deltaMs": -1200000
+            },
+            {
+              "htfAt": 1784707200000,
+              "ltfAt": 1784707200000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1784826900000,
+              "ltfAt": 1784825400000,
+              "direction": "long",
+              "deltaMs": -1500000
+            }
+          ]
+        },
+        "±60m": {
+          "same": {
+            "observedHits": 5,
+            "observedRate": 0.14705882352941177,
+            "nullMean": 1.7311,
+            "nullQuantiles": {
+              "q50": 2,
+              "q90": 3,
+              "q95": 4,
+              "q99": 5
+            },
+            "pValue": 0.030896910308969103,
+            "enrichment": 2.8883368956155047,
+            "oneToOneHits": 5,
+            "loo": {
+              "minEnrichment": 2.3713540431586435,
+              "maxEnrichment": 2.987750224081267,
+              "maxP": 0.0887911208879112
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 1.6704,
+            "nullQuantiles": {
+              "q50": 2,
+              "q90": 3,
+              "q95": 4,
+              "q99": 5
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1779975900000,
+              "ltfAt": 1779975900000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1780675200000,
+              "ltfAt": 1780674300000,
+              "direction": "long",
+              "deltaMs": -900000
+            },
+            {
+              "htfAt": 1781208900000,
+              "ltfAt": 1781207700000,
+              "direction": "short",
+              "deltaMs": -1200000
+            },
+            {
+              "htfAt": 1784707200000,
+              "ltfAt": 1784707200000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1784826900000,
+              "ltfAt": 1784825400000,
+              "direction": "long",
+              "deltaMs": -1500000
+            }
+          ]
+        },
+        "±240m": {
+          "same": {
+            "observedHits": 11,
+            "observedRate": 0.3235294117647059,
+            "nullMean": 6.8317,
+            "nullQuantiles": {
+              "q50": 7,
+              "q90": 10,
+              "q95": 11,
+              "q99": 13
+            },
+            "pValue": 0.0675932406759324,
+            "enrichment": 1.6101409605222712,
+            "oneToOneHits": 11,
+            "loo": {
+              "minEnrichment": 1.5026070231852264,
+              "maxEnrichment": 1.664120058698053,
+              "maxP": 0.12138786121387861
+            }
+          },
+          "opposite": {
+            "observedHits": 3,
+            "observedRate": 0.08823529411764706,
+            "nullMean": 6.5692,
+            "nullQuantiles": {
+              "q50": 7,
+              "q90": 9,
+              "q95": 10,
+              "q99": 12
+            },
+            "pValue": 0.9735026497350265,
+            "enrichment": 0.45667661206844057,
+            "oneToOneHits": 3,
+            "loo": {
+              "minEnrichment": 0.3129792494757598,
+              "maxEnrichment": 0.4725302419354839,
+              "maxP": 0.993000699930007
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1779907500000,
+              "ltfAt": 1779918900000,
+              "direction": "long",
+              "deltaMs": 11400000
+            },
+            {
+              "htfAt": 1779975900000,
+              "ltfAt": 1779975900000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1780675200000,
+              "ltfAt": 1780674300000,
+              "direction": "long",
+              "deltaMs": -900000
+            },
+            {
+              "htfAt": 1781208900000,
+              "ltfAt": 1781207700000,
+              "direction": "short",
+              "deltaMs": -1200000
+            },
+            {
+              "htfAt": 1782086400000,
+              "ltfAt": 1782075000000,
+              "direction": "long",
+              "deltaMs": -11400000
+            },
+            {
+              "htfAt": 1783526400000,
+              "ltfAt": 1783518900000,
+              "direction": "long",
+              "deltaMs": -7500000
+            },
+            {
+              "htfAt": 1783659600000,
+              "ltfAt": 1783651200000,
+              "direction": "short",
+              "deltaMs": -8400000
+            },
+            {
+              "htfAt": 1784318400000,
+              "ltfAt": 1784312100000,
+              "direction": "short",
+              "deltaMs": -6300000
+            },
+            {
+              "htfAt": 1784707200000,
+              "ltfAt": 1784707200000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1784826900000,
+              "ltfAt": 1784825400000,
+              "direction": "long",
+              "deltaMs": -1500000
+            },
+            {
+              "htfAt": 1785420000000,
+              "ltfAt": 1785410700000,
+              "direction": "short",
+              "deltaMs": -9300000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pair": "P2: 1h(HTF) vs 15m(LTF)",
+      "scope": "pairwise-overlap",
+      "overlapFromUtc": "2026-02-28T23:15:00.000Z",
+      "overlapToUtc": "2026-07-31T21:00:00.000Z",
+      "htfEvents": 16,
+      "ltfEvents": 69,
+      "windows": {
+        "±30m": {
+          "same": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.155,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 1,
+              "q95": 1,
+              "q99": 2
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.1436,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 1,
+              "q95": 1,
+              "q99": 1
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": []
+        },
+        "±60m": {
+          "same": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.3116,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 1,
+              "q95": 1,
+              "q99": 2
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.2969,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 1,
+              "q95": 1,
+              "q99": 2
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": []
+        },
+        "±240m": {
+          "same": {
+            "observedHits": 2,
+            "observedRate": 0.125,
+            "nullMean": 1.2377,
+            "nullQuantiles": {
+              "q50": 1,
+              "q90": 3,
+              "q95": 3,
+              "q99": 4
+            },
+            "pValue": 0.35566443355664434,
+            "enrichment": 1.6159004605316312,
+            "oneToOneHits": 2,
+            "loo": {
+              "minEnrichment": 0.8630361612151549,
+              "maxEnrichment": 1.7412502176562772,
+              "maxP": 0.6907309269073093
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 1.1701,
+            "nullQuantiles": {
+              "q50": 1,
+              "q90": 3,
+              "q95": 3,
+              "q99": 4
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1779894000000,
+              "ltfAt": 1779907500000,
+              "direction": "long",
+              "deltaMs": 13500000
+            },
+            {
+              "htfAt": 1785247200000,
+              "ltfAt": 1785234600000,
+              "direction": "long",
+              "deltaMs": -12600000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pair": "P3: 4h(HTF) vs 1h(LTF)",
+      "scope": "pairwise-overlap",
+      "overlapFromUtc": "2025-06-20T02:00:00.000Z",
+      "overlapToUtc": "2026-07-31T16:00:00.000Z",
+      "htfEvents": 12,
+      "ltfEvents": 44,
+      "windows": {
+        "±30m": {
+          "same": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.0306,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 0,
+              "q99": 1
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.0225,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 0,
+              "q99": 1
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": []
+        },
+        "±60m": {
+          "same": {
+            "observedHits": 1,
+            "observedRate": 0.08333333333333333,
+            "nullMean": 0.0588,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 1,
+              "q99": 1
+            },
+            "pValue": 0.057694230576942306,
+            "enrichment": 17.006802721088437,
+            "oneToOneHits": 1,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 19.157088122605362,
+              "maxP": 1
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.0444,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 0,
+              "q99": 1
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1782864000000,
+              "ltfAt": 1782867600000,
+              "direction": "long",
+              "deltaMs": 3600000
+            }
+          ]
+        },
+        "±240m": {
+          "same": {
+            "observedHits": 3,
+            "observedRate": 0.25,
+            "nullMean": 0.2369,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 1,
+              "q95": 1,
+              "q99": 2
+            },
+            "pValue": 0.00039996000399960006,
+            "enrichment": 12.66357112705783,
+            "oneToOneHits": 3,
+            "loo": {
+              "minEnrichment": 9.22509225092251,
+              "maxEnrichment": 14.018691588785048,
+              "maxP": 0.016798320167983202
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.1928,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 1,
+              "q95": 1,
+              "q99": 2
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1750550400000,
+              "ltfAt": 1750543200000,
+              "direction": "long",
+              "deltaMs": -7200000
+            },
+            {
+              "htfAt": 1763337600000,
+              "ltfAt": 1763330400000,
+              "direction": "long",
+              "deltaMs": -7200000
+            },
+            {
+              "htfAt": 1782864000000,
+              "ltfAt": 1782867600000,
+              "direction": "long",
+              "deltaMs": 3600000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pair": "P1: 15m(HTF) vs 5m(LTF)",
+      "scope": "four-tf-overlap",
+      "overlapFromUtc": "2026-05-25T08:50:00.000Z",
+      "overlapToUtc": "2026-07-31T16:00:00.000Z",
+      "htfEvents": 34,
+      "ltfEvents": 81,
+      "windows": {
+        "±30m": {
+          "same": {
+            "observedHits": 5,
+            "observedRate": 0.14705882352941177,
+            "nullMean": 0.8922,
+            "nullQuantiles": {
+              "q50": 1,
+              "q90": 2,
+              "q95": 3,
+              "q99": 3
+            },
+            "pValue": 0.0012998700129987,
+            "enrichment": 5.604124635731899,
+            "oneToOneHits": 5,
+            "loo": {
+              "minEnrichment": 4.6003450258769405,
+              "maxEnrichment": 5.809225049378413,
+              "maxP": 0.006399360063993601
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.8313,
+            "nullQuantiles": {
+              "q50": 1,
+              "q90": 2,
+              "q95": 2,
+              "q99": 3
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1779975900000,
+              "ltfAt": 1779975900000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1780675200000,
+              "ltfAt": 1780674300000,
+              "direction": "long",
+              "deltaMs": -900000
+            },
+            {
+              "htfAt": 1781208900000,
+              "ltfAt": 1781207700000,
+              "direction": "short",
+              "deltaMs": -1200000
+            },
+            {
+              "htfAt": 1784707200000,
+              "ltfAt": 1784707200000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1784826900000,
+              "ltfAt": 1784825400000,
+              "direction": "long",
+              "deltaMs": -1500000
+            }
+          ]
+        },
+        "±60m": {
+          "same": {
+            "observedHits": 5,
+            "observedRate": 0.14705882352941177,
+            "nullMean": 1.7673,
+            "nullQuantiles": {
+              "q50": 2,
+              "q90": 3,
+              "q95": 4,
+              "q99": 5
+            },
+            "pValue": 0.029097090290970903,
+            "enrichment": 2.8291744468963955,
+            "oneToOneHits": 5,
+            "loo": {
+              "minEnrichment": 2.3224757591592637,
+              "maxEnrichment": 2.9279147391227967,
+              "maxP": 0.08759124087591241
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 1.6831,
+            "nullQuantiles": {
+              "q50": 2,
+              "q90": 3,
+              "q95": 4,
+              "q99": 5
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1779975900000,
+              "ltfAt": 1779975900000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1780675200000,
+              "ltfAt": 1780674300000,
+              "direction": "long",
+              "deltaMs": -900000
+            },
+            {
+              "htfAt": 1781208900000,
+              "ltfAt": 1781207700000,
+              "direction": "short",
+              "deltaMs": -1200000
+            },
+            {
+              "htfAt": 1784707200000,
+              "ltfAt": 1784707200000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1784826900000,
+              "ltfAt": 1784825400000,
+              "direction": "long",
+              "deltaMs": -1500000
+            }
+          ]
+        },
+        "±240m": {
+          "same": {
+            "observedHits": 11,
+            "observedRate": 0.3235294117647059,
+            "nullMean": 6.8408,
+            "nullQuantiles": {
+              "q50": 7,
+              "q90": 10,
+              "q95": 11,
+              "q99": 13
+            },
+            "pValue": 0.062993700629937,
+            "enrichment": 1.607999064436908,
+            "oneToOneHits": 11,
+            "loo": {
+              "minEnrichment": 1.5005552054260076,
+              "maxEnrichment": 1.6619577862722288,
+              "maxP": 0.11158884111588842
+            }
+          },
+          "opposite": {
+            "observedHits": 3,
+            "observedRate": 0.08823529411764706,
+            "nullMean": 6.5796,
+            "nullQuantiles": {
+              "q50": 7,
+              "q90": 10,
+              "q95": 10,
+              "q99": 12
+            },
+            "pValue": 0.9763023697630236,
+            "enrichment": 0.4559547692868867,
+            "oneToOneHits": 3,
+            "loo": {
+              "minEnrichment": 0.3124707058713246,
+              "maxEnrichment": 0.4718464926077383,
+              "maxP": 0.9897010298970103
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1779907500000,
+              "ltfAt": 1779918900000,
+              "direction": "long",
+              "deltaMs": 11400000
+            },
+            {
+              "htfAt": 1779975900000,
+              "ltfAt": 1779975900000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1780675200000,
+              "ltfAt": 1780674300000,
+              "direction": "long",
+              "deltaMs": -900000
+            },
+            {
+              "htfAt": 1781208900000,
+              "ltfAt": 1781207700000,
+              "direction": "short",
+              "deltaMs": -1200000
+            },
+            {
+              "htfAt": 1782086400000,
+              "ltfAt": 1782075000000,
+              "direction": "long",
+              "deltaMs": -11400000
+            },
+            {
+              "htfAt": 1783526400000,
+              "ltfAt": 1783518900000,
+              "direction": "long",
+              "deltaMs": -7500000
+            },
+            {
+              "htfAt": 1783659600000,
+              "ltfAt": 1783651200000,
+              "direction": "short",
+              "deltaMs": -8400000
+            },
+            {
+              "htfAt": 1784318400000,
+              "ltfAt": 1784312100000,
+              "direction": "short",
+              "deltaMs": -6300000
+            },
+            {
+              "htfAt": 1784707200000,
+              "ltfAt": 1784707200000,
+              "direction": "long",
+              "deltaMs": 0
+            },
+            {
+              "htfAt": 1784826900000,
+              "ltfAt": 1784825400000,
+              "direction": "long",
+              "deltaMs": -1500000
+            },
+            {
+              "htfAt": 1785420000000,
+              "ltfAt": 1785410700000,
+              "direction": "short",
+              "deltaMs": -9300000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pair": "P2: 1h(HTF) vs 15m(LTF)",
+      "scope": "four-tf-overlap",
+      "overlapFromUtc": "2026-05-25T08:50:00.000Z",
+      "overlapToUtc": "2026-07-31T16:00:00.000Z",
+      "htfEvents": 7,
+      "ltfEvents": 34,
+      "windows": {
+        "±30m": {
+          "same": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.0857,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 1,
+              "q99": 1
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.0645,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 1,
+              "q99": 1
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": []
+        },
+        "±60m": {
+          "same": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.1746,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 1,
+              "q95": 1,
+              "q99": 2
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.1248,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 1,
+              "q95": 1,
+              "q99": 1
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": []
+        },
+        "±240m": {
+          "same": {
+            "observedHits": 2,
+            "observedRate": 0.2857142857142857,
+            "nullMean": 0.6841,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 2,
+              "q95": 2,
+              "q99": 3
+            },
+            "pValue": 0.16248375162483752,
+            "enrichment": 2.9235491887151,
+            "oneToOneHits": 2,
+            "loo": {
+              "minEnrichment": 1.7096939647803044,
+              "maxEnrichment": 3.464403256539061,
+              "maxP": 0.43885611438856115
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.4971,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 1,
+              "q95": 2,
+              "q99": 2
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1779894000000,
+              "ltfAt": 1779907500000,
+              "direction": "long",
+              "deltaMs": 13500000
+            },
+            {
+              "htfAt": 1785247200000,
+              "ltfAt": 1785234600000,
+              "direction": "long",
+              "deltaMs": -12600000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pair": "P3: 4h(HTF) vs 1h(LTF)",
+      "scope": "four-tf-overlap",
+      "overlapFromUtc": "2026-05-25T08:50:00.000Z",
+      "overlapToUtc": "2026-07-31T16:00:00.000Z",
+      "htfEvents": 2,
+      "ltfEvents": 7,
+      "windows": {
+        "±30m": {
+          "same": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.0064,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 0,
+              "q99": 0
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.001,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 0,
+              "q99": 0
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": []
+        },
+        "±60m": {
+          "same": {
+            "observedHits": 1,
+            "observedRate": 0.5,
+            "nullMean": 0.0131,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 0,
+              "q99": 1
+            },
+            "pValue": 0.0131986801319868,
+            "enrichment": 76.33587786259541,
+            "oneToOneHits": 1,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 188.67924528301887,
+              "maxP": 1
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.0022,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 0,
+              "q99": 0
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1782864000000,
+              "ltfAt": 1782867600000,
+              "direction": "long",
+              "deltaMs": 3600000
+            }
+          ]
+        },
+        "±240m": {
+          "same": {
+            "observedHits": 1,
+            "observedRate": 0.5,
+            "nullMean": 0.0559,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 1,
+              "q99": 1
+            },
+            "pValue": 0.05599440055994401,
+            "enrichment": 17.88908765652952,
+            "oneToOneHits": 1,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 38.91050583657587,
+              "maxP": 1
+            }
+          },
+          "opposite": {
+            "observedHits": 0,
+            "observedRate": 0,
+            "nullMean": 0.0112,
+            "nullQuantiles": {
+              "q50": 0,
+              "q90": 0,
+              "q95": 0,
+              "q99": 1
+            },
+            "pValue": 1,
+            "enrichment": 0,
+            "oneToOneHits": 0,
+            "loo": {
+              "minEnrichment": 0,
+              "maxEnrichment": 0,
+              "maxP": 1
+            }
+          },
+          "oneToOnePairs": [
+            {
+              "htfAt": 1782864000000,
+              "ltfAt": 1782867600000,
+              "direction": "long",
+              "deltaMs": 3600000
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "killTriggered": {
+    "K1": true,
+    "K2": false,
+    "K3": false,
+    "K4": false,
+    "K5": false
+  },
+  "adjacentSurviveWindows": [],
+  "h3Verdict": "H3 rejected / not advanced (kill criteria triggered)",
+  "datasetStatus": [
+    {
+      "dataset": "btc-perp-15m",
+      "executionStatus": "sealed slices unconsumed by V7-prime final (never run); full series consumed by earlier full-corpus diagnostics",
+      "hypothesisStatusH2H3": "hypothesis-SEEN (all labels used in H2/H3 audits and this falsification audit)",
+      "permittedFutureUse": "reproduction of V1-V7 results; development/exploratory for H2/H3-derived models; NOT valid as final OOS confirmation for them"
+    },
+    {
+      "dataset": "btc-perp-1h",
+      "executionStatus": "sealed slices unconsumed by V7-prime final (never run); full series consumed by earlier full-corpus diagnostics",
+      "hypothesisStatusH2H3": "hypothesis-SEEN (all labels used in H2/H3 audits and this falsification audit)",
+      "permittedFutureUse": "reproduction of V1-V7 results; development/exploratory for H2/H3-derived models; NOT valid as final OOS confirmation for them"
+    },
+    {
+      "dataset": "eth-perp-15m",
+      "executionStatus": "sealed slices unconsumed by V7-prime final (never run); full series consumed by earlier full-corpus diagnostics",
+      "hypothesisStatusH2H3": "hypothesis-SEEN (all labels used in H2/H3 audits and this falsification audit)",
+      "permittedFutureUse": "reproduction of V1-V7 results; development/exploratory for H2/H3-derived models; NOT valid as final OOS confirmation for them"
+    },
+    {
+      "dataset": "sol-spot-15m",
+      "executionStatus": "sealed slices unconsumed by V7-prime final (never run); full series consumed by earlier full-corpus diagnostics",
+      "hypothesisStatusH2H3": "hypothesis-SEEN (all labels used in H2/H3 audits and this falsification audit)",
+      "permittedFutureUse": "reproduction of V1-V7 results; development/exploratory for H2/H3-derived models; NOT valid as final OOS confirmation for them"
+    },
+    {
+      "dataset": "btc-perp-5m",
+      "executionStatus": "sealed slices unconsumed by V7-prime final (never run); full series consumed by earlier full-corpus diagnostics",
+      "hypothesisStatusH2H3": "hypothesis-SEEN (all labels used in H2/H3 audits and this falsification audit)",
+      "permittedFutureUse": "reproduction of V1-V7 results; development/exploratory for H2/H3-derived models; NOT valid as final OOS confirmation for them"
+    },
+    {
+      "dataset": "btc-perp-4h",
+      "executionStatus": "sealed slices unconsumed by V7-prime final (never run); full series consumed by earlier full-corpus diagnostics",
+      "hypothesisStatusH2H3": "hypothesis-SEEN (all labels used in H2/H3 audits and this falsification audit)",
+      "permittedFutureUse": "reproduction of V1-V7 results; development/exploratory for H2/H3-derived models; NOT valid as final OOS confirmation for them"
+    }
+  ]
+}

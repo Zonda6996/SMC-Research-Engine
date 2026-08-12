@@ -1,0 +1,776 @@
+[
+  {
+    "cfg": {
+      "windowBars": 48,
+      "minAgeBars": 8,
+      "recoveryThreshold": 0.5
+    },
+    "meanValidationF1": 0.030303030303030304,
+    "meanValidationPrecision": 0.021739130434782608,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0.029850746268656716,
+          "r": 0.0625,
+          "f1": 0.04040404040404041,
+          "preds": 67,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 31,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0.023255813953488372,
+          "r": 0.043478260869565216,
+          "f1": 0.030303030303030304,
+          "preds": 43,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0.043478260869565216,
+          "r": 0.1,
+          "f1": 0.06060606060606061,
+          "preds": 23,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 54,
+      "minAgeBars": 8,
+      "recoveryThreshold": 0.25
+    },
+    "meanValidationF1": 0.030303030303030304,
+    "meanValidationPrecision": 0.021739130434782608,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0.014925373134328358,
+          "r": 0.03125,
+          "f1": 0.020202020202020204,
+          "preds": 67,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 29,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0.04878048780487805,
+          "r": 0.08695652173913043,
+          "f1": 0.0625,
+          "preds": 41,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0.043478260869565216,
+          "r": 0.1,
+          "f1": 0.06060606060606061,
+          "preds": 23,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 54,
+      "minAgeBars": 8,
+      "recoveryThreshold": 0.5
+    },
+    "meanValidationF1": 0.030303030303030304,
+    "meanValidationPrecision": 0.021739130434782608,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0.03076923076923077,
+          "r": 0.0625,
+          "f1": 0.041237113402061855,
+          "preds": 65,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 29,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0.025,
+          "r": 0.043478260869565216,
+          "f1": 0.031746031746031744,
+          "preds": 40,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0.043478260869565216,
+          "r": 0.1,
+          "f1": 0.06060606060606061,
+          "preds": 23,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 60,
+      "minAgeBars": 8,
+      "recoveryThreshold": 0.25
+    },
+    "meanValidationF1": 0.030303030303030304,
+    "meanValidationPrecision": 0.021739130434782608,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0.015384615384615385,
+          "r": 0.03125,
+          "f1": 0.020618556701030927,
+          "preds": 65,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 29,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0.05,
+          "r": 0.08695652173913043,
+          "f1": 0.06349206349206349,
+          "preds": 40,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0.043478260869565216,
+          "r": 0.1,
+          "f1": 0.06060606060606061,
+          "preds": 23,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 60,
+      "minAgeBars": 8,
+      "recoveryThreshold": 0.5
+    },
+    "meanValidationF1": 0.030303030303030304,
+    "meanValidationPrecision": 0.021739130434782608,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0.03225806451612903,
+          "r": 0.0625,
+          "f1": 0.0425531914893617,
+          "preds": 62,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 29,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0.02564102564102564,
+          "r": 0.043478260869565216,
+          "f1": 0.03225806451612903,
+          "preds": 39,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0.043478260869565216,
+          "r": 0.1,
+          "f1": 0.06060606060606061,
+          "preds": 23,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 48,
+      "minAgeBars": 8,
+      "recoveryThreshold": 0.25
+    },
+    "meanValidationF1": 0.029411764705882353,
+    "meanValidationPrecision": 0.020833333333333332,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0.014285714285714285,
+          "r": 0.03125,
+          "f1": 0.0196078431372549,
+          "preds": 70,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 31,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0.043478260869565216,
+          "r": 0.08695652173913043,
+          "f1": 0.057971014492753624,
+          "preds": 46,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0.041666666666666664,
+          "r": 0.1,
+          "f1": 0.058823529411764705,
+          "preds": 24,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 48,
+      "minAgeBars": 16,
+      "recoveryThreshold": 0.25
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 58,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 27,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 38,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 23,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 48,
+      "minAgeBars": 16,
+      "recoveryThreshold": 0.5
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 57,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 27,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 38,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 23,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 48,
+      "minAgeBars": 24,
+      "recoveryThreshold": 0.25
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 47,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 23,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 34,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 48,
+      "minAgeBars": 24,
+      "recoveryThreshold": 0.5
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 47,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 23,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 34,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 54,
+      "minAgeBars": 16,
+      "recoveryThreshold": 0.25
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 58,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 25,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 37,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 22,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 54,
+      "minAgeBars": 16,
+      "recoveryThreshold": 0.5
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 57,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 25,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 36,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 22,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 54,
+      "minAgeBars": 24,
+      "recoveryThreshold": 0.25
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 47,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 33,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 54,
+      "minAgeBars": 24,
+      "recoveryThreshold": 0.5
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 47,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 32,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 60,
+      "minAgeBars": 16,
+      "recoveryThreshold": 0.25
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 56,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 24,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 37,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 60,
+      "minAgeBars": 16,
+      "recoveryThreshold": 0.5
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 55,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 24,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 36,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 60,
+      "minAgeBars": 24,
+      "recoveryThreshold": 0.25
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 47,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 20,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 32,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 10
+        }
+      }
+    }
+  },
+  {
+    "cfg": {
+      "windowBars": 60,
+      "minAgeBars": 24,
+      "recoveryThreshold": 0.5
+    },
+    "meanValidationF1": 0,
+    "meanValidationPrecision": 0,
+    "detail": {
+      "btc-perp-15m": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 47,
+          "truth": 32
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 20,
+          "truth": 16
+        }
+      },
+      "btc-perp-1h": {
+        "fit": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 31,
+          "truth": 23
+        },
+        "validation": {
+          "p": 0,
+          "r": 0,
+          "f1": 0,
+          "preds": 21,
+          "truth": 10
+        }
+      }
+    }
+  }
+]

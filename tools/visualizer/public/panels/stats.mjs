@@ -73,7 +73,7 @@ export function renderFunnel() {
 }
 
 export function renderEvents() {
-	if (!$('showEvents').checked) return
+	if (!$('showBosChoch')?.checked) return
 	for (const e of S.data.events) {
 		const a = candleAt(e.levelIndex), b = candleAt(e.confirmIndex)
 		if (!a || !b || e.levelIndex >= e.confirmIndex) continue
@@ -90,7 +90,7 @@ export function renderEvents() {
 }
 
 export function renderProtected() {
-	if (!$('showProtected').checked) return
+	if (!$('showProtected')?.checked) return
 	for (const x of S.data.protectedSegments) {
 		const a = candleAt(x.startIndex), b = candleAt(x.endIndex)
 		if (a && b) line([{ time: time(a.timestamp), value: x.price }, { time: time(b.timestamp), value: x.price }], { color: C.amber, lineWidth: 1, lineStyle: lineStyle().SparseDotted })
@@ -99,7 +99,11 @@ export function renderProtected() {
 
 export function renderTradeMarkers() {
 	const m = []
+	const showDeep = $('showDeep')?.checked ?? false
+	const showOte = $('showOte')?.checked ?? false
 	for (const t of S.filtered) {
+		if (t.stream === 'deep' && !showDeep) continue
+		if (t.stream === 'ote' && !showOte) continue
 		const en = candleAt(t.entryIndex), ex = t.exitIndex != null ? candleAt(t.exitIndex) : null
 		if (en) {
 			const skipped = t.first5Skipped || t.executionCostSkipped
@@ -220,8 +224,10 @@ export function renderTradesMode() {
 }
 
 export function wireStatsPanel() {
-	for (const id of ['fStream', 'fDirection', 'fResult', 'fTrigger', 'bigbarOnly', 'showSkipped', 'showEvents', 'showProtected'])
-		$(id).onchange = () => { S.selectedId = null; document.dispatchEvent(new CustomEvent('viz:redraw')) }
+	for (const id of ['fStream', 'fDirection', 'fResult', 'fTrigger', 'bigbarOnly', 'showSkipped', 'showProtected', 'showDeep', 'showOte', 'showBosChoch']) {
+		const el = $(id)
+		if (el) el.onchange = () => { S.selectedId = null; document.dispatchEvent(new CustomEvent('viz:redraw')) }
+	}
 	$('prevBtn').onclick = () => navigateTrades(-1)
 	$('nextBtn').onclick = () => navigateTrades(1)
 }

@@ -19,12 +19,12 @@
 			<div class="combo-pop hidden" id="symbolPop"></div>
 		</div>
 		<div class="seg" id="tfGroup">
-			<button data-tf="15m">15m</button><button data-tf="30m">30m</button><button data-tf="1h">1h</button><button data-tf="4h" class="active">4h</button><button data-tf="1d">1d</button><button data-tf="1w">1w</button>
+			<button data-tf="1m">1м</button><button data-tf="3m">3м</button><button data-tf="5m">5м</button><button data-tf="15m">15м</button><button data-tf="30m">30м</button><button data-tf="45m">45м</button><button data-tf="1h">1ч</button><button data-tf="2h">2ч</button><button data-tf="3h">3ч</button><button data-tf="4h" class="active">4ч</button><button data-tf="1d">Д</button><button data-tf="1w">Н</button>
 		</div>
 		<input class="input input-limit" type="number" id="limit" value="5000" min="500" max="25000" step="500" title="Количество свечей" />
 		<input class="input input-date" type="text" id="historyUntil" placeholder="гггг-мм-дд" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" title="История до конца выбранного дня (гггг-мм-дд); пусто — по сейчас" />
 		<button class="btn btn-ghost icon" id="randomPeriod" title="Случайная дата от марта 2024"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h4"/><path d="M14 22h4"/><path d="m15 6 3 3"/><path d="m18 9 3 3"/></svg></button>
-		<label class="check" id="fullLtfWrap" title="Полная история ТФ подтверждения (1h для 1D-зон, 15m для 4h, 5m для 1h): глубокая часть из архивов data.binance.vision, свежий хвост из API. Первая загрузка символа дольше на несколько секунд — дальше дисковый кэш. Выключено — потолок API"><input type="checkbox" id="fullLtf" checked /> подтверждение: вся история</label>
+		<label class="check" id="fullLtfWrap" title="Полная история ТФ подтверждения (1h для 1D-зон, 15m для 4h, 5m для 1h): глубокая часть из архивов data.binance.vision, свежий хвост из API. Первая загрузка символа дольше на несколько секунд — дальше дисковый кэш. Выключено — потолок API"><input type="checkbox" id="fullLtf" /> подтверждение: вся история</label>
 		<select class="input input-source" id="source" title="Источник данных">
 			<option value="fresh">Binance Futures</option>
 			<option value="fixture">Fixture (офлайн)</option>
@@ -38,6 +38,7 @@
 		<section class="chart-wrap">
 			<div id="chart"></div>
 			<canvas id="hmProfile" class="hm-profile"></canvas>
+			<div class="signal-arrow-hud hidden" id="signalArrowHud"></div>
 			<div class="loading hidden" id="loading"></div>
 			<div class="hover-card hidden" id="tooltip"></div>
 			<div class="hover-card hover-zone hidden" id="zoneHover"></div>
@@ -58,25 +59,6 @@
 					<div class="meta-row"><span class="badge mono" id="version">—</span></div>
 					<div class="cards" id="cards"></div>
 					<details class="help"><summary>Справка</summary><p>First-5 gate: touch в первой 5m-свече HTF-бара пропускается (counterfactual). Bigbar — диагностическая метка, не фильтр. Цифры risk-unscaled.</p></details>
-				</div>
-			</section>
-
-			<!-- Фильтры канона -->
-			<section class="section collapsed" id="filtersPanel">
-				<div class="section-head"><h2>Фильтры сделок</h2><span class="chevron"></span></div>
-				<div class="section-body">
-					<div class="grid2">
-						<select class="input" id="fStream"><option value="all">Deep + OTE</option><option value="deep">Deep</option><option value="ote">OTE</option></select>
-						<select class="input" id="fDirection"><option value="all">Long + Short</option><option value="long">Long</option><option value="short">Short</option></select>
-						<select class="input" id="fResult"><option value="all">Все исходы</option><option value="tp">Только TP</option><option value="stop">Только Stop</option><option value="timestop">Time-stop</option><option value="open">Открытые</option><option value="first5-skip">First-5 skip</option><option value="cost-skip">Cost skip</option></select>
-						<select class="input" id="fTrigger"><option value="all">BOS + CHoCH</option><option value="bos">BOS</option><option value="choch">CHoCH</option></select>
-					</div>
-					<div class="check-row">
-						<label class="check"><input type="checkbox" id="bigbarOnly" /> только bigbar</label>
-						<label class="check"><input type="checkbox" id="showSkipped" /> показывать skip</label>
-						<label class="check"><input type="checkbox" id="showEvents" checked /> BOS/CHoCH</label>
-						<label class="check"><input type="checkbox" id="showProtected" /> protected</label>
-					</div>
 				</div>
 			</section>
 
@@ -101,8 +83,8 @@
 						</div>
 						<div class="status" id="poiZoneStatus">—</div>
 						<div class="btn-row">
-							<button class="btn btn-outline sm" id="poiZonePrev" title="Предыдущая зона"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
-							<button class="btn btn-outline sm" id="poiZoneNext" title="Следующая зона"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+							<button class="btn btn-outline sm" id="poiZonePrev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+							<button class="btn btn-outline sm" id="poiZoneNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
 							<button class="btn btn-outline sm" id="poiZoneExport">Экспорт JSON</button>
 							<button class="btn btn-ghost sm" id="poiZoneBack">Обычный график</button>
 						</div>
@@ -124,29 +106,48 @@
 				</div>
 			</section>
 
+			<!-- Независимые индикаторы -->
+			<section class="section" id="indicatorPanel">
+				<div class="section-head"><div class="head-titles"><h2>Индикаторы</h2><div class="head-sub">TV-style · независимые слои</div></div><span class="chevron"></span></div>
+				<div class="section-body indicator-settings">
+					<div class="indicator-switches"><label class="check switch" id="apexChkWrap"><input type="checkbox" id="apexChk" checked /><span class="knob"></span>Zonda Apex</label><label class="check switch" id="signalArrowsChkWrap"><input type="checkbox" id="signalArrowsChk" checked /><span class="knob"></span>Zonda Reversal reconstruction</label></div>
+					<details open><summary>Zonda Apex · Inputs</summary><div class="indicator-body"><div class="indicator-grid">
+						<label class="indicator-field">Источник<select class="input" id="apexSource"><option value="hlc3">(H+L+C)/3</option><option value="close">Close</option><option value="hl2">(H+L)/2</option><option value="ohlc4">OHLC/4</option></select></label>
+						<label class="indicator-field">Lookback<input class="input" id="apexLookback" type="number" min="20" max="1000" value="200" /></label><label class="indicator-field">Inner multiplier<input class="input" id="apexKInner" type="number" step="0.1" value="5.6" /></label><label class="indicator-field">Outer amplitude<input class="input" id="apexKOuter" type="number" step="0.1" value="9.6" /></label>
+					</div></div></details>
+					<details><summary>Zonda Apex · Style</summary><div class="indicator-body style-list">
+						<label class="style-row"><input type="checkbox" id="meanOn" checked><span>Mean</span><input class="style-width" type="number" id="meanWidth" min="1" max="4" value="2" title="Толщина"><input type="color" id="meanColor" value="#4f83ff"></label>
+						<label class="style-row"><input type="checkbox" id="redLoOn" checked><span>Upper inner</span><input class="style-width" type="number" id="redLoWidth" min="1" max="4" value="1"><input type="color" id="redLoColor" value="#f4506a"></label><label class="style-row"><input type="checkbox" id="redHiOn" checked><span>Upper outer</span><input class="style-width" type="number" id="redHiWidth" min="1" max="4" value="1"><input type="color" id="redHiColor" value="#f4506a"></label>
+						<label class="style-row"><input type="checkbox" id="greenHiOn" checked><span>Lower inner</span><input class="style-width" type="number" id="greenHiWidth" min="1" max="4" value="1"><input type="color" id="greenHiColor" value="#2fd08c"></label><label class="style-row"><input type="checkbox" id="greenLoOn" checked><span>Lower outer</span><input class="style-width" type="number" id="greenLoWidth" min="1" max="4" value="1"><input type="color" id="greenLoColor" value="#2fd08c"></label>
+						<label class="style-row"><input type="checkbox" id="upperFillOn" checked><span>Upper fill</span><input type="color" id="upperFillColor" value="#f4506a"></label><label class="style-row"><input type="checkbox" id="lowerFillOn" checked><span>Lower fill</span><input type="color" id="lowerFillColor" value="#2fd08c"></label><label class="check"><input type="checkbox" id="priceLabels" checked> Метки на шкале</label>
+					</div></details>
+					<details open><summary>Zonda Reversal reconstruction · Inputs & Style</summary><div class="indicator-body"><div class="indicator-grid"><label class="indicator-field">Статистика<select class="input" id="statsRange"><option value="loaded" selected>Загруженное окно</option><option value="visible">Видимые свечи</option></select></label><label class="indicator-field">Размер стрелки<input class="input" id="arrowSize" type="number" min="1" max="3" value="1" /></label><label class="indicator-field full" title="Режим фильтрации сигналов: Off (без фильтра), Exhaustion (Истощение), Slope (тренд Apex), Reversal (тренд + отмена контр-пробоя), Contraction (строгое сжатие), Liquidity (Пул ликвидности), Combo (Ликвидность + Истощение)">Фильтр сигналов<select class="input" id="filterMode"><option value="off" selected>Off (Без фильтра)</option><option value="exhaustion">Volume Exhaustion (Low Vol)</option><option value="slope">Trend Only (Apex Slope)</option><option value="reversal">Trend + Reversal (Slope + FailedCont)</option><option value="contraction">Strict Contraction (All 4)</option><option value="liquidity">Liquidity POI (Zones)</option><option value="combo">Combo: POI + Exhaustion</option></select></label></div><div class="check-row"><label class="check"><input type="checkbox" id="exitMarkers" /> Метки выходов</label><label class="check"><input type="checkbox" id="includeCosts" checked /> Учитывать costs</label></div><div class="style-list"><label class="style-row"><input type="checkbox" id="buyOn" checked><span>BUY</span><input type="color" id="buyColor" value="#2fd08c"></label><label class="style-row"><input type="checkbox" id="sellOn" checked><span>SELL</span><input type="color" id="sellColor" value="#f4506a"></label></div><p class="indicator-note">OWN2 — reconstruction/approximation detector, не exact vendor parity. BUY только bullish, SELL только bearish, doji запрещён. Safe/Risk: moving Mean partial по wick и moving opposite Inner full только по close; BE — approximation. Standard: static уровни. Stop-first сохраняется.</p></div></details>
+					<div class="btn-row"><button class="btn btn-primary sm" id="indicatorApply">Применить и пересчитать</button><button class="btn btn-ghost sm" id="indicatorReset">Сбросить к канону</button></div>
+				</div>
+			</section>
+
 			<!-- Подтверждение -->
 			<section class="section mode" id="confPanel">
 				<div class="section-head" data-toggle="confToggle"><div class="head-titles"><h2>Подтверждение</h2><div class="head-sub">simplified / refined · лестница §14.1</div></div><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="confControls">
 						<div class="grid2">
-							<select class="input" id="confLayer" title="§16.20/§16.23: связка «ТФ зоны → ТФ подтверждения» — график или слой"><option value="ctx" selected>Связка графика</option><option value="1d">1D→1h</option><option value="4h">4h→15m</option><option value="1h">1h→5m</option></select>
+							<select class="input" id="confLayer" title="§14.1: TF зависит от выбранного движка — simplified использует первый после `/`, refined второй"><option value="ctx" selected>Связка графика</option><option value="1d">1D: 4h / 1h</option><option value="4h">4h: 1h / 15m</option><option value="1h">1h: 15m / 5m</option></select>
 							<select class="input" id="confStatus"><option value="all">Все попытки</option><option value="entered">Entered</option><option value="rejected">Rejected</option></select>
 							<select class="input" id="confOutcome"><option value="all">Любой исход</option><option value="tp">TP2</option><option value="stop">Stop</option><option value="open">Open</option></select>
 							<select class="input" id="confReason"><option value="all">Все причины</option></select>
-							<select class="input" id="confEngine" title="Уточнённое подтверждение (пересвип + защита) или УПРОЩЁННОЕ с пресетом v0.4: касание зоны → первая направленная свеча, частичка 0.40R (25%) → безубыток → фулл 12R, вход дальше 1 ATR от края зоны не берётся, входы с недавним сигналом полос GGI отбрасываются (§16.29)"><option value="refined" selected>Уточнённое</option><option value="simplified">Упрощённое v0.4</option></select>
-							<label class="check" id="ggiChkWrap" title="§16.28: полосы перекупленности/перепроданности по фактическим параметрам индикатора (hlc3, окно 200, внутренний край 5.6·ATR, внешний 9.6·ATR) и его сигналы на ТФ подтверждения. Сигнал = касание внутреннего края, повтор только после возврата к средней"><input type="checkbox" id="ggiChk" checked /> полосы GGI</label>
+							<select class="input" id="confEngine" title="Уточнённое подтверждение (пересвип + защита) или УПРОЩЁННОЕ с пресетом v0.4: касание зоны → первая направленная свеча, частичка 0.40R (25%) → безубыток → фулл 12R, вход дальше 1 ATR от края зоны не берётся, входы с недавним сигналом полос Apex отбрасываются (§16.29)"><option value="refined" selected>Уточнённое</option><option value="simplified">Упрощённое v0.4</option></select>
 						</div>
-						<div class="status" id="confStatusText">—</div>
+<div class="status" id="confStatusText">—</div>
 						<div class="btn-row">
-							<button class="btn btn-outline sm" id="confPrev" title="Предыдущее подтверждение"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
-							<button class="btn btn-outline sm" id="confNext" title="Следующее подтверждение"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+							<button class="btn btn-outline sm" id="confPrev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+							<button class="btn btn-outline sm" id="confNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
 							<button class="btn btn-outline sm" id="confZonesBtn">Зоны на 4h</button>
 							<button class="btn btn-outline sm" id="confExport">Экспорт JSON</button>
 							<button class="btn btn-ghost sm" id="confBack">Обычный график</button>
 						</div>
 						<div class="detail" id="confTrace"></div>
-						<details class="help"><summary>Справка по подтверждению</summary><p>Последовательность: заход → остановка (направленное закрытие после 4 тихих баров) → отскок (6 баров) → пересвип невыметенного якоря → защита → тест слабости (объём возобновления выше отката) → вход; стоп за экстремумом свипа, тейк 2R. Попытка умирает: 96 баров бездействия · пробой закрытиями · конец окна зоны (со состоявшимся свипом — доигрывается). Вход отменяется при риске &gt; 1.5 ATR15. Уточнённое подтверждение по лестнице ТФ: 1D-зоны → 1h, 4h → 15m, 1h → 5m; константы движка — в барах ТФ подтверждения (время масштабируется с ТФ контекста). Пометка «против импульса» калибрована на связке 4h→15m. Тусклые зоны — окно раньше истории ТФ подтверждения: нет данных, не логики.</p></details>
+						<details class="help"><summary>Справка по подтверждению</summary><p>Лестница §14.1: POI 1W → simplified 1D / refined 4h; 1D → 4h / 1h; 4h → 1h / 15m; 1h → 15m / 5m. Уточнённая последовательность: заход → остановка → отскок → пересвип → защита → тест слабости → вход. Упрощённая: касание зоны → первая направленная свеча своего TF. Константы движков считаются в барах выбранного TF, поэтому 80 баров time-stop означают разное реальное время на разных строках лестницы.</p></details>
 					</div>
 				</div>
 			</section>
@@ -196,9 +197,9 @@
 						<div class="lab-outcome hidden" id="labOutcome"></div>
 						<div class="status" id="labAnalytics"></div>
 						<div class="btn-row">
-							<button class="btn btn-outline sm" id="labShuffle" title="Перемешать"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg></button>
-							<button class="btn btn-outline sm" id="labPrev" title="Предыдущее решение"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
-							<button class="btn btn-outline sm" id="labNext" title="Следующее решение"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+							<button class="btn btn-outline sm" id="labShuffle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg></button>
+							<button class="btn btn-outline sm" id="labPrev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+							<button class="btn btn-outline sm" id="labNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
 							<button class="btn btn-outline sm" id="labStep">+1 свеча</button>
 							<button class="btn btn-outline sm" id="labWait">WAIT</button>
 							<button class="btn btn-take sm" id="labTake">TAKE</button>
@@ -242,11 +243,30 @@
 			<section class="section collapsed" id="tradesPanel">
 				<div class="section-head"><div class="head-titles"><h2>Сделки</h2><div class="head-sub">Deep + OTE · канон</div></div>
 					<span class="badge" id="count"></span>
-					<button class="btn btn-ghost sm icon" id="prevBtn" title="Предыдущая сделка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></button>
-					<button class="btn btn-ghost sm icon" id="nextBtn" title="Следующая сделка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></button>
+					<button class="btn btn-ghost sm icon" id="prevBtn" title="Предыдущая сделка"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></button>
+					<button class="btn btn-ghost sm icon" id="nextBtn" title="Следующая сделка"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></button>
 					<span class="chevron"></span>
 				</div>
-				<div class="section-body"><div class="list list-tall" id="tradeList"></div></div>
+				<div class="section-body">
+					<div class="grid2">
+						<select class="input" id="fStream"><option value="all">Deep + OTE</option><option value="deep">Deep</option><option value="ote">OTE</option></select>
+						<select class="input" id="fDirection"><option value="all">Long + Short</option><option value="long">Long</option><option value="short">Short</option></select>
+						<select class="input" id="fResult"><option value="all">Все исходы</option><option value="tp">Только TP</option><option value="stop">Только Stop</option><option value="timestop">Time-stop</option><option value="open">Открытые</option><option value="first5-skip">First-5 skip</option><option value="cost-skip">Cost skip</option></select>
+						<select class="input" id="fTrigger"><option value="all">BOS + CHoCH</option><option value="bos">BOS</option><option value="choch">CHoCH</option></select>
+					</div>
+					<div class="check-row">
+						<label class="check"><input type="checkbox" id="bigbarOnly" /> только bigbar</label>
+						<label class="check"><input type="checkbox" id="showSkipped" /> показывать skip</label>
+					</div>
+					<div class="subhead">Маркеры на главном графике</div>
+					<div class="check-row">
+						<label class="check"><input type="checkbox" id="showDeep" /> Deep</label>
+						<label class="check"><input type="checkbox" id="showOte" /> OTE</label>
+						<label class="check"><input type="checkbox" id="showBosChoch" checked /> BOS/CHoCH</label>
+						<label class="check"><input type="checkbox" id="showProtected" /> protected</label>
+					</div>
+					<div class="list list-tall" id="tradeList"></div>
+				</div>
 			</section>
 
 			<!-- Выбранная сделка -->

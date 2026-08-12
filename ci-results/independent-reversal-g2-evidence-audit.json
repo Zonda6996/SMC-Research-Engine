@@ -1,0 +1,182 @@
+{
+  "protocolHash": "da1696b7f09ee068e79ddb7987f0309a5b1d99c451a728b7d61dcd0b38f63ba0",
+  "selectedVariant": "EXT_POOL_SEQ",
+  "parentVerdicts": {
+    "fit": "PROMISING_NOT_PROVEN",
+    "temporalBlocks": "WALK_FORWARD_STABLE",
+    "ablation": "ABLATION_SUPPORTS_INTERACTION"
+  },
+  "verdict": "RESEARCH_CANDIDATE_NOT_LIVE_READY",
+  "aggregate": {
+    "trades": 60,
+    "meanNetR": 0.05600016571889499,
+    "profitFactor": 1.578459061315233,
+    "bestOnePercentRemovedR": 0.0422673753163149,
+    "blockBootstrap95": [
+      -0.06932251106413159,
+      0.17612822194416133
+    ],
+    "probabilityPositive": 0.8186,
+    "totalReturnPctAtOnePercentRisk": 3.3600099431337007,
+    "maximumDrawdownPctAtOnePercentRisk": 3.204255197353074,
+    "transferYears": 2.5817932922655715,
+    "simpleReturnPctPerYearAtOnePercentRisk": 1.3014248480695485,
+    "lastTemporalFoldMeanNetR": 0.0015405162220631114
+  },
+  "gates": {
+    "minimumOosTrades": {
+      "value": 60,
+      "threshold": 100,
+      "pass": false
+    },
+    "meanNetR": {
+      "value": 0.05600016571889499,
+      "threshold": 0.05,
+      "pass": true
+    },
+    "profitFactor": {
+      "value": 1.578459061315233,
+      "threshold": 1.2,
+      "pass": true
+    },
+    "stressMeanNetR": {
+      "value": 0.04808367217479052,
+      "threshold": 0,
+      "pass": true
+    },
+    "stressProfitFactor": {
+      "value": 1.4813754701573814,
+      "threshold": 1.05,
+      "pass": true
+    },
+    "bestOnePercentRemovedR": {
+      "value": 0.0422673753163149,
+      "threshold": 0,
+      "pass": true
+    },
+    "nullAdvantage": {
+      "value": 0.08895061361799853,
+      "threshold": 0.04,
+      "pass": true
+    },
+    "nonNegativeCellShare": {
+      "value": 0.6666666666666666,
+      "threshold": 0.7,
+      "pass": false
+    },
+    "positiveTransferCells": {
+      "value": 4,
+      "threshold": 3,
+      "pass": true
+    },
+    "maximumSingleSymbolPositiveContribution": {
+      "value": 0.31449381143194655,
+      "threshold": 0.35,
+      "pass": true
+    },
+    "maximumPortfolioDrawdownPct": {
+      "value": 3.204255197353074,
+      "threshold": 15,
+      "pass": true
+    }
+  },
+  "failedPromotionGates": [
+    "minimumOosTrades",
+    "nonNegativeCellShare"
+  ],
+  "evidenceWarnings": [
+    {
+      "id": "matched-null-count-mismatch",
+      "pass": false,
+      "detail": "Selected has 60 trades; MATCHED_NULL has 801. The preregistered count-matched control is not reproduced."
+    },
+    {
+      "id": "matched-null-specification-mismatch",
+      "pass": false,
+      "detail": "The frozen runner matches side/month and approximately sequence score, but does not implement the preregistered volatility/regime matching."
+    },
+    {
+      "id": "confidence-interval-excludes-zero",
+      "pass": false,
+      "detail": "Month-block bootstrap 95% lower bound is -0.06932251106413159R."
+    },
+    {
+      "id": "walk-forward-is-refit",
+      "pass": false,
+      "detail": "The current walk-forward artifact is a frozen-variant temporal block audit. It does not re-fit or re-select parameters in rolling training windows."
+    }
+  ],
+  "failedEvidenceChecks": [
+    "matched-null-count-mismatch",
+    "matched-null-specification-mismatch",
+    "confidence-interval-excludes-zero",
+    "walk-forward-is-refit"
+  ],
+  "stability": {
+    "positiveCells": 4,
+    "totalCells": 6,
+    "nonNegativeCellShare": 0.6666666666666666,
+    "positiveContributionBySymbol": [
+      {
+        "symbol": "BCHUSDT",
+        "positiveNetR": 1.7354707612669131,
+        "share": 0.31449381143194655
+      },
+      {
+        "symbol": "APTUSDT",
+        "positiveNetR": 1.566985427636689,
+        "share": 0.28396169534773735
+      },
+      {
+        "symbol": "FILUSDT",
+        "positiveNetR": 1.4540415492533767,
+        "share": 0.26349453935558226
+      },
+      {
+        "symbol": "NEARUSDT",
+        "positiveNetR": 0.7618008679904816,
+        "share": 0.13804995386473376
+      }
+    ],
+    "leaveOneSymbolOut": [
+      {
+        "excluded": "BCHUSDT",
+        "trades": 50,
+        "meanNetR": 0.03249078363733573
+      },
+      {
+        "excluded": "APTUSDT",
+        "trades": 50,
+        "meanNetR": 0.03586049030994021
+      },
+      {
+        "excluded": "FILUSDT",
+        "trades": 48,
+        "meanNetR": 0.039707674872506725
+      },
+      {
+        "excluded": "NEARUSDT",
+        "trades": 52,
+        "meanNetR": 0.04996555913736957
+      },
+      {
+        "excluded": "UNIUSDT",
+        "trades": 50,
+        "meanNetR": 0.08262792362721565
+      },
+      {
+        "excluded": "ETCUSDT",
+        "trades": 50,
+        "meanNetR": 0.09493824735840756
+      }
+    ],
+    "worstLeaveOneOutMeanR": 0.03249078363733573
+  },
+  "nextResearchOrder": [
+    "CONTROL1: repair the matched null to equal count plus side/month/causal-volatility/causal-regime matching; treat the current transfer set as contaminated audit data.",
+    "BREADTH1: freeze EXT_POOL_SEQ unchanged and test new symbols and at least one additional timeframe to reach 100+ genuinely new OOS trades.",
+    "ECON1: add funding, spread and latency/slippage stress; max holding of 2,000 hours makes funding omission material.",
+    "RANK1: on development data only, replace the hard sequence cutoff with a shallow monotone/regularized ranker and an abstain region; compare it against the unchanged binary core on a new holdout.",
+    "EXEC1: nested-validation-only stop/partial/timeout ablation. Do not optimize execution on the already opened transfer symbols."
+  ]
+}
