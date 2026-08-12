@@ -4,7 +4,7 @@ import type { FibGridCandidate } from '../../models/fib/FibGrid.js'
 import type { LiquidityPoiCandidate } from '../confirmation/LiquidityPoiCalibration.js'
 import type { ApexBand, ReversalSignal } from '../signals/ApexEngine.js'
 
-export const ZONDA_EDGE_FEATURE_VERSION = 'zonda-edge-features-0.1-causal-snapshot'
+export const ZONDA_EDGE_FEATURE_VERSION = 'zonda-edge-features-0.2-causal-stackshare'
 
 export interface ZondaEdgeFeatureContext {
 	candles: Candle[]
@@ -149,6 +149,14 @@ export function buildZondaEdgeFeatureSnapshot(context: ZondaEdgeFeatureContext):
 	}
 	const nearestZone = activeZones.sort((a, b) => zoneDistance(a) - zoneDistance(b) || b.knownAt - a.knownAt)[0]
 	const zoneAtr = nearestZone?.atr && nearestZone.atr > 0 ? nearestZone.atr : null
+	// CAUSAL stackShare: nearestZone.stackShare from the engine is normalized to the
+	// strongest stack AT END OF HISTORY (look-ahead) — a display metric only. Here we
+	// renormalize by the strongest stack KNOWN & alive at the decision time.
+	const causalMaxStack = nearestZone
+		? activeZones.reduce((max, zone) => zone.direction === nearestZone.direction && zone.duplicateOf == null && zone.endAt > current.timestamp
+			? Math.max(max, zone.stackNotional) : max, 0)
+		: 0
+	const causalStackShare = nearestZone ? (causalMaxStack > 0 ? nearestZone.stackNotional / causalMaxStack : 1) : null
 
 	const structure = (context.structureEvents ?? []).filter((event) => event.confirmIndex <= decisionIndex && event.confirmTimestamp <= current.timestamp).sort((a, b) => b.confirmIndex - a.confirmIndex)[0]
 
@@ -178,7 +186,7 @@ export function buildZondaEdgeFeatureSnapshot(context: ZondaEdgeFeatureContext):
 		liquidity: nearestZone ? {
 			direction: nearestZone.direction,
 			distanceAtr: zoneAtr ? zoneDistance(nearestZone) / zoneAtr : null,
-			stackShare: nearestZone.stackShare,
+			stackShare: causalStackShare,
 			stackNotional: nearestZone.stackNotional,
 			touchCount: nearestZone.touchCount,
 			ageBars: ageBars(nearestZone.knownAt),

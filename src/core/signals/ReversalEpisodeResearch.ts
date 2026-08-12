@@ -141,12 +141,13 @@ export function detectReversalEpisodes(
 			const fast = fastValues[i]!, slow = slowValues[i]!, prevFast = fastValues[i - 1]!, prevSlow = slowValues[i - 1]!
 			const fastSlowCross = side === 'long' ? fast >= slow && prevFast < prevSlow : fast <= slow && prevFast > prevSlow
 			const recovery = side === 'long' ? (row.close - state.extreme) / width : (state.extreme - row.close) / width
+			if (!directional) continue
 			let ok = false
-			if (config.confirm === 'directional') ok = directional
+			if (config.confirm === 'directional') ok = true
 			else if (config.confirm === 'osc-cross') ok = releaseCross
 			else if (config.confirm === 'fast-slow-cross') ok = fastSlowCross
 			else if (config.confirm === 'price-recovery') ok = recovery >= config.minRecoveryWidth
-			else ok = releaseCross && directional
+			else ok = releaseCross
 			if (!ok) continue
 			out.push({ at: row.timestamp, index: i, direction: side, episodeBars: i - state.start, oscillator: config.oscillator, confirm: config.confirm })
 			state.available = false; state.start = null; state.extreme = side === 'long' ? Infinity : -Infinity; state.armedExtreme = false; state.lastSignal = i
