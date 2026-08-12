@@ -54,3 +54,12 @@ tmp/funding-cache/
 
 # исследовательский стенд диагностики (пересобирается по описанию в docs/CONTEXT.md §0.5)
 tmp/diag/
+
+# --- cleanup 2026-08-12: local / regenerable artifacts ---
+/tmp/
+.tmp/
+.workbuddy-ai/
+.github/
+.postman
+postman
+
