@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import {
 	fetchFundingHistory, parseBinanceFundingRows, parseFundingArchiveCsv, parseMarkPriceArchiveCsv,
 } from '../tools/shared/fundingFetcher.js'
-import { deterministicNullB, fundingReturnR, replayFrozenStatic2, type FrozenTrade } from '../ci/research/runZondaQuickProfitabilityScan.js'
+import { auditRelaxedPool, deterministicNullB, fundingReturnR, replayFrozenStatic2, selectStateFirst, type FrozenTrade } from '../ci/research/runZondaQuickProfitabilityScan.js'
 import type { ExactIndicatorRow } from '../ci/research/lib/exactIndicatorExport.js'
 
 test('funding parser normalizes, sorts and deduplicates valid rows', () => {
@@ -50,6 +50,71 @@ test('FROZEN-1 STATIC2 uses step=5.5*ATR/1.17, stop-first and timeout close', ()
 	const trade = replayFrozenStatic2(rows, [1, 1], 0, 1, 3_600_000, [])
 	assert.equal(trade?.outcome, 'stop')
 	assert.ok(Math.abs((trade?.grossR ?? 0) + 1) < 1e-12)
+})
+
+test('FROZEN-1 state gate is applied before RELAXED context with exact exit-plus-three boundary', () => {
+	const accepted: number[] = []
+	const result = selectStateFirst(
+		[{ idx: 10 }, { idx: 12 }, { idx: 18 }, { idx: 19 }],
+		(signal) => ({ holdingBars: signal.idx === 10 ? 5 : 1 }),
+		(signal) => { accepted.push(signal.idx); return signal.idx !== 10 },
+		3,
+	)
+	assert.deepEqual(accepted, [10, 19])
+	assert.deepEqual(result.selected.map(({ signal }) => signal.idx), [19])
+	assert.equal(result.admittedByStateGate, 2)
+	assert.equal(result.replayable, 2)
+})
+
+test('FROZEN-1 warmup signals occupy state without entering reported counts', () => {
+	const accepted: number[] = []
+	const result = selectStateFirst(
+		[{ idx: 10 }, { idx: 12 }, { idx: 20 }],
+		(signal) => ({ holdingBars: signal.idx === 10 ? 5 : 1 }),
+		(signal) => { accepted.push(signal.idx); return signal.idx >= 12 },
+		3,
+		(signal) => signal.idx >= 12,
+	)
+	assert.deepEqual(accepted, [10, 20])
+	assert.deepEqual(result.selected.map(({ signal }) => signal.idx), [20])
+	assert.equal(result.admittedByStateGate, 1)
+	assert.equal(result.replayable, 1)
+})
+
+test('FROZEN-1 RELAXED audit exposes rank, sweep and entry-band stages', () => {
+	const base = {
+		id: 'pool', version: 'test', side: 'buy-side' as const,
+		extremePrice: 100, bandLow: 99, bandHigh: 101, spanBins: 1,
+		startIndex: 0, startAt: 0, lastContributionIndex: 1, lastContributionAt: 1,
+		sweptIndex: 2, sweptAt: 99 * 3_600_000, contributions: 1,
+		volumeAccumulated: 1, notional: 10, remainingNotional: 10, weight: 1,
+		status: 'swept' as const, endAt: 100 * 3_600_000,
+	}
+	const pass = auditRelaxedPool([base], 100 * 3_600_000, 101.4, 1)
+	assert.equal(pass.nearPool, true)
+	assert.equal(pass.rankPassed, true)
+	assert.equal(pass.freshSweepPassed, true)
+	assert.equal(pass.entryBandPassed, true)
+	assert.equal(pass.pool?.id, 'pool')
+	assert.equal(pass.sweepAgeHours, 1)
+	const stale = auditRelaxedPool([{ ...base, sweptAt: 50 * 3_600_000 }], 100 * 3_600_000, 100, 1)
+	assert.equal(stale.freshSweepPassed, false)
+	assert.equal(stale.pool, null)
+	const future = auditRelaxedPool([{ ...base, sweptAt: 101 * 3_600_000 }], 100 * 3_600_000, 100, 1)
+	assert.equal(future.nearPool, false)
+	assert.equal(future.freshSweepPassed, false)
+	assert.equal(future.pool, null)
+	const outOfBand = auditRelaxedPool([base], 100 * 3_600_000, 101.75, 1)
+	assert.equal(outOfBand.nearPool, true)
+	assert.equal(outOfBand.entryBandPassed, false)
+	assert.equal(outOfBand.pool, null)
+	const heavier = { ...base, id: 'heavy', notional: 30 }
+	const middle = { ...base, id: 'middle', extremePrice: 200, bandLow: 199, bandHigh: 201, notional: 20 }
+	const lighter = { ...base, id: 'light', extremePrice: 300, bandLow: 299, bandHigh: 301, notional: 10 }
+	const rankedOut = auditRelaxedPool([heavier, middle, lighter], 100 * 3_600_000, 100, 1)
+	assert.equal(rankedOut.nearPool, true)
+	assert.equal(rankedOut.rankPassed, false)
+	assert.equal(rankedOut.pool, null)
 })
 
 test('Null B matches without replacement by side, month and timeframe', () => {
