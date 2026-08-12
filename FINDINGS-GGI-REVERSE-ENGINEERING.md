@@ -86,13 +86,3 @@ Consistent with everything above.
   constants from Nikita's simulator screenshots.
 - `ci-results/own2b-ablation.*`, `geo1-*` - replay evidence chain.
 - `data/gate-cache/` (untracked, local) - klines cache; rebuildable.
-
-## 5. Next steps
-
-1. Collect 3-4 more entry/add price pairs (safe) -> solve step formula.
-2. Re-run GEO1 with calibrated step + risk-definition R (add-filled
-   stop = -1R) -> true R of vendor arrows, final answer.
-3. Wire calibrated geometry into OUR pipeline as one more exit preset;
-   A/B vs VAR1 P25/S12 on FWD1.
-4. Watch Nikita's live AAVE 5m open trade: which stat row increments
-   (expect Partial) - final confirmation of 1.4.

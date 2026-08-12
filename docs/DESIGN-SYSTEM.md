@@ -1,58 +1,159 @@
-# Дизайн-система визуализатора
+# Design System: Dark Compact Dashboard (shadcn/ui v4 + Vercel Geist)
 
-Канонический норматив для `tools/visualizer`: один тёмный classic-интерфейс в духе shadcn/ui + Vercel/Geist. Это не журнал изменений, не второй хэндофф и не каталог альтернативных skins. Отражает то, что реально реализовано в `tools/visualizer/public/styles.css` и модулях `lib/` + `panels/`; при изменении интерфейса сверяться с этим файлом и действующими разделами `SPEC.md`.
+The visual design system for analytical trading applications, charts, event tables, and metric dashboards is built strictly on **shadcn/ui v4 achromatic neutral base** with **Vercel Geist typography**.
 
-`terminal.html`, `terminal.css` и `terminal.mjs` не являются частью продукта и не должны возвращаться без отдельного решения пользователя.
+---
 
-## Токены
+## 1. Tokens & Color System
 
-- Шрифты: `Geist` (интерфейс), `Geist Mono` (числа, цены, моноширинные значения).
-- Ахроматичная тёмная база: `--bg #0a0a0a`, `--card #171717`, `--elev #262626`; текст `--fg #fafafa`, вторичный `--muted #a1a1a1`.
-- Радиусы производятся от `--radius: 0.625rem`: 6px (мелкие элементы), 8px (контролы), 10px (плитки), 14px (панели).
-- Основное действие белое (`--accent-strong #fafafa`, тёмный текст); цвет сохраняется только для семантических статусов и dataviz.
-- Обычные карточки не используют тень; `--shadow-pop` оставлен только для всплывающих элементов и палитры.
+The base is strictly achromatic (`C = 0` in oklch). No blue or warm tints in neutral grays.
 
-## Палитра сигналов (согласована с `lib/format.mjs`)
+```css
+:root, .dark {
+  --background: #0a0a0a;
+  --card: #171717;
+  --popover: #171717;
+  --elev: #262626;        /* Muted surfaces: tiles, rows, track, hover */
+  --muted: #262626;
+  --accent: #262626;
+  --foreground: #fafafa;
+  --muted-foreground: #a1a1a1;
 
-- green `#2fd08c` — тейк/подтверждение (FULL).
-- red `#f4506a` — стоп (STOP).
-- amber `#f0a941` — частичка/безубыток (PARTIAL/BE).
-- purple `#9a7bff` — тайм-стоп (TIME).
-- blue `#5b8cff` — вход/зона по стороне.
-- dim `#6b7280` — служебные подписи.
+  /* Semi-transparent borders composite dynamically over underlying surfaces */
+  --border: rgb(255 255 255 / 10%);
+  --input:  rgb(255 255 255 / 15%);
+  --ring:   #737373;
 
-## Раскладка
+  /* Primary is strictly white. No colored primary exists in this system */
+  --primary: #fafafa;
+  --primary-foreground: #0a0a0a;
 
-- Сетка `minmax(0, 1fr) 420px`: график слева, панель справа.
-- Ширина сайдбара до 420px, разумный минимум 400px — не раздувать.
-- График никогда не уже 400px по ширине; зоны рисуются кастомным примитивом и НЕ участвуют в автошкале цены (сплющивание графика невозможно по построению).
+  /* Single-token semantic indicators */
+  --success: #4ade80;
+  --destructive: #f87171;
+  --warning: #fbbf24;
 
-## Компоненты
+  /* Dataviz extensions */
+  --purple: #9a7bff;      /* Timeouts / secondary indicators */
+  --cyan: #38bdf8;        /* Interactive chart accents */
 
-- Панели: Stats, Heatmap, Zones (POI), Confirmation, Decision Lab, Config.
-- Зоны — прямоугольниками: near сплошная граница, far пунктир, заливка по силе стека.
-- Командная палитра: Cmd/Ctrl+K, фильтр по подстроке, ↑↓ навигация, Enter выполнить, Esc закрыть.
-- Все числовые константы движков редактируются в UI и применяются кнопкой «Пересчитать»; дефолты в коде не меняются.
+  --font: "Geist", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+}
+```
 
-## Действующие правила (антипаттерны — чего не делать)
+### Dynamic Border Transparency
+`white/10%` resolves as:
+- `#222222` on page background (`#0a0a0a`)
+- `#2e2e2e` on card background (`#171717`)
+- `#3c3c3c` on tile surface (`#262626`)
 
-1. Не хардкодить inline-стили в разметке — только классы и токены.
-2. Не менять дефолты движков ради красивой картинки; правки конфигов идут через UI-оверрайды.
-3. Смена «Стиля» (цвета/толщины) НЕ должна вызывать пересчёт через API — только локальная перерисовка.
-4. Серверные поля применяются только по кнопке «Пересчитать», не на каждый ввод.
-5. Зоны не рисовать линиями по ценовой шкале — только прямоугольным примитивом вне автошкалы.
-6. Не смешивать шкалы времени разных ТФ на одном графике (4h heatmap на 15m свечи не накладывать).
-7. Не начинать тело страницы с дублирующего заголовка; заголовок панели не повторять в контенте.
-8. Не ломать сценарий «склонировал и запустил»: `npx tsx tools/visualizer/server.ts`, порт 7788, без автозагрузки данных.
-9. Не плодить дублирующиеся DOM id (проверяется в QA).
-10. Панели-тумблеры независимы: один тумблер не должен переключать другой.
-11. Подписи и статусы — на русском, единый формат ТФ.
-12. Числа — моноширинным `Geist Mono`, единый формат цен/размеров.
-13. Не увеличивать сайдбар сверх 420px и не опускать ниже 400px.
-14. Не выдавать неоткалиброванные приближения (Apex/Reversal) за точную формулу вендора.
+A single border token automatically clarifies depth hierarchy across nested layers.
 
-## Проверка
+---
 
-- Синтаксис фронта: `node --check tools/visualizer/public/*.mjs tools/visualizer/public/{lib,panels}/*.mjs`.
-- Регрессии поведения: `npx tsx --test tests/visualizerChartRestore.test.ts tests/visualizerConfirmationRouting.test.ts tests/zoneTimelineSnap.test.ts tests/zoneTradeSort.test.ts tests/timeframeLabels.test.ts tests/indicatorTimeframeRouting.test.ts`.
-- Визуальную QA запускать через отдельную, неавтоматическую browser-процедуру. Старые одноразовые mutation-скрипты (`ci/research/finishRedesign.ts`, `vizIndicatorQa.ts`, `zonePanQa.ts`) не являются частью поддерживаемого UI workflow и не должны автоматически устанавливать зависимости, менять production-файлы или делать Git-коммиты.
+## 2. Corner Radii
+
+Radii are derived strictly from a single base token via multipliers:
+
+```css
+--radius: 0.625rem;                        /* 10px base */
+--radius-sm: calc(var(--radius) * 0.6);    /* 6px  — Badges, checkboxes */
+--radius-md: calc(var(--radius) * 0.8);    /* 8px  — Buttons, inputs */
+--radius-lg: var(--radius);                /* 10px — Tiles, list rows, tab tracks */
+--radius-xl: calc(var(--radius) * 1.4);    /* 14px — Cards */
+```
+
+---
+
+## 3. Typography & Scale
+
+The interface uses strictly **three font sizes**. Hierarchy is created using font weights (400, 500, 600) and color opacity (`--foreground` / `--muted-foreground`).
+
+| Size | Role |
+|------|------|
+| **12px** | Subtitles, card descriptions, badges, secondary table values |
+| **14px** | Interface base: buttons, inputs, checkboxes, card headers, table body |
+| **24px** | Large metrics (R values, totals, percentages) |
+
+### Typography Guidelines
+- **Primary Font**: Geist, fallback Inter, system-ui.
+- **Monospace Font**: Geist Mono, fallback JetBrains Mono.
+- **Tracking**: Body `-0.006em`, card titles `-0.012em`, metric numbers `-0.028em`.
+- **Card Titles**: `14px / 600 / line-height: 1`, regular sentence casing (no uppercase transformations).
+- **Card Descriptions**: `12px / 400 / --muted-foreground`.
+- **Numeric Formatting**: `font-variant-numeric: tabular-nums` (prevents layout shifts on value updates).
+- **Monospace Usage**: Monospace is reserved exclusively for numbers, prices, timestamps, versions, and system IDs.
+
+---
+
+## 4. Spacing & Rhythm
+
+- **Card Internal Padding**: `24px` on all sides.
+- **Card Body Vertical Gap**: `20px`.
+- **Inter-Card Gap**: `16px`.
+- **Group Element Gap** (button row, input grid): `8px`.
+- **Icon-Text Gap**: `6px`.
+
+---
+
+## 5. Component Specifications
+
+### Card
+- `background: --card` (`#171717`), `border: 1px solid --border`, `border-radius: 14px`, no elevation shadow.
+- Structure: Header (`14px/600`) + Description (`12px/muted`) grouped on the left; actions placed on the right.
+
+### Button
+- Height: **32px**, `padding: 0 12px`, `radius: 8px`, `14px / 500`.
+- **Primary**: `background: --primary` (`#fafafa`), `color: --primary-foreground` (`#0a0a0a`). Maximum **one primary button per card**.
+- **Outline**: Transparent background, `border: 1px solid --input`, hover `background: --muted`.
+- **Ghost**: Transparent background, `color: --muted-foreground`, hover `background: --muted`, hover text `--foreground`.
+- **Icon-only**: Square 32×32px.
+
+### Input / Select
+- Height: **36px**, `padding: 0 12px`, `radius: 8px`, `14px`, transparent background, `border: 1px solid --input`, hover background `white/3%`.
+- Requires `white-space: nowrap; overflow: hidden`. Custom styled triggers only (no native system inputs or select arrows).
+
+### Badge
+- Height: **20px**, `padding: 0 8px`, `radius: 6px`, `12px / 500`, sans-serif typography.
+- **Outline**: `border: 1px solid --input`, text muted.
+- **Secondary**: `background: --muted`, no border, text `--foreground`.
+
+### Checkbox
+- 16×16px, `radius: 6px`, border `--input`.
+- Checked state: `background: --primary` with a 12px Lucide `check` icon in `--primary-foreground`. Label `14px / --foreground`.
+
+### ToggleGroup / Segmented Tabs
+- Track: `background: --muted` (`#262626`), `radius: 10px` (`--radius-lg`), `padding: 3px`.
+- Active Tab: `background: --primary` (`#fafafa`), `color: --primary-foreground` (`#0a0a0a`), `radius: 6px` (`--radius-sm`), `font-weight: 600`, subtle shadow `0 1px 2px rgb(0 0 0 / 0.4)`.
+- Inactive Tabs: `color: --muted-foreground` (`#a1a1a1`), transparent background.
+
+### Metric Tile
+- `background: --muted` (`#262626`), **no border**, `radius: 10px`, `padding: 16px`.
+- Structure: Label `12px muted` → Value `24px/600 tabular-nums` → Subtitle `12px muted`.
+- Value color: `--success` (positive), `--destructive` (negative), `--muted-foreground` (zero/neutral).
+
+### List Row
+- `background: --muted` (`#262626`), **no border**, `radius: 10px`, `padding: 12px 14px`. Single row baseline alignment.
+
+### Tables & Key-Value Pairs
+- Separated exclusively by `divide-y` with `--border`.
+- No outer border box, no row background fills.
+
+### Separator
+- Height: `1px`, `background: --border`. Used to delineate sections without wrapping elements in borders.
+
+---
+
+## 6. Iconography
+
+- **Library**: Lucide SVG icons exclusively.
+- **Dimensions**: **16px**, `stroke-width: 2`, `stroke-linecap: round`, `stroke-linejoin: round`, `stroke: currentColor`.
+- **Unicode Glyphs**: Raw text symbols (`⌄ › ‹ ← → ↑ ↓ ✓ ✕ ×`) are prohibited. Use `chevron-down`, `chevron-right`, `arrow-left`, `arrow-right`, `arrow-up`, `check`, `x`, `circle-help`, `plus`, `download`, `trending-up`.
+
+---
+
+## 7. Panel Dimensions & Layout Constraints
+
+- **Sidebar / Control Panel Width**: Minimum **400px** (optimal 420px).
+- Necessary to accommodate 14px text density, 24px card padding, and formatted numeric triples (`tabular-nums`) without text wrapping or key truncation.
