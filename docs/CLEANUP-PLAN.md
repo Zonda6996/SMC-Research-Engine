@@ -167,3 +167,41 @@ Definition of done: в дереве остались только актуаль
   - cedc5d6 chore(research): reversal benchmark script + runner/report updates
   - Рабочее дерево чистое, кроме untracked temp/ (frozen baseline + вендорские xlsx — держим до Фазы 3).
   - ОСТАЛОСЬ: примирить main (merge research->main) + PUSH (только с явного согласия).
+- 2026-08-12 Фаза 2, Партия 8 — ЗАВЕРШЕНА:
+  - Журнальный коммит 120ce31 (+запись A-G). main примирён merge-коммитом e519c3c: 6 конфликтов (наследие shadcn-seed) разрешены — .gitignore объединён (обе записи кэша + tmp/funding-cache/), DESIGN-SYSTEM.md/app.mjs/index.html/zones.mjs/styles.css взяты из research. Деревья main==research с точностью до строки /.cache/.
+  - PUSH ВЫПОЛНЕН (с согласия пользователя): main (72360b8..e519c3c), теги archive/* (3 шт.), затем research. research отклонялся из-за CI-коммита origin (research.yml auto-commit "ci(gate): results [skip ci]") — забран merge, повторный push прошёл. Обе ветки синхронизированы с origin (учтены последующие CI gate-коммиты 2d8769f/8cd5ba9). ФАЗА 2 ЗАКРЫТА.
+- 2026-08-12 Фаза 3 — СОГЛАСОВАННАЯ АРХИТЕКТУРА ДОКОВ (решения пользователя):
+  - ПРИЧИНА деградации SPEC.md: смешаны стабильная «конституция» и волатильный research-лог (§16.1..16.x до бесконечности). Лечение — разделение слоёв. Research-итерации/QA БОЛЬШЕ НЕ живут в спеке: артефакты → outputs/ + ci-results/, выводы → NEGATIVE-KNOWLEDGE.
+  - Приоритет пользователя: Zonda Reversal + Apex (активная линия). Остальные подсистемы ЖИВЫЕ, но сейчас НЕ трогаются → им короткие справки-спеки, не глубокие.
+  - Целевая структура:
+    - `AGENTS.md` (корень) — конституция: главное правило (не придумывать правила анализа; не чинить баги молча; не уверен — спроси) + тех-ограничения (strict TS, tsc не гарантия, верификация тестами) + как запускать/тестировать + КАРТА ДОКОВ. Источник — §1–2 легаси-спеки (docs/archive/SPEC-legacy-2026-07-21.md). Подтверждено пользователем.
+    - `docs/ARCHITECTURE.md` — движок/платформа: пайплайн данных, структура папок, реестр модулей (Pivot/Swing/Structure BOS-CHoCH, Fibonacci, POI/liquidity, Apex, confirmation). Источник — §3–5 легаси. Меняется редко.
+    - `docs/INDICATOR.md` — логика индикаторов/сигналов А→Я (Apex ALMA + Zonda Reversal OWN2, геометрия, режимы Safe/Risk/Standard, динамические тейки, почему нет б/у, POI). КРИТИЧНА КОРРЕКТНОСТЬ: каждое правило подтверждать по коду (ApexEngine/ArrowSignalEngine/ArrowTradeReplay), спорные места помечать «⚠ подтверди» и давать на вычитку. Меняется редко.
+    - `docs/strategies/zonda-reversal.md` — ПОЛНАЯ спека активной стратегии (правила, параметры, статус). baseline-таблицы живут ЗДЕСЬ, не в HANDOFF.
+    - `docs/strategies/fibonacci.md`, `docs/strategies/poi-confirmation.md` — КОРОТКИЕ справки-спеки (живые, но замороженные по приоритету).
+    - `docs/NEGATIVE-KNOWLEDGE.md` — отвергнутое + утечки (#1 fixed, #2 open, V1–V7, stackShare-артефакт, динамич. цели, инвертир. GGI, «зон меньше→WR» и т.д.).
+    - `docs/HANDOFF.md` — ТОЩИЙ восстановитель контекста: что сейчас в работе, активная линия, следующий шаг, указатели. БЕЗ таблиц результатов. Вердикт одной строкой + ссылка. Красный список — секцией здесь.
+    - `docs/DESIGN-SYSTEM.md` — оставляем (UI).
+    - `docs/archive/` — легаси-спека (3115) + текущий лог SPEC.md §16.x держим ЧИТАЕМЫМИ файлами (подтверждено). Полезные решения дистиллируем, сырой лог остаётся в архиве.
+  - У каждого дока — шапка «как вести этот док + частота изменений» (ответ на «что можно/нельзя менять»).
+  - FINDINGS-GGI-REVERSE-ENGINEERING.md — ОСТАВИТЬ (канонический протокол реверс-инжиниринга + красный список), распилить описательную часть в INDICATOR.
+  - Порядок: ARCHITECTURE → AGENTS → INDICATOR → strategies → NEGATIVE → HANDOFF → архивирование SPEC → чистка распиленных доков (ARROW_FILTERS_SPEC, EDGE_HYPOTHESES, LOOK-AHEAD-AUDIT) + outputs/ + .workbuddy-ai/memory → хвосты Фазы 1 (temp/, консолидация папок) → коммит/push → удалить CLEANUP-PLAN последним.
+  - Источник легаси для копирования правил: git 531f290~1:docs/archive/SPEC-legacy-2026-07-21.md.
+- 2026-08-12 Фаза 3, Партия 9 — СОЗДАНЫ ДОКИ (6 из 8 по плану):
+  - AGENTS.md (корень) — конституция (§1–2 легаси + карта доков + правило «спеки=текущее состояние, research→outputs/ci-results»).
+  - docs/ARCHITECTURE.md — 2 слоя (базовый SMC / Apex-сигнальный), пайплайн, структура папок, реестр модулей (из реального src/ + легаси §5). Base-слой описан как заморожен.
+  - docs/INDICATOR.md — Apex ALMA + OWN2-триггер + геометрия/реплей + режимы + динамич. тейки + «почему нет БУ». СВЕРЕНО С КОДОМ. 4 неоднозначности разобраны (см. ниже).
+  - docs/strategies/zonda-reversal.md — активная линия: runtime, universe/costs/split, baseline (OOS Safe -0.063/Risk -0.016/Standard +0.017), breadth, H1 Risk кандидат, вердикт HOLD/NO-GO, следующий шаг (H1 Risk → paper-forward 200 trades).
+  - docs/strategies/fibonacci.md — заморож. справка по BATTLE_CONFIG (canon deep 38.2/15/61.8, ote 78.6/61.8/100, first-5 gate, cost gate 1.75R, сайзинг, mirror=shadow).
+  - docs/strategies/poi-confirmation.md — заморож. справка (heatmap→зоны near/far lifecycle, гео-касание, simplified/refined; stackShare=UI-only).
+  - ОТВЕТЫ АВТОРА по 4 неоднозначностям INDICATOR: (1) relVol — автор не помнит; РАЗОБРАНО ПО КОДУ: движок state-free (дефолт 0.0), канон 1.4 задаётся в runOwn2ExtensionTrigger.ts (VOL_MIN=1.4) + IndependentReversalG2Protocol.extensionRelativeVolumeMin=1.4. (2) distance — оставить адаптивным, пометить что был фикс. 3%. (3) два детектора — активный OWN2, detectReversals исторический. (4) БУ — стоп не переносится/не трейлится (подтверждено).
+  - НАХОДКИ (по правилу «показать, не молчать»): (A) HANDOFF §4 описывает механику БУ (закрытие остатка по averageEntry), которой НЕТ в текущем ArrowTradeReplay.ts — устаревший текст, при переписывании HANDOFF не тащить, код=истина. (B) battleConfig.ts относится к Fibonacci-стратегии, НЕ к Zonda Reversal — учтено в раскладке доков.
+  - ОСТАЛОСЬ: NEGATIVE-KNOWLEDGE, тощий HANDOFF, архив SPEC §16.x, чистка распиленных (ARROW_FILTERS_SPEC/EDGE_HYPOTHESES/LOOK-AHEAD-AUDIT/outputs/memory), хвосты Фазы 1 (temp/), коммит+push, удалить CLEANUP-PLAN.
+- 2026-08-12 Фаза 3, Партия 10 — ДОКИ ЗАВЕРШЕНЫ + АРХИВ + ЧИСТКА + temp/:
+  - Созданы docs/NEGATIVE-KNOWLEDGE.md (утечки #1 fixed/#2 open, viz-clean, V1–V7, exact-bar limit, FROZEN/IMP2, BREADTH1, отвергнутое из SPEC, методграбли) и переписан docs/HANDOFF.md (ТОЩИЙ: фокус, вердикт 1 строкой, следующий шаг H1 Risk, хвосты, карта «куда смотреть», команды, красный список; старое описание БУ НЕ перенесено).
+  - АРХИВ: git mv SPEC.md → docs/archive/SPEC-2026-08-12.md (полный лог §16.x, читаемый); восстановлена docs/archive/SPEC-legacy-2026-07-21.md (git checkout 531f290~1, точные байты). Обе — только чтение.
+  - УДАЛЕНО (git rm, распилено в новые доки; обратимо через git): docs/ARROW_FILTERS_SPEC.md, docs/EDGE_HYPOTHESES.md, docs/LOOK-AHEAD-AUDIT.md; outputs/*.md (5: ggi-econ0-final, ggi-fable-sol, ggi-independent-reversal-second-look, independent-reversal-g2-evidence-audit, zonda-quick-profitability-scan). outputs/ теперь пуст.
+  - .workbuddy-ai/memory/*.md — НЕ удалял и НЕ вычитывал: gitignored (в коммит не попадёт), доки распилены из первичных источников (HANDOFF/SPEC/аудит). Мину́ть память отдельно при желании.
+  - temp/ РАСФОРМИРОВАНА (untracked): baseline (run-zonda-profitability-cycle.ts, summarize-zonda-cycle.cjs, zonda-profitability-cycle.json) → ci-results/ (git add, tracked); вендор (ggi.xlsx, ggi_preview.csv, zonda_v1/v2.xlsx, v1_full_preview/v1_preview/v2_preview.csv) → data/vendor-exports/ (оставлены UNTRACKED — единый локальный дом вендорских выгрузок, без раздувания репо; если нужны в git — отдельное решение). temp/ удалена.
+  - CLEANUP-PLAN.md НЕ удаляю сейчас: остаются незакрытые хвосты (ниже). Удалить последним, когда закроются.
+  - ОСТАВШИЕСЯ ХВОСТЫ (перенесены и в docs/HANDOFF «Открытые технические хвосты»): утечка #2; починка scripts/auditReversalBenchmark.ts; посчитать tmp/forward (~3 недели); прунинг ci-results/ (247) и раннеров ci/research/ (~90); консолидация папок (scripts→tools, scratch→ci/research) с проверкой импортов + tsc; при желании — вычитка .workbuddy-ai/memory и отвязка вендорских выгрузок/трекинг.
