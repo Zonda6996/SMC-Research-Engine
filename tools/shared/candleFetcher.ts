@@ -18,6 +18,7 @@ export const MAX_CANDLES_LTF = 60_000
 
 export const TF_MS: Record<string, number> = {
 	'1m': 60_000,
+	'3m': 180_000,
 	'5m': 300_000,
 	'15m': 900_000,
 	'30m': 1_800_000,
@@ -75,27 +76,34 @@ export async function fetchCandlesPaginated(
 	const tfMs = TF_MS[timeframe]
 	if (!tfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
 
+	// Для 45m и 3h (не поддерживаются Binance API) качаем младший ТФ и агрегируем
+	let fetchTf = timeframe
+	let multiplier = 1
+	if (timeframe === '45m') { fetchTf = '15m'; multiplier = 3 }
+	if (timeframe === '3h') { fetchTf = '1h'; multiplier = 3 }
+	const fetchTfMs = TF_MS[fetchTf]!
+
 	const { default: ccxt } = await import('ccxt')
 	const exchange = market === 'futures' ? new ccxt.binanceusdm() : new ccxt.binance()
 	const end = untilMs ?? Date.now()
-	const since = Math.max(0, end - capped * tfMs)
+	const since = Math.max(0, end - (capped * multiplier * fetchTfMs))
 
 	// Страницы известны заранее (окно since..end фиксировано), поэтому качаем
 	// их параллельными пачками и дедуплицируем по timestamp: у коротких
 	// историй ранние страницы возвращают один и тот же левый край данных.
 	const pageStarts: number[] = []
-	for (let cursor = since; cursor < end; cursor += BINANCE_PAGE_LIMIT * tfMs) pageStarts.push(cursor)
+	for (let cursor = since; cursor < end; cursor += BINANCE_PAGE_LIMIT * fetchTfMs) pageStarts.push(cursor)
 	const byTs = new Map<number, number[]>()
 	const PARALLEL_PAGES = 6
 	for (let i = 0; i < pageStarts.length; i += PARALLEL_PAGES) {
 		const pages = await Promise.all(pageStarts.slice(i, i + PARALLEL_PAGES).map((start) =>
-			exchange.fetchOHLCV(symbol, timeframe, start, BINANCE_PAGE_LIMIT)))
+			exchange.fetchOHLCV(symbol, fetchTf, start, BINANCE_PAGE_LIMIT)))
 		for (const page of pages) for (const row of page as number[][]) byTs.set(Number(row[0]), row as number[])
 	}
 	const all = [...byTs.values()].sort((a, b) => Number(a[0]!) - Number(b[0]!))
 
 	const bounded = all.filter((row) => Number(row[0]) < end)
-	return bounded.slice(-capped).map(([timestamp, open, high, low, close, volume]) => ({
+	let rawCandles = bounded.map(([timestamp, open, high, low, close, volume]) => ({
 		timestamp: Number(timestamp),
 		open: Number(open),
 		high: Number(high),
@@ -103,6 +111,11 @@ export async function fetchCandlesPaginated(
 		close: Number(close),
 		volume: Number(volume),
 	}))
+	
+	if (multiplier > 1) {
+		rawCandles = aggregateCandles(rawCandles, fetchTf, timeframe)
+	}
+	return rawCandles.slice(-capped)
 }
 
 /**

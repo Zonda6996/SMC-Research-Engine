@@ -23,7 +23,9 @@ import { dirname, join, extname, resolve } from 'node:path'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { detectLiquidityPoi, LIQUIDITY_POI_CONFIG, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
 import { detectLiquidityHeatmap, heatmapConfigForTf, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
-import { computeApexBands, detectReversals, APEX_VERSION, APEX_PARAMS, REVERSAL_VERSION } from '../../src/core/signals/ApexEngine.js'
+import { computeApexBands, APEX_VERSION, APEX_PARAMS } from '../../src/core/signals/ApexEngine.js'
+import { detectArrowSignalCandidates } from '../../src/core/signals/ArrowSignalEngine.js'
+import { replayArrowSignals } from '../../src/core/signals/ArrowTradeReplay.js'
 import { detectSimplifiedConfirmation, SIMPLIFIED_CONFIRMATION_VERSION, SIMPLIFIED_APEX_VETO_PRESET } from '../../src/core/confirmation/SimplifiedConfirmationEngine.js'
 import { detectPoiConfirmation, POI_CONFIRMATION_CONFIG, POI_CONFIRMATION_VERSION } from '../../src/core/confirmation/PoiConfirmationEngine.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
@@ -95,6 +97,9 @@ interface AnalyzeQuery {
 	hmConfig?: string | undefined
 	confConfig?: string | undefined
 	apexConfig?: string | undefined
+	arrowMode?: string | undefined
+	filterMode?: string | undefined
+	contractionFilter?: string | undefined
 }
 
 function parseQuery(qs: string): AnalyzeQuery {
@@ -113,6 +118,9 @@ function parseQuery(qs: string): AnalyzeQuery {
 		hmConfig: params.get('hmConfig') ?? undefined,
 		confConfig: params.get('confConfig') ?? undefined,
 		apexConfig: params.get('apexConfig') ?? undefined,
+		arrowMode: params.get('arrowMode') ?? undefined,
+		filterMode: params.get('filterMode') ?? undefined,
+		contractionFilter: params.get('contractionFilter') ?? undefined,
 	}
 }
 
@@ -148,15 +156,100 @@ function pickApexOverrides(rawJson: string | undefined): Partial<typeof APEX_PAR
 	return out as Partial<typeof APEX_PARAMS>
 }
 
-export function buildIndicatorPayload(series: import('../../src/models/price/Candle.js').Candle[], params: typeof APEX_PARAMS = APEX_PARAMS) {
+function averageRange(candles: readonly import('../../src/models/price/Candle.js').Candle[], from: number, until: number): number {
+	let sum = 0
+	for (let i = from; i < until; i++) sum += candles[i]!.high - candles[i]!.low
+	return until > from ? sum / (until - from) : 0
+}
+
+function evaluateFilterMode(candles: readonly import('../../src/models/price/Candle.js').Candle[], bands: any[], signal: any, filterMode: string, poiCandidates?: any[]): boolean {
+	if (filterMode === 'off') return true
+	const i = signal.signalIndex, side = signal.side === 'long' ? 1 : -1
+	
+	if ((filterMode === 'liquidity' || filterMode === 'combo') && poiCandidates) {
+		if (filterMode === 'combo' && signal.trigger?.relativeVolume >= 0.8) return false
+
+		const activeZone = poiCandidates.find(zone => {
+			if (zone.knownAt > signal.signalAt) return false
+			if (zone.lifecycleState === 'spent' && zone.spentAt < signal.signalAt) return false
+			
+			if (signal.side === 'long' && zone.direction === 'long') {
+				return candles[i]!.low <= Math.max(zone.near, zone.far)
+			}
+			if (signal.side === 'short' && zone.direction === 'short') {
+				return candles[i]!.high >= Math.min(zone.near, zone.far)
+			}
+			return false
+		})
+		return !!activeZone
+	}
+
+	if (i < 200 || bands[i] == null || bands[i - 8] == null) return false
+	let adverse = side === 1 ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY
+	for (let j = i - 8; j < i; j++) adverse = side === 1 ? Math.min(adverse, candles[j]!.low) : Math.max(adverse, candles[j]!.high)
+	const c = candles[i]!
+	const failedContinuation = side === 1 ? c.low >= adverse && c.close > c.open : c.high <= adverse && c.close < c.open
+	let trSum = 0
+	for (let j = i - 7; j <= i; j++) {
+		const x = candles[j]!, p = candles[j - 1]!
+		trSum += Math.max(x.high - x.low, Math.abs(x.high - p.close), Math.abs(x.low - p.close))
+	}
+	const meanSlopeAtr = side * (bands[i]!.mean - bands[i - 8]!.mean) / Math.max(trSum / 8, Number.EPSILON)
+	const trendSlope = meanSlopeAtr > -0.25
+	const contraction = averageRange(candles, i - 8, i) < averageRange(candles, i - 16, i - 8)
+	const directional = side === 1 ? c.close > c.open : c.close < c.open
+
+	if (filterMode === 'slope') return trendSlope
+	if (filterMode === 'reversal') return trendSlope && failedContinuation
+	if (filterMode === 'contraction') return (Number(failedContinuation) + Number(trendSlope) + Number(contraction) + Number(directional)) >= 3
+	if (filterMode === 'exhaustion') return signal.trigger?.relativeVolume < 0.8
+	return true
+}
+
+export function buildIndicatorPayload(
+	series: import('../../src/models/price/Candle.js').Candle[],
+	params: typeof APEX_PARAMS = APEX_PARAMS,
+	mode: 'safe' | 'standard' | 'risk' = 'standard',
+	filterMode: string = 'off',
+	poiCandidates?: any[]
+) {
 	const rawBands = computeApexBands(series, params)
+	const detection = detectArrowSignalCandidates(series, params)
+	const candidateList = detection.candidates.filter((s) => evaluateFilterMode(series, detection.bands, s, filterMode, poiCandidates))
+	const replaySafe = replayArrowSignals(series, detection.bands, candidateList, 'safe')
+	const replayRisk = replayArrowSignals(series, detection.bands, candidateList, 'risk')
+	const replayStandard = replayArrowSignals(series, detection.bands, candidateList, 'standard')
+	const selectedReplay = mode === 'safe' ? replaySafe : mode === 'risk' ? replayRisk : replayStandard
 	return {
 		apex: { version: APEX_VERSION, params, bands: rawBands.map((b, i) => Number.isFinite(b.mean) ? { t: series[i]!.timestamp, mean: b.mean, redLo: b.redLo, redHi: b.redHi, greenHi: b.greenHi, greenLo: b.greenLo } : null) },
-		reversal: { version: REVERSAL_VERSION, signals: detectReversals(series, params) },
+		signalArrows: {
+			version: selectedReplay.version,
+			mode,
+			filterMode,
+			warmupBars: detection.warmupBars,
+			loadedBars: series.length,
+			evaluatedBars: Math.max(0, series.length - detection.warmupBars),
+			signals: selectedReplay.signals,
+			trades: selectedReplay.trades,
+			diagnostics: detection.diagnostics,
+			diagnosticReport: detection.diagnosticReport,
+			summary: selectedReplay.summary,
+			modes: {
+				safe: { signals: replaySafe.signals, trades: replaySafe.trades, summary: replaySafe.summary },
+				risk: { signals: replayRisk.signals, trades: replayRisk.trades, summary: replayRisk.summary },
+				standard: { signals: replayStandard.signals, trades: replayStandard.trades, summary: replayStandard.summary },
+			},
+		},
 	}
 }
 
 const FIXTURE_PATH = join(__dirname, '../../tests/fixtures/btcusdt-15m-500.json')
+
+export function assertFixtureRequest(symbol: string, timeframe: string): void {
+	if (symbol !== 'BTC/USDT' || timeframe !== '15m') {
+		throw new Error(`BTC fixture guard: fixture contains BTC/USDT 15m, not requested ${symbol} ${timeframe}`)
+	}
+}
 
 /** Фикстура читается из файла — воспроизводимость без похода на биржу. */
 function loadFixtureCandles(): import('../../src/models/price/Candle.js').Candle[] {
@@ -423,12 +516,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			if (q.until && !Number.isFinite(parsedUntil)) throw new Error(`Invalid until date: ${q.until}`)
 			const untilMs = parsedUntil == null ? null : Math.min(parsedUntil, Date.now())
 
-			// §16.19: полная история TF подтверждения из архивов (дефолт ВКЛ, fullLtf=0 выключает).
-			const fullLtf = q.fullLtf !== '0'
+			// §16.19: полная история TF подтверждения из архивов (дефолт ВЫКЛ, fullLtf=1 включает).
+			const fullLtf = q.fullLtf === '1'
 			// §14.1: simplified берёт первый TF после `/`, refined — второй.
 			const simplifiedTf = SIMPLIFIED_CONFIRMATION_TF[timeframe] ?? null
 			const refinedTf = REFINED_CONFIRMATION_TF[timeframe] ?? null
-			const useFixture = q.source !== 'fresh'
+			if (q.source !== 'fresh' && q.source !== 'fixture') throw new Error(`Unknown data source: ${q.source ?? '(missing)'}`)
+			const useFixture = q.source === 'fixture'
+			if (useFixture) assertFixtureRequest(symbol, timeframe)
 			const htfMs = TF_MS[timeframe]
 			if (!htfMs) throw new Error(`Unknown timeframe: ${timeframe}`)
 			// Загружаем не просто replay-хвост, а запрошенный левый контекст.
@@ -504,18 +599,24 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			const confOverrides = pickNumericOverrides(POI_CONFIRMATION_CONFIG, q.confConfig)
 			const apexOverrides = pickApexOverrides(q.apexConfig)
 			const apexParams = { ...APEX_PARAMS, ...apexOverrides }
+			const arrowMode = q.arrowMode === 'safe' || q.arrowMode === 'risk' ? q.arrowMode : 'standard'
+			const filterMode = typeof q.filterMode === 'string' && ['off', 'slope', 'reversal', 'contraction', 'exhaustion', 'liquidity', 'combo'].includes(q.filterMode)
+				? q.filterMode
+				: q.contractionFilter === '1'
+				? 'contraction'
+				: 'off'
 			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, { ...hmBase, ...hmOverrides }, heatmapAux ?? undefined)
 			// §14.1/§16.19: зоны общие, но каждый confirmation engine получает свой TF.
 			// §16.21: per-TF профиль зон (иерархия слоёв пользователя) под UI-overrides; 4h = дефолты.
 			const poiProfile = liquidityPoiProfileForTf(htfMs)
-			const poiCandidates = refinedTf != null || simplifiedTf != null
+			const poiCandidates = refinedTf != null || simplifiedTf != null || filterMode === 'liquidity' || filterMode === 'combo'
 				? detectLiquidityPoi(snapshot.candles, snapshot.events, { structure: snapshot.structure, protectedHistory: snapshot.market.protectedHistory, heatmapPools, config: { ...poiProfile, ...poiOverrides } })
 				: []
 			// §16.8: htf-свечи нужны для диагностики «пришли на объёме» (объём бара захода ТФ зоны / SMA20).
 			const poiConfirmations = refinedTf != null ? detectPoiConfirmation(poiCandidates, ltfRefined, snapshot.candles, confOverrides) : []
-			const refinedIndicators = buildIndicatorPayload(ltfRefined, apexParams)
-			const simplifiedIndicators = buildIndicatorPayload(ltfSimplified, apexParams)
-			const mainIndicators = buildIndicatorPayload(snapshot.candles, apexParams)
+			const refinedIndicators = buildIndicatorPayload(ltfRefined, apexParams, arrowMode, filterMode, poiCandidates)
+			const simplifiedIndicators = buildIndicatorPayload(ltfSimplified, apexParams, arrowMode, filterMode, poiCandidates)
+			const mainIndicators = buildIndicatorPayload(snapshot.candles, apexParams, arrowMode, filterMode, poiCandidates)
 			const simplified = ltfSimplified.length
 				? detectSimplifiedConfirmation(poiCandidates, ltfSimplified, SIMPLIFIED_APEX_VETO_PRESET, { events: snapshot.events })
 				: []
@@ -527,7 +628,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			// загруженного (агрегация вверх из candles/5m). Движки те же, per-TF профили §16.21,
 			// overrides пользователя поверх.
 			const mtfLayers: Array<{ contextTf: string; confTf: string; simplifiedTf: string; role: 'swing' | 'mid' | 'local'; candles: number; candidates: unknown[]; results: unknown[]; simplifiedResults: unknown[]; ltfConf: unknown[] | null; ltfSimplified: unknown[] | null; indicators: ReturnType<typeof buildIndicatorPayload>; simplifiedIndicators: ReturnType<typeof buildIndicatorPayload> }> = []
-			if ((refinedTf != null || simplifiedTf != null) && candles.length) {
+			if (fullLtf && (refinedTf != null || simplifiedTf != null) && candles.length) {
 				const ROLE: Record<string, 'swing' | 'mid' | 'local'> = { '1d': 'swing', '4h': 'mid', '1h': 'local' }
 				// Деривация ряда из загруженного: старше текущего ТФ — из candles, младше — из 5m.
 				const derived = (tf: string): typeof candles => {
@@ -562,8 +663,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					const zones = detectLiquidityPoi(ctxCandles, [], { heatmapPools: pools, config: { ...liquidityPoiProfileForTf(TF_MS[ctxTf]!), ...poiOverrides } })
 					const confs = detectPoiConfirmation(zones, refinedSeries, ctxCandles, confOverrides)
 					const simplifiedConfs = detectSimplifiedConfirmation(zones, simplifiedSeries, SIMPLIFIED_APEX_VETO_PRESET)
-					const layerIndicators = buildIndicatorPayload(refinedSeries, apexParams)
-					const layerSimplifiedIndicators = buildIndicatorPayload(simplifiedSeries, apexParams)
+					const layerIndicators = buildIndicatorPayload(refinedSeries, apexParams, arrowMode)
+					const layerSimplifiedIndicators = buildIndicatorPayload(simplifiedSeries, apexParams, arrowMode)
 					mtfLayers.push({ contextTf: ctxTf, confTf: lRefinedTf, simplifiedTf: lSimplifiedTf, role: ROLE[ctxTf]!, candles: ctxCandles.length, candidates: zones, results: confs, simplifiedResults: simplifiedConfs, ltfConf: refinedSeries === ltf5m ? null : refinedSeries, ltfSimplified: simplifiedSeries === ltf5m ? null : simplifiedSeries, indicators: layerIndicators, simplifiedIndicators: layerSimplifiedIndicators })
 				}
 			}
@@ -590,8 +691,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
-				apex: refinedIndicators.apex,
-				reversal: refinedIndicators.reversal,
+				apex: mainIndicators.apex,
+				signalArrows: mainIndicators.signalArrows,
 				indicators: { main: mainIndicators, confirmation: refinedIndicators, simplified: simplifiedIndicators },
 				simplifiedConfirmation: {
 					version: SIMPLIFIED_CONFIRMATION_VERSION,
