@@ -14,10 +14,14 @@
 **HOLD research / NO-GO production.** Причинный baseline закрыт как trading edge; высокий
 vendor-style WR не компенсирует слабый expectancy. Детали и цифры — `docs/strategies/zonda-reversal.md`.
 
-## Следующий один шаг
-Заморозить ровно **H1 Risk** (Apex contraction/regime guard) как research-only кандидат и
-собрать новый **untouched paper-forward до 200 finalized trades** — с funding, cluster-equal
-метрикой и отдельным long/short gate. Score/параметры не менять до checkpoint.
+## Следующий шаг
+Активный план работ — **`docs/ROADMAP.md`** (треки: A — корректность движка [развязка счётчика
+сигналов от режима, утечка #2], B — research фильтров [бенчмарк-харнесс, кросс-биржевая
+устойчивость], C — UI/производительность [убрать Decision Lab, оптимизация загрузки]). Треки
+ведём параллельно.
+
+> **Paper-forward H1 Risk — ОТЛОЖЕН** (решение автора 2026-08-13). H1 Risk остаётся зафиксированным
+> research-only кандидатом (contraction/regime guard), но приоритет сейчас — план в ROADMAP.
 
 ## Paper-forward (Fib/BATTLE_CONFIG `battle-7.53-cost175-v5`) — посчитан 2026-08-13
 > Это forward **Fib/BATTLE_CONFIG**, НЕ Reversal. Для активной линии — только справочный фон.
