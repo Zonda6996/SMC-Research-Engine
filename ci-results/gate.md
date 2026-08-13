@@ -1,9 +1,9 @@
 # Gate
 
-- run: 31598162209 attempt 1
-- commit: e519c3cf4469e6e95e2fc3112123ac4a3702cafd
-- date UTC: 2026-08-12T12:47:47Z
-- node: v24.19.0, npm: 11.17.0
+- run: 31598338364 attempt 1
+- commit: acbe0af6835c8344d1b8495ce37561b697d99d3a
+- date UTC: 2026-08-12T12:50:00Z
+- node: v24.18.0, npm: 11.16.0
 
 ## tests (tsx --test tests/*.test.ts)
 ```
@@ -15,7 +15,7 @@ exit=1
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 8159.696009
+ℹ duration_ms 8266.544276
 ✖ failing tests:
 -- failures --
   Error: ENOENT: no such file or directory, open '/home/runner/work/SMC-Research-Engine/SMC-Research-Engine/data/vendor-exports/bybit-btcusdt-perp-15m.csv'
