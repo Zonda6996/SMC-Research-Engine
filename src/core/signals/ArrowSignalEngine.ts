@@ -183,3 +183,37 @@ export function detectArrowSignalCandidates(
 	const params = { ...APEX_PARAMS, ...apexParams }
 	return detectArrowSignalsFromBands(candles, computeApexBands([...candles], params), partial)
 }
+
+/**
+ * Regime-independent arrow spacing, in BARS. Vendor-anchored: the vendor's
+ * arrow density (~85-90 arrows) does not depend on asset or timeframe, which
+ * implies a fixed bar-step rather than an ATR/exit-derived cooldown. `N≈180`
+ * bars matches vendor density across all assets and TFs (see docs/ROADMAP.md
+ * A1). This is a comparability/fidelity anchor, NOT a performance lever — the
+ * step does not create edge (BTC/ETH negative, ONDO mildly positive at any N).
+ * Named so it can later be specialized per-TF if the author decides to.
+ */
+export const ARROW_SIGNAL_SPACING_BARS = 180
+
+/**
+ * Regime-independent signal admission: greedy minimum-spacing over candidates
+ * by `signalIndex`. Produces ONE admitted arrow set that every mode
+ * (safe/standard/risk) trades identically, so the modes differ only in
+ * management — never in which arrows they take. This replaces the previous,
+ * regime-dependent behaviour where each mode's exit-cooldown decided how many
+ * arrows it could fit (A1). Candidates are expected in ascending `signalIndex`
+ * order, as produced by `detectArrowSignalsFromBands`.
+ */
+export function admitArrowSignals(
+	candidates: readonly ArrowSignal[],
+	spacingBars: number = ARROW_SIGNAL_SPACING_BARS,
+): ArrowSignal[] {
+	const admitted: ArrowSignal[] = []
+	let lastAdmittedIndex = Number.NEGATIVE_INFINITY
+	for (const signal of candidates) {
+		if (signal.signalIndex - lastAdmittedIndex < spacingBars) continue
+		admitted.push(signal)
+		lastAdmittedIndex = signal.signalIndex
+	}
+	return admitted
+}

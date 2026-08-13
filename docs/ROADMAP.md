@@ -19,7 +19,7 @@
 
 ## Трек A — корректность движка
 
-- [ ] **A1. Развязать число сигналов от режима.**
+- [x] **A1. Развязать число сигналов от режима.** ✅ Реализовано.
   Проблема: safe/risk/standard берут ОДИН и тот же набор кандидатов, но число реальных входов
   разное (ONDO 15m 20k: safe **88** / risk **112** / standard **86** на 1658 кандидатах).
   Причина — кулдаун `blockedUntil = exitIndex + postExitBars` в `src/core/signals/ArrowTradeReplay.ts`:
@@ -51,6 +51,14 @@
   баров) → все режимы управляют одним набором стрелок, каждая стрелка = независимая сделка (без
   exit-кулдауна). N — именованная константа (при нужде per-TF). Радиус: `replayArrowSignals` зовут
   бенчмарк/тесты/визуализатор → новый шаг допуска вживляем аккуратно, ядро реплея сохраняем, `tsc`+тесты.
+  **Сделано (2026-08-13):** `ARROW_SIGNAL_SPACING_BARS = 180` + `admitArrowSignals()` (greedy min-spacing по
+  барам) в `ArrowSignalEngine.ts`; `replayAdmittedArrowSignals()` (каждая стрелка = независимая сделка, без
+  exit-кулдауна) в `ArrowTradeReplay.ts` — старый `replayArrowSignals` (per-mode кулдаун) сохранён для
+  совместимости и тестов. Вживлено в визуализатор (`tools/visualizer/server.ts`) и бенчмарк
+  (`tools/research/auditReversalBenchmark.ts`). `tsc` чист; тесты 503/505 (2 падения — отсутствующий
+  `data/vendor-exports/bybit-btcusdt-perp-15m.csv`, не связано с A1). Проверка режимо-стабильности на реальных
+  20k барах (`tmp/a1OndoReproduce.ts`): ONDO 15m — OLD safe 88/std 86/risk 112 → NEW 86/86/86; BTC 15m —
+  OLD 96/100/121 → NEW 88/88/88 (admitted матчит вендор-плотность ~85-90).
 
 - [ ] **A2. Закрыть утечку #2 (`pool.notional` за всю жизнь пула).**
   Блокер для доверия к фильтрам liquidity/combo (они идут по POI-пути). Пока открыта — цифры
