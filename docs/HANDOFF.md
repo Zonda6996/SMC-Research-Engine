@@ -31,7 +31,9 @@ vendor-style WR не компенсирует слабый expectancy. Дета�
 - Раннер (`npm run forward`) не держится постоянно включённым; catch-up-сделки anti-backfill гардом корректно маркируются `forwardEligible:false`.
 
 ## Открытые технические хвосты
-- Утечка #2 (`pool.notional` за всю жизнь пула) — не исправлена (см. `NEGATIVE-KNOWLEDGE.md`).
+- ~~Утечка #2 (`pool.notional` за всю жизнь пула).~~ ✅ Исправлена 2026-08-13 (вариант B `notional-as-of-t`:
+  `notionalSchedule` + `notionalAsOf` в heatmap, POI на причинной массе). Фильтры liquidity/combo теперь
+  причинны по таймингу рождения зон. Детали — `NEGATIVE-KNOWLEDGE.md` #2.
 - ~~`scripts/auditReversalBenchmark.ts` — сломан.~~ ✅ Починен + перенесён в `tools/research/auditReversalBenchmark.ts` (tsc чист).
 - ~~Посчитать накопленный paper-forward (`tmp/forward/`, ~3 недели).~~ ✅ Сделано 2026-08-13 (см. выше).
 - Прунинг `ci-results/`/`ci/research/`: Партия 1 (UI/QA, 20 файлов) удалена 2026-08-13. Остаток (Apex-anchors, orphan-очередь, legacy independent-reversal) — по решению автора.

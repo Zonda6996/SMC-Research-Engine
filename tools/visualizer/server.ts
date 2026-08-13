@@ -690,7 +690,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				ltf5m: ltf5m ?? [],
 				ltfConf: ltfRefined,
 				ltfSimplified,
-				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
+				// notionalSchedule нужен только серверу (POI причинный notionalAsOf) — из payload его срезаем, чтобы не раздувать ответ.
+				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools.map(({ notionalSchedule: _notionalSchedule, ...pool }) => pool), oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
 				apex: mainIndicators.apex,
