@@ -1,6 +1,6 @@
 import { fetchCandlesPaginated } from '../tools/shared/candleFetcher.js'
 import { detectArrowSignalCandidates, type ArrowSignal } from '../src/core/signals/ArrowSignalEngine.js'
-import { replayArrowSignals } from '../src/core/signals/arrowTradeReplay.js'
+import { replayArrowSignals } from '../src/core/signals/ArrowTradeReplay.js'
 import { computeApexBands, APEX_PARAMS } from '../src/core/signals/ApexEngine.js'
 import type { Candle } from '../src/models/price/Candle.js'
 
@@ -97,7 +97,7 @@ export function runBenchmarkOnSeries(symbol: string, timeframe: string, candles:
 				partialStopCount: partialStop,
 				stopCount: stop,
 				netR: totalNetR.toFixed(2) + 'R',
-				meanNetR: meanNetR.toFixed(2) + 'R',
+				meanR: meanNetR.toFixed(2) + 'R',
 				profitFactor: Number.isFinite(pf) ? pf.toFixed(2) : '∞',
 				vendorWinrate: `${(vendorWr * 100).toFixed(1)}%`,
 			})
