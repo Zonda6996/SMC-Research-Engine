@@ -19,11 +19,19 @@ vendor-style WR не компенсирует слабый expectancy. Дета�
 собрать новый **untouched paper-forward до 200 finalized trades** — с funding, cluster-equal
 метрикой и отдельным long/short gate. Score/параметры не менять до checkpoint.
 
+## Paper-forward (Fib/BATTLE_CONFIG `battle-7.53-cost175-v5`) — посчитан 2026-08-13
+> Это forward **Fib/BATTLE_CONFIG**, НЕ Reversal. Для активной линии — только справочный фон.
+- **Live forward 20–29 июля** (строгий, заявка+amend известны до свечи fill): n=107, total **+18.67R**, mean **+0.175R**, WR 62.6%. Deep +0.170 / OTE +0.177; long +0.309 / short +0.026; 1h +0.495, 15m +0.170, 30m −0.006.
+- **Frozen-config OOS replay 30 июля – 13 авг** (catch-up, конфиг заморожен): n=568, total +4.93R, mean **+0.009R**, WR 56.2%. Deep +0.056 / OTE −0.020; 1h +0.157, 30m +0.054, 15m **−0.069**.
+- **Вывод:** edge не подтверждён на большей/свежей OOS-выборке — expectancy схлопнулся почти в ноль; стабилен только **1h**. Июльский результат — во многом артефакт короткого окна. Дорабатывать эту ветку не планируем.
+- Раннер (`npm run forward`) не держится постоянно включённым; catch-up-сделки anti-backfill гардом корректно маркируются `forwardEligible:false`.
+
 ## Открытые технические хвосты
 - Утечка #2 (`pool.notional` за всю жизнь пула) — не исправлена (см. `NEGATIVE-KNOWLEDGE.md`).
-- `scripts/auditReversalBenchmark.ts` — сломан (регистр импорта `ArrowTradeReplay` + `meanNetR`).
-- Посчитать накопленный paper-forward (`tmp/forward/`, ~3 недели).
-- Прунинг `ci-results/` и раннеров `ci/research/` — после стабилизации доков.
+- ~~`scripts/auditReversalBenchmark.ts` — сломан.~~ ✅ Починен + перенесён в `tools/research/auditReversalBenchmark.ts` (tsc чист).
+- ~~Посчитать накопленный paper-forward (`tmp/forward/`, ~3 недели).~~ ✅ Сделано 2026-08-13 (см. выше).
+- Прунинг `ci-results/`/`ci/research/`: Партия 1 (UI/QA, 20 файлов) удалена 2026-08-13. Остаток (Apex-anchors, orphan-очередь, legacy independent-reversal) — по решению автора.
+- Консолидация папок `scripts→tools`, `scratch→ci/research` — ✅ выполнено 2026-08-13.
 
 ## Куда смотреть
 | Нужно | Файл |

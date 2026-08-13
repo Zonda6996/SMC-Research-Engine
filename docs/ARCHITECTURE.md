@@ -81,8 +81,11 @@ tools/
   forward/               — paper-forward раннер (вывод в tmp/forward/, gitignored)
   shared/                — candleFetcher и общие утилиты
   batch/                 — батч-раннер статистики
-scripts/                 — save-fixture (генератор фикстур), auditReversalBenchmark (⚠ сломан, чинить)
-ci/research/             — исследовательские раннеры (воспроизводят ci-results/)
+  research/              — validateHeatmap, save-fixture (генератор фикстур), auditReversalBenchmark
+ci/research/             — исследовательские раннеры (воспроизводят ci-results/); + auditStackSize/auditStackSizeCausal
+ci/research/archive/     — заморож. раннеры-провенанс (apex v7 / user-anchor, POI time-stop, V7′): не в активном обороте, держим читаемыми
+ci-results/              — результаты раннеров (evidence база + красный список)
+ci-results/archive/      — заморож. результаты (apex user-anchor, G1 fit-verdict): провенанс/отрицательное знание, не мусор
 tests/                   — node:test, офлайн-фикстуры в tests/fixtures/
 ```
 
@@ -135,8 +138,7 @@ tests/                   — node:test, офлайн-фикстуры в tests/f
 
 ---
 
-## 5. Известные хвосты (актуально на 2026-08-12)
-- `scripts/auditReversalBenchmark.ts` — сломан (регистр импорта `ArrowTradeReplay` + поле
-  `meanNetR`), чинить.
+## 5. Известные хвосты (актуально на 2026-08-13)
+- `tools/research/auditReversalBenchmark.ts` — починен (регистр импорта + `meanNetR`), tsc чист. Перенесён из `scripts/`.
 - Утечка #2 (`pool.notional` за всю жизнь пула) — не исправлена, см. NEGATIVE-KNOWLEDGE.
-- Консолидация папок (`scratch→ci/research`, часть `temp→ci-results/data`) — в процессе уборки.
+- Консолидация папок (`scripts→tools`, `scratch→ci/research`) — выполнено 2026-08-13.

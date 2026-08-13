@@ -59,7 +59,7 @@
 - `results/`, `screenshots/`, `ci-results/shots/` — артефакты прогонов.
 - `temp/` — временные раннеры (`run-zonda-profitability-cycle.ts` и пр.).
 - `ci/research/` — большой набор исследовательских раннеров (многие отработали).
-- `scratch/auditStackSizeCausal.ts` — оставить до завершения разбора утечек (артефакт).
+- `ci/research/auditStackSizeCausal.ts` (перенесён из `scratch/` 2026-08-13) — оставить до завершения разбора утечек (артефакт).
 
 Definition of done: в дереве остались только актуальные для действующей стратегии
 и активного research файлы; всё удалённое — перечислено в «Журнале».
@@ -205,3 +205,24 @@ Definition of done: в дереве остались только актуаль
   - temp/ РАСФОРМИРОВАНА (untracked): baseline (run-zonda-profitability-cycle.ts, summarize-zonda-cycle.cjs, zonda-profitability-cycle.json) → ci-results/ (git add, tracked); вендор (ggi.xlsx, ggi_preview.csv, zonda_v1/v2.xlsx, v1_full_preview/v1_preview/v2_preview.csv) → data/vendor-exports/ (оставлены UNTRACKED — единый локальный дом вендорских выгрузок, без раздувания репо; если нужны в git — отдельное решение). temp/ удалена.
   - CLEANUP-PLAN.md НЕ удаляю сейчас: остаются незакрытые хвосты (ниже). Удалить последним, когда закроются.
   - ОСТАВШИЕСЯ ХВОСТЫ (перенесены и в docs/HANDOFF «Открытые технические хвосты»): утечка #2; починка scripts/auditReversalBenchmark.ts; посчитать tmp/forward (~3 недели); прунинг ci-results/ (247) и раннеров ci/research/ (~90); консолидация папок (scripts→tools, scratch→ci/research) с проверкой импортов + tsc; при желании — вычитка .workbuddy-ai/memory и отвязка вендорских выгрузок/трекинг.
+- 2026-08-13 Фаза 3, Партия 11 — forward + прунинг + консолидация (текущая сессия):
+  - tmp/forward ПОСЧИТАН (Fib/BATTLE_CONFIG battle-7.53-cost175-v5): live 20–29 июля n=107 mean +0.175R WR 62.6%; frozen-config OOS 30 июля–13 авг n=568 mean +0.009R WR 56.2%. Вывод: edge не подтверждён на OOS, стабилен только 1h. Детали в HANDOFF.
+  - ПРУНИНГ Партия 1 (UI/QA, git rm, обратимо): ci-results/chart-restore-qa, confirmation-close-qa, marker-tf-qa, shots, tf-routing-e2e + design-zone-fix.md + current-zone-trade-sort.md = 20 файлов (268→248). Проверено: нет ссылок из tests/src/актуальных docs (только раннеры-генераторы). tsc чист, тесты 503/505 (2 падения — pre-existing, отсутствует data/vendor-exports/bybit-btcusdt-perp-15m.csv, не связано с прунингом).
+  - ПРИДЕРЖАНО до решения автора: apex-rename.md, archive-oi-wiring.md, geo-probe.md, gate.md (Apex/OI/CI-смежные); остальные партии прунинга (Apex-anchors, orphan-очередь, legacy independent-reversal).
+  - КОНСОЛИДАЦИЯ (git mv): scripts/auditReversalBenchmark.ts, scripts/save-fixture.ts → tools/research/; scratch/auditStackSize.ts, scratch/auditStackSizeCausal.ts → ci/research/. Импорты переписаны под новую глубину, tsc чист. scripts/ и scratch/ удалены.
+  - auditReversalBenchmark ПОДТВЕРЖДЁН починенным (tsc чист) — пометка «сломан» в доках снята.
+  - НЕ коммитили и НЕ пушили. Остаток Фазы 2: примирение main + push — только с согласия.
+- 2026-08-13 Фаза 3, Партия 12 — прунинг Apex-anchors / orphan / legacy independent-reversal (по согласованию с автором: аккуратно, полезное для ИИ — не удалять, а АРХИВИРОВАТЬ). Заведены папки-архивы `ci/research/archive/` (раннеры) и `ci-results/archive/` (результаты).
+  - УДАЛЕНО (git rm, обратимо, 24 файла):
+    - A1 (apex-anchors v1–v6, superseded канонической цепочкой apex-exact-export-cross-tf-fit → apex-sigma-oos → tests/apexOosRegression): ci/research/apexAnchors{,2,3,4,5,6}.ts + ci-results/apex-anchors.{md,json}, apex-anchors2.{md,json}, apex-anchors{3,4,5,6}.md.
+    - B1 (orphan): ci-results/apex-rename.md, ci-results/archive-oi-wiring.md (короткие отчёты завершённых задач); ci/research/runZonePanQaWithFixture.ts, runZonePanQaWithFixture2.ts, sortCurrentZoneTrades.ts (одноразовые self-modifying/migration раннеры, их UI-артефакты уже удалены в Партии 11).
+    - C1 (тяжёлый регенерируемый G1 fit-output): ci-results/independent-reversal-fit-{btc,eth,sol,xrp}-15m.json + independent-reversal-fit-aggregate.json.
+  - ЗААРХИВИРОВАНО (git mv, провенанс/отрицательное знание — держим читаемым для ИИ):
+    - A2 → ci/research/archive/: apexAnchors7.ts (финальная 14-anchor cross-symbol проверка — ближайший провенанс канонных констант), apexUserAnchor20260727.ts (ручные TV-якоря, невосстановимы из биржи); → ci-results/archive/: apex-user-anchor-2026-07-27.{md,json}.
+    - B2 → ci/research/archive/: fullTakeTimeStopE2e.ts, fullTakeTimeSweep.ts (историч. POI time-stop эксперименты), runReversalV7RollingExtremum.ts (часть отрицательного знания V7′, final намеренно не открывался).
+    - C2 → ci-results/archive/: independent-reversal-fit-verdict.md (отрицательный вердикт G1).
+  - ИМПОРТЫ перенесённых раннеров поправлены под новую глубину (../../ → ../../../ в apexUserAnchor20260727.ts; ./config, ./lib → ../config, ../lib в runReversalV7RollingExtremum.ts). Остальные три переносимых раннера используют CWD-относительные пути/только node — правки не требовали.
+  - НАХОДКА (правило «показать, не молчать»): C2-preregistration НЕЛЬЗЯ было архивировать — на них ссылается ЖИВОЙ тест tests/independentReversalProtocol.test.ts (читает ci-results/independent-reversal-preregistration.json/.md + проверяет их mtime ≤ mtime раннера). Первичная архивация уронила 2 теста; ОТКАЧЕНО — independent-reversal-preregistration.{json,md} ОСТАВЛЕНЫ на месте в ci-results/. Вывод: слой G1 evidence связан с активными G1-тестами (C3) — архивировать G1 preregistration только вместе с ретайрингом G1-кода/тестов, отдельным атомарным шагом.
+  - ОСТАВЛЕНО НЕ ТРОНУТЫМ: A3 (каноническая apex-цепочка + tests/apexOosRegression), B3 (geo-probe.md, gate.md — генерируются CI; auditStackSize*, config/, lib/ — импортируются), C3 (весь G1-код + тесты, ещё в package scripts/G2-ablation), C4 (весь G2 — активный OWN2/H1-контекст).
+  - ПРОВЕРКА: `npx tsc --noEmit` чист; `npm test` = 505 tests, 503 pass, 2 fail — ровно pre-existing (отсутствует vendor-CSV, к прунингу не относятся). Новых падений нет.
+  - НЕ коммитили и НЕ пушили.

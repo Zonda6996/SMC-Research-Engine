@@ -13,13 +13,13 @@
 // NOTE: the numerator (stackNotional) still carries the milder look-ahead #2
 // (pool.notional is full-lifetime). That is a separate engine fix (step 2);
 // this script isolates and removes the dominant leak #1 (the denominator).
-import { fetchCandlesPaginated } from '../tools/shared/candleFetcher.js'
-import { computeApexBands, APEX_PARAMS } from '../src/core/signals/ApexEngine.js'
-import { detectArrowSignalCandidates } from '../src/core/signals/ArrowSignalEngine.js'
-import { replayArrowSignals, ARROW_MODE_CONFIGS } from '../src/core/signals/ArrowTradeReplay.js'
-import { detectLiquidityHeatmap, heatmapConfigForTf } from '../src/core/liquidity/LiquidityHeatmapEngine.js'
-import { detectLiquidityPoi, LIQUIDITY_POI_CONFIG } from '../src/core/confirmation/LiquidityPoiCalibration.js'
-import { liquidityPoiProfileForTf } from '../tools/shared/poiProfiles.js'
+import { fetchCandlesPaginated } from '../../tools/shared/candleFetcher.js'
+import { computeApexBands, APEX_PARAMS } from '../../src/core/signals/ApexEngine.js'
+import { detectArrowSignalCandidates } from '../../src/core/signals/ArrowSignalEngine.js'
+import { replayArrowSignals, ARROW_MODE_CONFIGS } from '../../src/core/signals/ArrowTradeReplay.js'
+import { detectLiquidityHeatmap, heatmapConfigForTf } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
+import { detectLiquidityPoi, LIQUIDITY_POI_CONFIG } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
+import { liquidityPoiProfileForTf } from '../../tools/shared/poiProfiles.js'
 
 type ShareMode = 'leaky' | 'causal'
 

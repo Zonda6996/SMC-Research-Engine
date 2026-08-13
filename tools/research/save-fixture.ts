@@ -7,7 +7,7 @@
  */
 
 import { writeFileSync } from 'node:fs'
-import { BinanceService } from '../src/services/BinanceService.js'
+import { BinanceService } from '../../src/services/BinanceService.js'
 
 async function main() {
 	const service = new BinanceService()
@@ -17,7 +17,7 @@ async function main() {
 		limit: 500,
 	})
 
-	const outPath = new URL('../tests/fixtures/btcusdt-15m-500.json', import.meta.url)
+	const outPath = new URL('../../tests/fixtures/btcusdt-15m-500.json', import.meta.url)
 	writeFileSync(outPath, JSON.stringify(candles, null, 2))
 
 	console.log(

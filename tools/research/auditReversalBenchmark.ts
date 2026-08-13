@@ -1,8 +1,8 @@
-import { fetchCandlesPaginated } from '../tools/shared/candleFetcher.js'
-import { detectArrowSignalCandidates, type ArrowSignal } from '../src/core/signals/ArrowSignalEngine.js'
-import { replayArrowSignals } from '../src/core/signals/ArrowTradeReplay.js'
-import { computeApexBands, APEX_PARAMS } from '../src/core/signals/ApexEngine.js'
-import type { Candle } from '../src/models/price/Candle.js'
+import { fetchCandlesPaginated } from '../shared/candleFetcher.js'
+import { detectArrowSignalCandidates, type ArrowSignal } from '../../src/core/signals/ArrowSignalEngine.js'
+import { replayArrowSignals } from '../../src/core/signals/ArrowTradeReplay.js'
+import { computeApexBands, APEX_PARAMS } from '../../src/core/signals/ApexEngine.js'
+import type { Candle } from '../../src/models/price/Candle.js'
 
 export interface BenchmarkResult {
 	symbol: string

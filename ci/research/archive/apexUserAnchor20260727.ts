@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { computeApexBands } from '../../src/core/signals/ApexEngine.js'
-import { fetchArchiveKlines } from '../../tools/shared/archiveKlines.js'
+import { computeApexBands } from '../../../src/core/signals/ApexEngine.js'
+import { fetchArchiveKlines } from '../../../tools/shared/archiveKlines.js'
 
 const OUT = process.env.OUT_DIR ?? 'ci-results'
 const CACHE = process.env.CACHE_DIR ?? '.cache/binance'

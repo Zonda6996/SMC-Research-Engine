@@ -7,9 +7,9 @@
  */
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { chronologicalSlices, developmentDatasets, futuresHoldouts, loadReversalDatasets, spotHoldouts } from './config/reversalDatasets.js'
-import { exactEvents, type ExactDirection, type ExactIndicatorRow } from './lib/exactIndicatorExport.js'
-import { matchDirectionalEvents, type TimedDirectionalEvent } from './lib/eventMetrics.js'
+import { chronologicalSlices, developmentDatasets, futuresHoldouts, loadReversalDatasets, spotHoldouts } from '../config/reversalDatasets.js'
+import { exactEvents, type ExactDirection, type ExactIndicatorRow } from '../lib/exactIndicatorExport.js'
+import { matchDirectionalEvents, type TimedDirectionalEvent } from '../lib/eventMetrics.js'
 
 const EPISODE_CAP_BARS = 256
 
