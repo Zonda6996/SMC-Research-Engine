@@ -2,7 +2,7 @@ import type { Candle } from '../../models/price/Candle.js'
 import type { StructureEvent } from '../../models/events/StructureEvent.js'
 import type { StructurePoint } from '../../models/structure/StructurePoint.js'
 import type { ProtectedLevelLifecycle } from '../../models/structure/ProtectedLevelLifecycle.js'
-import type { LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
+import { notionalAsOf, type LiquidityPool } from '../liquidity/LiquidityHeatmapEngine.js'
 
 // SPEC §16.12 (v2.0) + §16.13 (v2.1, калибровка 24.07.2026): ЗОНЫ РОЖДАЮТСЯ ОТ ЛИКВИДНОСТИ.
 // v2.0: полка (стек живых свежих пулов) значима по силе×свежести → зона [near=wick экстремума перед
@@ -545,10 +545,16 @@ export function detectLiquidityPoi(c: Candle[], _events: StructureEvent[] = [], 
 			// Живые и свежие пулы: родился к t, не снят к t, кормился не дальше shelfFreshBars назад.
 			// Строгие границы: пул рождается ВНУТРИ бара startAt (на закрытии предыдущего его ещё нет),
 			// снятый на баре sweptAt пул жив ещё на закрытии этого бара.
-			const freshPools = bySide[side].filter(p => p.startAt < t
+			const freshPoolsRaw = bySide[side].filter(p => p.startAt < t
 				&& (p.sweptAt == null || p.sweptAt >= t)
 				&& t <= p.lastContributionAt + cfg.shelfFreshBars * tfMs)
-			if (!freshPools.length) continue
+			if (!freshPoolsRaw.length) continue
+			// Утечка #2 (docs/NEGATIVE-KNOWLEDGE.md): масса пула на баре t — это notionalAsOf(t),
+			// а НЕ полный lifetime notional (тот включает объём ПОСЛЕ t). Клонируем пул с причинной
+			// массой; всё ниже (sideTotal, полки/профиль плотности, топ-N, shelfMinShare, новизна и
+			// снимок shelfPools) теперь опирается на массу, известную на t, а не из будущего.
+			// Геометрия краёв (bandLow/bandHigh), тайминги (startAt/sweptAt/lastContributionAt) — как были.
+			const freshPools = freshPoolsRaw.map(p => ({ ...p, notional: notionalAsOf(p, t) }))
 			const sideTotal = freshPools.reduce((sm, p) => sm + p.notional, 0)
 			const shelves = buildShelves(freshPools, a, cfg)
 			// (§16.14: пик-фильтр рождения «≥ доли сильнейшей полки бара» проверен и отвергнут —

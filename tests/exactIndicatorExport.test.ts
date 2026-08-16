@@ -1,17 +1,10 @@
 import assert from 'node:assert/strict'
 import { it } from 'node:test'
-import { exactEvents, loadExactDatasets, parseExactIndicatorCsv } from '../ci/research/lib/exactIndicatorExport.js'
+import { parseExactIndicatorCsv } from '../ci/research/lib/exactIndicatorExport.js'
 
-it('exact exports: manifest, hashes, counts and timestamps validate', () => {
-	const datasets = loadExactDatasets()
-	assert.equal(datasets.length, 6)
-	assert.equal(datasets.reduce((sum, dataset) => sum + dataset.rows.length, 0), 86_420)
-	assert.equal(datasets.reduce((sum, dataset) => sum + exactEvents(dataset.rows).length, 0), 370)
-	assert.equal(datasets.filter((dataset) => dataset.meta.market === 'spot').length, 1)
-	assert.deepEqual(datasets.map((dataset) => dataset.meta.id), [
-		'btc-perp-15m', 'btc-perp-1h', 'eth-perp-15m', 'sol-spot-15m', 'btc-perp-5m', 'btc-perp-4h',
-	])
-})
+// Note: the dataset-loading test (loadExactDatasets over data/vendor-exports/*.csv) was removed
+// because those exact-indicator CSV exports were permanently deleted (author, 2026-08-13). The
+// parser unit tests below stay — they exercise parseExactIndicatorCsv on inline fixtures.
 
 it('exact exports: parser rejects irregular chronology and invalid labels', () => {
 	const header = 'time,open,high,low,close,GGI Mean,GGI Upper Outer,GGI Upper Inner,GGI Lower Inner,GGI Lower Outer,Shapes,Shapes'

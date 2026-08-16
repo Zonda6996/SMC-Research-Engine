@@ -1,0 +1,587 @@
+{
+  "generatedAt": "2026-08-16T10:59:42.805Z",
+  "protocol": "D5-rank-relative-momentum-top1-1.0 (variant A: strength=relative momentum over H bars; long leader / short laggard; signal-gated vs momentum-only control)",
+  "preregistration": {
+    "universe": [
+      "SOL",
+      "BTC",
+      "ETH",
+      "XRP",
+      "BNB"
+    ],
+    "timeframes": [
+      "30m",
+      "1h",
+      "2h"
+    ],
+    "horizonBars": 2000,
+    "momentumLookbackBars": 2000,
+    "strength": "relative momentum = past-H-bar return (causal); ranking by past return (basket subtraction is rank-preserving)",
+    "arms": {
+      "signal-gated-top1": "take only if signaled coin is the extreme in signal direction; long leader / short laggard",
+      "momentum-only": "control: long leader / short laggard at each signal-clock, ignoring signal side/asset"
+    },
+    "topK": "1 (leader) vs 1 (laggard)",
+    "costs": "4×7bps (2 legs); funding omitted",
+    "metric": "return % per trade",
+    "trainFraction": 0.65,
+    "bootstrap": "2000 resamples, seed 20260807",
+    "note": "§2.1: H и издержки штатные, метрика силы фикс. (past-H return), НЕ свипается. §2.3: src не тронут. ⚠ top-k, окно импульса, определение силы — уточняет автор."
+  },
+  "sources": [
+    {
+      "asset": "SOL",
+      "timeframe": "30m",
+      "admitted": 88,
+      "usedGated": 11,
+      "usedMomo": 79
+    },
+    {
+      "asset": "BTC",
+      "timeframe": "30m",
+      "admitted": 87,
+      "usedGated": 14,
+      "usedMomo": 78
+    },
+    {
+      "asset": "ETH",
+      "timeframe": "30m",
+      "admitted": 85,
+      "usedGated": 8,
+      "usedMomo": 77
+    },
+    {
+      "asset": "XRP",
+      "timeframe": "30m",
+      "admitted": 90,
+      "usedGated": 11,
+      "usedMomo": 73
+    },
+    {
+      "asset": "BNB",
+      "timeframe": "30m",
+      "admitted": 92,
+      "usedGated": 15,
+      "usedMomo": 74
+    },
+    {
+      "asset": "SOL",
+      "timeframe": "1h",
+      "admitted": 87,
+      "usedGated": 10,
+      "usedMomo": 80
+    },
+    {
+      "asset": "BTC",
+      "timeframe": "1h",
+      "admitted": 85,
+      "usedGated": 15,
+      "usedMomo": 77
+    },
+    {
+      "asset": "ETH",
+      "timeframe": "1h",
+      "admitted": 81,
+      "usedGated": 11,
+      "usedMomo": 74
+    },
+    {
+      "asset": "XRP",
+      "timeframe": "1h",
+      "admitted": 87,
+      "usedGated": 12,
+      "usedMomo": 73
+    },
+    {
+      "asset": "BNB",
+      "timeframe": "1h",
+      "admitted": 87,
+      "usedGated": 13,
+      "usedMomo": 70
+    },
+    {
+      "asset": "SOL",
+      "timeframe": "2h",
+      "admitted": 90,
+      "usedGated": 16,
+      "usedMomo": 80
+    },
+    {
+      "asset": "BTC",
+      "timeframe": "2h",
+      "admitted": 90,
+      "usedGated": 10,
+      "usedMomo": 80
+    },
+    {
+      "asset": "ETH",
+      "timeframe": "2h",
+      "admitted": 87,
+      "usedGated": 11,
+      "usedMomo": 77
+    },
+    {
+      "asset": "XRP",
+      "timeframe": "2h",
+      "admitted": 84,
+      "usedGated": 13,
+      "usedMomo": 75
+    },
+    {
+      "asset": "BNB",
+      "timeframe": "2h",
+      "admitted": 87,
+      "usedGated": 23,
+      "usedMomo": 79
+    }
+  ],
+  "skipped": [],
+  "gatedTrades": 193,
+  "momoTrades": 1146,
+  "arms": {
+    "signal-gated-top1": {
+      "full": {
+        "N": 193,
+        "meanPct": -2.0353307892477632,
+        "ci": [
+          -13.049243227475827,
+          8.522216568774773
+        ],
+        "posRate": 0.5077720207253886
+      },
+      "train": {
+        "N": 125,
+        "meanPct": -2.6346184154395367,
+        "ci": [
+          -20.72089785085739,
+          13.481088097206248
+        ],
+        "posRate": 0.544
+      },
+      "oos": {
+        "N": 68,
+        "meanPct": -0.9336991234540595,
+        "ci": [
+          -2.749021614793073,
+          0.9485750405279008
+        ],
+        "posRate": 0.4411764705882353
+      },
+      "breadthByLongAssetOOS": [
+        {
+          "asset": "SOL",
+          "N": 6,
+          "meanPct": -5.715879847462251
+        },
+        {
+          "asset": "BTC",
+          "N": 29,
+          "meanPct": 1.4433879962781575
+        },
+        {
+          "asset": "ETH",
+          "N": 7,
+          "meanPct": -6.623030813897915
+        },
+        {
+          "asset": "XRP",
+          "N": 7,
+          "meanPct": -2.9825430447571093
+        },
+        {
+          "asset": "BNB",
+          "N": 19,
+          "meanPct": -0.20081558903073532
+        }
+      ],
+      "perQuarter": [
+        {
+          "quarter": "2022-Q2",
+          "N": 2,
+          "meanPct": 38.648929546961455,
+          "ci": [
+            27.87318280837539,
+            49.42467628554752
+          ]
+        },
+        {
+          "quarter": "2022-Q3",
+          "N": 6,
+          "meanPct": 51.10051529120326,
+          "ci": [
+            39.49111466875105,
+            63.1010510640599
+          ]
+        },
+        {
+          "quarter": "2022-Q4",
+          "N": 5,
+          "meanPct": -21.06086358987663,
+          "ci": [
+            -46.56941510309947,
+            11.891370012518834
+          ]
+        },
+        {
+          "quarter": "2023-Q1",
+          "N": 4,
+          "meanPct": 28.883994129430736,
+          "ci": [
+            11.604035667957705,
+            52.138066731528696
+          ]
+        },
+        {
+          "quarter": "2023-Q2",
+          "N": 3,
+          "meanPct": 84.76738481750675,
+          "ci": [
+            -0.8168663542940092,
+            201.02804765156802
+          ]
+        },
+        {
+          "quarter": "2023-Q3",
+          "N": 6,
+          "meanPct": -34.73280295361801,
+          "ci": [
+            -52.92996573571859,
+            -5.775341889392966
+          ]
+        },
+        {
+          "quarter": "2023-Q4",
+          "N": 4,
+          "meanPct": 43.80947041140839,
+          "ci": [
+            -99.3954810670848,
+            236.84759697192513
+          ]
+        },
+        {
+          "quarter": "2024-Q1",
+          "N": 4,
+          "meanPct": 57.5469222668643,
+          "ci": [
+            42.83204317419474,
+            71.1339785553722
+          ]
+        },
+        {
+          "quarter": "2024-Q2",
+          "N": 5,
+          "meanPct": -80.41835691797843,
+          "ci": [
+            -237.01878830063617,
+            0.3463420090596556
+          ]
+        },
+        {
+          "quarter": "2024-Q3",
+          "N": 13,
+          "meanPct": -15.229839893667581,
+          "ci": [
+            -126.52177602728956,
+            85.86431317472424
+          ]
+        },
+        {
+          "quarter": "2024-Q4",
+          "N": 12,
+          "meanPct": -0.819779024271527,
+          "ci": [
+            -81.35284980144813,
+            52.11828280379321
+          ]
+        },
+        {
+          "quarter": "2025-Q1",
+          "N": 9,
+          "meanPct": -5.179024784127346,
+          "ci": [
+            -19.609702121219843,
+            7.731514765975699
+          ]
+        },
+        {
+          "quarter": "2025-Q2",
+          "N": 9,
+          "meanPct": -48.31198822204732,
+          "ci": [
+            -87.26668636849696,
+            -7.701046773398694
+          ]
+        },
+        {
+          "quarter": "2025-Q3",
+          "N": 26,
+          "meanPct": -3.2301616759318157,
+          "ci": [
+            -9.318887263007475,
+            3.265044534439194
+          ]
+        },
+        {
+          "quarter": "2025-Q4",
+          "N": 30,
+          "meanPct": 0.28188889485867974,
+          "ci": [
+            -2.736634442228274,
+            3.0742881460119214
+          ]
+        },
+        {
+          "quarter": "2026-Q1",
+          "N": 30,
+          "meanPct": 2.6803942576244157,
+          "ci": [
+            0.14799847964312446,
+            5.0873777363547985
+          ]
+        },
+        {
+          "quarter": "2026-Q2",
+          "N": 21,
+          "meanPct": -6.192571623453504,
+          "ci": [
+            -9.120106633520031,
+            -3.2930064764207194
+          ]
+        },
+        {
+          "quarter": "2026-Q3",
+          "N": 4,
+          "meanPct": -5.446619382886048,
+          "ci": [
+            -9.427511495940248,
+            -1.4657272698318493
+          ]
+        }
+      ],
+      "quartersEligible": 6,
+      "quartersPositive": 2
+    },
+    "momentum-only": {
+      "full": {
+        "N": 1146,
+        "meanPct": -1.4760225885190283,
+        "ci": [
+          -6.328374553439136,
+          3.1878472510631877
+        ],
+        "posRate": 0.49912739965095987
+      },
+      "train": {
+        "N": 744,
+        "meanPct": -1.703856061998503,
+        "ci": [
+          -8.871857158872643,
+          5.552654733052856
+        ],
+        "posRate": 0.5120967741935484
+      },
+      "oos": {
+        "N": 402,
+        "meanPct": -1.054360637601794,
+        "ci": [
+          -1.8617520198111719,
+          -0.2504215372749958
+        ],
+        "posRate": 0.47512437810945274
+      },
+      "breadthByLongAssetOOS": [
+        {
+          "asset": "SOL",
+          "N": 21,
+          "meanPct": -7.894459809545405
+        },
+        {
+          "asset": "BTC",
+          "N": 165,
+          "meanPct": 2.185219950078876
+        },
+        {
+          "asset": "ETH",
+          "N": 64,
+          "meanPct": -6.213977003589818
+        },
+        {
+          "asset": "XRP",
+          "N": 26,
+          "meanPct": -1.5124085801110203
+        },
+        {
+          "asset": "BNB",
+          "N": 126,
+          "meanPct": -1.4413766727448194
+        }
+      ],
+      "perQuarter": [
+        {
+          "quarter": "2022-Q2",
+          "N": 10,
+          "meanPct": 38.07903487234338,
+          "ci": [
+            25.637195623687692,
+            51.68671897023906
+          ]
+        },
+        {
+          "quarter": "2022-Q3",
+          "N": 21,
+          "meanPct": 49.91120487688582,
+          "ci": [
+            43.80077975309163,
+            56.379888966367844
+          ]
+        },
+        {
+          "quarter": "2022-Q4",
+          "N": 24,
+          "meanPct": -11.256097180527718,
+          "ci": [
+            -24.615130996047043,
+            1.7836224744098677
+          ]
+        },
+        {
+          "quarter": "2023-Q1",
+          "N": 23,
+          "meanPct": 22.48277163109503,
+          "ci": [
+            10.618819994515933,
+            33.39041130719969
+          ]
+        },
+        {
+          "quarter": "2023-Q2",
+          "N": 23,
+          "meanPct": 55.31467660852308,
+          "ci": [
+            24.498982107473648,
+            91.35224107129234
+          ]
+        },
+        {
+          "quarter": "2023-Q3",
+          "N": 24,
+          "meanPct": -39.463454198022454,
+          "ci": [
+            -49.80258986874511,
+            -27.442935516279043
+          ]
+        },
+        {
+          "quarter": "2023-Q4",
+          "N": 23,
+          "meanPct": 68.12030981182396,
+          "ci": [
+            -6.476944761210998,
+            156.36159684120122
+          ]
+        },
+        {
+          "quarter": "2024-Q1",
+          "N": 22,
+          "meanPct": 43.87532983783427,
+          "ci": [
+            33.257646320002635,
+            53.48005749901247
+          ]
+        },
+        {
+          "quarter": "2024-Q2",
+          "N": 26,
+          "meanPct": -78.16585198854854,
+          "ci": [
+            -131.90917675562713,
+            -34.129274104172104
+          ]
+        },
+        {
+          "quarter": "2024-Q3",
+          "N": 74,
+          "meanPct": 24.405079844187682,
+          "ci": [
+            -20.338018703205385,
+            65.93401503901009
+          ]
+        },
+        {
+          "quarter": "2024-Q4",
+          "N": 67,
+          "meanPct": -29.91502946026395,
+          "ci": [
+            -76.67364592408659,
+            11.223578201478247
+          ]
+        },
+        {
+          "quarter": "2025-Q1",
+          "N": 70,
+          "meanPct": -19.78078778986403,
+          "ci": [
+            -27.84276336332389,
+            -11.734075409855514
+          ]
+        },
+        {
+          "quarter": "2025-Q2",
+          "N": 70,
+          "meanPct": -30.814298153043236,
+          "ci": [
+            -43.04216728795887,
+            -18.402354600283285
+          ]
+        },
+        {
+          "quarter": "2025-Q3",
+          "N": 175,
+          "meanPct": -1.1558154600981172,
+          "ci": [
+            -3.490668557398636,
+            1.0556501241357314
+          ]
+        },
+        {
+          "quarter": "2025-Q4",
+          "N": 172,
+          "meanPct": 1.553416158975428,
+          "ci": [
+            0.37634634369593856,
+            2.709870185663752
+          ]
+        },
+        {
+          "quarter": "2026-Q1",
+          "N": 172,
+          "meanPct": 2.2031582178010494,
+          "ci": [
+            0.944958811642491,
+            3.398411391620939
+          ]
+        },
+        {
+          "quarter": "2026-Q2",
+          "N": 137,
+          "meanPct": -6.106428426240472,
+          "ci": [
+            -7.401910444033616,
+            -4.865587641757366
+          ]
+        },
+        {
+          "quarter": "2026-Q3",
+          "N": 13,
+          "meanPct": -4.579011994694844,
+          "ci": [
+            -7.139466282432684,
+            -2.1132249396707086
+          ]
+        }
+      ],
+      "quartersEligible": 18,
+      "quartersPositive": 9
+    }
+  }
+}

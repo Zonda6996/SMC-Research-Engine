@@ -329,3 +329,31 @@ export function replayArrowSignals(
 	}
 	return { version: ARROW_TRADE_REPLAY_VERSION, mode, trades, signals, summary: summarizeArrowTrades(trades) }
 }
+
+/**
+ * Regime-independent replay (A1). Every admitted arrow is its own independent
+ * trade — there is NO per-mode exit-cooldown, so safe/standard/risk all trade
+ * the SAME arrow set and differ only in management (geometry/partials). Signal
+ * admission (min-spacing in bars) must be done upstream with `admitArrowSignals`;
+ * this function does not thin the input. Use this on the visualizer/benchmark
+ * path. `replayArrowSignals` (regime-dependent exit-cooldown) is preserved
+ * unchanged for backward compatibility with existing callers/tests.
+ */
+export function replayAdmittedArrowSignals(
+	candles: readonly Candle[],
+	bands: readonly ApexBand[],
+	admitted: readonly ArrowSignal[],
+	mode: ArrowMode,
+	partial: Partial<ArrowModeConfig> = {},
+): ArrowReplayResult {
+	const config = { ...ARROW_MODE_CONFIGS[mode], ...partial }
+	const signals: ArrowSignal[] = []
+	const trades: ArrowTrade[] = []
+	for (const signal of admitted) {
+		const trade = replayArrowTrade(candles, bands, signal, mode, config)
+		if (trade == null) continue
+		signals.push(signal)
+		trades.push(trade)
+	}
+	return { version: ARROW_TRADE_REPLAY_VERSION, mode, trades, signals, summary: summarizeArrowTrades(trades) }
+}

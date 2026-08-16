@@ -24,8 +24,8 @@ import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { detectLiquidityPoi, LIQUIDITY_POI_CONFIG, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
 import { detectLiquidityHeatmap, heatmapConfigForTf, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
 import { computeApexBands, APEX_VERSION, APEX_PARAMS } from '../../src/core/signals/ApexEngine.js'
-import { detectArrowSignalCandidates } from '../../src/core/signals/ArrowSignalEngine.js'
-import { replayArrowSignals } from '../../src/core/signals/ArrowTradeReplay.js'
+import { admitArrowSignals, detectArrowSignalCandidates } from '../../src/core/signals/ArrowSignalEngine.js'
+import { replayAdmittedArrowSignals } from '../../src/core/signals/ArrowTradeReplay.js'
 import { detectSimplifiedConfirmation, SIMPLIFIED_CONFIRMATION_VERSION, SIMPLIFIED_APEX_VETO_PRESET } from '../../src/core/confirmation/SimplifiedConfirmationEngine.js'
 import { detectPoiConfirmation, POI_CONFIRMATION_CONFIG, POI_CONFIRMATION_VERSION } from '../../src/core/confirmation/PoiConfirmationEngine.js'
 import { bigbarCovered } from '../../src/core/analysis/entryModels.js'
@@ -216,9 +216,11 @@ export function buildIndicatorPayload(
 	const rawBands = computeApexBands(series, params)
 	const detection = detectArrowSignalCandidates(series, params)
 	const candidateList = detection.candidates.filter((s) => evaluateFilterMode(series, detection.bands, s, filterMode, poiCandidates))
-	const replaySafe = replayArrowSignals(series, detection.bands, candidateList, 'safe')
-	const replayRisk = replayArrowSignals(series, detection.bands, candidateList, 'risk')
-	const replayStandard = replayArrowSignals(series, detection.bands, candidateList, 'standard')
+	// A1: regime-independent admission (fixed bar-step). All modes trade the SAME admitted arrow set and differ only in management.
+	const admittedList = admitArrowSignals(candidateList)
+	const replaySafe = replayAdmittedArrowSignals(series, detection.bands, admittedList, 'safe')
+	const replayRisk = replayAdmittedArrowSignals(series, detection.bands, admittedList, 'risk')
+	const replayStandard = replayAdmittedArrowSignals(series, detection.bands, admittedList, 'standard')
 	const selectedReplay = mode === 'safe' ? replaySafe : mode === 'risk' ? replayRisk : replayStandard
 	return {
 		apex: { version: APEX_VERSION, params, bands: rawBands.map((b, i) => Number.isFinite(b.mean) ? { t: series[i]!.timestamp, mean: b.mean, redLo: b.redLo, redHi: b.redHi, greenHi: b.greenHi, greenLo: b.greenLo } : null) },
@@ -688,7 +690,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				ltf5m: ltf5m ?? [],
 				ltfConf: ltfRefined,
 				ltfSimplified,
-				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools, oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
+				// notionalSchedule нужен только серверу (POI причинный notionalAsOf) — из payload его срезаем, чтобы не раздувать ответ.
+				liquidityHeatmap: { version: LIQUIDITY_HEATMAP_VERSION, pools: heatmapPools.map(({ notionalSchedule: _notionalSchedule, ...pool }) => pool), oiBars: heatmapAux?.oiBars ?? 0, takerBars: heatmapAux?.takerBars ?? 0 },
 				liquidityPoi: { version: LIQUIDITY_POI_VERSION, candidates: poiCandidates },
 				poiConfirmation: { version: POI_CONFIRMATION_VERSION, results: poiConfirmations },
 				apex: mainIndicators.apex,

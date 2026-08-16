@@ -1,6 +1,6 @@
 import { fetchCandlesPaginated } from '../shared/candleFetcher.js'
-import { detectArrowSignalCandidates, type ArrowSignal } from '../../src/core/signals/ArrowSignalEngine.js'
-import { replayArrowSignals } from '../../src/core/signals/ArrowTradeReplay.js'
+import { admitArrowSignals, detectArrowSignalCandidates, type ArrowSignal } from '../../src/core/signals/ArrowSignalEngine.js'
+import { replayAdmittedArrowSignals } from '../../src/core/signals/ArrowTradeReplay.js'
 import { computeApexBands, APEX_PARAMS } from '../../src/core/signals/ApexEngine.js'
 import type { Candle } from '../../src/models/price/Candle.js'
 
@@ -67,9 +67,11 @@ export function runBenchmarkOnSeries(symbol: string, timeframe: string, candles:
 
 	for (const variant of ['baseline', 'H1_APEX_CONTRACTION'] as const) {
 		const candidateList = variant === 'baseline' ? detection.candidates : filteredCandidates
+		// A1: regime-independent admission (fixed bar-step). Same admitted set for every mode.
+		const admittedList = admitArrowSignals(candidateList)
 
 		for (const mode of ['safe', 'risk', 'standard'] as const) {
-			const replay = replayArrowSignals(candles, bands as any, candidateList, mode)
+			const replay = replayAdmittedArrowSignals(candles, bands as any, admittedList, mode)
 			const trades = replay.trades
 			const values = trades.map((t) => t.netR)
 			const gains = values.filter((x) => x > 0).reduce((s, x) => s + x, 0)

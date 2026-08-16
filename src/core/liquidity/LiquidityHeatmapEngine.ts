@@ -127,6 +127,15 @@ export interface LiquidityPool {
 	volumeAccumulated: number
 	/** Накопленный условный объём (volume x price x share) — основа яркости. */
 	notional: number
+	/**
+	 * Причинное расписание накопления notional: отсортированные по времени точки
+	 * {at, cum}, где cum — суммарный notional пула к закрытию бара `at` включительно.
+	 * Нужно для `notionalAsOf(pool, t)` — массы пула, известной на баре `t`, без
+	 * заглядывания в будущее (утечка #2, docs/NEGATIVE-KNOWLEDGE.md). Всегда есть у
+	 * пулов из движка; отсутствует у рукотворных пулов (тесты) — тогда `notionalAsOf`
+	 * откатывается к полному `notional`.
+	 */
+	notionalSchedule?: ReadonlyArray<{ at: number; cum: number }>
 	/** Остаток после частичного потребления: notional минус снятые бины (для затухания яркости). */
 	remainingNotional: number
 	weight: number
@@ -143,6 +152,8 @@ interface Segment {
 	contributions: number
 	volume: number
 	notional: number
+	/** Причинное расписание: вклад notional на закрытии бара (по времени свечи). */
+	schedule: Array<{ at: number; notional: number }>
 }
 
 interface Cluster {
@@ -157,6 +168,8 @@ interface Cluster {
 	volume: number
 	notional: number
 	midNum: number
+	/** Причинное расписание вкладов всех слитых сегментов (несортированное). */
+	schedule: Array<{ at: number; notional: number }>
 }
 
 function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: number, aux?: LiquidityHeatmapAux): Segment[] {
@@ -233,13 +246,16 @@ function collectSegments(c: Candle[], config: LiquidityHeatmapConfig, logStep: n
 					seg = undefined
 				}
 				if (!seg) {
-					seg = { side, k, startIndex: i, lastIndex: i, sweptIndex: null, contributions: 0, volume: 0, notional: 0 }
+					seg = { side, k, startIndex: i, lastIndex: i, sweptIndex: null, contributions: 0, volume: 0, notional: 0, schedule: [] }
 					alive.set(key, seg)
 				}
+				const contribNotional = effVol[i]! * entry * tier.share * sideShare
 				seg.lastIndex = i
 				seg.contributions++
 				seg.volume += effVol[i]! * tier.share * sideShare
-				seg.notional += effVol[i]! * entry * tier.share * sideShare
+				seg.notional += contribNotional
+				// Причинное расписание: вклад приписывается времени свечи i (известен на её закрытии).
+				seg.schedule.push({ at: bar.timestamp, notional: contribNotional })
 			}
 		}
 	}
@@ -275,6 +291,7 @@ function clusterSegments(segments: Segment[], config: LiquidityHeatmapConfig, lo
 			target.volume += seg.volume
 			target.notional += seg.notional
 			target.midNum += seg.notional * binMid(seg.k)
+			for (const s of seg.schedule) target.schedule.push(s)
 		} else {
 			clusters.push({
 				side: seg.side, minK: seg.k, maxK: seg.k,
@@ -283,6 +300,7 @@ function clusterSegments(segments: Segment[], config: LiquidityHeatmapConfig, lo
 				sweeps: seg.sweptIndex != null ? [{ index: seg.sweptIndex, notional: seg.notional, k: seg.k }] : [],
 				contributions: seg.contributions, volume: seg.volume, notional: seg.notional,
 				midNum: seg.notional * binMid(seg.k),
+				schedule: [...seg.schedule],
 			})
 		}
 	}
@@ -345,6 +363,10 @@ export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmap
 		const sweptIndex = resolveSweptIndex(cl, Math.floor(Math.log(extremePrice) / logStep))
 		let sweptNotional = 0
 		for (const sw of cl.sweeps) sweptNotional += sw.notional
+		// Причинное кумулятивное расписание: вклады по времени свечи → prefix-суммы для notionalAsOf(t).
+		const orderedSched = [...cl.schedule].sort((a, b) => a.at - b.at)
+		let cumNotional = 0
+		const notionalSchedule = orderedSched.map(s => ({ at: s.at, cum: (cumNotional += s.notional) }))
 		pools.push({
 			id: `${LIQUIDITY_HEATMAP_VERSION}|${cl.side}|${cl.minK}:${cl.maxK}|${cl.startIndex}`,
 			version: LIQUIDITY_HEATMAP_VERSION,
@@ -375,4 +397,25 @@ export function detectLiquidityHeatmap(c: Candle[], configArg?: LiquidityHeatmap
 	const kept = [...pools].sort((a, b) => b.lastContributionAt - a.lastContributionAt).slice(0, config.maxPools)
 	kept.sort((a, b) => b.weight - a.weight)
 	return kept
+}
+
+/**
+ * Причинная масса пула, известная на баре `t`: суммарный notional вкладов со
+ * временем свечи СТРОГО раньше `t` (`at < t`). Устраняет утечку #2 — POI-путь
+ * должен ранжировать/отбирать полки по массе as-of-t, а не по полному
+ * (lifetime) notional, который включает объём после `t`.
+ * Fallback: у рукотворных пулов без расписания (тесты) возвращается полный
+ * `notional` — поведение как раньше.
+ */
+export function notionalAsOf(pool: LiquidityPool, t: number): number {
+	const sched = pool.notionalSchedule
+	if (!sched || sched.length === 0) return pool.notional
+	// Наибольший индекс с at < t (бинарный поиск по возрастающему at).
+	let lo = 0, hi = sched.length
+	while (lo < hi) {
+		const mid = (lo + hi) >> 1
+		if (sched[mid]!.at < t) lo = mid + 1
+		else hi = mid
+	}
+	return lo > 0 ? sched[lo - 1]!.cum : 0
 }
