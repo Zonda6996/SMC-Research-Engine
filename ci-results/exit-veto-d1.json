@@ -1,0 +1,377 @@
+{
+  "generatedAt": "2026-08-16T10:09:32.367Z",
+  "protocol": "D1-exit-veto-1.0 (pre-registered: A0 safe/static/T2 vs A1 pure-hold; veto ON=high-vol-only vs OFF; filter=off, A1 admission path)",
+  "preregistration": {
+    "universe": [
+      "SOL",
+      "BTC",
+      "ETH",
+      "XRP",
+      "BNB"
+    ],
+    "timeframes": [
+      "30m",
+      "1h",
+      "2h"
+    ],
+    "geometry": "safe",
+    "exits": {
+      "A0": "safe/static-full, target 2×step (референс, replayStatic verbatim)",
+      "A1": "pure-hold: без фикс-TP, выход только по стопу или maxHoldingBars (timeout)"
+    },
+    "vetoDefinition": "ON = только high-vol (low-vol дроп, durable risk-filter из D4b); OFF = high∪low; warmup (regime=null) исключён из обоих",
+    "volWindow": 120,
+    "medianWindow": 1000,
+    "trainFraction": 0.65,
+    "costs": "7 bps/side (ARROW_MODE_CONFIGS.oneWayCostBps); funding omitted",
+    "bootstrap": "2000 trade-level resamples, seed 20260807",
+    "note": "§2.1: ни одного нового числа (A1 = аблация TP-ветки A0; окна волы заранее заданы, НЕ свипаются). §2.3: src не тронут, replay/vol/helpers вербатим из regimeGateD4Vol.ts. Режим строго причинный."
+  },
+  "sources": [
+    {
+      "asset": "SOL",
+      "timeframe": "30m",
+      "bars": 20000,
+      "admitted": 88
+    },
+    {
+      "asset": "SOL",
+      "timeframe": "1h",
+      "bars": 20000,
+      "admitted": 87
+    },
+    {
+      "asset": "SOL",
+      "timeframe": "2h",
+      "bars": 20000,
+      "admitted": 90
+    },
+    {
+      "asset": "BTC",
+      "timeframe": "30m",
+      "bars": 20000,
+      "admitted": 87
+    },
+    {
+      "asset": "BTC",
+      "timeframe": "1h",
+      "bars": 20000,
+      "admitted": 85
+    },
+    {
+      "asset": "BTC",
+      "timeframe": "2h",
+      "bars": 20000,
+      "admitted": 90
+    },
+    {
+      "asset": "ETH",
+      "timeframe": "30m",
+      "bars": 20000,
+      "admitted": 85
+    },
+    {
+      "asset": "ETH",
+      "timeframe": "1h",
+      "bars": 20000,
+      "admitted": 81
+    },
+    {
+      "asset": "ETH",
+      "timeframe": "2h",
+      "bars": 20000,
+      "admitted": 87
+    },
+    {
+      "asset": "XRP",
+      "timeframe": "30m",
+      "bars": 20000,
+      "admitted": 90
+    },
+    {
+      "asset": "XRP",
+      "timeframe": "1h",
+      "bars": 20000,
+      "admitted": 87
+    },
+    {
+      "asset": "XRP",
+      "timeframe": "2h",
+      "bars": 20000,
+      "admitted": 84
+    },
+    {
+      "asset": "BNB",
+      "timeframe": "30m",
+      "bars": 20000,
+      "admitted": 92
+    },
+    {
+      "asset": "BNB",
+      "timeframe": "1h",
+      "bars": 20000,
+      "admitted": 87
+    },
+    {
+      "asset": "BNB",
+      "timeframe": "2h",
+      "bars": 20000,
+      "admitted": 87
+    }
+  ],
+  "skipped": [],
+  "btcBarsLoaded": 20000,
+  "btcHighBars": 9359,
+  "btcLowBars": 9522,
+  "warmupExcluded": 25,
+  "arms": {
+    "A0/vetoOFF": {
+      "full": {
+        "N": 1282,
+        "meanR": -0.06527115363687769,
+        "totalR": -83.6776189624772,
+        "ci": [
+          -0.12207211250237023,
+          -0.00783136411716858
+        ],
+        "pf": 0.8771133091057779,
+        "clusters": 885
+      },
+      "train": {
+        "N": 833,
+        "meanR": -0.08079234643176503,
+        "totalR": -67.30002457766027,
+        "ci": [
+          -0.15188723344849678,
+          -0.009579696592304194
+        ],
+        "pf": 0.851545348974178,
+        "clusters": 634
+      },
+      "oos": {
+        "N": 449,
+        "meanR": -0.03647571132475939,
+        "totalR": -16.377594384816966,
+        "ci": [
+          -0.13456813033127243,
+          0.06485324821144725
+        ],
+        "pf": 0.9280408982315179,
+        "clusters": 252
+      },
+      "breadthByAssetOOS": [
+        {
+          "asset": "SOL",
+          "N": 88,
+          "meanR": -0.018997829374744587
+        },
+        {
+          "asset": "BTC",
+          "N": 88,
+          "meanR": -0.00448523607784307
+        },
+        {
+          "asset": "ETH",
+          "N": 89,
+          "meanR": -0.027875255720469536
+        },
+        {
+          "asset": "XRP",
+          "N": 90,
+          "meanR": -0.1583432177844368
+        },
+        {
+          "asset": "BNB",
+          "N": 94,
+          "meanR": 0.02575215675246644
+        }
+      ]
+    },
+    "A0/vetoON": {
+      "full": {
+        "N": 589,
+        "meanR": 0.016834008818969497,
+        "totalR": 9.915231194373034,
+        "ci": [
+          -0.06713663221358003,
+          0.10472959994267943
+        ],
+        "pf": 1.0344519249542876,
+        "clusters": 385
+      },
+      "train": {
+        "N": 382,
+        "meanR": -0.06849928081460603,
+        "totalR": -26.166725271179505,
+        "ci": [
+          -0.1774525269038185,
+          0.03606239086962121
+        ],
+        "pf": 0.8740392894817044,
+        "clusters": 285
+      },
+      "oos": {
+        "N": 207,
+        "meanR": 0.1743089684326208,
+        "totalR": 36.08195646555251,
+        "ci": [
+          0.03270303803793765,
+          0.3178186698115705
+        ],
+        "pf": 1.4506760378111658,
+        "clusters": 101
+      },
+      "breadthByAssetOOS": [
+        {
+          "asset": "SOL",
+          "N": 41,
+          "meanR": 0.20944950304962934
+        },
+        {
+          "asset": "BTC",
+          "N": 40,
+          "meanR": 0.4119307848922416
+        },
+        {
+          "asset": "ETH",
+          "N": 43,
+          "meanR": -0.00912494535278001
+        },
+        {
+          "asset": "XRP",
+          "N": 40,
+          "meanR": 0.014584309177640798
+        },
+        {
+          "asset": "BNB",
+          "N": 43,
+          "meanR": 0.2517743192533018
+        }
+      ]
+    },
+    "A1/vetoOFF": {
+      "full": {
+        "N": 1282,
+        "meanR": 0.17337605527293007,
+        "totalR": 222.26810285989635,
+        "ci": [
+          -0.03166617992708769,
+          0.4293572879132351
+        ],
+        "pf": 1.2377714455021263,
+        "clusters": 885
+      },
+      "train": {
+        "N": 833,
+        "meanR": 0.27270457939788173,
+        "totalR": 227.16291463843547,
+        "ci": [
+          -0.03651505797790208,
+          0.6455350681135521
+        ],
+        "pf": 1.3550289577046777,
+        "clusters": 634
+      },
+      "oos": {
+        "N": 449,
+        "meanR": -0.01090158525287134,
+        "totalR": -4.894811778539232,
+        "ci": [
+          -0.17714452167143271,
+          0.1655435290793521
+        ],
+        "pf": 0.983404827070805,
+        "clusters": 252
+      },
+      "breadthByAssetOOS": [
+        {
+          "asset": "SOL",
+          "N": 88,
+          "meanR": 0.017449638019576184
+        },
+        {
+          "asset": "BTC",
+          "N": 88,
+          "meanR": 0.17921898004100054
+        },
+        {
+          "asset": "ETH",
+          "N": 89,
+          "meanR": 0.4802654174894492
+        },
+        {
+          "asset": "XRP",
+          "N": 90,
+          "meanR": -0.3694553033465659
+        },
+        {
+          "asset": "BNB",
+          "N": 94,
+          "meanR": -0.337173351311064
+        }
+      ]
+    },
+    "A1/vetoON": {
+      "full": {
+        "N": 589,
+        "meanR": 0.1726289489072609,
+        "totalR": 101.67845090637668,
+        "ci": [
+          -0.0453248460033302,
+          0.4084209627365176
+        ],
+        "pf": 1.2688310627958448,
+        "clusters": 385
+      },
+      "train": {
+        "N": 382,
+        "meanR": 0.31011285324278964,
+        "totalR": 118.46310993874565,
+        "ci": [
+          -0.01442552373197656,
+          0.6756524167674636
+        ],
+        "pf": 1.4321227195959947,
+        "clusters": 285
+      },
+      "oos": {
+        "N": 207,
+        "meanR": -0.08108530933511619,
+        "totalR": -16.784659032369053,
+        "ci": [
+          -0.22928979156251175,
+          0.06437895174061117
+        ],
+        "pf": 0.8387362803584856,
+        "clusters": 101
+      },
+      "breadthByAssetOOS": [
+        {
+          "asset": "SOL",
+          "N": 41,
+          "meanR": 0.04850107124872245
+        },
+        {
+          "asset": "BTC",
+          "N": 40,
+          "meanR": 0.3881540271137907
+        },
+        {
+          "asset": "ETH",
+          "N": 43,
+          "meanR": -0.26671797817749887
+        },
+        {
+          "asset": "XRP",
+          "N": 40,
+          "meanR": -0.39028120175650105
+        },
+        {
+          "asset": "BNB",
+          "N": 43,
+          "meanR": -0.16788936991222828
+        }
+      ]
+    }
+  }
+}

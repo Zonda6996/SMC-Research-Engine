@@ -1,0 +1,1721 @@
+{
+  "generatedAt": "2026-08-14T12:47:38.678Z",
+  "protocol": "D1.2-static-target-sweep-1.0",
+  "preregistration": {
+    "universe": [
+      "SOL",
+      "BTC",
+      "ETH",
+      "XRP",
+      "BNB"
+    ],
+    "timeframes": [
+      "30m",
+      "1h",
+      "2h"
+    ],
+    "geometries": [
+      "safe",
+      "standard",
+      "risk"
+    ],
+    "targetSteps": [
+      2,
+      2.5,
+      3
+    ],
+    "trainFraction": 0.65,
+    "costs": "7 bps/side",
+    "bootstrapSeed": 20260807,
+    "note": "targetSteps 2/2.5/3 — решение автора; static-путь воспроизведён вербатим, src не тронут; safe/T2 = валидация против D1."
+  },
+  "skipped": [],
+  "survivors": [],
+  "aggregate": [
+    {
+      "variant": "safe/T2",
+      "split": "train",
+      "net": {
+        "signals": 841,
+        "meanR": -0.08229707721468686,
+        "medianR": -1.008482197627189,
+        "totalR": -69.21184193755165,
+        "ci95MeanR": [
+          -0.15320540352390286,
+          -0.011622291322594852
+        ],
+        "profitFactor": 0.8500524004094927,
+        "positiveRate": 0.4625445897740785,
+        "winRate": 0.460166468489893,
+        "stopRate": 0.5362663495838288,
+        "avgHoldBars": 284.9500594530321,
+        "clusters": 648
+      }
+    },
+    {
+      "variant": "safe/T2",
+      "split": "oos",
+      "net": {
+        "signals": 466,
+        "meanR": -0.010710037176240302,
+        "medianR": 0.022852383588087024,
+        "totalR": -4.990877324127981,
+        "ci95MeanR": [
+          -0.10411696329297969,
+          0.08894833392420513
+        ],
+        "profitFactor": 0.9781522782115205,
+        "positiveRate": 0.5021459227467812,
+        "winRate": 0.4656652360515021,
+        "stopRate": 0.4742489270386266,
+        "avgHoldBars": 301.98068669527896,
+        "clusters": 300
+      }
+    },
+    {
+      "variant": "safe/T2.5",
+      "split": "train",
+      "net": {
+        "signals": 841,
+        "meanR": -0.08741525838339169,
+        "medianR": -1.0106424669657783,
+        "totalR": -73.5162323004324,
+        "ci95MeanR": [
+          -0.16783774654252906,
+          -0.009717781001779656
+        ],
+        "profitFactor": 0.8547325009330298,
+        "positiveRate": 0.40784780023781214,
+        "winRate": 0.40071343638525564,
+        "stopRate": 0.5873959571938169,
+        "avgHoldBars": 361.3935790725327,
+        "clusters": 648
+      }
+    },
+    {
+      "variant": "safe/T2.5",
+      "split": "oos",
+      "net": {
+        "signals": 466,
+        "meanR": -0.019679667147717492,
+        "medianR": -1.007811348506399,
+        "totalR": -9.170724890836352,
+        "ci95MeanR": [
+          -0.12417777167195312,
+          0.09047326654327359
+        ],
+        "profitFactor": 0.9638502482286365,
+        "positiveRate": 0.44635193133047213,
+        "winRate": 0.3905579399141631,
+        "stopRate": 0.5257510729613734,
+        "avgHoldBars": 394.08369098712444,
+        "clusters": 300
+      }
+    },
+    {
+      "variant": "safe/T3",
+      "split": "train",
+      "net": {
+        "signals": 841,
+        "meanR": -0.0627187885504836,
+        "medianR": -1.0116602350411763,
+        "totalR": -52.74650117095671,
+        "ci95MeanR": [
+          -0.14813922380681735,
+          0.024771422724405943
+        ],
+        "profitFactor": 0.9002632411862679,
+        "positiveRate": 0.37812128418549346,
+        "winRate": 0.36028537455410226,
+        "stopRate": 0.6135552913198573,
+        "avgHoldBars": 415.44708680142685,
+        "clusters": 648
+      }
+    },
+    {
+      "variant": "safe/T3",
+      "split": "oos",
+      "net": {
+        "signals": 466,
+        "meanR": -0.006746149450041974,
+        "medianR": -1.0089239517886344,
+        "totalR": -3.14370564371956,
+        "ci95MeanR": [
+          -0.1227490260294283,
+          0.1072769290875026
+        ],
+        "profitFactor": 0.9882685436254357,
+        "positiveRate": 0.41630901287553645,
+        "winRate": 0.3369098712446352,
+        "stopRate": 0.555793991416309,
+        "avgHoldBars": 475.19742489270385,
+        "clusters": 300
+      }
+    },
+    {
+      "variant": "standard/T2",
+      "split": "train",
+      "net": {
+        "signals": 841,
+        "meanR": -0.10661008372460629,
+        "medianR": -1.0147590171940262,
+        "totalR": -89.65908041239389,
+        "ci95MeanR": [
+          -0.182293116243737,
+          -0.03105607695422424
+        ],
+        "profitFactor": 0.8219412995325276,
+        "positiveRate": 0.41973840665873957,
+        "winRate": 0.41973840665873957,
+        "stopRate": 0.5802615933412604,
+        "avgHoldBars": 187.61474435196195,
+        "clusters": 648
+      }
+    },
+    {
+      "variant": "standard/T2",
+      "split": "oos",
+      "net": {
+        "signals": 466,
+        "meanR": -0.04373736947798072,
+        "medianR": -1.0109381293708328,
+        "totalR": -20.381614176739017,
+        "ci95MeanR": [
+          -0.13799529943638672,
+          0.06315971502805443
+        ],
+        "profitFactor": 0.9191749535562765,
+        "positiveRate": 0.463519313304721,
+        "winRate": 0.43991416309012876,
+        "stopRate": 0.5214592274678111,
+        "avgHoldBars": 197.931330472103,
+        "clusters": 300
+      }
+    },
+    {
+      "variant": "standard/T2.5",
+      "split": "train",
+      "net": {
+        "signals": 841,
+        "meanR": -0.10753097690225406,
+        "medianR": -1.0169814413503226,
+        "totalR": -90.43355157479567,
+        "ci95MeanR": [
+          -0.19314700428581258,
+          -0.023111601772537203
+        ],
+        "profitFactor": 0.8336824531947088,
+        "positiveRate": 0.3733650416171225,
+        "winRate": 0.37217598097502974,
+        "stopRate": 0.6266349583828775,
+        "avgHoldBars": 227.12247324613554,
+        "clusters": 648
+      }
+    },
+    {
+      "variant": "standard/T2.5",
+      "split": "oos",
+      "net": {
+        "signals": 466,
+        "meanR": -0.07938621876573702,
+        "medianR": -1.015926202250005,
+        "totalR": -36.99397794483345,
+        "ci95MeanR": [
+          -0.192304619523318,
+          0.034779760968113055
+        ],
+        "profitFactor": 0.8697970401077919,
+        "positiveRate": 0.3969957081545064,
+        "winRate": 0.3648068669527897,
+        "stopRate": 0.5879828326180258,
+        "avgHoldBars": 249.62875536480686,
+        "clusters": 300
+      }
+    },
+    {
+      "variant": "standard/T3",
+      "split": "train",
+      "net": {
+        "signals": 841,
+        "meanR": -0.12170509334423471,
+        "medianR": -1.0188863983854741,
+        "totalR": -102.35398350250139,
+        "ci95MeanR": [
+          -0.21185234001037132,
+          -0.028866383564820648
+        ],
+        "profitFactor": 0.823163286520332,
+        "positiveRate": 0.33174791914387636,
+        "winRate": 0.3234244946492271,
+        "stopRate": 0.667063020214031,
+        "avgHoldBars": 275.0071343638526,
+        "clusters": 648
+      }
+    },
+    {
+      "variant": "standard/T3",
+      "split": "oos",
+      "net": {
+        "signals": 466,
+        "meanR": -0.10331165900148316,
+        "medianR": -1.0177832835837761,
+        "totalR": -48.143233094691155,
+        "ci95MeanR": [
+          -0.21944828631503357,
+          0.020873730851326586
+        ],
+        "profitFactor": 0.842265120939065,
+        "positiveRate": 0.351931330472103,
+        "winRate": 0.3111587982832618,
+        "stopRate": 0.630901287553648,
+        "avgHoldBars": 305.4613733905579,
+        "clusters": 300
+      }
+    },
+    {
+      "variant": "risk/T2",
+      "split": "train",
+      "net": {
+        "signals": 841,
+        "meanR": -0.11854324293269293,
+        "medianR": -1.0134666503230387,
+        "totalR": -99.69486730639476,
+        "ci95MeanR": [
+          -0.1909160814452889,
+          -0.04791648582410854
+        ],
+        "profitFactor": 0.7923148894080937,
+        "positiveRate": 0.4470868014268728,
+        "winRate": 0.4470868014268728,
+        "stopRate": 0.5529131985731273,
+        "avgHoldBars": 142.00951248513675,
+        "clusters": 648
+      }
+    },
+    {
+      "variant": "risk/T2",
+      "split": "oos",
+      "net": {
+        "signals": 466,
+        "meanR": -0.05044298862190279,
+        "medianR": -0.3061695125882369,
+        "totalR": -23.506432697806698,
+        "ci95MeanR": [
+          -0.14748265980286795,
+          0.043864198180846
+        ],
+        "profitFactor": 0.9021085363236251,
+        "positiveRate": 0.49141630901287553,
+        "winRate": 0.4699570815450644,
+        "stopRate": 0.4957081545064378,
+        "avgHoldBars": 150.27467811158797,
+        "clusters": 300
+      }
+    },
+    {
+      "variant": "risk/T2.5",
+      "split": "train",
+      "net": {
+        "signals": 841,
+        "meanR": -0.11161738444191288,
+        "medianR": -1.015968679096103,
+        "totalR": -93.87022031564874,
+        "ci95MeanR": [
+          -0.186940803664113,
+          -0.027716352400265043
+        ],
+        "profitFactor": 0.8199238006825559,
+        "positiveRate": 0.3995243757431629,
+        "winRate": 0.3995243757431629,
+        "stopRate": 0.6004756242568371,
+        "avgHoldBars": 177.37455410225922,
+        "clusters": 648
+      }
+    },
+    {
+      "variant": "risk/T2.5",
+      "split": "oos",
+      "net": {
+        "signals": 466,
+        "meanR": -0.07836685066787479,
+        "medianR": -1.0133488666883403,
+        "totalR": -36.51895241122965,
+        "ci95MeanR": [
+          -0.17522050293896607,
+          0.030029884071094252
+        ],
+        "profitFactor": 0.8637579672706975,
+        "positiveRate": 0.4334763948497854,
+        "winRate": 0.40987124463519314,
+        "stopRate": 0.5536480686695279,
+        "avgHoldBars": 192.05150214592274,
+        "clusters": 300
+      }
+    },
+    {
+      "variant": "risk/T3",
+      "split": "train",
+      "net": {
+        "signals": 841,
+        "meanR": -0.1120554721506659,
+        "medianR": -1.0182934569952808,
+        "totalR": -94.23865207871002,
+        "ci95MeanR": [
+          -0.19778216159311088,
+          -0.028132658362844256
+        ],
+        "profitFactor": 0.8302906131047351,
+        "positiveRate": 0.36028537455410226,
+        "winRate": 0.36028537455410226,
+        "stopRate": 0.6397146254458977,
+        "avgHoldBars": 205.36860879904876,
+        "clusters": 648
+      }
+    },
+    {
+      "variant": "risk/T3",
+      "split": "oos",
+      "net": {
+        "signals": 466,
+        "meanR": -0.08191113040535881,
+        "medianR": -1.017169750625226,
+        "totalR": -38.17058676889721,
+        "ci95MeanR": [
+          -0.19286752171809285,
+          0.03321092570806181
+        ],
+        "profitFactor": 0.8682289677972996,
+        "positiveRate": 0.388412017167382,
+        "winRate": 0.3626609442060086,
+        "stopRate": 0.5987124463519313,
+        "avgHoldBars": 228.3068669527897,
+        "clusters": 300
+      }
+    }
+  ],
+  "slices": [
+    {
+      "variant": "safe/T2",
+      "dimension": "asset",
+      "key": "SOL",
+      "net": {
+        "signals": 94,
+        "meanR": -0.03418508603474595,
+        "medianR": -0.07937082602916856,
+        "totalR": -3.2133980872661194,
+        "ci95MeanR": [
+          -0.2288764948489522,
+          0.1708769268340543
+        ],
+        "profitFactor": 0.9303774559359442,
+        "positiveRate": 0.5,
+        "winRate": 0.4787234042553192,
+        "stopRate": 0.4787234042553192,
+        "avgHoldBars": 307.6170212765957,
+        "clusters": 91
+      }
+    },
+    {
+      "variant": "safe/T2",
+      "dimension": "asset",
+      "key": "BTC",
+      "net": {
+        "signals": 91,
+        "meanR": 0.009292645595567167,
+        "medianR": 0.3645229105247391,
+        "totalR": 0.8456307491966122,
+        "ci95MeanR": [
+          -0.2054171983032886,
+          0.21442157260993053
+        ],
+        "profitFactor": 1.0194354427199535,
+        "positiveRate": 0.5164835164835165,
+        "winRate": 0.4835164835164835,
+        "stopRate": 0.46153846153846156,
+        "avgHoldBars": 253.58241758241758,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "safe/T2",
+      "dimension": "asset",
+      "key": "ETH",
+      "net": {
+        "signals": 91,
+        "meanR": 0.004753515444131345,
+        "medianR": 0.09834001183399199,
+        "totalR": 0.4325699054159524,
+        "ci95MeanR": [
+          -0.20284586574578048,
+          0.2222468936195466
+        ],
+        "profitFactor": 1.009657867388847,
+        "positiveRate": 0.5054945054945055,
+        "winRate": 0.4835164835164835,
+        "stopRate": 0.4725274725274725,
+        "avgHoldBars": 297.68131868131866,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "safe/T2",
+      "dimension": "asset",
+      "key": "XRP",
+      "net": {
+        "signals": 94,
+        "meanR": -0.007542451464945856,
+        "medianR": -0.0006921834146014182,
+        "totalR": -0.7089904377049104,
+        "ci95MeanR": [
+          -0.21887519455081825,
+          0.2073403326541763
+        ],
+        "profitFactor": 0.9846091431568037,
+        "positiveRate": 0.5,
+        "winRate": 0.43617021276595747,
+        "stopRate": 0.4787234042553192,
+        "avgHoldBars": 334.3191489361702,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "safe/T2",
+      "dimension": "asset",
+      "key": "BNB",
+      "net": {
+        "signals": 96,
+        "meanR": -0.024444681810099057,
+        "medianR": -0.05155356357061405,
+        "totalR": -2.3466894537695095,
+        "ci95MeanR": [
+          -0.2313855633278963,
+          0.19183679146239213
+        ],
+        "profitFactor": 0.9510289143834946,
+        "positiveRate": 0.4895833333333333,
+        "winRate": 0.4479166666666667,
+        "stopRate": 0.4791666666666667,
+        "avgHoldBars": 314.75,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "safe/T2",
+      "dimension": "side",
+      "key": "long",
+      "net": {
+        "signals": 249,
+        "meanR": -0.10162172603242844,
+        "medianR": -1.0072487676736364,
+        "totalR": -25.303809782074683,
+        "ci95MeanR": [
+          -0.2274754952391909,
+          0.03235016499076168
+        ],
+        "profitFactor": 0.812687029454858,
+        "positiveRate": 0.4497991967871486,
+        "winRate": 0.41767068273092367,
+        "stopRate": 0.5301204819277109,
+        "avgHoldBars": 315.7871485943775,
+        "clusters": 155
+      }
+    },
+    {
+      "variant": "safe/T2",
+      "dimension": "side",
+      "key": "short",
+      "net": {
+        "signals": 217,
+        "meanR": 0.09360798367717381,
+        "medianR": 0.6434974132877229,
+        "totalR": 20.312932457946715,
+        "ci95MeanR": [
+          -0.04176152499588432,
+          0.23303955201014329
+        ],
+        "profitFactor": 1.2175977118285748,
+        "positiveRate": 0.5622119815668203,
+        "winRate": 0.5207373271889401,
+        "stopRate": 0.41013824884792627,
+        "avgHoldBars": 286.13824884792626,
+        "clusters": 145
+      }
+    },
+    {
+      "variant": "safe/T2.5",
+      "dimension": "asset",
+      "key": "SOL",
+      "net": {
+        "signals": 94,
+        "meanR": 0.023740390443411672,
+        "medianR": -1.005735346500209,
+        "totalR": 2.2315967016806972,
+        "ci95MeanR": [
+          -0.20927325217010903,
+          0.26711508809867074
+        ],
+        "profitFactor": 1.045356901389676,
+        "positiveRate": 0.46808510638297873,
+        "winRate": 0.4148936170212766,
+        "stopRate": 0.5106382978723404,
+        "avgHoldBars": 411.7340425531915,
+        "clusters": 91
+      }
+    },
+    {
+      "variant": "safe/T2.5",
+      "dimension": "asset",
+      "key": "BTC",
+      "net": {
+        "signals": 91,
+        "meanR": -0.038468211709005655,
+        "medianR": -1.013417662677453,
+        "totalR": -3.500607265519515,
+        "ci95MeanR": [
+          -0.26728138328691753,
+          0.21915519948243298
+        ],
+        "profitFactor": 0.9315293987292445,
+        "positiveRate": 0.42857142857142855,
+        "winRate": 0.3956043956043956,
+        "stopRate": 0.5384615384615384,
+        "avgHoldBars": 366.010989010989,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "safe/T2.5",
+      "dimension": "asset",
+      "key": "ETH",
+      "net": {
+        "signals": 91,
+        "meanR": 0.02923460333976826,
+        "medianR": -1.0072040670501057,
+        "totalR": 2.6603489039189117,
+        "ci95MeanR": [
+          -0.21439419706040022,
+          0.26384993283145985
+        ],
+        "profitFactor": 1.055284953266232,
+        "positiveRate": 0.46153846153846156,
+        "winRate": 0.4065934065934066,
+        "stopRate": 0.5054945054945055,
+        "avgHoldBars": 387.83516483516485,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "safe/T2.5",
+      "dimension": "asset",
+      "key": "XRP",
+      "net": {
+        "signals": 94,
+        "meanR": -0.009517873644200071,
+        "medianR": -1.0073984890200274,
+        "totalR": -0.8946801225548068,
+        "ci95MeanR": [
+          -0.23989772961381942,
+          0.23225934300563128
+        ],
+        "profitFactor": 0.9821530147036643,
+        "positiveRate": 0.4574468085106383,
+        "winRate": 0.39361702127659576,
+        "stopRate": 0.5212765957446809,
+        "avgHoldBars": 382.8723404255319,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "safe/T2.5",
+      "dimension": "asset",
+      "key": "BNB",
+      "net": {
+        "signals": 96,
+        "meanR": -0.10070190737876696,
+        "medianR": -1.010917220439576,
+        "totalR": -9.667383108361628,
+        "ci95MeanR": [
+          -0.32330619041324177,
+          0.12429541865099923
+        ],
+        "profitFactor": 0.8245779781972706,
+        "positiveRate": 0.4166666666666667,
+        "winRate": 0.34375,
+        "stopRate": 0.5520833333333334,
+        "avgHoldBars": 420.3125,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "safe/T2.5",
+      "dimension": "side",
+      "key": "long",
+      "net": {
+        "signals": 249,
+        "meanR": -0.120225366260983,
+        "medianR": -1.0086569006814738,
+        "totalR": -29.936116198984767,
+        "ci95MeanR": [
+          -0.2596910162056866,
+          0.027064478500769547
+        ],
+        "profitFactor": 0.7981128448203455,
+        "positiveRate": 0.39759036144578314,
+        "winRate": 0.3453815261044177,
+        "stopRate": 0.5823293172690763,
+        "avgHoldBars": 394.2730923694779,
+        "clusters": 155
+      }
+    },
+    {
+      "variant": "safe/T2.5",
+      "dimension": "side",
+      "key": "short",
+      "net": {
+        "signals": 217,
+        "meanR": 0.09569304750298821,
+        "medianR": 0.027181631940642263,
+        "totalR": 20.76539130814844,
+        "ci95MeanR": [
+          -0.05220675638948416,
+          0.2493179654134597
+        ],
+        "profitFactor": 1.1970045425891225,
+        "positiveRate": 0.5023041474654378,
+        "winRate": 0.4423963133640553,
+        "stopRate": 0.4608294930875576,
+        "avgHoldBars": 393.8663594470046,
+        "clusters": 145
+      }
+    },
+    {
+      "variant": "safe/T3",
+      "dimension": "asset",
+      "key": "SOL",
+      "net": {
+        "signals": 94,
+        "meanR": 0.006178519300901874,
+        "medianR": -1.0078548245584469,
+        "totalR": 0.5807808142847761,
+        "ci95MeanR": [
+          -0.25435293175258544,
+          0.26373486070819285
+        ],
+        "profitFactor": 1.0106921893474128,
+        "positiveRate": 0.4148936170212766,
+        "winRate": 0.32978723404255317,
+        "stopRate": 0.5638297872340425,
+        "avgHoldBars": 539.7553191489362,
+        "clusters": 91
+      }
+    },
+    {
+      "variant": "safe/T3",
+      "dimension": "asset",
+      "key": "BTC",
+      "net": {
+        "signals": 91,
+        "meanR": 0.049915329794933,
+        "medianR": -1.0143992981399808,
+        "totalR": 4.542295011338903,
+        "ci95MeanR": [
+          -0.21761260881207456,
+          0.31536977542110967
+        ],
+        "profitFactor": 1.0871033343339398,
+        "positiveRate": 0.4175824175824176,
+        "winRate": 0.3626373626373626,
+        "stopRate": 0.5494505494505495,
+        "avgHoldBars": 446.57142857142856,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "safe/T3",
+      "dimension": "asset",
+      "key": "ETH",
+      "net": {
+        "signals": 91,
+        "meanR": 0.1075671447127681,
+        "medianR": -1.0072040670501057,
+        "totalR": 9.788610168861897,
+        "ci95MeanR": [
+          -0.16010890270305642,
+          0.36941200436995497
+        ],
+        "profitFactor": 1.2034180008981972,
+        "positiveRate": 0.46153846153846156,
+        "winRate": 0.38461538461538464,
+        "stopRate": 0.5054945054945055,
+        "avgHoldBars": 440.2197802197802,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "safe/T3",
+      "dimension": "asset",
+      "key": "XRP",
+      "net": {
+        "signals": 94,
+        "meanR": -0.024519259213370906,
+        "medianR": -1.008474976848042,
+        "totalR": -2.304810366056865,
+        "ci95MeanR": [
+          -0.2580780971220947,
+          0.21574470371582205
+        ],
+        "profitFactor": 0.956661475347003,
+        "positiveRate": 0.425531914893617,
+        "winRate": 0.32978723404255317,
+        "stopRate": 0.5531914893617021,
+        "avgHoldBars": 463.52127659574467,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "safe/T3",
+      "dimension": "asset",
+      "key": "BNB",
+      "net": {
+        "signals": 96,
+        "meanR": -0.16406855491821107,
+        "medianR": -1.0131704900447698,
+        "totalR": -15.750581272148263,
+        "ci95MeanR": [
+          -0.3913181849657025,
+          0.08985770866129436
+        ],
+        "profitFactor": 0.7383777215499164,
+        "positiveRate": 0.3645833333333333,
+        "winRate": 0.28125,
+        "stopRate": 0.6041666666666666,
+        "avgHoldBars": 483.7083333333333,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "safe/T3",
+      "dimension": "side",
+      "key": "long",
+      "net": {
+        "signals": 249,
+        "meanR": -0.10565270642045335,
+        "medianR": -1.009070595485935,
+        "totalR": -26.307523898692885,
+        "ci95MeanR": [
+          -0.2613883105498178,
+          0.04494882820524246
+        ],
+        "profitFactor": 0.8273259495405447,
+        "positiveRate": 0.3815261044176707,
+        "winRate": 0.2931726907630522,
+        "stopRate": 0.5983935742971888,
+        "avgHoldBars": 468.32530120481925,
+        "clusters": 155
+      }
+    },
+    {
+      "variant": "safe/T3",
+      "dimension": "side",
+      "key": "short",
+      "net": {
+        "signals": 217,
+        "meanR": 0.1067457062441169,
+        "medianR": -1.008829351855758,
+        "totalR": 23.163818254973368,
+        "ci95MeanR": [
+          -0.07182379493450189,
+          0.2760509014706106
+        ],
+        "profitFactor": 1.200346705033992,
+        "positiveRate": 0.45622119815668205,
+        "winRate": 0.3870967741935484,
+        "stopRate": 0.5069124423963134,
+        "avgHoldBars": 483.08294930875576,
+        "clusters": 145
+      }
+    },
+    {
+      "variant": "standard/T2",
+      "dimension": "asset",
+      "key": "SOL",
+      "net": {
+        "signals": 94,
+        "meanR": -0.002109790713482101,
+        "medianR": -0.6687445905358633,
+        "totalR": -0.1983203270673175,
+        "ci95MeanR": [
+          -0.22240187755353077,
+          0.22256864984718183
+        ],
+        "profitFactor": 0.9959091164063238,
+        "positiveRate": 0.48936170212765956,
+        "winRate": 0.46808510638297873,
+        "stopRate": 0.5,
+        "avgHoldBars": 217.54255319148936,
+        "clusters": 91
+      }
+    },
+    {
+      "variant": "standard/T2",
+      "dimension": "asset",
+      "key": "BTC",
+      "net": {
+        "signals": 91,
+        "meanR": 0.053482715883264,
+        "medianR": 0.03816301124466187,
+        "totalR": 4.866927145377024,
+        "ci95MeanR": [
+          -0.18278112141422886,
+          0.27700872279521854
+        ],
+        "profitFactor": 1.1073599332627122,
+        "positiveRate": 0.5054945054945055,
+        "winRate": 0.4835164835164835,
+        "stopRate": 0.4725274725274725,
+        "avgHoldBars": 179.9120879120879,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "standard/T2",
+      "dimension": "asset",
+      "key": "ETH",
+      "net": {
+        "signals": 91,
+        "meanR": -0.1763595208303183,
+        "medianR": -1.0146474110436345,
+        "totalR": -16.048716395558966,
+        "ci95MeanR": [
+          -0.3902182970426833,
+          0.058455573955216736
+        ],
+        "profitFactor": 0.7058799973071567,
+        "positiveRate": 0.4175824175824176,
+        "winRate": 0.3956043956043956,
+        "stopRate": 0.5824175824175825,
+        "avgHoldBars": 171.04395604395606,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "standard/T2",
+      "dimension": "asset",
+      "key": "XRP",
+      "net": {
+        "signals": 94,
+        "meanR": -0.032644671162054446,
+        "medianR": -1.012276867494651,
+        "totalR": -3.068599089233118,
+        "ci95MeanR": [
+          -0.25888783854189895,
+          0.2046143742111396
+        ],
+        "profitFactor": 0.9406532191900581,
+        "positiveRate": 0.44680851063829785,
+        "winRate": 0.425531914893617,
+        "stopRate": 0.5319148936170213,
+        "avgHoldBars": 196.30851063829786,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "standard/T2",
+      "dimension": "asset",
+      "key": "BNB",
+      "net": {
+        "signals": 96,
+        "meanR": -0.061801099065173205,
+        "medianR": -1.012675519105592,
+        "totalR": -5.932905510256628,
+        "ci95MeanR": [
+          -0.27712592582765627,
+          0.1491402263981354
+        ],
+        "profitFactor": 0.8860955311296506,
+        "positiveRate": 0.4583333333333333,
+        "winRate": 0.4270833333333333,
+        "stopRate": 0.5208333333333334,
+        "avgHoldBars": 222.88541666666666,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "standard/T2",
+      "dimension": "side",
+      "key": "long",
+      "net": {
+        "signals": 249,
+        "meanR": -0.08236691898411834,
+        "medianR": -1.011203012399877,
+        "totalR": -20.509362827045468,
+        "ci95MeanR": [
+          -0.21519764874984545,
+          0.06334901259082348
+        ],
+        "profitFactor": 0.8543329488934308,
+        "positiveRate": 0.43373493975903615,
+        "winRate": 0.41365461847389556,
+        "stopRate": 0.5461847389558233,
+        "avgHoldBars": 226.31726907630522,
+        "clusters": 155
+      }
+    },
+    {
+      "variant": "standard/T2",
+      "dimension": "side",
+      "key": "short",
+      "net": {
+        "signals": 217,
+        "meanR": 0.0005887034576334089,
+        "medianR": -0.09314757800174692,
+        "totalR": 0.12774865030644975,
+        "ci95MeanR": [
+          -0.14856892106732436,
+          0.14518969797478715
+        ],
+        "profitFactor": 1.001147030554927,
+        "positiveRate": 0.4976958525345622,
+        "winRate": 0.4700460829493088,
+        "stopRate": 0.4930875576036866,
+        "avgHoldBars": 165.35944700460828,
+        "clusters": 145
+      }
+    },
+    {
+      "variant": "standard/T2.5",
+      "dimension": "asset",
+      "key": "SOL",
+      "net": {
+        "signals": 94,
+        "meanR": -0.04257539931236301,
+        "medianR": -1.0114061736800595,
+        "totalR": -4.002087535362123,
+        "ci95MeanR": [
+          -0.28157660457448214,
+          0.21857823742932828
+        ],
+        "profitFactor": 0.9280655232661408,
+        "positiveRate": 0.4148936170212766,
+        "winRate": 0.3829787234042553,
+        "stopRate": 0.574468085106383,
+        "avgHoldBars": 274.6808510638298,
+        "clusters": 91
+      }
+    },
+    {
+      "variant": "standard/T2.5",
+      "dimension": "asset",
+      "key": "BTC",
+      "net": {
+        "signals": 91,
+        "meanR": 0.041576353426324056,
+        "medianR": -1.0192163983991438,
+        "totalR": 3.7834481617954894,
+        "ci95MeanR": [
+          -0.21497703661006493,
+          0.315549954731405
+        ],
+        "profitFactor": 1.073429511859875,
+        "positiveRate": 0.43956043956043955,
+        "winRate": 0.4065934065934066,
+        "stopRate": 0.5384615384615384,
+        "avgHoldBars": 237.1868131868132,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "standard/T2.5",
+      "dimension": "asset",
+      "key": "ETH",
+      "net": {
+        "signals": 91,
+        "meanR": -0.1707153856938675,
+        "medianR": -1.0167826885147138,
+        "totalR": -15.535100098141942,
+        "ci95MeanR": [
+          -0.40432503648798995,
+          0.06162060320693229
+        ],
+        "profitFactor": 0.7351358260247524,
+        "positiveRate": 0.37362637362637363,
+        "winRate": 0.34065934065934067,
+        "stopRate": 0.6263736263736264,
+        "avgHoldBars": 204.92307692307693,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "standard/T2.5",
+      "dimension": "asset",
+      "key": "XRP",
+      "net": {
+        "signals": 94,
+        "meanR": -0.07566460028512911,
+        "medianR": -1.0142100461033334,
+        "totalR": -7.112472426802137,
+        "ci95MeanR": [
+          -0.31599304633006603,
+          0.17898324472476823
+        ],
+        "profitFactor": 0.8771483280483235,
+        "positiveRate": 0.3829787234042553,
+        "winRate": 0.3617021276595745,
+        "stopRate": 0.5957446808510638,
+        "avgHoldBars": 244.7340425531915,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "standard/T2.5",
+      "dimension": "asset",
+      "key": "BNB",
+      "net": {
+        "signals": 96,
+        "meanR": -0.14716422964919537,
+        "medianR": -1.0188693680228567,
+        "totalR": -14.127766046322755,
+        "ci95MeanR": [
+          -0.3814939057856959,
+          0.0931051967932577
+        ],
+        "profitFactor": 0.7661644168196907,
+        "positiveRate": 0.375,
+        "winRate": 0.3333333333333333,
+        "stopRate": 0.6041666666666666,
+        "avgHoldBars": 284.0625,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "standard/T2.5",
+      "dimension": "side",
+      "key": "long",
+      "net": {
+        "signals": 249,
+        "meanR": -0.12786218024379328,
+        "medianR": -1.0139045292149926,
+        "totalR": -31.83768288070453,
+        "ci95MeanR": [
+          -0.28526542845437153,
+          0.026046299816324475
+        ],
+        "profitFactor": 0.7987486387186337,
+        "positiveRate": 0.3654618473895582,
+        "winRate": 0.3333333333333333,
+        "stopRate": 0.6144578313253012,
+        "avgHoldBars": 277.6787148594378,
+        "clusters": 155
+      }
+    },
+    {
+      "variant": "standard/T2.5",
+      "dimension": "side",
+      "key": "short",
+      "net": {
+        "signals": 217,
+        "meanR": -0.023761728406124165,
+        "medianR": -1.017698879044272,
+        "totalR": -5.156295064128944,
+        "ci95MeanR": [
+          -0.17212364648077152,
+          0.140391920368747
+        ],
+        "profitFactor": 0.9590532610313006,
+        "positiveRate": 0.43317972350230416,
+        "winRate": 0.4009216589861751,
+        "stopRate": 0.5576036866359447,
+        "avgHoldBars": 217.44239631336404,
+        "clusters": 145
+      }
+    },
+    {
+      "variant": "standard/T3",
+      "dimension": "asset",
+      "key": "SOL",
+      "net": {
+        "signals": 94,
+        "meanR": -0.05129992958969871,
+        "medianR": -1.012596840566022,
+        "totalR": -4.822193381431679,
+        "ci95MeanR": [
+          -0.3103490054611225,
+          0.2237579059962337
+        ],
+        "profitFactor": 0.9192762319077865,
+        "positiveRate": 0.3723404255319149,
+        "winRate": 0.32978723404255317,
+        "stopRate": 0.6170212765957447,
+        "avgHoldBars": 345.8191489361702,
+        "clusters": 91
+      }
+    },
+    {
+      "variant": "standard/T3",
+      "dimension": "asset",
+      "key": "BTC",
+      "net": {
+        "signals": 91,
+        "meanR": -0.060973506632607796,
+        "medianR": -1.0257994450813817,
+        "totalR": -5.548589103567309,
+        "ci95MeanR": [
+          -0.34949173628217994,
+          0.22743426743975886
+        ],
+        "profitFactor": 0.9072310587272565,
+        "positiveRate": 0.3516483516483517,
+        "winRate": 0.31868131868131866,
+        "stopRate": 0.6263736263736264,
+        "avgHoldBars": 311.57142857142856,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "standard/T3",
+      "dimension": "asset",
+      "key": "ETH",
+      "net": {
+        "signals": 91,
+        "meanR": -0.1320477730710625,
+        "medianR": -1.0167826885147138,
+        "totalR": -12.016347349466688,
+        "ci95MeanR": [
+          -0.38550992170323406,
+          0.1423464405802554
+        ],
+        "profitFactor": 0.8001548450621029,
+        "positiveRate": 0.3516483516483517,
+        "winRate": 0.3076923076923077,
+        "stopRate": 0.6373626373626373,
+        "avgHoldBars": 263.38461538461536,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "standard/T3",
+      "dimension": "asset",
+      "key": "XRP",
+      "net": {
+        "signals": 94,
+        "meanR": -0.0013008579647808718,
+        "medianR": -1.0142775819601795,
+        "totalR": -0.12228064868940194,
+        "ci95MeanR": [
+          -0.2771968337788396,
+          0.2986965893434798
+        ],
+        "profitFactor": 0.9979245195704683,
+        "positiveRate": 0.3723404255319149,
+        "winRate": 0.35106382978723405,
+        "stopRate": 0.6063829787234043,
+        "avgHoldBars": 274.5,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "standard/T3",
+      "dimension": "asset",
+      "key": "BNB",
+      "net": {
+        "signals": 96,
+        "meanR": -0.2670189855368342,
+        "medianR": -1.0238752209215347,
+        "totalR": -25.63382261153608,
+        "ci95MeanR": [
+          -0.4950855302287061,
+          -0.018360843181131844
+        ],
+        "profitFactor": 0.6152421027864362,
+        "positiveRate": 0.3125,
+        "winRate": 0.25,
+        "stopRate": 0.6666666666666666,
+        "avgHoldBars": 330.3541666666667,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "standard/T3",
+      "dimension": "side",
+      "key": "long",
+      "net": {
+        "signals": 249,
+        "meanR": -0.12506944809043613,
+        "medianR": -1.014408356064306,
+        "totalR": -31.1422925745186,
+        "ci95MeanR": [
+          -0.290726731426506,
+          0.03962550258876007
+        ],
+        "profitFactor": 0.8139384496575163,
+        "positiveRate": 0.3293172690763052,
+        "winRate": 0.2931726907630522,
+        "stopRate": 0.6506024096385542,
+        "avgHoldBars": 322.60642570281124,
+        "clusters": 155
+      }
+    },
+    {
+      "variant": "standard/T3",
+      "dimension": "side",
+      "key": "short",
+      "net": {
+        "signals": 217,
+        "meanR": -0.0783453480192283,
+        "medianR": -1.021588534379633,
+        "totalR": -17.00094052017254,
+        "ci95MeanR": [
+          -0.2392415124970043,
+          0.10105541430483184
+        ],
+        "profitFactor": 0.8766616533364405,
+        "positiveRate": 0.3778801843317972,
+        "winRate": 0.3317972350230415,
+        "stopRate": 0.6082949308755761,
+        "avgHoldBars": 285.78801843317973,
+        "clusters": 145
+      }
+    },
+    {
+      "variant": "risk/T2",
+      "dimension": "asset",
+      "key": "SOL",
+      "net": {
+        "signals": 94,
+        "meanR": -0.058673880706615236,
+        "medianR": -0.19144638195368396,
+        "totalR": -5.515344786421832,
+        "ci95MeanR": [
+          -0.2646307145367804,
+          0.1426155178272565
+        ],
+        "profitFactor": 0.8840552468249715,
+        "positiveRate": 0.5,
+        "winRate": 0.48936170212765956,
+        "stopRate": 0.48936170212765956,
+        "avgHoldBars": 165.37234042553192,
+        "clusters": 91
+      }
+    },
+    {
+      "variant": "risk/T2",
+      "dimension": "asset",
+      "key": "BTC",
+      "net": {
+        "signals": 91,
+        "meanR": 0.05902753839844676,
+        "medianR": 0.631400907681734,
+        "totalR": 5.371505994258655,
+        "ci95MeanR": [
+          -0.1644285250664745,
+          0.2919270202831707
+        ],
+        "profitFactor": 1.1237749738884937,
+        "positiveRate": 0.5274725274725275,
+        "winRate": 0.5054945054945055,
+        "stopRate": 0.45054945054945056,
+        "avgHoldBars": 135.4835164835165,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "risk/T2",
+      "dimension": "asset",
+      "key": "ETH",
+      "net": {
+        "signals": 91,
+        "meanR": -0.13956380729203816,
+        "medianR": -1.0118638588139135,
+        "totalR": -12.700306463575473,
+        "ci95MeanR": [
+          -0.35132326921138146,
+          0.07655109072758164
+        ],
+        "profitFactor": 0.748194039368353,
+        "positiveRate": 0.46153846153846156,
+        "winRate": 0.45054945054945056,
+        "stopRate": 0.5384615384615384,
+        "avgHoldBars": 109.41758241758242,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "risk/T2",
+      "dimension": "asset",
+      "key": "XRP",
+      "net": {
+        "signals": 94,
+        "meanR": -0.10315840541861843,
+        "medianR": -1.0126208835593669,
+        "totalR": -9.696890109350132,
+        "ci95MeanR": [
+          -0.3087374546067011,
+          0.11481844791478918
+        ],
+        "profitFactor": 0.8094046617351317,
+        "positiveRate": 0.4574468085106383,
+        "winRate": 0.43617021276595747,
+        "stopRate": 0.5212765957446809,
+        "avgHoldBars": 152.40425531914894,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "risk/T2",
+      "dimension": "asset",
+      "key": "BNB",
+      "net": {
+        "signals": 96,
+        "meanR": -0.010056222215811676,
+        "medianR": 0.17313524236959166,
+        "totalR": -0.9653973327179208,
+        "ci95MeanR": [
+          -0.22300100911706014,
+          0.1951606887125939
+        ],
+        "profitFactor": 0.9798235349520573,
+        "positiveRate": 0.5104166666666666,
+        "winRate": 0.46875,
+        "stopRate": 0.4791666666666667,
+        "avgHoldBars": 186.15625,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "risk/T2",
+      "dimension": "side",
+      "key": "long",
+      "net": {
+        "signals": 249,
+        "meanR": -0.038315222155536975,
+        "medianR": -1.0076836878915134,
+        "totalR": -9.540490316728707,
+        "ci95MeanR": [
+          -0.16241913960223772,
+          0.09534165382524687
+        ],
+        "profitFactor": 0.9263867623453866,
+        "positiveRate": 0.4819277108433735,
+        "winRate": 0.46184738955823296,
+        "stopRate": 0.5020080321285141,
+        "avgHoldBars": 172.45381526104418,
+        "clusters": 155
+      }
+    },
+    {
+      "variant": "risk/T2",
+      "dimension": "side",
+      "key": "short",
+      "net": {
+        "signals": 217,
+        "meanR": -0.06435918147962214,
+        "medianR": 0.038869733675118534,
+        "totalR": -13.965942381078005,
+        "ci95MeanR": [
+          -0.19277909583839772,
+          0.0683734934392323
+        ],
+        "profitFactor": 0.8736394958317534,
+        "positiveRate": 0.5023041474654378,
+        "winRate": 0.4792626728110599,
+        "stopRate": 0.48847926267281105,
+        "avgHoldBars": 124.82488479262673,
+        "clusters": 145
+      }
+    },
+    {
+      "variant": "risk/T2.5",
+      "dimension": "asset",
+      "key": "SOL",
+      "net": {
+        "signals": 94,
+        "meanR": -0.09814078203049689,
+        "medianR": -1.010558744829841,
+        "totalR": -9.225233510866708,
+        "ci95MeanR": [
+          -0.31222342377100243,
+          0.1272659829347837
+        ],
+        "profitFactor": 0.8281335864921988,
+        "positiveRate": 0.43617021276595747,
+        "winRate": 0.425531914893617,
+        "stopRate": 0.5531914893617021,
+        "avgHoldBars": 208.89361702127658,
+        "clusters": 91
+      }
+    },
+    {
+      "variant": "risk/T2.5",
+      "dimension": "asset",
+      "key": "BTC",
+      "net": {
+        "signals": 91,
+        "meanR": 0.09185449489045304,
+        "medianR": -0.1688947553721503,
+        "totalR": 8.358759035031227,
+        "ci95MeanR": [
+          -0.15949242076580997,
+          0.35108631882578906
+        ],
+        "profitFactor": 1.1795862613919004,
+        "positiveRate": 0.4945054945054945,
+        "winRate": 0.4725274725274725,
+        "stopRate": 0.4835164835164835,
+        "avgHoldBars": 177.0879120879121,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "risk/T2.5",
+      "dimension": "asset",
+      "key": "ETH",
+      "net": {
+        "signals": 91,
+        "meanR": -0.2399545012543497,
+        "medianR": -1.0190853647305655,
+        "totalR": -21.83585961414582,
+        "ci95MeanR": [
+          -0.4415530292637074,
+          -0.023677507519523844
+        ],
+        "profitFactor": 0.6213275800403013,
+        "positiveRate": 0.38461538461538464,
+        "winRate": 0.3626373626373626,
+        "stopRate": 0.6153846153846154,
+        "avgHoldBars": 158.1098901098901,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "risk/T2.5",
+      "dimension": "asset",
+      "key": "XRP",
+      "net": {
+        "signals": 94,
+        "meanR": -0.052372913521113895,
+        "medianR": -1.0135442975109958,
+        "totalR": -4.923053870984706,
+        "ci95MeanR": [
+          -0.2842028401866082,
+          0.1819017993565423
+        ],
+        "profitFactor": 0.9087428267146525,
+        "positiveRate": 0.425531914893617,
+        "winRate": 0.40425531914893614,
+        "stopRate": 0.5531914893617021,
+        "avgHoldBars": 191.7340425531915,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "risk/T2.5",
+      "dimension": "asset",
+      "key": "BNB",
+      "net": {
+        "signals": 96,
+        "meanR": -0.0926412963569127,
+        "medianR": -1.018281848809714,
+        "totalR": -8.89356445026362,
+        "ci95MeanR": [
+          -0.3258638206643112,
+          0.14239425472801337
+        ],
+        "profitFactor": 0.8417855848025272,
+        "positiveRate": 0.4270833333333333,
+        "winRate": 0.3854166666666667,
+        "stopRate": 0.5625,
+        "avgHoldBars": 222.22916666666666,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "risk/T2.5",
+      "dimension": "side",
+      "key": "long",
+      "net": {
+        "signals": 249,
+        "meanR": -0.10286654103120761,
+        "medianR": -1.012581217003541,
+        "totalR": -25.613768716770696,
+        "ci95MeanR": [
+          -0.2493705752737405,
+          0.046409206831743474
+        ],
+        "profitFactor": 0.8271681181464259,
+        "positiveRate": 0.40963855421686746,
+        "winRate": 0.3855421686746988,
+        "stopRate": 0.5742971887550201,
+        "avgHoldBars": 222.1285140562249,
+        "clusters": 155
+      }
+    },
+    {
+      "variant": "risk/T2.5",
+      "dimension": "side",
+      "key": "short",
+      "net": {
+        "signals": 217,
+        "meanR": -0.05025430273944215,
+        "medianR": -1.0167442483234932,
+        "totalR": -10.905183694458946,
+        "ci95MeanR": [
+          -0.19924300045307813,
+          0.09644043370192686
+        ],
+        "profitFactor": 0.9090053259158157,
+        "positiveRate": 0.4608294930875576,
+        "winRate": 0.4377880184331797,
+        "stopRate": 0.5299539170506913,
+        "avgHoldBars": 157.53917050691246,
+        "clusters": 145
+      }
+    },
+    {
+      "variant": "risk/T3",
+      "dimension": "asset",
+      "key": "SOL",
+      "net": {
+        "signals": 94,
+        "meanR": -0.1164963572700324,
+        "medianR": -1.0127154652514274,
+        "totalR": -10.950657583383045,
+        "ci95MeanR": [
+          -0.35323169496322604,
+          0.1305544406518792
+        ],
+        "profitFactor": 0.813751389497541,
+        "positiveRate": 0.3829787234042553,
+        "winRate": 0.3723404255319149,
+        "stopRate": 0.6063829787234043,
+        "avgHoldBars": 243.0212765957447,
+        "clusters": 91
+      }
+    },
+    {
+      "variant": "risk/T3",
+      "dimension": "asset",
+      "key": "BTC",
+      "net": {
+        "signals": 91,
+        "meanR": 0.1234195387010275,
+        "medianR": -1.0196666868555948,
+        "totalR": 11.231178021793502,
+        "ci95MeanR": [
+          -0.15744086942394173,
+          0.4098389802493261
+        ],
+        "profitFactor": 1.2215783848159878,
+        "positiveRate": 0.45054945054945056,
+        "winRate": 0.4175824175824176,
+        "stopRate": 0.5274725274725275,
+        "avgHoldBars": 220.87912087912088,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "risk/T3",
+      "dimension": "asset",
+      "key": "ETH",
+      "net": {
+        "signals": 91,
+        "meanR": -0.2107842569091229,
+        "medianR": -1.0190853647305655,
+        "totalR": -19.181367378730183,
+        "ci95MeanR": [
+          -0.4451095866675494,
+          0.024090809347807947
+        ],
+        "profitFactor": 0.6786753311489753,
+        "positiveRate": 0.3626373626373626,
+        "winRate": 0.34065934065934067,
+        "stopRate": 0.6373626373626373,
+        "avgHoldBars": 180.47252747252747,
+        "clusters": 85
+      }
+    },
+    {
+      "variant": "risk/T3",
+      "dimension": "asset",
+      "key": "XRP",
+      "net": {
+        "signals": 94,
+        "meanR": -0.07946679326230677,
+        "medianR": -1.0145898617719136,
+        "totalR": -7.469878566656837,
+        "ci95MeanR": [
+          -0.3412628417714672,
+          0.18004269067981293
+        ],
+        "profitFactor": 0.8736218563482553,
+        "positiveRate": 0.3723404255319149,
+        "winRate": 0.35106382978723405,
+        "stopRate": 0.6063829787234043,
+        "avgHoldBars": 228.5212765957447,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "risk/T3",
+      "dimension": "asset",
+      "key": "BNB",
+      "net": {
+        "signals": 96,
+        "meanR": -0.12291522147833996,
+        "medianR": -1.0199494646391467,
+        "totalR": -11.799861261920636,
+        "ci95MeanR": [
+          -0.3645631618398902,
+          0.12283559796142661
+        ],
+        "profitFactor": 0.8077838080583137,
+        "positiveRate": 0.375,
+        "winRate": 0.3333333333333333,
+        "stopRate": 0.6145833333333334,
+        "avgHoldBars": 266.0729166666667,
+        "clusters": 90
+      }
+    },
+    {
+      "variant": "risk/T3",
+      "dimension": "side",
+      "key": "long",
+      "net": {
+        "signals": 249,
+        "meanR": -0.10421763696320913,
+        "medianR": -1.0143440502320344,
+        "totalR": -25.950191603839073,
+        "ci95MeanR": [
+          -0.25149247876334496,
+          0.05831348045365028
+        ],
+        "profitFactor": 0.8372563424561984,
+        "positiveRate": 0.3654618473895582,
+        "winRate": 0.3373493975903614,
+        "stopRate": 0.6184738955823293,
+        "avgHoldBars": 254.05220883534136,
+        "clusters": 155
+      }
+    },
+    {
+      "variant": "risk/T3",
+      "dimension": "side",
+      "key": "short",
+      "net": {
+        "signals": 217,
+        "meanR": -0.05631518509243376,
+        "medianR": -1.0190853647305655,
+        "totalR": -12.220395165058125,
+        "ci95MeanR": [
+          -0.21630179210498687,
+          0.1083835503769933
+        ],
+        "profitFactor": 0.906155186282929,
+        "positiveRate": 0.4147465437788018,
+        "winRate": 0.391705069124424,
+        "stopRate": 0.576036866359447,
+        "avgHoldBars": 198.76497695852535,
+        "clusters": 145
+      }
+    }
+  ]
+}
