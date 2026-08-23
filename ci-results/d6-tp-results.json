@@ -1,0 +1,144 @@
+{
+  "studyId": "d6-tp",
+  "generatedAt": "2026-08-23T13:44:01.375Z",
+  "lineVerdict": "KILL",
+  "bestArmFrozenRule": "among GO arms with breadth>=9/12 pick highest CI-lower",
+  "bestArm": null,
+  "preregistrationSha256": "6b6f7465226d413dc4afd7377e410de9b14bb0ac648c4c50ebde83ce347b4862",
+  "manifestSha256": "e8eb549a25de84c3922951eead362cce9922ccbd37e5bbaf1ef32901dc2855bd",
+  "eventsTotal": 360,
+  "universe": [
+    "TLMUSDT",
+    "ONEUSDT",
+    "CTSIUSDT",
+    "PENDLEUSDT",
+    "ALICEUSDT",
+    "SEIUSDT",
+    "IOTXUSDT",
+    "JUPUSDT",
+    "STORJUSDT",
+    "ZILUSDT",
+    "CHZUSDT",
+    "1000XECUSDT"
+  ],
+  "mfeDiagnostics": {
+    "arm": "C-H72",
+    "n": 359,
+    "note": "доля сделок с максимальным благоприятным ходом (high от entryOpen) ≥ порога до выхода; диагностическая метрика",
+    "thresholds": [
+      {
+        "r": 1,
+        "count": 156,
+        "share": 0.43454038997214484
+      },
+      {
+        "r": 1.5,
+        "count": 120,
+        "share": 0.3342618384401114
+      },
+      {
+        "r": 2,
+        "count": 96,
+        "share": 0.26740947075208915
+      },
+      {
+        "r": 3,
+        "count": 61,
+        "share": 0.16991643454038996
+      }
+    ]
+  },
+  "arms": {
+    "C-H72": {
+      "n": 359,
+      "mean": 0.0001397344008921029,
+      "total": 0.050164649920264946,
+      "pf": 1.0049760147073261,
+      "wr": 0.26740947075208915,
+      "maxDd": 1.7893272133190556,
+      "breadthPositiveSymbols": "5/12",
+      "outcomes": {
+        "stop": 239,
+        "timeout72": 120
+      },
+      "ci95": {
+        "lower": -0.014149873579889793,
+        "median": -0.00004729830576255323,
+        "upper": 0.014368958801584448
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.001139734400892104,
+      "excludedNoHorizon": 0
+    },
+    "TP1R-fullfix": {
+      "n": 359,
+      "mean": 0.005542191821928052,
+      "total": 1.9896468640721705,
+      "pf": 1.2619355751801262,
+      "wr": 0.5403899721448467,
+      "maxDd": 0.7440273588392602,
+      "breadthPositiveSymbols": "9/12",
+      "outcomes": {
+        "stop": 148,
+        "tp1r": 154,
+        "timeout72": 57
+      },
+      "ci95": {
+        "lower": -0.007169130354231839,
+        "median": 0.005393288061544771,
+        "upper": 0.017977872455804112
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.006542191821928054,
+      "excludedNoHorizon": 0
+    },
+    "TP2R": {
+      "n": 359,
+      "mean": 0.006376167193214396,
+      "total": 2.289044022363968,
+      "pf": 1.2589355466884358,
+      "wr": 0.41225626740947074,
+      "maxDd": 0.6036454692129897,
+      "breadthPositiveSymbols": "7/12",
+      "outcomes": {
+        "stop": 190,
+        "tp2r": 94,
+        "timeout72": 75
+      },
+      "ci95": {
+        "lower": -0.006858729255387708,
+        "median": 0.00625977630467967,
+        "upper": 0.01889075308735109
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.007376167193214394,
+      "excludedNoHorizon": 0
+    },
+    "TP3R": {
+      "n": 359,
+      "mean": 0.004207762705488168,
+      "total": 1.5105868112702525,
+      "pf": 1.15846091805705,
+      "wr": 0.34818941504178275,
+      "maxDd": 1.188750424428104,
+      "breadthPositiveSymbols": "5/12",
+      "outcomes": {
+        "stop": 213,
+        "timeout72": 87,
+        "tp3r": 59
+      },
+      "ci95": {
+        "lower": -0.00937260518658471,
+        "median": 0.004100968757663196,
+        "upper": 0.017407320621656914
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.005207762705488176,
+      "excludedNoHorizon": 0
+    }
+  }
+}
