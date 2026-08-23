@@ -27,6 +27,11 @@ const CLUSTER_MS = 4 * 60 * 60 * 1000
 const BOOTSTRAP_SAMPLES = 2000
 const BOOTSTRAP_SEED = 20260807
 
+// E1-фикс: frozen relVol≥1.4 (zonda-reversal.md) передаём ЯВНО 3-м аргументом detectArrowSignalCandidates.
+// Дефолт движка minimumRelativeVolume=0.0 (DEFAULT_ARROW_SIGNAL_CONFIG) — без этого фильтр объёма ВЫКЛЮЧЕН.
+// §2.1: значение заранее задано (frozen), НЕ свипается. §2.3: движок не тронут — только явный аргумент.
+const FROZEN_REL_VOL = 1.4
+
 // ⚠ окна режима — заранее заданные нейтральные прокси, НЕ свипаются (§2.1, во избежание selection bias). Финальное определение режима — решение автора.
 const VOL_WINDOW = 120 // ≈10 дней на 2h; горизонт реализованной волатильности (число баров в трейлинг-std лог-доходностей)
 const VOL_MEDIAN_WINDOW = 1000 // трейлинг-окно для порога high/low (медиана realizedVol)
@@ -92,8 +97,8 @@ const quarterOf = (ms: number) => { const d = new Date(ms); return `${d.getUTCFu
 //   realizedVol[i] = выборочное стд лог-доходностей за трейлинг VOL_WINDOW баров, заканчивающихся на i (bars <= i).
 //   med[i]         = медиана realizedVol за трейлинг VOL_MEDIAN_WINDOW ОПРЕДЕЛЁННЫХ значений, заканчивающихся на i.
 //   regime[i]      = 'high' если realizedVol[i] > med[i] иначе 'low'; undefined пока обоих окон не хватает.
-//   regimeAsOf     = режим ПОСЛЕДНЕГО BTC-бара с timestamp <= signalAt (бинпоиск). null если бара нет / warmup.
-//   => трейлинг-std + трейлинг-медиана + последний бар ts<=signalAt — никакого будущего.
+//   regimeAsOf     = режим последнего ПОЛНОСТЬЮ ЗАКРЫТОГО BTC-бара (openTs + barMs <= signalAt; бинпоиск). null если бара нет / warmup.
+//   => трейлинг-std + трейлинг-медиана + последний ЗАКРЫТЫЙ бар — никакого будущего (timestamp = время ОТКРЫТИЯ бара).
 // ============================================================================
 const btcRegimePath = resolve(`tools/batch/cache/BTC-USDT_2h_20000_futures.json`)
 let btcTimestamps: number[] = []
@@ -140,14 +145,17 @@ if (existsSync(btcRegimePath)) {
 	})
 }
 
-// regimeAsOf: режим последнего BTC-бара с timestamp <= signalAt (бинпоиск). null если бара нет / warmup.
-// Причинно: только трейлинг-std, трейлинг-медиана и последний бар с ts<=signalAt.
+// regimeAsOf: режим последнего ПОЛНОСТЬЮ ЗАКРЫТОГО BTC-бара (openTs + barMs <= signalAt; бинпоиск).
+// null если закрытого бара нет / warmup. Причинно: только трейлинг-std, трейлинг-медиана и последний
+// ЗАКРЫТЫЙ бар. Важно: timestamp свечи = время ОТКРЫТИЯ бара, поэтому close бара, который на момент
+// signalAt ещё не закрылся (openTs+barMs>signalAt), — это look-ahead; такой бар пропускаем.
 function regimeAsOf(signalAt: number): VolRegime {
-	if (!btcTimestamps.length) return null
+	if (btcTimestamps.length < 2) return null
+	const barMs = btcTimestamps[1]! - btcTimestamps[0]! // шаг сетки = длительность бара (2h)
 	let lo = 0, hi = btcTimestamps.length - 1, idx = -1
 	while (lo <= hi) {
 		const mid = (lo + hi) >> 1
-		if (btcTimestamps[mid]! <= signalAt) { idx = mid; lo = mid + 1 } else { hi = mid - 1 }
+		if (btcTimestamps[mid]! + barMs <= signalAt) { idx = mid; lo = mid + 1 } else { hi = mid - 1 }
 	}
 	if (idx < 0) return null
 	return btcRegime[idx] ?? null
@@ -162,7 +170,7 @@ for (const asset of ASSETS) for (const timeframe of TIMEFRAMES) {
 	const path = resolve(`tools/batch/cache/${asset}-USDT_${timeframe}_20000_futures.json`)
 	if (!existsSync(path)) { skipped.push(`${asset} ${timeframe}`); continue }
 	const candles = JSON.parse(readFileSync(path, 'utf8')) as Candle[]
-	const detection = detectArrowSignalCandidates(candles, APEX_PARAMS)
+	const detection = detectArrowSignalCandidates(candles, APEX_PARAMS, { minimumRelativeVolume: FROZEN_REL_VOL })
 	for (const signal of admitArrowSignals(detection.candidates)) {
 		const t = replayStatic(candles, signal)
 		if (t == null) continue
