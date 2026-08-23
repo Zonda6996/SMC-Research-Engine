@@ -1,25 +1,35 @@
 /**
- * D6 paper-forward — живой журнал сигналов каскадной руки.
+ * D6 paper-forward — живой журнал сигналов Doppler по ТРЁМ режимам (решение автора 2026-08-23).
  *
- * Правило (docs/strategies/d6-cascade.md): бар i закрылся с ΔOI_8h≤−15% И ΔP_8h≤−3% → LONG на
- * open бара i+1; стоп flushLow−0.5×ATR200; цель reclaim = close[i−8]; таймаут 72ч.
- * Живой OI: REST futures/data/openInterestHist (5m, история ~30 суток) ⇒ запускать достаточно
- * раз в день-два; сигналы старше часа при обнаружении помечаются missed=true (вход упущен).
- * Журнал: tmp/forward/d6/{signals.jsonl,trades.jsonl,state.json,report.md}
+ * Режимы (пресеты триггера из census-карты мажоров, ci-results/d6-census-majors.*):
+ *   SAFE     OI −20% / цена −5%   — редкие чистые выстрелы
+ *   STANDARD OI −15% / цена −5%   — рабочий режим (утверждённое правило)
+ *   RISK     OI −12% / цена −5%   — частота вместо качества
+ * База сделки одинакова: бар i закрылся с ΔOI_8h≤порог И ΔP_8h≤порог → LONG на open бара i+1;
+ * стоп flushLow−0.5×ATR200; цель reclaim = close[i−8]; таймаут 72ч. Окна в барах (8ч).
+ * Живой OI: REST futures/data/openInterestHist (5m, окно ~8 суток) ⇒ запускать раз в 1–3 дня.
+ * Сигналы старше часа при обнаружении помечаются missed=true (вход упущен, в статистике учитывается).
+ * Меж-прогонный min-gap: последний журнальный сигнал режима занимает gap-слот (8 баров).
+ * Журнал: tmp/forward/d6/{signals.jsonl,trades.jsonl,state.json,report.md};
+ * журналы старого правила (−15/−3, без поля mode) при первом запуске переносятся в *.legacy-oi15px3.
  * Запуск: npx tsx tools/forward/d6ForwardRunner.ts
  */
-import { existsSync, mkdirSync, appendFileSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, appendFileSync, readFileSync, writeFileSync, renameSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const STATE_DIR = 'tmp/forward/d6'
 const HOUR = 3_600_000
 const WINDOW_BARS = 8
-const OI_DROP = -0.15
-const PRICE_DROP = -0.03
 const GAP_BARS = 8
 const HOLD_MAX = 72
 const ROUND_TRIP_COST = 0.001
 const KLINE_LOOKBACK = 420
+
+const MODES = [
+	{ id: 'SAFE', oiDrop: -0.20, priceDrop: -0.05 },
+	{ id: 'STANDARD', oiDrop: -0.15, priceDrop: -0.05 },
+	{ id: 'RISK', oiDrop: -0.12, priceDrop: -0.05 },
+] as const
 
 interface ManifestA { symbols: Array<{ symbol: string }> }
 
@@ -95,6 +105,7 @@ function arrowAtrLocal(candles: Kline[]): Array<number | null> {
 }
 
 interface SignalRecord {
+	mode: string
 	symbol: string
 	signalBarCloseUtc: string
 	signalBarOpenMs: number
@@ -126,10 +137,12 @@ interface Ctx {
 	allSignals: SignalRecord[]
 	allTrades: TradeRecord[]
 	openBySymbol: Map<string, TradeRecord>
-	lastSignalPerSymbol: Map<string, number>
+	lastSignalPerKey: Map<string, number>
 	signalsPath: string
 	tradesPath: string
 }
+
+const keyOf = (mode: string, symbol: string): string => `${mode}|${symbol}`
 
 function finishTrade(trade: TradeRecord, bar: Kline, price: number, outcome: 'stop' | 'reclaim' | 'timeout'): void {
 	trade.outcome = outcome
@@ -149,69 +162,73 @@ async function processSymbol(symbol: string, ctx: Ctx): Promise<{ newSignals: nu
 	let newSignals = 0
 	let newMissed = 0
 
-	// Ведение открытой позиции.
-	const openTrade = ctx.openBySymbol.get(symbol)
-	if (openTrade != null && openTrade.outcome === 'open') {
+	// Ведение открытых позиций (по каждому режиму).
+	for (const mode of MODES) {
+		const openTrade = ctx.openBySymbol.get(keyOf(mode.id, symbol))
+		if (openTrade == null || openTrade.outcome !== 'open') continue
 		const entryIdx = closed.findIndex((k) => k.openTime === Date.parse(openTrade.entryPlanUtc))
-		if (entryIdx >= 0) {
-			for (let k = entryIdx; k < closed.length && openTrade.outcome === 'open'; k++) {
-				const bar = closed[k]!
-				openTrade.mfeR = Math.max(openTrade.mfeR ?? 0, (bar.high - openTrade.entry!) / openTrade.riskDist)
-				if (bar.low <= openTrade.stop) finishTrade(openTrade, bar, openTrade.stop, 'stop')
-				else if (k > entryIdx && bar.close >= openTrade.targetRefLevel) finishTrade(openTrade, bar, bar.close, 'reclaim')
-				else if (k - entryIdx >= HOLD_MAX - 1) finishTrade(openTrade, bar, bar.close, 'timeout')
-			}
+		if (entryIdx < 0) continue
+		for (let k = entryIdx; k < closed.length && openTrade.outcome === 'open'; k++) {
+			const bar = closed[k]!
+			openTrade.mfeR = Math.max(openTrade.mfeR ?? 0, (bar.high - openTrade.entry!) / openTrade.riskDist)
+			if (bar.low <= openTrade.stop) finishTrade(openTrade, bar, openTrade.stop, 'stop')
+			else if (k > entryIdx && bar.close >= openTrade.targetRefLevel) finishTrade(openTrade, bar, bar.close, 'reclaim')
+			else if (k - entryIdx >= HOLD_MAX - 1) finishTrade(openTrade, bar, bar.close, 'timeout')
 		}
 	}
 
-	// Детекция новых событий. Последний журнальный сигнал символа занимает gap-слот
-	// между прогонами так же, как допущенный сигнал внутри одного прохода (решение автора 2026-08-23).
-	const lastSigMs = ctx.lastSignalPerSymbol.get(symbol) ?? Number.NEGATIVE_INFINITY
-	let lastAdmittedOffset = -Infinity
-	for (let i = WINDOW_BARS; i < closed.length; i++) {
-		const bar = closed[i]!
-		if (bar.openTime <= lastSigMs) continue
-		if (bar.openTime - lastSigMs < GAP_BARS * HOUR) continue
-		const oiNow = oi[i]
-		const oiPast = oi[i - WINDOW_BARS]!
-		if (oiNow == null || oiPast == null || oiPast <= 0) continue
-		if (!(oiNow / oiPast - 1 <= OI_DROP && closes[i]! / closes[i - WINDOW_BARS]! - 1 <= PRICE_DROP)) continue
-		if (i - lastAdmittedOffset < GAP_BARS) continue
-		lastAdmittedOffset = i
-		const atr = atrArr[i]!
-		if (!(Number.isFinite(atr) && atr > 0)) continue
-		const lows = closed.slice(i - WINDOW_BARS + 1, i + 1).map((k) => k.low)
-		const stop = Math.min(...lows) - 0.5 * atr
-		const refLevel = closes[i - WINDOW_BARS]!
-		const entryBar = closed[i + 1]
-		const missed = Date.now() > bar.openTime + HOUR + 15 * 60_000
-		const sig: SignalRecord = {
-			symbol,
-			signalBarCloseUtc: new Date(bar.openTime + HOUR).toISOString(),
-			signalBarOpenMs: bar.openTime,
-			detectedAtUtc: new Date().toISOString(),
-			missed,
-			entryPlanUtc: new Date(bar.openTime + HOUR).toISOString(),
-			entry: entryBar?.open ?? null,
-			stop,
-			targetRefLevel: refLevel,
-			riskDist: (entryBar?.open ?? NaN) - stop,
-			atr,
-		}
-		ctx.allSignals.push(sig)
-		newSignals++
-		if (missed) newMissed++
-		appendFileSync(ctx.signalsPath, JSON.stringify(sig) + '\n')
-		if (!missed && entryBar != null && !ctx.openBySymbol.has(symbol)) {
-			const trade: TradeRecord = { ...sig, outcome: 'open', exitUtc: null, exitPrice: null, mfeR: (entryBar.high - entryBar.open) / sig.riskDist, netPct: null }
-			if (entryBar.low <= stop) finishTrade(trade, entryBar, stop, 'stop')
-			ctx.openBySymbol.set(symbol, trade)
-			ctx.allTrades.push(trade)
-			appendFileSync(ctx.tradesPath, JSON.stringify(trade) + '\n')
-		} else if (!missed && entryBar == null) {
-			const trade: TradeRecord = { ...sig, outcome: 'pending-entry', exitUtc: null, exitPrice: null, mfeR: 0, netPct: null }
-			ctx.allTrades.push(trade)
-			appendFileSync(ctx.tradesPath, JSON.stringify(trade) + '\n')
+	// Детекция новых событий по каждому режиму.
+	for (const mode of MODES) {
+		const lastSigMs = ctx.lastSignalPerKey.get(keyOf(mode.id, symbol)) ?? Number.NEGATIVE_INFINITY
+		let lastAdmittedOffset = -Infinity
+		for (let i = WINDOW_BARS; i < closed.length; i++) {
+			const bar = closed[i]!
+			if (bar.openTime <= lastSigMs) continue
+			if (bar.openTime - lastSigMs < GAP_BARS * HOUR) continue
+			const oiNow = oi[i]
+			const oiPast = oi[i - WINDOW_BARS]!
+			if (oiNow == null || oiPast == null || oiPast <= 0) continue
+			if (!(oiNow / oiPast - 1 <= mode.oiDrop && closes[i]! / closes[i - WINDOW_BARS]! - 1 <= mode.priceDrop)) continue
+			if (i - lastAdmittedOffset < GAP_BARS) continue
+			lastAdmittedOffset = i
+			const atr = atrArr[i]!
+			if (!(Number.isFinite(atr) && atr > 0)) continue
+			const lows = closed.slice(i - WINDOW_BARS + 1, i + 1).map((k) => k.low)
+			const stop = Math.min(...lows) - 0.5 * atr
+			const refLevel = closes[i - WINDOW_BARS]!
+			const entryBar = closed[i + 1]
+			const missed = Date.now() > bar.openTime + HOUR + 15 * 60_000
+			const sig: SignalRecord = {
+				mode: mode.id,
+				symbol,
+				signalBarCloseUtc: new Date(bar.openTime + HOUR).toISOString(),
+				signalBarOpenMs: bar.openTime,
+				detectedAtUtc: new Date().toISOString(),
+				missed,
+				entryPlanUtc: new Date(bar.openTime + HOUR).toISOString(),
+				entry: entryBar?.open ?? null,
+				stop,
+				targetRefLevel: refLevel,
+				riskDist: (entryBar?.open ?? NaN) - stop,
+				atr,
+			}
+			ctx.allSignals.push(sig)
+			newSignals++
+			if (missed) newMissed++
+			appendFileSync(ctx.signalsPath, JSON.stringify(sig) + '\n')
+			const openKey = keyOf(mode.id, symbol)
+			if (!missed && entryBar != null && !ctx.openBySymbol.has(openKey)) {
+				const trade: TradeRecord = { ...sig, outcome: 'open', exitUtc: null, exitPrice: null, mfeR: (entryBar.high - entryBar.open) / sig.riskDist, netPct: null }
+				if (entryBar.low <= stop) finishTrade(trade, entryBar, stop, 'stop')
+				ctx.openBySymbol.set(openKey, trade)
+				ctx.allTrades.push(trade)
+				appendFileSync(ctx.tradesPath, JSON.stringify(trade) + '\n')
+			} else if (!missed && entryBar == null) {
+				const trade: TradeRecord = { ...sig, outcome: 'pending-entry', exitUtc: null, exitPrice: null, mfeR: 0, netPct: null }
+				ctx.openBySymbol.set(openKey, trade)
+				ctx.allTrades.push(trade)
+				appendFileSync(ctx.tradesPath, JSON.stringify(trade) + '\n')
+			}
 		}
 	}
 	return { newSignals, newMissed, note: `${closed.length} баров` }
@@ -221,17 +238,31 @@ async function main(): Promise<void> {
 	mkdirSync(resolve(STATE_DIR), { recursive: true })
 	const signalsPath = resolve(STATE_DIR, 'signals.jsonl')
 	const tradesPath = resolve(STATE_DIR, 'trades.jsonl')
+
+	// Ротация legacy-журнала старого правила (−15/−3, записи без поля mode).
+	if (existsSync(signalsPath)) {
+		const first = readFileSync(signalsPath, 'utf8').split('\n').find(Boolean) ?? ''
+		if (first && !JSON.parse(first).mode) {
+			renameSync(signalsPath, resolve(STATE_DIR, 'signals.legacy-oi15px3.jsonl'))
+			if (existsSync(tradesPath)) renameSync(tradesPath, resolve(STATE_DIR, 'trades.legacy-oi15px3.jsonl'))
+			console.log('Legacy-журнал (−15/−3) перенесён в *.legacy-oi15px3.jsonl; журналы режимов начаты с нуля.')
+		}
+	}
+
 	const universe = loadUniverse()
-	console.log(`Мониторинг ${universe.length} символов; прогон ${new Date().toISOString()}`)
+	console.log(`Мониторинг ${universe.length} символов; режимов ${MODES.length}; прогон ${new Date().toISOString()}`)
 
 	const allSignals = loadJsonl<SignalRecord>(signalsPath)
 	const allTrades = loadJsonl<TradeRecord>(tradesPath)
 	const openBySymbol = new Map<string, TradeRecord>()
-	for (const t of allTrades) if (t.outcome === 'open' || t.outcome === 'pending-entry') openBySymbol.set(t.symbol, t)
-	const lastSignalPerSymbol = new Map<string, number>()
-	for (const s of allSignals) lastSignalPerSymbol.set(s.symbol, Math.max(lastSignalPerSymbol.get(s.symbol) ?? 0, s.signalBarOpenMs))
+	for (const t of allTrades) if (t.outcome === 'open' || t.outcome === 'pending-entry') openBySymbol.set(keyOf(t.mode, t.symbol), t)
+	const lastSignalPerKey = new Map<string, number>()
+	for (const s of allSignals) {
+		const k = keyOf(s.mode, s.symbol)
+		lastSignalPerKey.set(k, Math.max(lastSignalPerKey.get(k) ?? 0, s.signalBarOpenMs))
+	}
 
-	const ctx: Ctx = { allSignals, allTrades, openBySymbol, lastSignalPerSymbol, signalsPath, tradesPath }
+	const ctx: Ctx = { allSignals, allTrades, openBySymbol, lastSignalPerKey, signalsPath, tradesPath }
 	let newSignals = 0
 	let newMissed = 0
 	const chunks = Math.ceil(universe.length / 4)
@@ -249,7 +280,7 @@ async function main(): Promise<void> {
 	}
 
 	writeFileSync(tradesPath, allTrades.map((t) => JSON.stringify(t)).join('\n') + (allTrades.length ? '\n' : ''))
-	writeFileSync(resolve(STATE_DIR, 'state.json'), JSON.stringify({ lastRunUtc: new Date().toISOString(), universeCount: universe.length }, null, 2))
+	writeFileSync(resolve(STATE_DIR, 'state.json'), JSON.stringify({ lastRunUtc: new Date().toISOString(), universeCount: universe.length, modes: MODES.map((m) => m.id) }, null, 2))
 
 	const resolved = allTrades.filter((t) => t.outcome === 'stop' || t.outcome === 'reclaim' || t.outcome === 'timeout')
 	const winsN = resolved.filter((t) => (t.netPct ?? 0) > 0).length
@@ -258,20 +289,33 @@ async function main(): Promise<void> {
 		const eligible = allTrades.filter((t) => t.mfeR != null)
 		return `${eligible.filter((t) => t.mfeR! >= thr).length}/${eligible.length}`
 	}
+	const perMode = MODES.map((m) => {
+		const sigs = allSignals.filter((s) => s.mode === m.id)
+		const tr = allTrades.filter((t) => t.mode === m.id)
+		const res = tr.filter((t) => t.outcome === 'stop' || t.outcome === 'reclaim' || t.outcome === 'timeout')
+		const wr = res.length ? res.filter((t) => (t.netPct ?? 0) > 0).length / res.length : null
+		const mean = res.length ? res.reduce((s, t) => s + (t.netPct ?? 0), 0) / res.length : null
+		return `| ${m.id} (OI ${(m.oiDrop * 100).toFixed(0)}% / цена ${(m.priceDrop * 100).toFixed(0)}%) | ${sigs.length} | ${tr.length} | ${res.length} | ${wr != null ? (wr * 100).toFixed(1) + '%' : '—'} | ${mean != null ? (mean * 100).toFixed(3) + '%' : '—'} |`
+	})
 	const md = [
-		'# D6 paper-forward — статус',
+		'# Doppler paper-forward — статус (режимы SAFE/STANDARD/RISK)',
 		'',
 		`Прогон: ${new Date().toISOString()}; символов: ${universe.length}; новых сигналов: ${newSignals} (пропущено по времени: ${newMissed}).`,
 		`Всего сигналов: ${allSignals.length}; открытых позиций: ${[...openBySymbol.values()].filter((t) => t.outcome === 'open').length}.`,
 		`Завершённых сделок: ${resolved.length}; WR ${resolved.length ? (winsN / resolved.length * 100).toFixed(1) : '—'}%; средняя net ${meanNet != null ? (meanNet * 100).toFixed(3) + '%' : '—'}%.`,
 		`MFE: ≥1R дошли ${reachedR(1)}; ≥1.5R: ${reachedR(1.5)}; ≥2R: ${reachedR(2)}; ≥3R: ${reachedR(3)}.`,
 		'',
-		'## Последние сигналы',
-		'| закрытие бара (UTC) | символ | вход | стоп | цель | упущен |',
-		'|---|---|---:|---:|---:|---|',
-		...allSignals.slice(-12).reverse().map((s) => `| ${s.signalBarCloseUtc} | ${s.symbol.replace('USDT', '')} | ${s.entry ?? '—'} | ${s.stop.toPrecision(6)} | ${s.targetRefLevel.toPrecision(6)} | ${s.missed ? 'да' : 'нет'} |`),
+		'## По режимам',
+		'| режим | сигналов | сделок | завершено | WR | средняя net |',
+		'|---|---:|---:|---:|---:|---:|',
+		...perMode,
 		'',
-		'_Сигнал: TradingView → актив → 1h → бар времени закрытия; вход = open следующего бара._',
+		'## Последние сигналы',
+		'| режим | закрытие бара (UTC) | символ | вход | стоп | цель | упущен |',
+		'|---|---|---|---:|---:|---:|---|',
+		...allSignals.slice(-12).reverse().map((s) => `| ${s.mode} | ${s.signalBarCloseUtc} | ${s.symbol.replace('USDT', '')} | ${s.entry ?? '—'} | ${s.stop.toPrecision(6)} | ${s.targetRefLevel.toPrecision(6)} | ${s.missed ? 'да' : 'нет'} |`),
+		'',
+		'_Сигнал: TradingView → актив → 1h → бар времени закрытия; вход = open следующего бара. Режим = порог триггера; стоп/таймаут у всех одинаковые._',
 	]
 	writeFileSync(resolve(STATE_DIR, 'report.md'), md.join('\n'))
 	console.log('\n' + md.slice(2, 6).join('\n'))
