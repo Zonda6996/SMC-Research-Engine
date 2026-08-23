@@ -1,0 +1,162 @@
+{
+  "studyId": "d6-mgmt",
+  "generatedAt": "2026-08-23T00:18:33.316Z",
+  "lineVerdict": "GO",
+  "bestArmFrozenRule": "among GO arms with breadth>=9/12 pick highest CI-lower",
+  "bestArm": {
+    "id": "H72-stopStruct",
+    "ciLow": 0.0050335335997446435
+  },
+  "preregistrationSha256": "365f4e8c74651b07f4aa80d1882442440e5bab17bc253239bd5e28450fb57fdd",
+  "amendment1Sha256": "1004952eb6404c9589b4cced33a296117e5a2928f6f968d55871d78605b84b80",
+  "manifestSha256": "5ed29eb914d138349040de555ee7ef4560f3107dd2a9cded21eef243f9cb50d6",
+  "eventsTotal": 186,
+  "universe": [
+    "APTUSDT",
+    "ETHFIUSDT",
+    "DODOXUSDT",
+    "PEOPLEUSDT",
+    "WIFUSDT",
+    "ORDIUSDT",
+    "ATOMUSDT",
+    "JTOUSDT",
+    "GALAUSDT",
+    "DASHUSDT",
+    "TIAUSDT",
+    "ALGOUSDT"
+  ],
+  "arms": {
+    "H24-nostop": {
+      "n": 181,
+      "mean": 0.019233841801400413,
+      "total": 3.4813253660534746,
+      "pf": 1.7098525883472564,
+      "wr": 0.5966850828729282,
+      "maxDd": 0.614413657827308,
+      "breadthPositiveSymbols": "7/12",
+      "outcomes": {
+        "h24": 181
+      },
+      "ci95": {
+        "lower": -0.003592498778963474,
+        "median": 0.019131639797280435,
+        "upper": 0.041510088904244076
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.020233841801400407,
+      "excludedNoHorizon": 0
+    },
+    "H24-stopStruct": {
+      "n": 181,
+      "mean": 0.013139119358760045,
+      "total": 2.378180603935568,
+      "pf": 1.5455475292558651,
+      "wr": 0.44751381215469616,
+      "maxDd": 0.5762136580706552,
+      "breadthPositiveSymbols": "6/12",
+      "outcomes": {
+        "h24": 109,
+        "stop": 72
+      },
+      "ci95": {
+        "lower": -0.004196688359624582,
+        "median": 0.012852216209541138,
+        "upper": 0.031226203544638818
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.014139119358760055,
+      "excludedNoHorizon": 0
+    },
+    "H24-stopWide": {
+      "n": 181,
+      "mean": 0.01904791841619361,
+      "total": 3.4476732333310434,
+      "pf": 1.73321645938463,
+      "wr": 0.585635359116022,
+      "maxDd": 0.5360351512522515,
+      "breadthPositiveSymbols": "7/12",
+      "outcomes": {
+        "h24": 157,
+        "stop": 24
+      },
+      "ci95": {
+        "lower": -0.00040874241431816335,
+        "median": 0.018759917600078283,
+        "upper": 0.039562315522177934
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.020047918416193602,
+      "excludedNoHorizon": 0
+    },
+    "Reclaim-stopStruct": {
+      "n": 181,
+      "mean": 0.021736357174286996,
+      "total": 3.934280648545946,
+      "pf": 1.853555226693915,
+      "wr": 0.46408839779005523,
+      "maxDd": 0.6251384803963744,
+      "breadthPositiveSymbols": "9/12",
+      "outcomes": {
+        "reclaim": 61,
+        "stop": 81,
+        "timeout72": 39
+      },
+      "ci95": {
+        "lower": 0.0028428369055397192,
+        "median": 0.021582598922154854,
+        "upper": 0.039444012679703655
+      },
+      "gatePower": true,
+      "verdict": "GO",
+      "grossMean": 0.02273635717428698,
+      "excludedNoHorizon": 0
+    },
+    "H72-stopStruct": {
+      "n": 181,
+      "mean": 0.02972223112337654,
+      "total": 5.379723833331154,
+      "pf": 2.0347194709320244,
+      "wr": 0.40331491712707185,
+      "maxDd": 0.8326071342996865,
+      "breadthPositiveSymbols": "9/12",
+      "outcomes": {
+        "h72": 91,
+        "stop": 90
+      },
+      "ci95": {
+        "lower": 0.0050335335997446435,
+        "median": 0.02945286918625856,
+        "upper": 0.05455430183449582
+      },
+      "gatePower": true,
+      "verdict": "GO",
+      "grossMean": 0.03072223112337654,
+      "excludedNoHorizon": 0
+    },
+    "H12-stopStruct": {
+      "n": 181,
+      "mean": 0.015512236614280138,
+      "total": 2.807714827184705,
+      "pf": 2.218608889994478,
+      "wr": 0.5414364640883977,
+      "maxDd": 0.4986928063832387,
+      "breadthPositiveSymbols": "7/12",
+      "outcomes": {
+        "h12": 129,
+        "stop": 52
+      },
+      "ci95": {
+        "lower": 0.0054116239252504006,
+        "median": 0.015297378667600121,
+        "upper": 0.025782054202536663
+      },
+      "gatePower": true,
+      "verdict": "GO",
+      "grossMean": 0.016512236614280137,
+      "excludedNoHorizon": 0
+    }
+  }
+}
