@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "split": "stateful-apex-s1 untouched-oos",
+  "wholeSplitRevealCount": 0,
+  "wholeSplitStatus": "partially-revealed",
+  "series": [
+    {
+      "file": "csv/BINANCE_AVAXUSDT.P, 60.csv",
+      "symbol": "AVAXUSDT",
+      "market": "futures",
+      "timeframe": "1h",
+      "status": "revealed-diagnostic",
+      "revealArtifact": "ci-results/own2-funding-sign-avax-diagnostic.json"
+    },
+    {
+      "file": "csv/BINANCE_AVAXUSDT, 5.csv",
+      "symbol": "AVAXUSDT",
+      "market": "spot",
+      "timeframe": "5m",
+      "status": "untouched"
+    },
+    {
+      "file": "csv/BINANCE_LINKUSDT, 15.csv",
+      "symbol": "LINKUSDT",
+      "market": "spot",
+      "timeframe": "15m",
+      "status": "untouched"
+    },
+    {
+      "file": "csv/BINANCE_LINKUSDT, 60.csv",
+      "symbol": "LINKUSDT",
+      "market": "spot",
+      "timeframe": "1h",
+      "status": "untouched"
+    },
+    {
+      "file": "csv/BINANCE_SOLUSDT, 120.csv",
+      "symbol": "SOLUSDT",
+      "market": "spot",
+      "timeframe": "2h",
+      "status": "untouched"
+    }
+  ],
+  "note": "Granular status: one of five series revealed. wholeSplitRevealCount remains 0 because the entire S1 split was not revealed."
+}

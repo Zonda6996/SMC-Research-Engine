@@ -1,0 +1,1383 @@
+{
+  "schemaVersion": 1,
+  "verdict": "INCONCLUSIVE DATA",
+  "frozenRuleChangedAfterReveal": false,
+  "independence": {
+    "protocolHoldout": true,
+    "globallyUntouchedGuaranteed": false,
+    "note": "Chronological tail is held out within this frozen corpus, but BTC/ETH/SOL and overlapping dates may have appeared in earlier project research."
+  },
+  "provenance": {
+    "preregistrationSha256": "6442965a30ddb0546b82cbd29529ab27d1de79539dc143f4503d261d40f183d9",
+    "acquisitionFreezeSha256": "80ea6a481a3d987210ee36c1365f21990d9f497cb8423527114ec5d6617b3586",
+    "acquiredDataManifestSha256BeforeOutcomes": "33a52fbe8ec89a08fb6dbd8416dda03f7dee7bdf182335c87ff24e15c00d02d8",
+    "dataManifestPath": "data/own2-funding-sign-btc-eth-sol/manifest.json"
+  },
+  "config": {
+    "universe": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "timeframe": "1h",
+    "cutoffUtc": "2025-09-17T17:00:00.000Z",
+    "own2": {
+      "warmupBars": 200,
+      "relativeVolumePeriod": 20,
+      "minimumRelativeVolume": 1.4,
+      "minimumDistanceMeanPct": 3,
+      "minimumPenetrationInner": -0.35
+    },
+    "management": "safe",
+    "costsBpsPerSidePrimary": 5,
+    "grossDiagnosticBps": 0,
+    "filter": "long rate<0; short rate>0; zero/missing veto; latest settlement strictly before decision",
+    "bootstrap": {
+      "cluster": "joint UTC day",
+      "samples": 10000,
+      "seed": 25082026
+    }
+  },
+  "counts": {
+    "bySymbol": {
+      "BTCUSDT": {
+        "rawCandidatesAll": 441,
+        "rawCandidatesHoldout": 149,
+        "admittedTradesAll": 97,
+        "admittedBaselineHoldout": 34
+      },
+      "ETHUSDT": {
+        "rawCandidatesAll": 426,
+        "rawCandidatesHoldout": 151,
+        "admittedTradesAll": 104,
+        "admittedBaselineHoldout": 34
+      },
+      "SOLUSDT": {
+        "rawCandidatesAll": 403,
+        "rawCandidatesHoldout": 129,
+        "admittedTradesAll": 88,
+        "admittedBaselineHoldout": 33
+      }
+    },
+    "pooledBaselineOpportunities": 101,
+    "pooledBaselineExecutedTrades": 101,
+    "retained": 56,
+    "vetoed": 45,
+    "retainedRate": 0.5544554455445545,
+    "decisions": {
+      "retain": 56,
+      "veto-sign": 45,
+      "veto-zero": 0,
+      "veto-missing": 0
+    }
+  },
+  "aggregate": {
+    "baseline": {
+      "gross0": {
+        "n": 101,
+        "totalR": -17.53670576557824,
+        "meanR": -0.17363075015424,
+        "meanPerBaselineOpportunity": -0.17363075015424,
+        "pf": 0.5754038681209039,
+        "wr": 0.5247524752475248,
+        "maxDdR": 18.820590952624304,
+        "fundingR": 0.003817386529241149,
+        "costsR": 1.2751578767187053,
+        "meanHoldingBars": 184.1089108910891,
+        "medianHoldingBars": 145
+      },
+      "net5": {
+        "n": 101,
+        "totalR": -18.81186364229695,
+        "meanR": -0.18625607566630642,
+        "meanPerBaselineOpportunity": -0.18625607566630642,
+        "pf": 0.5529210079511705,
+        "wr": 0.5247524752475248,
+        "maxDdR": 19.798578317157617,
+        "fundingR": 0.003817386529241149,
+        "costsR": 1.2751578767187053,
+        "meanHoldingBars": 184.1089108910891,
+        "medianHoldingBars": 145
+      }
+    },
+    "filtered": {
+      "gross0PerBaselineOpportunity": {
+        "n": 101,
+        "totalR": -5.903870877478541,
+        "meanR": -0.05845416710374793,
+        "meanPerBaselineOpportunity": -0.05845416710374793,
+        "pf": 0.7111954763960227,
+        "wr": 0.3069306930693069,
+        "maxDdR": 7.279037837928277,
+        "fundingR": 0.23717900047634446,
+        "costsR": 0.6933849670690223,
+        "meanHoldingBars": 192.98214285714286,
+        "medianHoldingBars": 138
+      },
+      "net5PerBaselineOpportunity": {
+        "n": 101,
+        "totalR": -6.597255844547561,
+        "meanR": -0.06531936479750061,
+        "meanPerBaselineOpportunity": -0.06531936479750061,
+        "pf": 0.6836800426469417,
+        "wr": 0.3069306930693069,
+        "maxDdR": 7.834581464110987,
+        "fundingR": 0.23717900047634446,
+        "costsR": 0.6933849670690223,
+        "meanHoldingBars": 192.98214285714286,
+        "medianHoldingBars": 138
+      },
+      "net5ExecutedRetainedOnly": {
+        "n": 56,
+        "totalR": -6.597255844547561,
+        "meanR": -0.11780814008120645,
+        "meanPerBaselineOpportunity": -0.06531936479750061,
+        "pf": 0.6836800426469417,
+        "wr": 0.5535714285714286,
+        "maxDdR": 7.834581464110987,
+        "fundingR": 0.23717900047634446,
+        "costsR": 0.6933849670690223,
+        "meanHoldingBars": 192.98214285714286,
+        "medianHoldingBars": 138
+      }
+    },
+    "retainedBaselineCounterfactual": {
+      "n": 56,
+      "totalR": -6.597255844547561,
+      "meanR": -0.11780814008120645,
+      "meanPerBaselineOpportunity": -0.06531936479750061,
+      "pf": 0.6836800426469417,
+      "wr": 0.5535714285714286,
+      "maxDdR": 7.834581464110987,
+      "fundingR": 0.23717900047634446,
+      "costsR": 0.6933849670690223,
+      "meanHoldingBars": 192.98214285714286,
+      "medianHoldingBars": 138
+    },
+    "vetoedBaselineCounterfactual": {
+      "n": 45,
+      "totalR": -12.214607797749382,
+      "meanR": -0.2714357288388752,
+      "meanPerBaselineOpportunity": -0.12093671086880577,
+      "pf": 0.42440930568338187,
+      "wr": 0.4888888888888889,
+      "maxDdR": 14.00198806055416,
+      "fundingR": -0.2333616139471034,
+      "costsR": 0.581772909649683,
+      "meanHoldingBars": 173.06666666666666,
+      "medianHoldingBars": 161
+    },
+    "paired": {
+      "deltaTotalR": 12.214607797749379,
+      "deltaMeanRPerBaselineOpportunity": 0.12093671086880572,
+      "ci95": {
+        "lower": 0.006067733666084349,
+        "median": 0.1192729949444813,
+        "upper": 0.23890443945920747
+      }
+    },
+    "fundingAndAge": {
+      "baselineFundingR": 0.003817386529241149,
+      "retainedFundingR": 0.23717900047634446,
+      "baselineCostsR": 1.2751578767187053,
+      "retainedCostsR": 0.6933849670690223,
+      "latestRateAgeHours": {
+        "min": 0.9999980555555555,
+        "median": 5.999996944444445,
+        "p90": 7.999998611111111,
+        "max": 8
+      }
+    },
+    "bySideBaseline": {
+      "long": {
+        "n": 56,
+        "totalR": -17.99673066496764,
+        "meanR": -0.3213701904458507,
+        "meanPerBaselineOpportunity": -0.17818545212839246,
+        "pf": 0.3811824052907703,
+        "wr": 0.44642857142857145,
+        "maxDdR": 20.902269353427876,
+        "fundingR": -0.17769008180144344,
+        "costsR": 0.6700162657827167,
+        "meanHoldingBars": 177.42857142857142,
+        "medianHoldingBars": 161
+      },
+      "short": {
+        "n": 45,
+        "totalR": -0.8151329773293103,
+        "meanR": -0.018114066162873563,
+        "meanPerBaselineOpportunity": -0.008070623537913964,
+        "pf": 0.9372724792649622,
+        "wr": 0.6222222222222222,
+        "maxDdR": 3.791934296376054,
+        "fundingR": 0.18150746833068457,
+        "costsR": 0.6051416109359885,
+        "meanHoldingBars": 192.42222222222222,
+        "medianHoldingBars": 144
+      }
+    },
+    "bySideRetained": {
+      "long": {
+        "n": 20,
+        "totalR": -2.011831846489366,
+        "meanR": -0.1005915923244683,
+        "meanPerBaselineOpportunity": -0.01991912719296402,
+        "pf": 0.7440890339701183,
+        "wr": 0.6,
+        "maxDdR": 5.377767291450964,
+        "fundingR": 0.057177844035860854,
+        "costsR": 0.15957970078392814,
+        "meanHoldingBars": 183.3,
+        "medianHoldingBars": 204
+      },
+      "short": {
+        "n": 36,
+        "totalR": -4.585423998058198,
+        "meanR": -0.12737288883494996,
+        "meanPerBaselineOpportunity": -0.04540023760453662,
+        "pf": 0.6471345327488419,
+        "wr": 0.5277777777777778,
+        "maxDdR": 5.33696209196541,
+        "fundingR": 0.18000115644048367,
+        "costsR": 0.5338052662850942,
+        "meanHoldingBars": 198.36111111111111,
+        "medianHoldingBars": 134
+      }
+    },
+    "concentrationBaseline": {
+      "topTradeAbsShare": 0.025034779386449532,
+      "topUtcDayAbsShare": 0.04651978154460578,
+      "topTrades": [
+        {
+          "symbol": "SOLUSDT",
+          "decisionUtc": "2026-06-23T13:00:00.000Z",
+          "side": "long",
+          "netR": 1.6358395075773409,
+          "retained": true
+        },
+        {
+          "symbol": "ETHUSDT",
+          "decisionUtc": "2026-04-14T14:00:00.000Z",
+          "side": "short",
+          "netR": 1.31494794585004,
+          "retained": true
+        },
+        {
+          "symbol": "BTCUSDT",
+          "decisionUtc": "2026-08-18T13:00:00.000Z",
+          "side": "short",
+          "netR": -1.0362092791965958,
+          "retained": true
+        },
+        {
+          "symbol": "BTCUSDT",
+          "decisionUtc": "2026-06-23T13:00:00.000Z",
+          "side": "long",
+          "netR": -1.032214102916154,
+          "retained": false
+        },
+        {
+          "symbol": "ETHUSDT",
+          "decisionUtc": "2026-08-19T13:00:00.000Z",
+          "side": "short",
+          "netR": -1.028640898265921,
+          "retained": true
+        },
+        {
+          "symbol": "BTCUSDT",
+          "decisionUtc": "2026-01-19T23:00:00.000Z",
+          "side": "long",
+          "netR": -1.0285800113086254,
+          "retained": false
+        },
+        {
+          "symbol": "BTCUSDT",
+          "decisionUtc": "2026-06-01T16:00:00.000Z",
+          "side": "long",
+          "netR": -1.024653878180854,
+          "retained": false
+        },
+        {
+          "symbol": "BTCUSDT",
+          "decisionUtc": "2025-10-02T00:00:00.000Z",
+          "side": "short",
+          "netR": -1.0226800347638798,
+          "retained": true
+        },
+        {
+          "symbol": "BTCUSDT",
+          "decisionUtc": "2025-11-03T16:00:00.000Z",
+          "side": "long",
+          "netR": -1.0204862165285304,
+          "retained": false
+        },
+        {
+          "symbol": "BTCUSDT",
+          "decisionUtc": "2026-01-30T14:00:00.000Z",
+          "side": "long",
+          "netR": -1.020324740970512,
+          "retained": false
+        }
+      ]
+    },
+    "concentrationRetained": {
+      "topTradeAbsShare": 0.04658481719061902,
+      "topUtcDayAbsShare": 0.0505392499529094,
+      "topTrades": [
+        {
+          "symbol": "SOLUSDT",
+          "decisionUtc": "2026-06-23T13:00:00.000Z",
+          "side": "long",
+          "netR": 1.6358395075773409,
+          "retained": true
+        },
+        {
+          "symbol": "ETHUSDT",
+          "decisionUtc": "2026-04-14T14:00:00.000Z",
+          "side": "short",
+          "netR": 1.31494794585004,
+          "retained": true
+        },
+        {
+          "symbol": "BTCUSDT",
+          "decisionUtc": "2026-08-18T13:00:00.000Z",
+          "side": "short",
+          "netR": -1.0362092791965958,
+          "retained": true
+        },
+        {
+          "symbol": "ETHUSDT",
+          "decisionUtc": "2026-08-19T13:00:00.000Z",
+          "side": "short",
+          "netR": -1.028640898265921,
+          "retained": true
+        },
+        {
+          "symbol": "BTCUSDT",
+          "decisionUtc": "2025-10-02T00:00:00.000Z",
+          "side": "short",
+          "netR": -1.0226800347638798,
+          "retained": true
+        },
+        {
+          "symbol": "ETHUSDT",
+          "decisionUtc": "2025-09-22T07:00:00.000Z",
+          "side": "long",
+          "netR": -1.0148158574199042,
+          "retained": true
+        },
+        {
+          "symbol": "SOLUSDT",
+          "decisionUtc": "2025-11-12T19:00:00.000Z",
+          "side": "long",
+          "netR": -1.0137788806451913,
+          "retained": true
+        },
+        {
+          "symbol": "ETHUSDT",
+          "decisionUtc": "2026-01-30T18:00:00.000Z",
+          "side": "long",
+          "netR": -1.0103194029867972,
+          "retained": true
+        },
+        {
+          "symbol": "SOLUSDT",
+          "decisionUtc": "2026-05-13T16:00:00.000Z",
+          "side": "long",
+          "netR": -1.0088349368170462,
+          "retained": true
+        },
+        {
+          "symbol": "SOLUSDT",
+          "decisionUtc": "2026-01-02T10:00:00.000Z",
+          "side": "short",
+          "netR": -1.0070106528231637,
+          "retained": true
+        }
+      ]
+    }
+  },
+  "perSymbol": {
+    "BTCUSDT": {
+      "counts": {
+        "rawCandidatesAll": 441,
+        "rawCandidatesHoldout": 149,
+        "admittedTradesAll": 97,
+        "admittedBaselineHoldout": 34
+      },
+      "retained": 16,
+      "vetoed": 18,
+      "baseline": {
+        "gross0": {
+          "n": 34,
+          "totalR": -7.306016973645498,
+          "meanR": -0.21488285216604405,
+          "meanPerBaselineOpportunity": -0.21488285216604405,
+          "pf": 0.49336635310738447,
+          "wr": 0.5,
+          "maxDdR": 7.598359838277936,
+          "fundingR": -0.07577583938219755,
+          "costsR": 0.5773898921330561,
+          "meanHoldingBars": 183.08823529411765,
+          "medianHoldingBars": 174
+        },
+        "net5": {
+          "n": 34,
+          "totalR": -7.883406865778552,
+          "meanR": -0.23186490781701624,
+          "meanPerBaselineOpportunity": -0.23186490781701624,
+          "pf": 0.46618720416791454,
+          "wr": 0.5,
+          "maxDdR": 8.1438734836794,
+          "fundingR": -0.07577583938219755,
+          "costsR": 0.5773898921330561,
+          "meanHoldingBars": 183.08823529411765,
+          "medianHoldingBars": 174
+        }
+      },
+      "filtered": {
+        "gross0PerOpportunity": {
+          "n": 34,
+          "totalR": -0.46740135824481616,
+          "meanR": -0.013747098771906358,
+          "meanPerBaselineOpportunity": -0.013747098771906358,
+          "pf": 0.8962668421961038,
+          "wr": 0.29411764705882354,
+          "maxDdR": 1.6082592283508288,
+          "fundingR": 0.08580225368663814,
+          "costsR": 0.25989835122633664,
+          "meanHoldingBars": 185.875,
+          "medianHoldingBars": 174
+        },
+        "net5PerOpportunity": {
+          "n": 34,
+          "totalR": -0.7272997094711529,
+          "meanR": -0.021391167925622144,
+          "meanPerBaselineOpportunity": -0.021391167925622144,
+          "pf": 0.843543493277085,
+          "wr": 0.29411764705882354,
+          "maxDdR": 1.7059542840329835,
+          "fundingR": 0.08580225368663814,
+          "costsR": 0.25989835122633664,
+          "meanHoldingBars": 185.875,
+          "medianHoldingBars": 174
+        },
+        "net5Executed": {
+          "n": 16,
+          "totalR": -0.7272997094711529,
+          "meanR": -0.04545623184194705,
+          "meanPerBaselineOpportunity": -0.021391167925622144,
+          "pf": 0.843543493277085,
+          "wr": 0.625,
+          "maxDdR": 1.7059542840329835,
+          "fundingR": 0.08580225368663814,
+          "costsR": 0.25989835122633664,
+          "meanHoldingBars": 185.875,
+          "medianHoldingBars": 174
+        }
+      },
+      "retainedCounterfactual": {
+        "n": 16,
+        "totalR": -0.7272997094711529,
+        "meanR": -0.04545623184194705,
+        "meanPerBaselineOpportunity": -0.021391167925622144,
+        "pf": 0.843543493277085,
+        "wr": 0.625,
+        "maxDdR": 1.7059542840329835,
+        "fundingR": 0.08580225368663814,
+        "costsR": 0.25989835122633664,
+        "meanHoldingBars": 185.875,
+        "medianHoldingBars": 174
+      },
+      "vetoedCounterfactual": {
+        "n": 18,
+        "totalR": -7.156107156307399,
+        "meanR": -0.39756150868374435,
+        "meanPerBaselineOpportunity": -0.21047373989139406,
+        "pf": 0.2928424387896149,
+        "wr": 0.3888888888888889,
+        "maxDdR": 7.503331182027311,
+        "fundingR": -0.16157809306883567,
+        "costsR": 0.31749154090671944,
+        "meanHoldingBars": 180.61111111111111,
+        "medianHoldingBars": 180
+      },
+      "pairedDeltaMeanPerOpportunity": 0.21047373989139406,
+      "improved": true,
+      "bySideBaseline": {
+        "long": {
+          "n": 19,
+          "totalR": -7.070439785462043,
+          "meanR": -0.3721284097611602,
+          "meanPerBaselineOpportunity": -0.2079541113371189,
+          "pf": 0.30130798125831737,
+          "wr": 0.42105263157894735,
+          "maxDdR": 7.4176638111819555,
+          "fundingR": -0.16157734283931846,
+          "costsR": 0.30670179411176945,
+          "meanHoldingBars": 181.3684210526316,
+          "medianHoldingBars": 153
+        },
+        "short": {
+          "n": 15,
+          "totalR": -0.8129670803165064,
+          "meanR": -0.05419780535443376,
+          "meanPerBaselineOpportunity": -0.02391079647989725,
+          "pf": 0.8251147528169155,
+          "wr": 0.6,
+          "maxDdR": 1.6497060652731699,
+          "fundingR": 0.08580150345712095,
+          "costsR": 0.27068809802128657,
+          "meanHoldingBars": 185.26666666666668,
+          "medianHoldingBars": 174
+        }
+      },
+      "bySideRetained": {
+        "long": {
+          "n": 2,
+          "totalR": 0.5958361365900254,
+          "meanR": 0.2979180682950127,
+          "meanPerBaselineOpportunity": 0.017524592252647807,
+          "pf": null,
+          "wr": 1,
+          "maxDdR": 0,
+          "fundingR": -0.00045614976380047197,
+          "costsR": 0.012827409032920126,
+          "meanHoldingBars": 205.5,
+          "medianHoldingBars": 311
+        },
+        "short": {
+          "n": 14,
+          "totalR": -1.3231358460611784,
+          "meanR": -0.09450970329008417,
+          "meanPerBaselineOpportunity": -0.038915760178269955,
+          "pf": 0.7153673929759606,
+          "wr": 0.5714285714285714,
+          "maxDdR": 1.7059542840329835,
+          "fundingR": 0.08625840345043861,
+          "costsR": 0.24707094219341647,
+          "meanHoldingBars": 183.07142857142858,
+          "medianHoldingBars": 174
+        }
+      },
+      "concentrationBaseline": {
+        "topTradeAbsShare": 0.04785563581810341,
+        "topUtcDayAbsShare": 0.04785563581810341,
+        "topTrades": [
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-08-18T13:00:00.000Z",
+            "side": "short",
+            "netR": -1.0362092791965958,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-06-23T13:00:00.000Z",
+            "side": "long",
+            "netR": -1.032214102916154,
+            "retained": false
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-01-19T23:00:00.000Z",
+            "side": "long",
+            "netR": -1.0285800113086254,
+            "retained": false
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-06-01T16:00:00.000Z",
+            "side": "long",
+            "netR": -1.024653878180854,
+            "retained": false
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2025-10-02T00:00:00.000Z",
+            "side": "short",
+            "netR": -1.0226800347638798,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2025-11-03T16:00:00.000Z",
+            "side": "long",
+            "netR": -1.0204862165285304,
+            "retained": false
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-01-30T14:00:00.000Z",
+            "side": "long",
+            "netR": -1.020324740970512,
+            "retained": false
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-02-05T16:00:00.000Z",
+            "side": "long",
+            "netR": -1.0099591109587673,
+            "retained": false
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-01-21T14:00:00.000Z",
+            "side": "long",
+            "netR": -0.8731271948998622,
+            "retained": false
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-05-18T15:00:00.000Z",
+            "side": "long",
+            "netR": -0.8658352725561084,
+            "retained": false
+          }
+        ]
+      },
+      "concentrationRetained": {
+        "topTradeAbsShare": 0.12091336404543143,
+        "topUtcDayAbsShare": 0.12091336404543143,
+        "topTrades": [
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-08-18T13:00:00.000Z",
+            "side": "short",
+            "netR": -1.0362092791965958,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2025-10-02T00:00:00.000Z",
+            "side": "short",
+            "netR": -1.0226800347638798,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-04-14T14:00:00.000Z",
+            "side": "short",
+            "netR": -0.8510916895265982,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-04-06T16:00:00.000Z",
+            "side": "short",
+            "netR": -0.7986143757465717,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2025-12-29T05:00:00.000Z",
+            "side": "short",
+            "netR": -0.7539553877793795,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-07-14T17:00:00.000Z",
+            "side": "short",
+            "netR": 0.6867777245514591,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-03-10T15:00:00.000Z",
+            "side": "short",
+            "netR": 0.6165883562164495,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2025-10-05T03:00:00.000Z",
+            "side": "short",
+            "netR": 0.5534346142267377,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2025-10-17T11:00:00.000Z",
+            "side": "long",
+            "netR": 0.41116076486449527,
+            "retained": true
+          },
+          {
+            "symbol": "BTCUSDT",
+            "decisionUtc": "2026-01-14T17:00:00.000Z",
+            "side": "short",
+            "netR": 0.37665661389875965,
+            "retained": true
+          }
+        ]
+      },
+      "latestRateAgeHours": {
+        "min": 0.9999988888888889,
+        "median": 5.999999166666667,
+        "p90": 7.999999722222222,
+        "max": 8
+      }
+    },
+    "ETHUSDT": {
+      "counts": {
+        "rawCandidatesAll": 426,
+        "rawCandidatesHoldout": 151,
+        "admittedTradesAll": 104,
+        "admittedBaselineHoldout": 34
+      },
+      "retained": 19,
+      "vetoed": 15,
+      "baseline": {
+        "gross0": {
+          "n": 34,
+          "totalR": -8.78339817047873,
+          "meanR": -0.25833524030819793,
+          "meanPerBaselineOpportunity": -0.25833524030819793,
+          "pf": 0.4499006311846298,
+          "wr": 0.47058823529411764,
+          "maxDdR": 8.78339817047873,
+          "fundingR": 0.01989611978149794,
+          "costsR": 0.4002904943424311,
+          "meanHoldingBars": 191.73529411764707,
+          "medianHoldingBars": 161
+        },
+        "net5": {
+          "n": 34,
+          "totalR": -9.183688664821162,
+          "meanR": -0.2701084901417989,
+          "meanPerBaselineOpportunity": -0.2701084901417989,
+          "pf": 0.43409927116297437,
+          "wr": 0.47058823529411764,
+          "maxDdR": 9.183688664821162,
+          "fundingR": 0.01989611978149794,
+          "costsR": 0.4002904943424311,
+          "meanHoldingBars": 191.73529411764707,
+          "medianHoldingBars": 161
+        }
+      },
+      "filtered": {
+        "gross0PerOpportunity": {
+          "n": 34,
+          "totalR": -4.107061126499603,
+          "meanR": -0.12079591548528243,
+          "meanPerBaselineOpportunity": -0.12079591548528243,
+          "pf": 0.514241210795174,
+          "wr": 0.2647058823529412,
+          "maxDdR": 4.23875695231085,
+          "fundingR": 0.08054845015751294,
+          "costsR": 0.23403587770015719,
+          "meanHoldingBars": 208.10526315789474,
+          "medianHoldingBars": 129
+        },
+        "net5PerOpportunity": {
+          "n": 34,
+          "totalR": -4.341097004199759,
+          "meanR": -0.1276793236529341,
+          "meanPerBaselineOpportunity": -0.1276793236529341,
+          "pf": 0.4956069021087228,
+          "wr": 0.2647058823529412,
+          "maxDdR": 4.408785090905615,
+          "fundingR": 0.08054845015751294,
+          "costsR": 0.23403587770015719,
+          "meanHoldingBars": 208.10526315789474,
+          "medianHoldingBars": 129
+        },
+        "net5Executed": {
+          "n": 19,
+          "totalR": -4.341097004199759,
+          "meanR": -0.22847878969472415,
+          "meanPerBaselineOpportunity": -0.1276793236529341,
+          "pf": 0.4956069021087228,
+          "wr": 0.47368421052631576,
+          "maxDdR": 4.408785090905615,
+          "fundingR": 0.08054845015751294,
+          "costsR": 0.23403587770015719,
+          "meanHoldingBars": 208.10526315789474,
+          "medianHoldingBars": 129
+        }
+      },
+      "retainedCounterfactual": {
+        "n": 19,
+        "totalR": -4.341097004199759,
+        "meanR": -0.22847878969472415,
+        "meanPerBaselineOpportunity": -0.1276793236529341,
+        "pf": 0.4956069021087228,
+        "wr": 0.47368421052631576,
+        "maxDdR": 4.408785090905615,
+        "fundingR": 0.08054845015751294,
+        "costsR": 0.23403587770015719,
+        "meanHoldingBars": 208.10526315789474,
+        "medianHoldingBars": 129
+      },
+      "vetoedCounterfactual": {
+        "n": 15,
+        "totalR": -4.842591660621403,
+        "meanR": -0.32283944404142684,
+        "meanPerBaselineOpportunity": -0.14242916648886478,
+        "pf": 0.3646451796913684,
+        "wr": 0.4666666666666667,
+        "maxDdR": 5.693364419387832,
+        "fundingR": -0.06065233037601501,
+        "costsR": 0.16625461664227384,
+        "meanHoldingBars": 171,
+        "medianHoldingBars": 163
+      },
+      "pairedDeltaMeanPerOpportunity": 0.14242916648886478,
+      "improved": true,
+      "bySideBaseline": {
+        "long": {
+          "n": 18,
+          "totalR": -8.005462139642859,
+          "meanR": -0.44474789664682546,
+          "meanPerBaselineOpportunity": -0.23545476881302527,
+          "pf": 0.2484029231262626,
+          "wr": 0.3888888888888889,
+          "maxDdR": 8.91120372439848,
+          "fundingR": -0.055282900984799946,
+          "costsR": 0.1932646423145154,
+          "meanHoldingBars": 180.83333333333334,
+          "medianHoldingBars": 203
+        },
+        "short": {
+          "n": 16,
+          "totalR": -1.1782265251783017,
+          "meanR": -0.07363915782364386,
+          "meanPerBaselineOpportunity": -0.03465372132877358,
+          "pf": 0.7887413892949747,
+          "wr": 0.5625,
+          "maxDdR": 2.125045456012152,
+          "fundingR": 0.07517902076629789,
+          "costsR": 0.20702585202791557,
+          "meanHoldingBars": 204,
+          "medianHoldingBars": 139
+        }
+      },
+      "bySideRetained": {
+        "long": {
+          "n": 6,
+          "totalR": -1.8706084487745818,
+          "meanR": -0.31176807479576363,
+          "meanPerBaselineOpportunity": -0.05501789555219358,
+          "pf": 0.3825149193606447,
+          "wr": 0.5,
+          "maxDdR": 2.5549039102832456,
+          "fundingR": 0.007865652642369868,
+          "costsR": 0.04879434961640874,
+          "meanHoldingBars": 208.5,
+          "medianHoldingBars": 222
+        },
+        "short": {
+          "n": 13,
+          "totalR": -2.4704885554251783,
+          "meanR": -0.19003758118655217,
+          "meanPerBaselineOpportunity": -0.07266142810074054,
+          "pf": 0.5570359613973156,
+          "wr": 0.46153846153846156,
+          "maxDdR": 3.0784977936964144,
+          "fundingR": 0.07268279751514307,
+          "costsR": 0.18524152808374844,
+          "meanHoldingBars": 207.92307692307693,
+          "medianHoldingBars": 129
+        }
+      },
+      "concentrationBaseline": {
+        "topTradeAbsShare": 0.056500520257899395,
+        "topUtcDayAbsShare": 0.06854541564221978,
+        "topTrades": [
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-04-14T14:00:00.000Z",
+            "side": "short",
+            "netR": 1.31494794585004,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-08-19T13:00:00.000Z",
+            "side": "short",
+            "netR": -1.028640898265921,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-06-02T16:00:00.000Z",
+            "side": "long",
+            "netR": -1.0200187086253891,
+            "retained": false
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-01-19T23:00:00.000Z",
+            "side": "long",
+            "netR": -1.0190215419591786,
+            "retained": false
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2025-09-22T07:00:00.000Z",
+            "side": "long",
+            "netR": -1.0148158574199042,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2025-11-03T04:00:00.000Z",
+            "side": "long",
+            "netR": -1.0139925286647302,
+            "retained": false
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2025-10-10T16:00:00.000Z",
+            "side": "long",
+            "netR": -1.012492074037008,
+            "retained": false
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-06-05T04:00:00.000Z",
+            "side": "long",
+            "netR": -1.0111562063475565,
+            "retained": false
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-01-30T18:00:00.000Z",
+            "side": "long",
+            "netR": -1.0103194029867972,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-02-01T18:00:00.000Z",
+            "side": "long",
+            "netR": -1.004263355731068,
+            "retained": true
+          }
+        ]
+      },
+      "concentrationRetained": {
+        "topTradeAbsShare": 0.10215526266908738,
+        "topUtcDayAbsShare": 0.12393292854172855,
+        "topTrades": [
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-04-14T14:00:00.000Z",
+            "side": "short",
+            "netR": 1.31494794585004,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-08-19T13:00:00.000Z",
+            "side": "short",
+            "netR": -1.028640898265921,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2025-09-22T07:00:00.000Z",
+            "side": "long",
+            "netR": -1.0148158574199042,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-01-30T18:00:00.000Z",
+            "side": "long",
+            "netR": -1.0103194029867972,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-02-01T18:00:00.000Z",
+            "side": "long",
+            "netR": -1.004263355731068,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2025-12-03T14:00:00.000Z",
+            "side": "short",
+            "netR": -0.8380668163789288,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2025-09-29T15:00:00.000Z",
+            "side": "short",
+            "netR": -0.8158919275567121,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-04-06T17:00:00.000Z",
+            "side": "short",
+            "netR": -0.8086230340094632,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2025-12-29T07:00:00.000Z",
+            "side": "short",
+            "netR": -0.7884606064970812,
+            "retained": true
+          },
+          {
+            "symbol": "ETHUSDT",
+            "decisionUtc": "2026-07-03T14:00:00.000Z",
+            "side": "short",
+            "netR": -0.7308627420772447,
+            "retained": true
+          }
+        ]
+      },
+      "latestRateAgeHours": {
+        "min": 0.9999980555555555,
+        "median": 5.999998888888889,
+        "p90": 7.999999444444445,
+        "max": 8
+      }
+    },
+    "SOLUSDT": {
+      "counts": {
+        "rawCandidatesAll": 403,
+        "rawCandidatesHoldout": 129,
+        "admittedTradesAll": 88,
+        "admittedBaselineHoldout": 33
+      },
+      "retained": 21,
+      "vetoed": 12,
+      "baseline": {
+        "gross0": {
+          "n": 33,
+          "totalR": -1.4472906214540109,
+          "meanR": -0.043857291559212454,
+          "meanPerBaselineOpportunity": -0.043857291559212454,
+          "pf": 0.867396777306643,
+          "wr": 0.6060606060606061,
+          "maxDdR": 4.650126061405091,
+          "fundingR": 0.059697106129940794,
+          "costsR": 0.29747749024321807,
+          "meanHoldingBars": 177.3030303030303,
+          "medianHoldingBars": 144
+        },
+        "net5": {
+          "n": 33,
+          "totalR": -1.7447681116972296,
+          "meanR": -0.05287176096052211,
+          "meanPerBaselineOpportunity": -0.05287176096052211,
+          "pf": 0.8425401046512777,
+          "wr": 0.6060606060606061,
+          "maxDdR": 4.835854409325108,
+          "fundingR": 0.059697106129940794,
+          "costsR": 0.29747749024321807,
+          "meanHoldingBars": 177.3030303030303,
+          "medianHoldingBars": 144
+        }
+      },
+      "filtered": {
+        "gross0PerOpportunity": {
+          "n": 33,
+          "totalR": -1.3294083927341223,
+          "meanR": -0.040285102810124915,
+          "meanPerBaselineOpportunity": -0.040285102810124915,
+          "pf": 0.8223120320132313,
+          "wr": 0.36363636363636365,
+          "maxDdR": 3.71801035848337,
+          "fundingR": 0.07082829663219349,
+          "costsR": 0.19945073814252848,
+          "meanHoldingBars": 184.71428571428572,
+          "medianHoldingBars": 138
+        },
+        "net5PerOpportunity": {
+          "n": 33,
+          "totalR": -1.5288591308766506,
+          "meanR": -0.04632906457201971,
+          "meanPerBaselineOpportunity": -0.04632906457201971,
+          "pf": 0.7988641011865535,
+          "wr": 0.36363636363636365,
+          "maxDdR": 3.8507340867909337,
+          "fundingR": 0.07082829663219349,
+          "costsR": 0.19945073814252848,
+          "meanHoldingBars": 184.71428571428572,
+          "medianHoldingBars": 138
+        },
+        "net5Executed": {
+          "n": 21,
+          "totalR": -1.5288591308766506,
+          "meanR": -0.07280281575603098,
+          "meanPerBaselineOpportunity": -0.04632906457201971,
+          "pf": 0.7988641011865535,
+          "wr": 0.5714285714285714,
+          "maxDdR": 3.8507340867909337,
+          "fundingR": 0.07082829663219349,
+          "costsR": 0.19945073814252848,
+          "meanHoldingBars": 184.71428571428572,
+          "medianHoldingBars": 138
+        }
+      },
+      "retainedCounterfactual": {
+        "n": 21,
+        "totalR": -1.5288591308766506,
+        "meanR": -0.07280281575603098,
+        "meanPerBaselineOpportunity": -0.04632906457201971,
+        "pf": 0.7988641011865535,
+        "wr": 0.5714285714285714,
+        "maxDdR": 3.8507340867909337,
+        "fundingR": 0.07082829663219349,
+        "costsR": 0.19945073814252848,
+        "meanHoldingBars": 184.71428571428572,
+        "medianHoldingBars": 138
+      },
+      "vetoedCounterfactual": {
+        "n": 12,
+        "totalR": -0.2159089808205782,
+        "meanR": -0.017992415068381517,
+        "meanPerBaselineOpportunity": -0.00654269638850237,
+        "pf": 0.9379498642141495,
+        "wr": 0.6666666666666666,
+        "maxDdR": 2.0179224071718065,
+        "fundingR": -0.011131190502252699,
+        "costsR": 0.09802675210068958,
+        "meanHoldingBars": 164.33333333333334,
+        "medianHoldingBars": 145
+      },
+      "pairedDeltaMeanPerOpportunity": 0.00654269638850237,
+      "improved": true,
+      "bySideBaseline": {
+        "long": {
+          "n": 19,
+          "totalR": -2.920828739862727,
+          "meanR": -0.15372782841382773,
+          "meanPerBaselineOpportunity": -0.08850996181402203,
+          "pf": 0.6485858695428047,
+          "wr": 0.5263157894736842,
+          "maxDdR": 5.747999923230429,
+          "fundingR": 0.039170162022675044,
+          "costsR": 0.17004982935643187,
+          "meanHoldingBars": 170.26315789473685,
+          "medianHoldingBars": 139
+        },
+        "short": {
+          "n": 14,
+          "totalR": 1.176060628165498,
+          "meanR": 0.08400433058324985,
+          "meanPerBaselineOpportunity": 0.03563820085349994,
+          "pf": 1.424712994887263,
+          "wr": 0.7142857142857143,
+          "maxDdR": 1.0070106528231637,
+          "fundingR": 0.020526944107265743,
+          "costsR": 0.12742766088678617,
+          "meanHoldingBars": 186.85714285714286,
+          "medianHoldingBars": 145
+        }
+      },
+      "bySideRetained": {
+        "long": {
+          "n": 12,
+          "totalR": -0.7370595343048101,
+          "meanR": -0.061421627858734174,
+          "meanPerBaselineOpportunity": -0.022335137403176063,
+          "pf": 0.8474645386611573,
+          "wr": 0.5833333333333334,
+          "maxDdR": 3.778879191845335,
+          "fundingR": 0.04976834115729146,
+          "costsR": 0.09795794213459927,
+          "meanHoldingBars": 167,
+          "medianHoldingBars": 204
+        },
+        "short": {
+          "n": 9,
+          "totalR": -0.7917995965718413,
+          "meanR": -0.08797773295242681,
+          "meanPerBaselineOpportunity": -0.023993927168843677,
+          "pf": 0.7140559168831981,
+          "wr": 0.5555555555555556,
+          "maxDdR": 1.5075753114789712,
+          "fundingR": 0.021059955474902022,
+          "costsR": 0.10149279600792921,
+          "meanHoldingBars": 208.33333333333334,
+          "medianHoldingBars": 100
+        }
+      },
+      "concentrationBaseline": {
+        "topTradeAbsShare": 0.08012277575592441,
+        "topUtcDayAbsShare": 0.08012277575592441,
+        "topTrades": [
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-06-23T13:00:00.000Z",
+            "side": "long",
+            "netR": 1.6358395075773409,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2025-11-12T19:00:00.000Z",
+            "side": "long",
+            "netR": -1.0137788806451913,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2025-09-23T03:00:00.000Z",
+            "side": "long",
+            "netR": -1.0104359637166402,
+            "retained": false
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-05-13T16:00:00.000Z",
+            "side": "long",
+            "netR": -1.0088349368170462,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-01-02T10:00:00.000Z",
+            "side": "short",
+            "netR": -1.0070106528231637,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2025-11-03T04:00:00.000Z",
+            "side": "long",
+            "netR": -1.005248322492549,
+            "retained": false
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-06-04T02:00:00.000Z",
+            "side": "long",
+            "netR": -1.0048806430820874,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-02-02T06:00:00.000Z",
+            "side": "long",
+            "netR": -0.9999931246590001,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-05-28T04:00:00.000Z",
+            "side": "long",
+            "netR": -0.8045660752075076,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-08-09T16:00:00.000Z",
+            "side": "short",
+            "netR": -0.7950008266037848,
+            "retained": true
+          }
+        ]
+      },
+      "concentrationRetained": {
+        "topTradeAbsShare": 0.11963670877646183,
+        "topUtcDayAbsShare": 0.11963670877646183,
+        "topTrades": [
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-06-23T13:00:00.000Z",
+            "side": "long",
+            "netR": 1.6358395075773409,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2025-11-12T19:00:00.000Z",
+            "side": "long",
+            "netR": -1.0137788806451913,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-05-13T16:00:00.000Z",
+            "side": "long",
+            "netR": -1.0088349368170462,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-01-02T10:00:00.000Z",
+            "side": "short",
+            "netR": -1.0070106528231637,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-06-04T02:00:00.000Z",
+            "side": "long",
+            "netR": -1.0048806430820874,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-02-02T06:00:00.000Z",
+            "side": "long",
+            "netR": -0.9999931246590001,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-05-28T04:00:00.000Z",
+            "side": "long",
+            "netR": -0.8045660752075076,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-08-09T16:00:00.000Z",
+            "side": "short",
+            "netR": -0.7950008266037848,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-04-16T20:00:00.000Z",
+            "side": "short",
+            "netR": -0.7876306098527293,
+            "retained": true
+          },
+          {
+            "symbol": "SOLUSDT",
+            "decisionUtc": "2026-01-12T17:00:00.000Z",
+            "side": "short",
+            "netR": 0.6843986509033545,
+            "retained": true
+          }
+        ]
+      },
+      "latestRateAgeHours": {
+        "min": 0.9999980555555555,
+        "median": 4.999998888888889,
+        "p90": 7.999998611111111,
+        "max": 8
+      }
+    }
+  },
+  "breadth": {
+    "improvedSymbols": 3,
+    "required": 2,
+    "total": 3
+  },
+  "gates": {
+    "baselineOpportunities": false,
+    "retainedTrades": false,
+    "filteredNetExpectancyPositive": false,
+    "pairedCiLowerPositive": true,
+    "breadthAtLeastTwoOfThree": true
+  },
+  "limitations": [
+    "Protocol holdout is not guaranteed globally untouched because dates/assets overlap earlier research.",
+    "Only three large-cap perpetual symbols and one timeframe are tested.",
+    "Bootstrap clusters UTC days but cannot manufacture cross-universe independence.",
+    "No post-reveal retuning or subgroup rescue is permitted."
+  ]
+}

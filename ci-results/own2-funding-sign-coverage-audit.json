@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "experiment": "OWN2 + funding-sign filter",
+  "verdict": "FAIL",
+  "classification": "INCONCLUSIVE DATA",
+  "preregistration": {
+    "path": "ci-results/own2-funding-sign-preregistration.md",
+    "sha256": "99a63a09edbf492bd151a63b0f5f6532db6093827abdc5f7a824bb4831c68ea1"
+  },
+  "s1Seal": {
+    "manifestPath": "ci-results/stateful-apex-s1-manifest.json",
+    "manifestSha256": "1eafaf72b8a5efd571a680e497f90c1416bd346eae543857c891a87d6bbb30ba",
+    "untouchedOosMetricsInspected": false,
+    "revealArtifactFound": false,
+    "stillUntouched": true
+  },
+  "frozenSeries": [
+    {
+      "symbol": "AVAXUSDT",
+      "market": "spot",
+      "timeframe": "5m",
+      "file": "csv/BINANCE_AVAXUSDT, 5.csv",
+      "sha256Match": true,
+      "fundingCompatible": false,
+      "reason": "Spot outcome path cannot be paired with perpetual funding without changing the frozen market corpus."
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "market": "futures",
+      "timeframe": "1h",
+      "file": "csv/BINANCE_AVAXUSDT.P, 60.csv",
+      "sha256Match": true,
+      "fundingCompatible": true,
+      "reason": "Only untouched series whose market is perpetual futures."
+    },
+    {
+      "symbol": "LINKUSDT",
+      "market": "spot",
+      "timeframe": "15m",
+      "file": "csv/BINANCE_LINKUSDT, 15.csv",
+      "sha256Match": true,
+      "fundingCompatible": false,
+      "reason": "Spot outcome path cannot be paired with perpetual funding without changing the frozen market corpus."
+    },
+    {
+      "symbol": "LINKUSDT",
+      "market": "spot",
+      "timeframe": "1h",
+      "file": "csv/BINANCE_LINKUSDT, 60.csv",
+      "sha256Match": true,
+      "fundingCompatible": false,
+      "reason": "Spot outcome path cannot be paired with perpetual funding without changing the frozen market corpus."
+    },
+    {
+      "symbol": "SOLUSDT",
+      "market": "spot",
+      "timeframe": "2h",
+      "file": "csv/BINANCE_SOLUSDT, 120.csv",
+      "sha256Match": true,
+      "fundingCompatible": false,
+      "reason": "Spot outcome path cannot be paired with perpetual funding without changing the frozen market corpus."
+    }
+  ],
+  "counts": {
+    "frozenSeries": 5,
+    "frozenSymbols": 3,
+    "fundingCompatibleSeries": 1,
+    "fundingCompatibleSymbols": 1,
+    "manifestPrimaryEventsAllSeries": 803,
+    "manifestPrimaryEventsFundingCompatible": 168
+  },
+  "failedFrozenGates": [
+    "Every included series must be perpetual futures with same-market official settled funding.",
+    "At least three independent symbols must be available without corpus substitution.",
+    "At least 250 baseline OOS opportunities cannot be established: the only compatible frozen series has 168 S1 primary events before OWN2 replay/occupancy resolution."
+  ],
+  "action": "Do not reveal or compute untouched S1 economic outcomes. Preserve reveal count 0. A clean test requires a newly frozen all-perpetual, at-least-three-symbol holdout acquired before outcome inspection."
+}

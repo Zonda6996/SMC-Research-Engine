@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 1,
+  "classification": "INCONCLUSIVE SMALL-N",
+  "diagnosticDirection": "point estimate supports filter",
+  "frozenRuleChangedAfterOutcomes": false,
+  "series": {
+    "symbol": "AVAXUSDT",
+    "market": "futures",
+    "timeframe": "1h",
+    "split": "S1 untouched-oos before this reveal"
+  },
+  "provenance": {
+    "schemaVersion": 1,
+    "generatedAtUtc": "2026-08-20T15:44:57.372Z",
+    "officialSource": "https://fapi.binance.com/fapi/v1/fundingRate",
+    "candle": {
+      "path": "csv/BINANCE_AVAXUSDT.P, 60.csv",
+      "expectedSha256": "63d3716eb8feb891c19786e5c27a989bdae78629c390474904f651098f488dae",
+      "actualSha256": "63d3716eb8feb891c19786e5c27a989bdae78629c390474904f651098f488dae",
+      "rows": 23096,
+      "firstUtc": "2024-01-01T00:00:00.000Z",
+      "lastUtc": "2026-08-20T07:00:00.000Z"
+    },
+    "funding": {
+      "path": "data/own2-funding-sign-avax/AVAXUSDT-funding.json",
+      "sha256": "b06393c2615176f21b26b4dc3a92cb6d769b69a125fd120cf884f63d41794947",
+      "rows": 2890,
+      "firstUtc": "2023-12-31T00:00:00.000Z",
+      "lastUtc": "2026-08-20T00:00:00.001Z",
+      "requestedFromUtc": "2023-12-31T00:00:00.000Z",
+      "requestedUntilExclusiveUtc": "2026-08-20T08:00:00.000Z",
+      "settledBeforeFirstDecision": true
+    },
+    "amendment": {
+      "path": "ci-results/own2-funding-sign-avax-diagnostic-amendment.md",
+      "sha256": "faf09ed3b260d96f3f0d45dec7d7f94b8f12208e6666f8e2da95c76f319e9a63"
+    }
+  },
+  "bootstrap": {
+    "method": "paired UTC-calendar-day block/cluster",
+    "samples": 10000,
+    "seed": 25082026,
+    "ci95": {
+      "lower": -0.0015763859110826729,
+      "median": 0.05847247738237669,
+      "upper": 0.12536705266052614
+    }
+  },
+  "counts": {
+    "rawBaselineCandidates": 462,
+    "baselineOpportunities": 105,
+    "baselineExecutedTrades": 105,
+    "retained": 77,
+    "vetoed": 28,
+    "retainedRate": 0.7333333333333333,
+    "byDecision": {
+      "retain": 77,
+      "veto-sign": 28,
+      "veto-zero": 0,
+      "veto-missing": 0
+    }
+  },
+  "metrics": {
+    "baseline": {
+      "gross0IncludingFunding": {
+        "n": 105,
+        "totalR": -11.380535377761358,
+        "meanR": -0.10838605121677485,
+        "pf": 0.6822741482278459,
+        "wr": 0.5904761904761905,
+        "maxDdR": 14.690594263499001
+      },
+      "net5IncludingFunding": {
+        "n": 105,
+        "totalR": -12.188825597037575,
+        "meanR": -0.11608405330511976,
+        "pf": 0.6638012260472693,
+        "wr": 0.5904761904761905,
+        "maxDdR": 15.449498424928828
+      }
+    },
+    "filtered": {
+      "gross0IncludingFunding": {
+        "n": 105,
+        "totalR": -5.403034988965365,
+        "meanR": -0.051457476085384424,
+        "pf": 0.7806141875586258,
+        "wr": 0.44761904761904764,
+        "maxDdR": 7.884174798690274
+      },
+      "net5IncludingFundingPerBaselineOpportunity": {
+        "n": 105,
+        "totalR": -5.99182865663396,
+        "meanR": -0.05706503482508533,
+        "pf": 0.7598071718900665,
+        "wr": 0.44761904761904764,
+        "maxDdR": 8.43823636437875
+      },
+      "net5ExecutedRetainedOnly": {
+        "n": 77,
+        "totalR": -5.99182865663396,
+        "meanR": -0.07781595657966181,
+        "pf": 0.7598071718900665,
+        "wr": 0.6103896103896104,
+        "maxDdR": 8.43823636437875
+      }
+    },
+    "primaryComparison": {
+      "baselineMeanNetPerOpportunity": -0.11608405330511976,
+      "baselineTotalNetR": -12.188825597037575,
+      "filteredMeanNetPerOpportunity": -0.05706503482508533,
+      "filteredTotalNetR": -5.99182865663396,
+      "pairedDeltaMeanR": 0.05901901848003441,
+      "pairedDeltaTotalR": 6.196996940403613
+    },
+    "retainedSubsetBaselineBeforeFilter": {
+      "gross0IncludingFunding": {
+        "n": 77,
+        "totalR": -5.403034988965365,
+        "meanR": -0.07016928557097876,
+        "pf": 0.7806141875586258,
+        "wr": 0.6103896103896104,
+        "maxDdR": 7.884174798690274
+      },
+      "net5IncludingFunding": {
+        "n": 77,
+        "totalR": -5.99182865663396,
+        "meanR": -0.07781595657966181,
+        "pf": 0.7598071718900665,
+        "wr": 0.6103896103896104,
+        "maxDdR": 8.43823636437875
+      }
+    },
+    "vetoedCounterfactualBaseline": {
+      "gross0IncludingFunding": {
+        "n": 28,
+        "totalR": -5.97750038879599,
+        "meanR": -0.21348215674271392,
+        "pf": 0.46585207620397173,
+        "wr": 0.5357142857142857,
+        "maxDdR": 7.242597030087068
+      },
+      "net5IncludingFunding": {
+        "n": 28,
+        "totalR": -6.196996940403614,
+        "meanR": -0.22132131930012908,
+        "pf": 0.452025207043306,
+        "wr": 0.5357142857142857,
+        "maxDdR": 7.434594207569993
+      }
+    }
+  },
+  "fundingDecomposition": {
+    "baselinePriceGrossR": -11.832342393546021,
+    "baselineFundingR": 0.4518070157846629,
+    "baselineFeeDragR": 0.8082902192762241,
+    "retainedPriceGrossR": -5.935644890218339,
+    "retainedFundingR": 0.5326099012529769,
+    "retainedFeeDragR": 0.5887936676685985,
+    "latestRateAgeHours": {
+      "min": 0.9999958333333333,
+      "median": 5,
+      "p90": 7.999999444444445,
+      "max": 8
+    }
+  },
+  "breakdown": {
+    "baselineNet5BySide": {
+      "long": {
+        "n": 50,
+        "totalR": -6.460029242015907,
+        "meanR": -0.12920058484031816,
+        "pf": 0.6360568055018713,
+        "wr": 0.58,
+        "maxDdR": 8.369235880006277
+      },
+      "short": {
+        "n": 55,
+        "totalR": -5.728796355021668,
+        "meanR": -0.10415993372766669,
+        "pf": 0.6904142439567058,
+        "wr": 0.6,
+        "maxDdR": 8.792676021302423
+      }
+    },
+    "filteredRetainedNet5BySide": {
+      "long": {
+        "n": 30,
+        "totalR": -0.7621482086181385,
+        "meanR": -0.025404940287271284,
+        "pf": 0.9121005911396449,
+        "wr": 0.6333333333333333,
+        "maxDdR": 4.715415760946401
+      },
+      "short": {
+        "n": 47,
+        "totalR": -5.229680448015822,
+        "meanR": -0.11126979676629409,
+        "pf": 0.6786722814562499,
+        "wr": 0.5957446808510638,
+        "maxDdR": 8.58426920530722
+      }
+    },
+    "vetoedNet5BySide": {
+      "long": {
+        "n": 20,
+        "totalR": -5.697881033397768,
+        "meanR": -0.2848940516698884,
+        "pf": 0.37243975140811514,
+        "wr": 0.5,
+        "maxDdR": 6.935478300564147
+      },
+      "short": {
+        "n": 8,
+        "totalR": -0.4991159070058473,
+        "meanR": -0.06238948837573091,
+        "pf": 0.7761302111194378,
+        "wr": 0.625,
+        "maxDdR": 1.0512020208762334
+      }
+    },
+    "baselineConcentration": {
+      "topUtcDayAbsShare": 0.01701446192893226,
+      "topTradeAbsShare": 0.01701446192893226
+    },
+    "filteredRetainedConcentration": {
+      "topUtcDayAbsShare": 0.023048775550377636,
+      "topTradeAbsShare": 0.023048775550377636
+    }
+  },
+  "limitations": [
+    "Single symbol: no cross-symbol breadth or generalization.",
+    "Baseline N=105, below frozen 250 gate.",
+    "Retained N=77, below frozen 100 gate.",
+    "This diagnostic cannot produce a clean multi-symbol GO."
+  ]
+}
