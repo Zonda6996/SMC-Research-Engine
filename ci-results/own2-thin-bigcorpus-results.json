@@ -1,0 +1,175 @@
+{
+  "studyId": "own2-thin-bigcorpus",
+  "generatedAt": "2026-08-22T17:47:02.563Z",
+  "verdict": "KILL",
+  "frozenRuleChangedAfterReveal": false,
+  "terminal": true,
+  "universe": {
+    "survivors": [
+      "ACEUSDT",
+      "COTIUSDT",
+      "WLDUSDT",
+      "BICOUSDT",
+      "NEARUSDT",
+      "UNIUSDT",
+      "1000SHIBUSDT",
+      "1000RATSUSDT",
+      "TAOUSDT",
+      "RIFUSDT",
+      "BCHUSDT",
+      "ONGUSDT",
+      "FILUSDT",
+      "LTCUSDT",
+      "XLMUSDT",
+      "XMRUSDT",
+      "TRXUSDT",
+      "DOTUSDT",
+      "INJUSDT",
+      "FETUSDT",
+      "1000BONKUSDT",
+      "CRVUSDT",
+      "PORTALUSDT",
+      "HBARUSDT",
+      "ETCUSDT"
+    ],
+    "cutoffUtc": "2026-08-22T00:00:00.000Z",
+    "globallyUntouchedSymbols": true
+  },
+  "provenance": {
+    "preregistrationSha256": "fb07e29fb4b727303d1d0c316249501b745420562f54d8804c7ad6a202d86886",
+    "amendment1Sha256": "6866f1c57aa2f04fa52c73c1242580d3497e5b13ae7180881e9ec665c7a26c40",
+    "amendment2Sha256": "1be3164acf82854e61fadc25cb4375d43a02628334d9822abde9e6da894dd17e",
+    "amendment3Sha256": "3f958552f29550ed70087d15167e812a5e690a584151d29ed0f625dc5676f869",
+    "acquisitionManifestSha256": "5fa7d805e4d7c237cc110cc9ad30bfbcdd488f59fac7e9df5bc4291ac2725c50"
+  },
+  "config": {
+    "stopSteps": 2,
+    "stepDefinition": "5.5 * atr200 / stepDivisor(safe=1) — ширина стопа определяется ТФ и волатильностью (Amendment №3)",
+    "addLevel": "entry ∓ step = ровно середина между entry и стопом",
+    "spacingBars": 180,
+    "management": "safe dynamic-partial, partialFraction 0.25 at mean, full target opposite inner band, addEnabled=true, fullFixAtMean=false",
+    "costsBpsPerSide": {
+      "grossCeiling": 0,
+      "primaryTaker": 5
+    },
+    "bootstrap": {
+      "cluster": "joint UTC day",
+      "samples": 10000,
+      "seed": 22082026
+    }
+  },
+  "counts": {
+    "opportunities": 3619,
+    "resolved": 3615,
+    "decisionsBreakdown": {
+      "retain": 2078,
+      "veto-zero": 10,
+      "veto-missing": 0,
+      "veto-sign": 1527
+    }
+  },
+  "primary": {
+    "metric": "pooled mean (netR@5bps + actual funding)",
+    "n": 3615,
+    "totalR": -230.17745345193623,
+    "meanR": -0.06367287785669053,
+    "pf": 0.815301511517182,
+    "wr": 0.5914246196403873,
+    "maxDdR": 244.99646288389616,
+    "long": 1820,
+    "short": 1795,
+    "medianHoldingBars": 156,
+    "outcomes": {
+      "full-tp": 2195,
+      "partial-stop": 812,
+      "stop": 608
+    },
+    "ci95": {
+      "lower": -0.09768754991174386,
+      "median": -0.06376551465069007,
+      "upper": -0.029365957155861832
+    }
+  },
+  "diagnostics": {
+    "priceOnlyNet5": {
+      "n": 3615,
+      "totalR": -249.72686599518894,
+      "meanR": -0.06908073748138006,
+      "pf": 0.8012721769843133,
+      "wr": 0.5914246196403873,
+      "maxDdR": 264.3106716740116,
+      "long": 1820,
+      "short": 1795,
+      "medianHoldingBars": 156,
+      "outcomes": {
+        "full-tp": 2195,
+        "partial-stop": 812,
+        "stop": 608
+      }
+    },
+    "priceOnlyGross0": {
+      "n": 3615,
+      "totalR": -222.1352284765381,
+      "meanR": -0.06144819598244484,
+      "pf": 0.8211575840457415,
+      "wr": 0.5919778699861687,
+      "maxDdR": 237.5143765636007,
+      "long": 1820,
+      "short": 1795,
+      "medianHoldingBars": 156,
+      "outcomes": {
+        "full-tp": 2195,
+        "partial-stop": 812,
+        "stop": 608
+      }
+    },
+    "retainedExecutedSecondary": {
+      "n": 2078,
+      "totalR": -90.97311555343516,
+      "meanR": -0.043779170141210376,
+      "pf": 0.8753260627450555,
+      "wr": 0.5837343599615015,
+      "maxDdR": 104.92475565843137,
+      "long": 550,
+      "short": 1528,
+      "medianHoldingBars": 142,
+      "outcomes": {
+        "partial-stop": 499,
+        "stop": 353,
+        "full-tp": 1226
+      }
+    },
+    "pairedDeltaMeanROpportunity": 0.03850742403831289,
+    "pairedCi95": {
+      "lower": 0.0195964940343753,
+      "median": 0.03857670528196413,
+      "upper": 0.05777724366933096
+    },
+    "referenceUnthinnedNet5": {
+      "n": 16500,
+      "totalR": -1197.6244767271178,
+      "meanR": -0.07258330161982532,
+      "pf": 0.8021801934250791,
+      "wr": 0.5707878787878787,
+      "maxDdR": 1222.2538630198594,
+      "long": 7909,
+      "short": 8591,
+      "medianHoldingBars": 155,
+      "outcomes": {
+        "full-tp": 9652,
+        "partial-stop": 3757,
+        "stop": 3091
+      }
+    }
+  },
+  "gates": {
+    "opportunitiesAtLeast250": true,
+    "resolvedAtLeast100": true,
+    "ciLowerPositive": false
+  },
+  "limitations": [
+    "Символы вселенной ранее не исследовались проектом, но сам рынок общий с прошлыми корпусами.",
+    "Стоп = 2×step (ATR200-масштаб по ТФ); добор entry∓step; каноническая механика без свободных параметров (Amendment №3).",
+    "После этого reveal корпус сожжён для данной гипотезы: retune/rescue/subgroup запрещены (§6)."
+  ]
+}

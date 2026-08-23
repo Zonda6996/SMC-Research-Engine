@@ -1,0 +1,283 @@
+{
+  "studyId": "own2-thin-bigcorpus",
+  "generatedAt": "2026-08-22T17:46:56.183Z",
+  "labelFree": true,
+  "formula": "stopSteps* = 0.019 / median(step_i/entry_i); step_i = 5.5*atr200_i/safeStepDivisor; entry_i = open(signalIndex+1)",
+  "targetMedianStopPctOfPrice": 0.019,
+  "safeStepDivisor": 1,
+  "spacingBars": 180,
+  "own2Config": {
+    "warmupBars": 200,
+    "relativeVolumePeriod": 20,
+    "minimumRelativeVolume": 1.4,
+    "minimumDistanceMeanPct": 3,
+    "minimumPenetrationInner": -0.35
+  },
+  "provenance": {
+    "preregistrationSha256": "fb07e29fb4b727303d1d0c316249501b745420562f54d8804c7ad6a202d86886",
+    "amendment1Sha256": "6866f1c57aa2f04fa52c73c1242580d3497e5b13ae7180881e9ec665c7a26c40",
+    "amendment2Sha256": "1be3164acf82854e61fadc25cb4375d43a02628334d9822abde9e6da894dd17e",
+    "acquisitionManifestSha256": "5fa7d805e4d7c237cc110cc9ad30bfbcdd488f59fac7e9df5bc4291ac2725c50"
+  },
+  "pooled": {
+    "symbols": 25,
+    "candidatesTotal": 16550,
+    "admittedTotal": 3619,
+    "ratiosUsed": 3619,
+    "pooledMedianStepOverEntry": 0.08090630709965824,
+    "stopStepsFrozen": 0.2348395407121512,
+    "expectedMedianStopPctOfPrice": 0.019
+  },
+  "perSymbol": [
+    {
+      "symbol": "ACEUSDT",
+      "candidates": 363,
+      "admitted": 80,
+      "usedForRatios": 80,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.10128475997080469,
+      "impliedStopStepsForThisSymbol": 0.18758991980113046
+    },
+    {
+      "symbol": "COTIUSDT",
+      "candidates": 777,
+      "admitted": 170,
+      "usedForRatios": 170,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.09788462258797848,
+      "impliedStopStepsForThisSymbol": 0.1941060760889469
+    },
+    {
+      "symbol": "WLDUSDT",
+      "candidates": 479,
+      "admitted": 93,
+      "usedForRatios": 93,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.10760869652835868,
+      "impliedStopStepsForThisSymbol": 0.17656565512800196
+    },
+    {
+      "symbol": "BICOUSDT",
+      "candidates": 434,
+      "admitted": 94,
+      "usedForRatios": 94,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.08978044469081714,
+      "impliedStopStepsForThisSymbol": 0.2116273768238903
+    },
+    {
+      "symbol": "NEARUSDT",
+      "candidates": 867,
+      "admitted": 184,
+      "usedForRatios": 184,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.09214366366754112,
+      "impliedStopStepsForThisSymbol": 0.2061997455251284
+    },
+    {
+      "symbol": "UNIUSDT",
+      "candidates": 834,
+      "admitted": 191,
+      "usedForRatios": 191,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.08449937912289888,
+      "impliedStopStepsForThisSymbol": 0.22485372315417523
+    },
+    {
+      "symbol": "1000SHIBUSDT",
+      "candidates": 770,
+      "admitted": 166,
+      "usedForRatios": 166,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.07070834998890936,
+      "impliedStopStepsForThisSymbol": 0.26870942403521164
+    },
+    {
+      "symbol": "1000RATSUSDT",
+      "candidates": 416,
+      "admitted": 84,
+      "usedForRatios": 84,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.13734981738205493,
+      "impliedStopStepsForThisSymbol": 0.13833291053565241
+    },
+    {
+      "symbol": "TAOUSDT",
+      "candidates": 376,
+      "admitted": 76,
+      "usedForRatios": 76,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.09686443271079931,
+      "impliedStopStepsForThisSymbol": 0.19615042867929489
+    },
+    {
+      "symbol": "RIFUSDT",
+      "candidates": 469,
+      "admitted": 88,
+      "usedForRatios": 88,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.08602286298763288,
+      "impliedStopStepsForThisSymbol": 0.22087151415469097
+    },
+    {
+      "symbol": "BCHUSDT",
+      "candidates": 892,
+      "admitted": 205,
+      "usedForRatios": 205,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.06461986741034793,
+      "impliedStopStepsForThisSymbol": 0.2940272204420745
+    },
+    {
+      "symbol": "ONGUSDT",
+      "candidates": 403,
+      "admitted": 81,
+      "usedForRatios": 81,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.06880042673486332,
+      "impliedStopStepsForThisSymbol": 0.2761610777970961
+    },
+    {
+      "symbol": "FILUSDT",
+      "candidates": 825,
+      "admitted": 186,
+      "usedForRatios": 186,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.0797764312210997,
+      "impliedStopStepsForThisSymbol": 0.23816557984828451
+    },
+    {
+      "symbol": "LTCUSDT",
+      "candidates": 851,
+      "admitted": 207,
+      "usedForRatios": 207,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.0637807657354646,
+      "impliedStopStepsForThisSymbol": 0.2978954514093464
+    },
+    {
+      "symbol": "XLMUSDT",
+      "candidates": 953,
+      "admitted": 201,
+      "usedForRatios": 201,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.06468633942966612,
+      "impliedStopStepsForThisSymbol": 0.29372507653890084
+    },
+    {
+      "symbol": "XMRUSDT",
+      "candidates": 664,
+      "admitted": 172,
+      "usedForRatios": 172,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.06580784538671065,
+      "impliedStopStepsForThisSymbol": 0.28871937514971263
+    },
+    {
+      "symbol": "TRXUSDT",
+      "candidates": 1027,
+      "admitted": 221,
+      "usedForRatios": 221,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.038008450363366496,
+      "impliedStopStepsForThisSymbol": 0.49988883572882203
+    },
+    {
+      "symbol": "DOTUSDT",
+      "candidates": 813,
+      "admitted": 181,
+      "usedForRatios": 181,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.0740080357733082,
+      "impliedStopStepsForThisSymbol": 0.2567288781747746
+    },
+    {
+      "symbol": "INJUSDT",
+      "candidates": 556,
+      "admitted": 128,
+      "usedForRatios": 128,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.09084006067750747,
+      "impliedStopStepsForThisSymbol": 0.20915882110044112
+    },
+    {
+      "symbol": "FETUSDT",
+      "candidates": 546,
+      "admitted": 110,
+      "usedForRatios": 110,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.09820477282417348,
+      "impliedStopStepsForThisSymbol": 0.1934732849901067
+    },
+    {
+      "symbol": "1000BONKUSDT",
+      "candidates": 468,
+      "admitted": 88,
+      "usedForRatios": 88,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.10827314517011286,
+      "impliedStopStepsForThisSymbol": 0.17548211026980176
+    },
+    {
+      "symbol": "CRVUSDT",
+      "candidates": 728,
+      "admitted": 173,
+      "usedForRatios": 173,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.10197147331284305,
+      "impliedStopStepsForThisSymbol": 0.18632662040401252
+    },
+    {
+      "symbol": "PORTALUSDT",
+      "candidates": 335,
+      "admitted": 75,
+      "usedForRatios": 75,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.11509418427101434,
+      "impliedStopStepsForThisSymbol": 0.16508219003716434
+    },
+    {
+      "symbol": "HBARUSDT",
+      "candidates": 771,
+      "admitted": 169,
+      "usedForRatios": 169,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.07510047467537934,
+      "impliedStopStepsForThisSymbol": 0.2529944062554493
+    },
+    {
+      "symbol": "ETCUSDT",
+      "candidates": 933,
+      "admitted": 196,
+      "usedForRatios": 196,
+      "missingNextBar": 0,
+      "invalidGeometry": 0,
+      "medianRatio": 0.06924458835713404,
+      "impliedStopStepsForThisSymbol": 0.2743896736306108
+    }
+  ]
+}
