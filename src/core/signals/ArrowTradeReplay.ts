@@ -22,6 +22,16 @@ export interface ArrowModeConfig {
 	postExitBars: number
 	maxHoldingBars: number
 	oneWayCostBps: number
+	/** E5 (default-off, обратная совместимость): при true — полная фиксация 100% у движущейся band.mean
+	 *  (mean-в-прибыли, favorable wick) → сделка завершается тут (тейк-или-стоп), без ожидания opposite-inner. */
+	fullFixAtMean?: boolean
+	/** E5 (default true): включён ли добор (add). При false add не заполняется и oneR = |entry − stop|
+	 *  (риск = дистанция стопа без усреднения). undefined/true → каноническое поведение не меняется. */
+	addEnabled?: boolean
+	/** RE18 (default off): после частичной фиксации у mean перенести стоп в безубыток (averageEntry).
+	 *  Только для management 'dynamic-partial' (там, где берётся partial). undefined/false → поведение
+	 *  не меняется (стоп фиксирован, как в §6 INDICATOR). oneR НЕ меняется (риск-юнит от исходного стопа). */
+	breakevenAfterPartial?: boolean
 }
 
 /** GEO4 calibrated geometry; costs use the later BingX small-size 7 bps assumption. */
@@ -179,7 +189,7 @@ export function replayArrowTrade(
 	let stop = signal.side === 'long' ? entry - config.stopSteps * step : entry + config.stopSteps * step
 	const staticFull = signal.side === 'long' ? entry + 2 * step : entry - 2 * step
 	const averageFullEntry = (entry + add) / 2
-	const oneR = Math.abs(averageFullEntry - stop) * 2
+	const oneR = config.addEnabled === false ? Math.abs(entry - stop) : Math.abs(averageFullEntry - stop) * 2
 	if (!(oneR > 0)) return null
 
 	const events: ArrowTradeEvent[] = [{ type: 'entry', index: entryIndex, at: entryCandle.timestamp, price: entry }]
@@ -201,7 +211,7 @@ export function replayArrowTrade(
 	for (let index = entryIndex; index <= lastIndex; index++) {
 		const candle = candles[index]!
 		const band = bands[index]
-		if (!addFilled && adverseWick(signal.side, candle, add)) {
+		if (config.addEnabled !== false && !addFilled && adverseWick(signal.side, candle, add)) {
 			addFilled = true
 			// The add is one original unit. If Partial happened first, only
 			// (1 - partialFraction) of the entry lot remains, so its blended
@@ -236,6 +246,16 @@ export function replayArrowTrade(
 		if (!Number.isFinite(fullTarget)) continue
 		trajectory.push({ index, at: candle.timestamp, mean: band.mean, oppositeInner: fullTarget })
 		const meanInProfit = signal.side === 'long' ? band.mean > averageEntry : band.mean < averageEntry
+		if (config.fullFixAtMean && meanInProfit && favorableWick(signal.side, candle, band.mean)) {
+			// E5: полная фиксация 100% у движущейся mean — сделка завершается (take-at-mean).
+			exitIndex = index
+			exitPrice = band.mean
+			outcome = 'full-tp'
+			fullEventPrice = band.mean
+			turnoverNotional += Math.abs(band.mean) * weight
+			events.push({ type: 'full', index, at: candle.timestamp, price: band.mean })
+			break
+		}
 		if (!partialTaken && meanInProfit && favorableWick(signal.side, candle, band.mean)) {
 			const closedWeight = weight * config.partialFraction
 			realizedPnl += directionalPnl(signal.side, averageEntry, band.mean) * closedWeight
@@ -244,6 +264,12 @@ export function replayArrowTrade(
 			partialTaken = true
 			partialPrice = band.mean
 			events.push({ type: 'partial', index, at: candle.timestamp, price: band.mean })
+			// RE18 (opt-in): после частички перенести стоп в безубыток (averageEntry). Действует со следующего
+			// бара (порядок add→stop→partial→full). oneR не меняется. Только для dynamic-partial (этот блок).
+			if (config.breakevenAfterPartial) {
+				stop = averageEntry
+				events.push({ type: 'breakeven', index, at: candle.timestamp, price: averageEntry })
+			}
 		}
 
 		if ((signal.side === 'long' ? candle.close >= fullTarget : candle.close <= fullTarget)) {
