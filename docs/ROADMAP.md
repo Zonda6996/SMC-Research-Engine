@@ -8,12 +8,151 @@
 
 ---
 
+## OWN2 + funding-sign filter — BTC/ETH/SOL protocol holdout `INCONCLUSIVE DATA`
+- [x] До outcomes заморожены preregistration SHA-256 `6442965a30ddb0546b82cbd29529ab27d1de79539dc143f4503d261d40f183d9` и acquisition manifest SHA-256 `80ea6a481a3d987210ee36c1365f21990d9f497cb8423527114ec5d6617b3586`.
+- [x] Общий calendar cutoff 65/35 = 2025-09-17 17:00 UTC; development только QA, без подбора. Корпус protocol-held-out, но не гарантирован globally untouched из-за прошлых BTC/ETH/SOL исследований.
+- [x] Канонический OWN2 восстановлен до reveal: `minimumRelativeVolume:1.4` передан явно; исторический default=0 wiring bug не использован. Vendor Shapes/GGI исключены из features/labels.
+- [x] Official Binance USD-M settlements сохранены по 2891 строке/symbol; candle QA: 23104 строки/symbol, exact alignment, 0 malformed/duplicates/gaps/OHLC/volume errors. Funding: 0 duplicates/conflicts; фактическая cadence сохранена без синтетики.
+- [x] Frozen run: baseline 101, retained 56, vetoed 45. Baseline net −18.81186R (−0.18626R/opportunity); filtered −6.59726R (−0.11781R/executed, −0.06532R/opportunity). Paired delta +0.12094R/opportunity, CI95 [0.00607; 0.23890], breadth 3/3, но filtered остаётся отрицательным и N gates 250/100 провалены ⇒ `INCONCLUSIVE DATA`, не GO.
+- [x] Без ретюна после reveal; эти protocol-tail outcomes сожжены для данного правила.
+
+Артефакты: `ci-results/own2-funding-sign-btc-eth-sol-{preregistration,results}.{md,json}`, `data/own2-funding-sign-btc-eth-sol/{acquisition-manifest.md,manifest.json,*-funding.json}`.
+
+## OWN2 + funding-sign filter — AVAX diagnostic `INCONCLUSIVE SMALL-N`
+- [x] До outcomes создан immutable preregistration: канонический OWN2/Safe, 5 bps/side, actual direction-aware funding cashflows, strict `settlementTimestamp < decisionTimestamp`, paired opportunity metric, UTC-day bootstrap 10k seed 25082026 и GO/KILL/N gates.
+- [x] Coverage-аудит установил: из пяти untouched S1 серий с funding совместима только AVAXUSDT futures 1h; spot PnL не подменялся perpetual рынком.
+- [x] До чтения AVAX outcomes создан immutable diagnostic amendment, SHA-256 `faf09ed3b260d96f3f0d45dec7d7f94b8f12208e6666f8e2da95c76f319e9a63`: один symbol не может дать общий GO; допустимы только diagnostic-классификации.
+- [x] Official Binance USD-M settlements получены и захешированы; frozen candle hash `63d371…88dae` совпал. Strict-prior coverage полная: zero/missing veto 0; возраст latest rate median 5h, max 8h.
+- [x] One-time reveal: baseline 105 opportunities, retained 77, vetoed 28. Net @5 + funding baseline −12.18883R, filtered veto=0 −5.99183R; paired delta +6.19700R / +0.05902R per opportunity, CI95 [−0.00158; 0.12537]. Retained arm всё ещё отрицателен (−0.07782R/trade, PF 0.75981), CI пересекает 0, N<250 и retained<100 ⇒ `INCONCLUSIVE SMALL-N`, не GO.
+- [x] Granular reveal status: AVAX futures 1h = revealed-diagnostic; AVAX spot 5m, LINK spot 15m/1h, SOL spot 2h = untouched; whole S1 = partially-revealed, не `reveal=1`.
+- [ ] Clean test всё ещё требует новый preregistered all-perpetual holdout ≥3 symbols, ≥250 baseline opportunities и ≥100 retained trades.
+
+Артефакты: `ci-results/own2-funding-sign-{preregistration,coverage-audit,avax-diagnostic-amendment,avax-diagnostic,reveal-status}.*`, `data/own2-funding-sign-avax/manifest.json`.
+
+## Funding-only independent line — ЗАКРЫТА (`KILL`)
+- [x] До reveal заморожены arms, event clock, costs 0/5 bps, universe BTC/ETH/SOL, общий 65/35 cutoff и evidence gates.
+- [x] Реализованы strict-after-settlement fills, actual variable cadence, funding cashflow, fixed-notional metrics и UTC-day joint cluster bootstrap (10k, seed 24082026).
+- [x] Официальная общая история Binance USD-M: 2020-09-13 — 2026-07-31; immutable data hashes/QA manifest сохранены.
+- [x] OOS reveal: 6768 trades; CONTRARIAN @5 bps equal-symbol −8.2786 bps/trade, CI95 [−14.1721; −2.5605], breadth 0/3; paired CI пересекает 0 ⇒ `KILL`. Retune/rescue запрещены.
+
+## Трек F — D6 Cascade Reversion (GO, активная линия)
+
+> **Что это:** первая стратегия проекта с двумя независимыми preregistered-репликациями GO.
+> Сигнал: каскадный делевериджинг (ΔOI_8h ≤ −15% И ΔP_8h ≤ −3%) → LONG next-open, структурный
+> стоп, выход reclaim/таймаут. Полная спека и цифры — `docs/strategies/d6-cascade.md`.
+> Протоколы: `ci-results/d6-cascade-preregistration.md` (a7fa407a…), `…extension.md` (8ebe6606…),
+> `d6-mgmt-preregistration.md` (365f4e8c…) + amendment (1004952e…).
+
+- [x] Census (карта событий, dev-only) → `ci-results/d6-leverage-flow-census.*`
+- [x] Reveal №1 (14 символов, OOS) → `INCONCLUSIVE` (N=54, правило редкое)
+- [x] Extension №2 (11 symbol-fresh, вся история) → **GO** (H24-nostop: +1.90%/сделку, CI [+0.15;+3.63])
+- [x] Mgmt-исследование (12 symbol-fresh, 6 рук) → **GO ×3 со стопом**; лучшая **H72-stopStruct**
+      (+2.97%/сделку, PF 2.03, CI [+0.50;+5.46], breadth 9/12) → спека `docs/strategies/d6-cascade.md`
+- [x] Funding-sign: на каскадной популяции знак ПЕРЕВЁРНУЛСЯ (−1.64%) → фильтр НЕ универсален
+      (запись в NEGATIVE-KNOWLEDGE; не применять к D6)
+- [x] **Paper-forward: первый полный проход** ✅ 2026-08-23 (~35с после фикса fetchOi; в журнале
+      10 сигналов; ⚠ вопрос автору: меж-прогонный min-gap не проверяется — смежные бары каскада
+      попадают в журнал, архивное правило второй бы отклонило)
+- [ ] **Paper-forward: накопление** (~10–15 сигналов/мес на 37 символах; осмысленная выборка ~полгода;
+      MFE-в-R пишется по каждой сделке — живой ответ на «сколько доходит до 1.5R»;
+      паритет live-OI vs архивы сверять по мере публикации архивов)
+- [x] **D6-tp (заморожено, прогнан):** терминальный reveal 2026-08-23 → **`KILL`** (все 4 руки CI
+      через ноль; контроль C-H72 +0.01% [−1.41;+1.44] — НЕ реплицировался на старых листингах
+      против +2.97% на mgmt). MFE-ответ: до ≥1.5R доходят 33.4% (120/359). Артефакты:
+      `ci-results/d6-tp-{preregistration,results}.*`, `ci/research/runD6TpReveal.ts`,
+      `data/d6-tp/manifest.json`. Вселенная сожжена; частички — будущая preregistration.
+      ⚠ Статус линии D6 — решение автора (см. HANDOFF)
+- [ ] **Мульти-ТФ пачка сигнала:** 5m / 15m / 30m / 1h / 2h / 4h. Правила: окна пропорциональны
+      (8 баров соответствующего ТФ), пороги события НЕ трогаем (−15%/−3% — гипотеза та же);
+      каждая ТФ-рука = отдельная preregistration на symbol-fresh данных; метрики OI кэшированы,
+      докачать только свечи нужных ТФ. ⚠ 5m/15m дополнительно тестировать как скальп-подтверждение
+      локальных зон Apex (идея автора) — отдельный census
+- [ ] **Визуализатор: слой D6-индикатора.** Маркеры сигналов (бар-сигнал, вход, стоп, цель) +
+      таблица статистики по активу (N/WR/PF/средняя/MFE). Данные — из кэша метрик+свечей.
+      ⚠ Название индикатора придумать ПОСЛЕ подтверждения форвардом (рабочее: «Каскад» / D6 Cascade)
+- [ ] **Хозяйство сессии:** коммит+пуш всех артефактов D6/Reversal-финала; решение по кэшу
+      (`.cache/binance` ~1.5ГБ/52k файлов и `tmp/viz-archive-cache` 252МБ — перекачиваются
+      детерминированно, можно чистить или архивировать; в .gitignore проверить); pruning старых
+      ci-results по списку автора; оптимизация визуализатора (существующий долг)
+
 ## Принципы (из AGENTS.md)
 - Правила анализа не выдумываем (§2.1). Пороги/условия значимости — только по явному решению
   автора; в задачах помечено «⚠ решает автор».
 - Найденное не чиним молча (§2.2): сначала показать/обсудить, потом менять.
 - Дисциплина проверки: гипотеза → отложенное окно (OOS), а не подбор красивой ячейки глазами
   в визуализаторе (это multiple-testing, регрессия к среднему на форварде).
+
+---
+
+## Трек S — собственный причинный stateful Apex-event индикатор (АКТИВНАЯ RESEARCH-ЛИНИЯ)
+
+> **Итог frozen S4: `KILL` — recovery filter не edge; вся линия не закрыта.** Exact-bar RE
+> остаётся закрытым; прошлые RE/S1–S3 результаты и frozen artifacts не удалялись. Vendor Shapes
+> не были features, targets или критерием выбора. Новый S4 holdout сожжён; S1 untouched OOS
+> остаётся sealed, `reveal=0`.
+
+### S1. Что реализовано и заморожено
+
+- [x] Причинная event machine `NEUTRAL → ARMED → EXTENDED → TRACKING → REVERSAL_CONFIRMED → COOLDOWN`.
+- [x] Immutable manifest, whole-symbol split, config/code/data hashes; integrity errors: **0**.
+- [x] Entry next-open, target=Mean, stop=same-side Outer, conservative stop-first, costs 5 bps/side.
+- [x] Единственная допустимая рука: threshold-free `primary-threshold-free-all-confirmed-events`;
+  train-selection, grid search и post-hoc thresholds не применялись.
+- [x] Prefix/mirror/no-shapes QA и расчёт MFE/MAE, target-before-stop, net R выполнены.
+
+### S2. Результаты и gate
+
+| split | resolved | net meanR | CI95 | PF | WR | positive symbols | positive series |
+|---|---:|---:|---|---:|---:|---:|---:|
+| train | 4845 | −8.2535 | [−14.0245; −0.0548] | 0.0418 | 0.3465 | 1/7 | 3/27 |
+| validation | 799 | −0.2001 | [−0.5861; 0.0530] | 0.7163 | 0.5006 | 0/2 | 1/5 |
+
+Validation mean net R ≤ 0, поэтому preregistered gate дал **`KILL_VALIDATION_NO_EDGE`**.
+Это **validation kill**, не OOS-провал: advance не состоялся, reveal count = 0, untouched
+whole-asset OOS намеренно не вскрыт и остаётся sealed. Split/hash integrity прошли.
+
+Гипотеза «проблема только в stateless OWN2» проверена в минимальной stateful форме: память
+траектории сама по себе edge не создала. A0/A1 не запускались, остаются не тестированными
+attribution-руками и не могут считаться winners.
+
+### S3. Profile → freeze → internal holdout
+
+- [x] Primary >=15m diagnostic profile выделил два candidate: `newAdverseExtremes` и
+  `lastExtensionIncrementOverInner`.
+- [x] До reveal заморожена ровно одна v2-рука `newAdverseExtremes <= 1`; threshold 1 —
+  label-free development median, без PnL-grid.
+- [x] Internal holdout ONDO/VIRTUAL раскрыт один раз. v1: resolved 259, meanR −0.09033,
+  CI95 [−0.24971; 0.05873], PF 0.84025, WR 0.44788, maxDD 39.17770R. v2: admitted 187,
+  resolved 184, meanR +0.00227, CI95 [−0.15046; 0.13710], PF 1.00472, WR 0.52717,
+  maxDD 22.85845R. Paired delta +0.09260, CI95 [−0.02065; 0.20599]; breadth 1/2 symbols,
+  1/2 series. Point estimate/PF/WR/DD улучшились, но CI и breadth gate не прошли ⇒ **`KILL`**.
+
+### S4. Loss source → recovery freeze → новый независимый holdout
+
+- [x] Диагностика источника потерь: development gross meanR −0.0146; fee drag −0.0798 —
+  главный incremental drag; net meanR −0.0944. Favorable-then-stop = 1434/1456 stop outcomes;
+  repeats не причина.
+- [x] До reveal заморожена одна v2-рука
+  `recoveryFromExtremeOverInner >= 0.3203983409316291`; cutoff = label-free development median,
+  без PnL-grid/subgroup rescue.
+- [x] Label-free universe freeze и acquisition: ZEC/1000PEPE/BOME, 1h, по 20 000 баров;
+  schema/completeness PASS, без замен и интерполяции.
+- [x] Единственный reveal: v1 meanR −0.02205, CI95 [−0.14444; 0.09872]; v2 meanR −0.00032,
+  CI95 [−0.19157; 0.23155]; paired delta +0.02173, CI95 [−0.14912; 0.22548]; breadth
+  2/3 symbols и 2/3 series ⇒ **`KILL`**, не edge.
+- [x] Новый holdout помечен сожжённым: reuse, retune, subgroup/asset/TF/side rescue запрещены.
+  S1 untouched OOS остаётся sealed (`reveal=0`).
+
+### Следующий шаг
+
+- [ ] Отдельно исследовать causal management-гипотезу favorable-then-stop: сохранение уже
+  возникшего favorable excursion. Сначала development + новая preregistration; не входной фильтр.
+  Конкретное торговое правило не задано и сейчас не реализуется (§2.1). Вся research-линия
+  остаётся открытой.
+
+Артефакты S4: `ci-results/stateful-apex-s4-loss-source-diagnostic.*`,
+`stateful-apex-s4-v2-freeze.*`, `stateful-apex-s4-holdout-universe-freeze.*`,
+`stateful-apex-s4-holdout-acquisition.*`, `stateful-apex-s4-v2-holdout-reveal.*`.
 
 ---
 
@@ -143,6 +282,286 @@
   рыночно-нейтрально, вычитает бету, топящую лонги. Другой источник edge (относительная сила), а не ещё фильтр.
 - [ ] **D6. Новая информация (план Б, если D1–D5 упрутся).** `NEGATIVE-KNOWLEDGE §3`: exact-bar, вероятно,
   зависит от intrabar/HTF-stateful/OI/funding, которых нет в экспорте. Инфраструктурно дорого → последний рычаг.
+  **Внешний срез (AI Edge, 2026-08-16):** 9 моделей независимо сошлись, что единственная прайс-идея с реальным
+  экономическим механизмом — liquidation-cascade / leverage-imbalance reversion (экстремум + OI/funding-extreme +
+  истощение потока → откат). Наш триггер `extension + relVol` — ценовой ПРОКСИ ровно этого. Отсюда гипотеза (не менять
+  движок, сначала данные): (1) добавить funding в `costR` (перп-позиции на 15m–2h держатся через settlement — может
+  доесть или добавить эдж); (2) OI-drop как ПРИЧИННОЕ подтверждение самого триггера (ортогональная инфа, не ещё порог
+  на цене); (3) maker-limit вход в тело панической свечи вместо chase exact-bar — атакует и recall-разрыв (73–89% эпизод
+  vs 10.9% бар, `FINDINGS-GGI`), и cost drag. Всё гнать через B1-харнесс (train/OOS + CI + breadth), ⚠ пороги/логика —
+  решает автор. Материал: папка `AI Edge/` (временная). GLM-бот (`AI Edge/GLM Edge tested/`) реализовал ту же гипотезу,
+  но его «PF 2.49» — in-sample на невоспроизводимом live-окне без OOS/DSR + intrabar-утечка стопа → как доказательство
+  не годится, ценна только сама гипотеза.
+
+---
+
+## Трек RE — реверс-инжиниринг стрелки GGI Buy/Sell (лог, 2026-08-17)
+> **Что это:** попытка воспроизвести логику стрелок вендора. §2.1 для этой линии снят автором
+> (можно выдвигать гипотезы). Метрика — recall/precision/density против реальных scalp-алертов
+> вендора (`data/vendor-exports/tg_topic_16293_scalp.json`, 341 на тест-парах / 1692 всего).
+> Матч: та же сторона, допуск ±N баров. Baseline — наш OWN2 (relVol 1.4): recall 19% @ density ×3.3.
+> Тест-пары: VIRTUAL/BNB/ETH 5m, OP/CRV/ONDO 15m (фид futures). Харнесс: `ci/research/runE5ZoneLagDiagnostic.ts`.
+
+- [x] **RE1. F&G-осциллятор поверх зоны — FALSIFIED (2026-08-17).** Гипотеза «стрелка = RSI/стохастик
+  на экстремуме поверх Apex-зоны». 432 конфига. При вендорской плотности recall ~1% << OWN2 19%.
+  Артефакт: `ci-results/e5-fg-arrow-fit.{md,json}`.
+- [x] **RE2. Диагностика лаг vs зона — прогнан (2026-08-17).** `runE5ZoneLagDiagnostic.ts`.
+  • **Лаг-кривая НЕ насыщается:** recall OWN2 @±{0,1,2,3,5,8} = 2.1/18.8/23.8/28.7/33.4/38.1%. Прирост
+    0→±3 = +26.7 п.п., ±3→±8 = +9.4 п.п. → разрыв **не** чистый лаг постинга; даже ±8 баров даёт лишь ~38%.
+  • **Прежний диагноз «~80% стрелок вне зоны» — НЕ подтверждён** тем замером: «мягкая» зона (distPct-от-mean
+    ≥ minDist) активна на 97.9% баров вендора, НО и на ~75% ВСЕХ баров — метрика тривиальна, не дискриминирует.
+  • **Строгое касание края Apex — стрелки вендора там почти НЕ стоят:** cover@±1 = **inner 20.6% / outer 0.3%**
+    (activationDensity inner 11.3% / outer 2.1%). Любой минимальный триггер поверх строгой зоны упирается в
+    recall ~0.3% при вендорской плотности — НЕ обгоняет OWN2 (18.8%).
+  • **ВЫВОД (важный отрицательный):** порог «экстремума» у вендора **не совпадает с геометрией полос Apex** —
+    его линия зоны стоит МЕЖДУ средней и краем, не у края и не «где угодно». Реверс-инжиниринг по одним свечам
+    (OHLCV) упёрся в стенку: перебор геометрии Apex (гео-свип) разрыв не закрыл. Артефакт: `ci-results/e5-zone-lag-diagnostic.{md,json}`.
+- [x] **RE3. Фингерпринт реальной GGI Zone по CSV из TradingView — ПРОГНАН (2026-08-18). ДВА КЛЮЧЕВЫХ ВЫВОДА.**
+  Данные пришли: `csv/BINANCE_{BTC.P 5m/15m/60m, BNB.P 5m, VIRTUAL.P 5m}.csv` (реальные линии зоны + shapes + volume, ~20–23k строк).
+  Раннер `ci/research/runRE3VendorZoneFit.ts` → `ci-results/re3-vendor-zone-fit.{md,json}`. Наш Apex считается из тех же OHLCV, движок не тронут.
+  • **(A) ГЕОМЕТРИЯ ЗОНЫ = НАШ APEX, точь-в-точь.** Медианная %-ошибка нашей mean/полос против реальных линий вендора
+    = **0.05%** на 5m (BNB/BTC/VIRTUAL), 0.09–0.24% на 15m/1h; max разово ≤2.2%. Аналитика линий вендора: лог-симметрия
+    верх/низ **0.00%**, внешн/внутр k-ratio **1.71** (= наш 9.6/5.6), implied widthScale **1.00**. ⇒ калибровка Apex
+    подтверждена как ТОЧНАЯ; узкое место — НЕ геометрия зоны. Мелкий нюанс: наш mean лучше всего ложится при сдвиге −5 баров
+    (medErr 0.05%→0.02%) — вероятно фазовый лаг ALMA-offset, второстепенно (⚠ можно уточнить отдельно).
+  • **(B) ГДЕ СТОИТ СТРЕЛКА — ИЗМЕРЕНО НА ВЕРНОЙ ЗОНЕ (471 стрелка, buy 245/sell 226).** Доля пути mean→ВНЕШНИЙ край,
+    достигнутая фитилём на баре стрелки: **median 0.54** (p10/p90 = 0.40/0.71; best±2 = 0.62). Касание OUTER = **0.0%** (в ±2 = 1.3%),
+    касание INNER = 41.6% (в ±2 = **57.3%**). Распределение узкое: ~78% стрелок в 0.4–0.7. Внутренняя полоса лежит на
+    kInner/kOuter = 5.6/9.6 = **0.583** пути → **стрелка вендора привязана к ВНУТРЕННЕЙ полосе (redLo/greenHi), а НЕ к внешнему краю**
+    (который сейчас использует детектор reversals). Это прямой ответ на стенку RE2: порог «экстремума» ≈ внутренняя полоса, чуть мельче.
+  • **(C) OWN2 recall на ПРАВИЛЬНЫХ свечах уже выше:** BTC 5m/15m/1h = 26.8/25.8/31.0%, VIRTUAL 28.0%, BNB 17.4% (против 18.8% на
+    прежнем несовпадающем фиде) — подтверждает, что часть прежнего разрыва была из-за чужого фида, а не логики.
+  **⇒ Гипотеза RE4 (⚠ решает автор, движок трогать по согласованию):** переякорить триггер стрелки на ВНУТРЕННЮЮ полосу / глубину
+  f≈0.5–0.6 (вместо внешнего края), сохранив подтверждение (relVol/направление свечи), и замерить recall/precision против shapes при
+  вендорской плотности. Валидацию гнать новым харнессом (fit-триггер на реальных shapes из CSV, train/OOS по файлам).
+
+  <s>СЛЕДУЮЩИЙ ШАГ / нужны данные автора.</s> (данные получены, RE3 закрыт)
+  Так как порог экстремума по свечам не восстанавливается, брали его напрямую с графика. **Что автору прислать
+  (следующий чат):** экспорт «Export chart data» из TradingView с включённым индикатором GGI Buy/Sell на графике,
+  чтобы в CSV попали НЕ только OHLCV, но и **значения линий зоны (верх/низ полос)** и **колонка shape-сигналов (Buy/Sell)**.
+  Файлы: ≤20k свечей каждый. Приоритет активов/ТФ:
+  (1) **BTC/USDT.P — 5m, 15m, 1h** (Apex калиброван на BTC → прямая сверка геометрии зоны);
+  (2) **VIRTUAL 5m и BNB 5m** (больше всего алертов вендора → сверка привязки стрелок к зоне).
+  Что делаем по приходу: (а) фитим геометрию нашей зоны (или новой) к реальным линиям вендора → находим истинный
+  порог/расстояние экстремума; (б) перемеряем покрытие стрелок при уже верной зоне; (в) только потом подбираем триггер.
+  Альтернатива без CSV (дешевле, но слабее): свип «глубины проникновения» зоны как доли пути mean→край
+  (не фикс. minDist, а % к краю) — поиск глубины, лучше всего кроющей стрелки вендора при вендорской плотности.
+
+- [x] **RE3-alt. Свип глубины проникновения (доля mean→край), без CSV — ПРОГНАН (2026-08-18): стенка ПОДТВЕРЖДЕНА.**
+  Раннер `ci/research/runRE3PenetrationDepthSweep.ts` → `ci-results/re3-penetration-depth-sweep.{md,json}`. Непрерывная
+  глубина f∈(0..1] как доля пути mean→ВНЕШНИЙ край (short: high≥mean+f·(redHi−mean); long: low≤mean−f·(mean−greenLo)),
+  свип f×relVolMin×spacing, матч ±1 бар, те же 6 пар/фид, движок не тронут. **f-кривая монотонна и неблагоприятна:**
+  мелкая глубина f=0.05–0.20 даёт recall 97–98%, но activationDensity 61–97% и density ×136–×216 (= «зона везде», мусор);
+  с ростом f плотность падает, но и recall рушится — f=0.60 → recall 17.9% @ ×23.4; f=0.90 → 1.5% @ ×6.6; f=1.0 (край) →
+  0.3% @ ×4.6. **При вендорской плотности** (density∈[0.6,1.6]) лучший конфиг f=0.80/relVol1.4/spacing10 = recall **1.5%** —
+  НЕ обгоняет OWN2 (**18.8%** @ ×3.3). **Вывод:** ни одна глубина на пути mean→край не восстанавливает порог вендора при
+  сравнимой плотности; OWN2 (extension+relVol) сильно лучше любого чистого порога глубины. Реверс по одним свечам
+  окончательно упёрся в стенку → RE3 (основной, CSV из TradingView) остаётся единственным путём к истинной линии зоны.
+
+- [x] **RE4. Триггер как ПОРОГ ГЛУБИНЫ в зоне вендора vs реальные shapes — ПРОГНАН (2026-08-18). Наивный порог НЕ бьёт OWN2.**
+  Раннер `ci/research/runRE4InnerBandTriggerFit.ts` → `ci-results/re4-inner-band-trigger-fit.{md,json}`. Зона взята ПРЯМО из
+  CSV-линий вендора (не пересчёт Apex — чистый референс). Триггер: фитиль достиг доли f пути mean→внешний край (порог, НЕ
+  «касание» — учитывает замечание автора, что сигнал бывает и без касания линии) + взвод/перевзвод (fire once, rearm при
+  возврате close к mean) + опц. relVol / направление свечи + min-spacing. Свип f×relVol×dir×spacing, матч ±1 с shapes,
+  **TRAIN** (BTC.P 5m/15m + BNB.P 5m) / **OOS** (BTC.P 1h + VIRTUAL.P 5m), ранг по F1 в density∈[0.6,1.6]. Движок не тронут.
+  **Результат:** лучший по TRAIN F1 = **f=0.55, relVol1.4, candleDir on, spacing1** → TRAIN recall **17.0%** / prec 10.8% (×1.58),
+  **OOS recall 11.5%** / prec 8.3% (×1.39). Это **НИЖЕ**, чем OWN2 (внешний край + relVol1.4) на тех же CSV (recall ~26–31% BTC).
+  **Вывод (важный нюанс):** хотя shapes сидят на медианной глубине ~0.54 (RE3), правило «первый бар, достигший глубины f»
+  их воспроизводит плохо — половина shapes мельче f, а взвод/перевзвод часто срабатывает РАНЬШЕ бара стрелки в той же
+  экскурсии. То есть недостающее — не уровень глубины, а **логика/тайминг триггера** (вероятно: срабатывание на ЛОКАЛЬНОМ
+  экстремуме экскурсии + подтверждение разворота, а не на первом пересечении порога) и/или доп. условие. Гипотеза RE5
+  (⚠ решает автор): триггер на баре максимальной глубины экскурсии (или first-close-back к внутр. полосе как «разворот»)
+  + relVol, снова замер recall/precision против shapes. OWN2 пока остаётся лучшим воспроизведением стрелки.
+
+- [x] **RE5. Триггер «экстремум волны + подтверждение разворота» — ПРОГНАН (2026-08-18). Тоже НЕ бьёт OWN2; важный отрицательный.**
+  Раннер `ci/research/runRE5ExtremeReversalFit.ts` → `ci-results/re5-extreme-reversal-fit.{md,json}`. Волна = период по одну
+  сторону от mean; трекаем макс. глубину и её бар; режимы **revCandle** / **closeBackInner** (causal) + **extreme** (потолок,
+  look-ahead). Свип mode×fMin×relVol×spacing, матч ±1 с shapes, TRAIN/OOS по файлам. Движок не тронут.
+  **Результат:** лучший causal = `closeBackInner, fMin0.65, relVol1.4` → TRAIN recall 10.7% / OOS **10.5%** (prec ~7%) — НИЖЕ OWN2 (~28%).
+  **Критично: потолок `extreme` (с look-ahead) = OOS recall всего 5.0%.** То есть shapes **НЕ лежат** на баре макс. глубины
+  волны mean→mean → это определение волны слишком грубое: вендор ставит НЕСКОЛЬКО стрелок в одном заходе за среднюю, значит
+  триггер локальнее (локальный свинг/пивот в зоне), а не экстремум крупной волны.
+  **Свод RE3-alt/RE4/RE5:** при наличии точной геометрии зоны (RE3) и известной локализации (глубина ~0.54, у внутренней полосы)
+  ни один чисто-ценовой порог/эвристика на OHLCV не воспроизводит shapes при вендорской плотности лучше OWN2 (~26–31%). Точный
+  триггер, вероятно, требует локальной свинг-структуры (RE6, дёшево) и/или инфы вне OHLCV (OI/funding/intrabar — см. D6/`FINDINGS-GGI`).
+  **RE6 (⚠ решает автор):** триггер на ЛОКАЛЬНОМ пивоте (swing low/high за окно W) внутри зоны глубины f + подтверждение, снова замер.
+- [x] **RE-audit. Внешний ревью (GPT 5.6 Sol) + проверка по коду — 2026-08-18. Два вывода: один слух развеян, один подтверждён.**
+  Ревью подсветило (а) сдвиг телеграм-таймстампа на бар и (б) что мы, возможно, реверсим сразу несколько разных объектов
+  (raw shape → historical CSV-shape → admitted live alert). Проверено по коду:
+  **(A) −1-бар телеграм-лаг НЕ искажает наши цифры (слух развеян).** Все матчеры используют допуск ±1 бар: RE3/4/5 —
+  `score()` в `runRE*.ts` (`for d=-1..1` против CSV-колонок buy/sell); own2b/E5 — `matchDirectionalEvents(..., toleranceBars)`
+  (`ci/research/lib/eventMetrics.ts`) и `±1 бар` в `runE5ArrowVsVendorScalp.ts` / `runE5ZoneLagDiagnostic.ts`. Доставка
+  «+5–6 сек после границы бара» = сдвиг на 1 бар, целиком поглощается толерантностью. Ни один recall не переоценён/недооценён из-за этого.
+  **(B) ДВА РАЗНЫХ вендорских корпуса — цитировать вперемешку НЕЛЬЗЯ (подтверждено, методологическая поправка).**
+  • **CSV-shapes** (колонки buy/sell в `csv/BINANCE_*.csv`, ВСЯ отрисовка на графике) — таргет RE3/RE4/RE5. Самосогласован:
+    OHLC + линии зоны + shapes в одних строках → recall RE5 честный (OWN2 ~26–31%, causal ~10% exact-bar).
+  • **Telegram-алерты** (`ci-results/fwd1-telegram-forward-audit.json` ~660 + `tg_topic_16293_scalp.json` 1692) — таргет own2b/E5,
+    где relaxed recall 73–89%. ⚠ Уточнение автора: telegram — НЕ отбор «по хорошей статистике», а **ПОЛНЫЙ поток сигналов**, просто по
+    ОГРАНИЧЕННОМУ набору активов/ТФ (не весь рынок и не все ТФ). Внутри покрытой пары шлёт ВСЕ стрелки.
+  ⇒ Разрыв «73–89% (telegram, relaxed, episode-level) vs ~10% (CSV-shape, exact-bar)» — частично сравнение РАЗНЫХ корпусов и
+  РАЗНЫХ определений допуска, а НЕ чистый провал модели. При сравнении триггеров всегда фиксировать, против какого корпуса меряем.
+  **НЕ воспроизведено на нашей стороне:** оверлап telegram↔CSV-shape (Sol намерил ~40% даже на лучшем лаге). Если понадобится —
+  отдельный раннер **RE-recon** (one-to-one матч telegram vs CSV с гистограммой лага, coverage, changepoint match-rate, shapes-на-экскурсию vs alerts-на-экскурсию).
+  **Идентифицируемость (принять как данность):** OHLCV — many-to-one проекция интрабар-пути; точный Pine-код невосстановим.
+  Достижимо максимум **класс механизма + минимальный information set**. Внутри RE-трека всё causal-чисто и самосогласовано;
+  остаточный вопрос «почему exact-bar ~10%» — реальный открытый, и порядок гипотез: дешёвые OHLCV-state (RE6 свинг/пивот) → и лишь потом внешние фиды (OI/funding/CVD/intrabar).
+- [x] **RE-recon. Замер оверлапа telegram↔CSV-shapes НА НАШЕЙ стороне — ПРОГНАН (2026-08-18). Гипотеза «подмножество» ОТВЕРГНУТА; это ДВЕ РАЗНЫЕ реализации.**
+  Раннер `ci/research/runReReconTelegramVsShapes.ts` → `ci-results/re-recon-telegram-vs-shapes.{md,json}`. Матч telegram-scalp
+  (`tg_topic_16293_scalp.json`) ↔ CSV-shapes той же стороны по АБСОЛЮТНОМУ времени бара (устойчиво к пропускам), скан лага ±20,
+  coverage(tol), гистограмма лага, shapes/alert, shapes-на-экскурсию vs alerts-на-экскурсию. Пересечение корпусов: BNB.P 5m,
+  VIRTUAL.P 5m (BTC.P — в scalp-топике почти нет, исключён). Движок не тронут.
+  **Результаты (BNB.P 5m / VIRTUAL.P 5m):**
+  • **shapes/alert ≈ ×1.0** (BNB 92 shapes vs 89 alerts; VIRTUAL 100 vs 94) и **медиана 1 стрелка/экскурсию в ОБОИХ корпусах** →
+    telegram НЕ подмножество отрисовки: для публикуемого актива telegram даёт ~все стрелки. Прежняя формулировка «отобранное подмножество арроу» — НЕВЕРНА
+    (курирование — на уровне АКТИВА, не арроу).
+  • **Оверлап только ~40–45%.** Гистограмма лага: **резкий пик ровно на d=−1** (BNB 29/77=38%, VIRTUAL 35/87=40%), d=0 ещё ~4–5%,
+    всё дальше ±1 — по 1–2 совпадения, размазано по ±20 = случайные (при плотности ~1 shape/неск.баров). Coverage «растёт» до 53–62% на ±8
+    только за счёт этого шума. То есть **реально совпадает ~40–45%, остальные ~55% telegram-алертов НЕ имеют CSV-shape рядом** (и симметрично: ~60% shapes без алерта).
+  • **d=−1** = подтверждённый сдвиг доставки (алерт приходит через ~5–6 сек после границы, т.е. на баре ПОСЛЕ бара-shape). Side-swap исключён (пик был бы размыт).
+  **Вывод (важный, меняет рамку RE):** telegram и CSV-shapes — НЕ «одно в другом», а **две разные РЕАЛИЗАЦИИ** сигнала одинакового
+  порядка (≈равное число), совпадающие лишь ~40–45% по бару. Наиболее вероятно (не различимо этим замером): CSV экспортирован из
+  ДРУГОЙ версии/inputs/режима индикатора, чем тот, что слал live-алерты (frozen-snapshot / repaint / другой mode). **Следствие:** RE3/4/5
+  фитят CSV-shapes — самосогласованный, но это лишь ~45%-тот же объект, что live-сигнал вендора (telegram). «Потолок» соответствия
+  любой модели, обученной на CSV-shapes, к ЖИВОМУ сигналу ≈ 45%. ⚠ Что различит версию/repaint — только контролируемый свежий alert
+  автора (`{{time}}` vs `{{timenow}}` + сверка положения shape до/после reload) — см. RE-audit «минимальный эксперимент».
+- [x] **RE6. Триггер «локальный свинг-пивот внутри зоны» — ПРОГНАН (2026-08-18). Тоже НЕ бьёт OWN2; даже look-ahead-потолок ~16%.**
+  Раннер `ci/research/runRE6LocalPivotFit.ts` → `ci-results/re6-local-pivot-fit.{md,json}`. Пивот окна W (buy=swing low ниже mean /
+  sell=swing high выше mean) + бар внутри зоны (глубина фитиля ≥ f пути mean→внешний край) + опц. relVol + spacing. Режимы:
+  **pivotCausal** (стрелка на баре подтверждения i+W, реализуемо) и **pivotBack** (стрелка на баре пивота — look-ahead W баров, ПОТОЛОК).
+  Свип W×f×relVol×spacing, матч ±1 с shapes, TRAIN(BTC.P 5m/15m+BNB.P 5m)/OOS(BTC.P 1h+VIRTUAL.P 5m). Движок не тронут.
+  **Результат:** лучший causal = `W2,f0.5,relVol1.4,sp5` → TRAIN recall 11.4% / **OOS 17.5%** (prec 13.9%, ×1.26); per-file OOS BTC 1h 17.0% / VIRTUAL 18.0%.
+  **Потолок pivotBack (look-ahead, до ×2.4 плотности) = OOS recall всего ~16%** (`W8,f0.6`). Лучше RE5 (~10%), но **НЕ обгоняет OWN2 (~26–31%)**,
+  и даже с заглядыванием вперёд локальные свинги кроют лишь ~16% shapes. **Вывод:** стрелка вендора НЕ определяется и локальной свинг-структурой на OHLCV.
+  **СВОД RE4/RE5/RE6 (чисто-ценовые триггеры на OHLCV+зона исчерпаны):** порог глубины ~10%, экстремум волны ~10% (потолок 5%),
+  локальный пивот ~17% (потолок ~16%) — все НИЖЕ OWN2 (extension+relVol, ~26–31%). OWN2 остаётся лучшим ценовым воспроизведением.
+  ⇒ Точный бар стрелки, вероятно, **не идентифицируем из OHLCV** (согласуется с `NEGATIVE-KNOWLEDGE §3` и RE-recon: два вендорских
+  корпуса и сами совпадают лишь ~45%). Следующий рычаг — либо не-OHLCV инфа (D6: OI/funding/CVD/intrabar), либо контролируемый alert-эксперимент
+  (различить версию/repaint), либо признать exact-bar «неидентифицируемым» и вернуться к вопросу edge (Трек D). ⚠ Решает автор.
+
+- [x] **H1. Causal local sweep → reclaim → protection — ПРОГНАН (2026-08-20), ОТВЕРГНУТ.**
+  Визуальный лид получен после точного сопоставления **10 скриншотов** с CSV, затем проверен причинно на полном корпусе: загружено **37/37** vendor CSV, pooled inference — **21** серии ≥15m; OOS-активы (ADA/DOGE/LINK/ONDO/SOL/XRP) зафиксированы заранее, остальные ряды разделены 60/20/20 на dev-early/dev-late/oos-time. Победитель выбирался только по dev-late ±1 F1 (tie-break dev-early), OOS в выборе не участвовал; bootstrap — по asset/file units. Causality checks: pivots delayed / sequence ordered / labels stripped before features — **PASS**.
+  Победитель `left2/right2/window6/no-rebound/no-relVol`: OOS lift ±1 F1 против `inner-excursion-touch` **−4.92 п.п.**, 95% CI **[−6.52; −3.43]**; против OWN2 **−10.60 п.п.**, 95% CI **[−12.74; −8.77]**. ⇒ Упрощённая последовательность `local sweep → reclaim → protection` shapes не отделяет и хуже обоих референсов OOS; визуальный лид с 10 точно сопоставленных примеров на полный OOS не перенёсся. Артефакты: `ci-results/h1-causal-sequence.{md,json}`.
+
+## Трек E — аудит линейки (по итогам внешнего ревью AI Edge, 2026-08-17)
+> Источник: `AI Edge/` — Prompt A от Opus 5 и GPT 5.6 Sol xHigh (с доступом к коду/репо) + Sonnet 5
+> (по файлам). Нашли набор потенциальных багов/утечек, которые, ЕСЛИ подтвердятся, меняют
+> интерпретацию B1/D3/D4/ZC5. **ЭТО ПРЕТЕНЗИИ РЕВЬЮ, НЕ ПОДТВЕРЖДЕНО** — проверить прежде,
+> чем доверять выводам или гнать новые эксперименты (§2.2: показать, не править молча).
+> Консенсус 6/6 моделей Prompt A: вывод «вход закрыт → утечка в выходе» СИЛЬНЕЕ, чем позволяет
+> протокол; NO-GO production при этом не меняется. Приоритет: E1–E2 (могут инвалидировать
+> выводы) → E3 (ремонт линейки) → остальное.
+
+- [x] **E1. КРИТ: сигнал прогнан не с `relVol≥1.4`, а с `0.0`.** ✅ ИСПРАВЛЕНО (2026-08-17): в `regimeGateD4.ts`
+  и `regimeGateD4Vol.ts` детектор зовётся с `{ minimumRelativeVolume: FROZEN_REL_VOL=1.4 }` (движок не тронут, §2.3).
+  Остальные раннеры (filterBenchmark/exitBenchmark/structureContextD3/runOwn2ExtensionTrigger) — по мере перепрогона. B1/D1/D3/D4 зовут
+  `detectArrowSignalCandidates(candles, APEX_PARAMS)` без 3-го аргумента → движок берёт дефолт
+  `minimumRelativeVolume: 0.0` (`ArrowSignalEngine.ts:17-23`), а не frozen `relVol≥1.4`
+  (`zonda-reversal.md`). Файлы: `filterBenchmark.ts:163`, `exitBenchmark.ts:91`,
+  `structureContextD3.ts:175`, `regimeGateD4.ts:130`, `regimeGateD4Vol.ts:165`; также
+  `runOwn2ExtensionTrigger.ts:31-56` объявляет `VOL_MIN=1.4`, но не передаёт детектору.
+  Санити (GPT xHigh): B1 даёт ненулевые exhaustion/combo при relVol<0.8. → если верно,
+  B1/D3/D4 гонялись на ДРУГОЙ (низкообъёмной) популяции, не на нашем сигнале.
+  **✅ ПОДТВЕРЖДЕНО В КОДЕ (2026-08-17, агент):** сигнатура `detectArrowSignalCandidates(candles,
+  apexParams={}, partial={})` (стр. 178) — 3-й арг `partial` дефолтится в `{}` →
+  `DEFAULT_ARROW_SIGNAL_CONFIG.minimumRelativeVolume = 0.0` (стр. 17-23); все 4 раннера зовут с 2
+  аргументами. relVol-фильтр реально ВЫКЛЮЧЕН в B1/D1/D3/D4. Осталось (⚠ автор): перепрогнать с
+  `{ minimumRelativeVolume: 1.4 }` и оценить, меняет ли это выводы.
+
+- [x] **E2. КРИТ: look-ahead в D4-режиме.** ✅ ПОДТВЕРЖДЁН + ИСПРАВЛЕН (2026-08-17). `regimeAsOf` брал
+  последний BTC-бар с `timestamp ≤ signalAt` и читал его `close`, но `timestamp` = OPEN time бара →
+  `close` ещё НЕзакрытого 2h-бара (будущее). Подтверждено семантикой репо (ресемплинг `bucket=floor(ts/2h)*2h`;
+  forward-аудит `signalOpen=closeTime−tfMs`). Фикс: брать последний ПОЛНОСТЬЮ ЗАКРЫТЫЙ бар
+  (`openTs+barMs ≤ signalAt`) в `regimeGateD4.ts` + `regimeGateD4Vol.ts`. tsc чист, тесты зелёные.
+  **Следствие (перепрогон D4b с E1+E2):** low-vol-вето НЕ выживает — `low_all` −0.135 [−0.214,−0.053] →
+  **−0.023 [−0.105,+0.058]** (CI пересекает 0). Прежний «durable risk-filter» ОТМЕНЁН как артефакт E1+E2
+  (см. `NEGATIVE-KNOWLEDGE §8`, D4b-запись обновлена).
+
+- [x] **E3. Ремонт линейки: плацебо-нормированный net-ре-замер** ✅ ПРОГНАН (2026-08-17) — оба KILLED. (Opus `plc1` — рекомендован как
+  эксперимент №1 с макс. EV). Наши «плюсы» (ZC5 SELECTIVE, IMP2 RELAXED, D3 `pd_premium`) не имеют
+  нулевой модели. Улики short-beta: `fixed_short` (тупое «всегда шорт») в `regime-gate-d4.json` =
+  OOS **+0.199R** CI[+0.066,+0.332], бьёт всё найденное; `pd_premium` — тот же объект под другим
+  именем; ZC5 SELECTIVE = 87% шортов (47/7), квартальная корреляция с шорт-плацебо **+0.83**. Плюс
+  ZC5 +0.18R — это **GROSS** (`runZc5CausalPoolState.ts:108`), net≈+0.13–0.15. Дизайн: для каждого
+  сигнала (symbol,side,t) — K плацебо-входов (тот же символ/сторона, случайный бар ±30 дн, условие
+  только «валидная полоса»), `excess = R − mean(placebo)`. OOS **по активам** (символы не из
+  ZC5-набора). Обязательные фиксы ДО прогона: (1) выключить per-mode гейт (1 сигнал = 1 сделка);
+  (2) не выбрасывать `End mark` — mark-to-market + таймстоп, доля End mark = первичное число;
+  (3) `bar.mean`→`mean_{i-1}`; (4) `validGgiBand`: полосу пропустить, но стоп проверять; (5) net,
+  не gross. Kill-критерий: excess < +0.05R net, ИЛИ p > 0.0167, ИЛИ excess < 0 на невиданных активах.
+  **РЕЗУЛЬТАТ (2026-08-17, `ci/research/runE3PlaceboNet.ts` → `ci-results/e3-placebo-net.{json,md}`):** оба **KILLED**.
+  ⚠ Выборка урезана по решению автора ради скорости (Leg A ~O(сигналы×префикс), ~5-6 мин/актив; побитово-идентичного
+  ускорения без правки замороженного heatmap-движка нет): in-sample 6 (BTC/ETH/SOL/XRP/BNB/DOGE), OOS 6
+  (1000PEPE/AAVE/ARB/ENA/OP/SUI). ТФ: оба лега 1h (пулы/HTF 4h; pd_premium исходно 30m/1h/2h — здесь только 1h).
+  • **ZC5 SELECTIVE — KILLED (все 3):** IN n=53 excess **+0.005** p=0.48; OOS n=116 excess **−0.020** p=0.64 → excess≈0 =
+    **чистая short-beta** (реальный ≈ случайный шорт того же символа). Прежние «+0.18R» = gross + бета шорта.
+  • **pd_premium (D3) — KILLED (excess<0.05 in-sample И p>0.0167):** IN n=225 excess **+0.034** p=0.22; OOS n=203 excess
+    **+0.083** p=0.044. НЕ чистая short-beta — excess **положителен на 10/12 активов** (все 6 OOS в плюсе), но суб-пороговый и
+    не значим при строгом барьере; in-sample топит DOGE (−0.074, стабильно худший в обеих ногах).
+  • End-mark rate ~51-63% (фикс №2 включает прежде выбрасываемый хвост → доходность к нулю/минусу).
+  • **Каветаты:** OOS всего 6 активов (kill-условие «excess<0 на невиданных» ослаблено); только 1h; **mean-фиксация выхода
+    (E5) НЕ тестировалась** — гонялся только BASE. Цифры и per-asset — `NEGATIVE-KNOWLEDGE §8`.
+  • **Вывод:** оба «плюса входа» не переживают net+плацебо. NO-GO production не меняется. Незакрытые ветки с учётом
+    per-asset дисперсии: **B3** (класс активов a-priori + OOS), **E5/mean-fix** как paired-arm, **D2 (fade)**, **E6 (E-BAR)**,
+    полный OOS+мульти-ТФ повтор pd_premium.
+
+- [ ] **E4. Технические хвосты к проверке (§2.2, с указанием мест из ревью):**
+  - Bootstrap trade-level: кластеры считаются (`new Set`), но НЕ используются в ресэмплинге → CI
+    занижены (pd_premium, low-vol, ZC5). Нужен cluster/block bootstrap. Эффективный n ZC5 ≈ 30, не 54.
+  - B1 — не чистая аблация: `filterBenchmark.ts:168-173` (raw → filter → greedy-180) → фильтр
+    сдвигает admitted-бары, filtered arm НЕ подмножество `off`. Нужно: admit один раз, потом фильтры
+    на общий admitted-набор.
+  - Мощность (Sonnet/Opus): σ≈0.66–0.9R → B1 MDE ≈ +0.11–0.18R на типичной ячейке. «0/21» доказывает
+    «нет фильтра ≳0.11R», НЕ «во входе нет информации»; диапазон 0.05–0.18R (масштаб ZC5) вне видимости.
+  - Split без purge/embargo (`maxHoldingBars=2000` → train-сделки разрешаются в OOS до 167 дн на 2h);
+    pooled OOS смешивает эпохи (2h OOS с ~2024-12, 30m с ~2026-02); D3/D4 режут каждый гейт по своей
+    65%-квантили СДЕЛОК → сравнение baseline vs корзины не на одном календарном окне.
+  - Цензурирование: `runVar1ExitSweep.ts:105` выбрасывает `End mark` (незакрытые), стоп 12×TR55 без
+    таймстопа → систематически режется худший хвост (+0.04…+0.08R). `:86` `if(!validGgiBand) continue`
+    пропускает и проверку стопа. `:96` `favWick(bar.mean)` — некаузальный (mean того же бара).
+  - Dynamic exit (`ArrowTradeReplay.ts:201-246`): wick-touch против финальной `band.mean` того же
+    бара → intrabar/path leak.
+  - BE-неоднозначность: FINDINGS (BE после partial) vs HANDOFF (стоп фиксирован, BE нет) — разрешить,
+    ЧЕМУ соответствует эталон, до интерпретации «выход отрицателен».
+
+- [ ] **E5. Снять «утечка в выходе» как ВЫВОД** (оставить гипотезой). IMP1: полный динамический
+  диапазон ручки выхода = 0.043R против дыры −0.16R → на порядок мал. B1(вход)×IMP1(выход) не
+  композируются (кросс не считали; per-mode гейт делает их неортогональными — n IMP1 736→1415).
+  Полная фиксация у mean УЖЕ протестирована: `imp1` MEANEXIT (holdout +0.029) / NOADD-MEAN (+0.037)
+  проваливают барьер +0.05R и ХУЖЕ BASE (+0.068); `imp3` LTF net −0.145/−0.169 (издержки съедают
+  ATR-шаг). → full-fix-at-mean (свежая интел автора) гнать только как **один paired-arm внутри E3**,
+  НЕ отдельным приоритетом. Пересчёт таблиц автора: pooled +0.155R gross (не +0.19), AVAX-короткий-стоп
+  +0.392R = переопределение единицы R (implied avg win ×6.4), не эдж; на m5 при стопе ~0.5% издержки
+  ≈0.28R → net отрицателен.
+  **⚠ ПОПЫТКА 1 (2026-08-17) — НЕВАЛИДНА, объект не тот.** `ci/research/runE5MeanFixPaired.ts` гонял mean-fix на **pd_premium**
+  (95–99% шорт) по геометрии **VAR1-форка** (`replayE3Trade`: стоп 12×TR55, static-inner TP, БЕЗ добора, фикс у `prevMean`) —
+  это НЕ канонический **GGI Buy/Sell** (OWN2, лонг+шорт) с фиксом у ДВИЖУЩЕЙСЯ `band.mean`. 7/8 KILLED; 15m MEANFIX формально
+  «SURVIVES», но теряет деньги на обоих сплитах (excess>0 лишь потому, что случайный шорт хуже) — см. `NEGATIVE-KNOWLEDGE §8` (E5).
+  Из ТГ автора (2026-08-17) уточнено: идея = **GGI Buy/Sell + полная фиксация у mean, БЕЗ добора, тейк-или-стоп**, LTF (5m/15m),
+  активы LDO/AVAX/ONDO/VIRTUAL, «стоп короче» (слова вендора, число не задано).
+  **КОРРЕКТНЫЙ ПЛАН (reproduce-first):** (1) канон `replayArrowSignals(candles, bands, OWN2-сигналы relVol1.4, mode, override)`;
+  фикс-у-mean = НЕ `partialFraction=1.0` (слот остаётся живым, `add` может пере-открыть позицию!), а **новый флаг движка
+  `fullFixAtMean` (default false)** — закрыть 100% на касании движущейся mean-в-прибыли и ЗАВЕРШИТЬ сделку. (2) `addEnabled`
+  (default true) — прогнать с добором и без (⚠ автор разрешил; при `false` `oneR=|entry−stop|`). (3) стоп — канон Safe `stopSteps=2`;
+  «стоп короче» — разведочные `stopSteps` (пометить «не авторское число», §2.1). (4) **reproduce-gate: сначала повторить LDO m15**
+  (≈89 сделок, WR 62.9%, +15.25R, avg stop −1.86%); совпало → объект верный, только тогда честный слой. (5) честный слой: net 7bps,
+  OOS на НЕвиданных активах, плацебо, cluster-bootstrap; **добавить kill-условие «net Result R > 0 (OOS)»** (дыра: excess>0 при
+  минусе денег ⇒ убыточная рука «выживает»). Флаги движка default-off ⇒ все прежние канон-результаты не меняются (проверить `npm test`).
+  **⚠ ПОПЫТКА 2 (2026-08-17) — reproduce НЕ сошёлся; корень = СИГНАЛЬНАЯ СТРЕЛКА, не выход.** Раннеры `runE5GgiLdoSpotReproduce.ts`,
+  `runE5GeomSweepLdoSpot.ts`, `measureLdoGeometryScale.ts`, `runE5AvaxSpotReproduce.ts` (канон движок, override-only, фид Binance **spot**).
+  Отвергнуто по очереди: (a) **фид** — spot ХУЖЕ perp (LDO 15m −13.61R vs −5.54R); (b) **окно 40k** — глубже минус; (c) **масштаб стопа** —
+  «Avg stop» = средний % убытка на стоп-сделке (подтверждено парой таблиц AVAX вендора: короче стоп ⇒ WR↓ RR↑); наш стоп ~−11%/6.6% vs
+  вендор −1.86%, но geom-свип под −1.86% только УХУДШАЕТ (WR 80%→38%, ResultR −16…−40R, 0 плюсовых). Тейк-логика ВЕРНА (автор подтвердил:
+  partial@mean, full@GGI Inner; замер LDO — Inner 6.79%, наш stop 6.60% → RR≈1:1 против вендорского ~3.6:1). **Три сигнатуры на стрелку:**
+  плотность (AVAX 5m: наш OWN2 296 канд./118–203 сделок vs вендор 67), счётчик инвариантен у вендора (67↔68) а у нас растёт (136→203),
+  качество входа (при ЕГО стопе наш WR всегда ниже: AVAX 70.6%/20% vs 91%/47%; LDO 38% vs 62.9%). Детали — `NEGATIVE-KNOWLEDGE §8` (E5-reproduce).
+  **Следующий шаг:** сверка наших OWN2-стрелок с реальными алертами вендора — `fwd1-telegram-forward-audit` (scalp-15m=114) +
+  `data/vendor-exports/tg_topic_16293_scalp.json` (сырые 5m/15m). ⚠ у обоих НЕТ цены входа → меряем тайминг/направление/плотность, не суб-бар.
+  Стоп-формула вендора неизвестна (§2.1 — не выдумывать); reproduce разблокируется только его правилами стрелки/стопа.
+
+- [ ] **E6. (после ремонта линейки) E-BAR — выбор точного бара внутри эпизода** (Sonnet, единственный
+  открытый ENTRY-вопрос; FINDINGS §2: exact-bar recall 10.9% vs эпизод 73–89%). Paired within-episode
+  (R выбранного бара − R первого бара) → σ_Δ мала (общий stop/TP), высокая мощность при малом n. Данные:
+  `fwd1-telegram-forward-audit.json` (read-only) + OHLCV. Признаки строго каузальны. Не смешивать с E3.
 
 ---
 
