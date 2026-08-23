@@ -1,0 +1,103 @@
+{
+  "studyId": "d6-cascade-extension",
+  "generatedAt": "2026-08-22T21:10:39.164Z",
+  "lineVerdict": "GO",
+  "preregistrationExtensionSha256": "8ebe66068de7b148166e066d1c316786b7dec64ccc53c51fb3803b7efcd3ef4c",
+  "basePreregistrationNote": "config identical to d6-cascade-preregistration.md a7fa407a…",
+  "acquisitionManifestSha256": "5fa7d805e4d7c237cc110cc9ad30bfbcdd488f59fac7e9df5bc4291ac2725c50",
+  "universe": [
+    "XLMUSDT",
+    "XMRUSDT",
+    "TRXUSDT",
+    "DOTUSDT",
+    "INJUSDT",
+    "FETUSDT",
+    "1000BONKUSDT",
+    "CRVUSDT",
+    "PORTALUSDT",
+    "HBARUSDT",
+    "ETCUSDT"
+  ],
+  "eventsTotal": 194,
+  "perSymbolEvents": {
+    "XLMUSDT": 11,
+    "XMRUSDT": 13,
+    "TRXUSDT": 18,
+    "DOTUSDT": 5,
+    "INJUSDT": 35,
+    "FETUSDT": 31,
+    "1000BONKUSDT": 13,
+    "CRVUSDT": 4,
+    "PORTALUSDT": 15,
+    "HBARUSDT": 29,
+    "ETCUSDT": 20
+  },
+  "h24ExcludedNoHorizon": 0,
+  "armH24": {
+    "n": 194,
+    "mean": 0.01900267159305289,
+    "total": 3.6865182890522608,
+    "pf": 1.884913037120939,
+    "wr": 0.6082474226804123,
+    "maxDd": 0.9260252022731543,
+    "outcomes": {
+      "h24": 194
+    },
+    "ci95": {
+      "lower": 0.0014906671149530805,
+      "median": 0.019203240887047987,
+      "upper": 0.036260084827599785
+    },
+    "gatePower": true,
+    "verdict": "GO",
+    "grossMeanDescriptive": 0.02000267159305289
+  },
+  "armCanon": {
+    "n": 183,
+    "mean": 0.04497705487532887,
+    "total": 8.230801042185183,
+    "pf": 1.1651527571382683,
+    "wr": 0.644808743169399,
+    "maxDd": 15.383565922413348,
+    "outcomes": {
+      "full-tp": 129,
+      "partial-stop": 32,
+      "stop": 22
+    },
+    "ci95": {
+      "lower": -0.07344742415323263,
+      "median": 0.045694421570834656,
+      "upper": 0.15759878017142592
+    },
+    "gatePower": true,
+    "verdict": "KILL",
+    "grossMeanRDescriptive": 0.05461074243450857
+  },
+  "fundingSignDiagnostics": {
+    "h24": {
+      "pairedDelta": -0.01641421063672646,
+      "ci": {
+        "lower": -0.032447147320720786,
+        "median": -0.01650312889659652,
+        "upper": -0.00011544159992848316
+      },
+      "retainedN": 47,
+      "retainedExecutedMean": 0.010684285649517577
+    },
+    "canon": {
+      "pairedDelta": -0.05956899216975434,
+      "ci": {
+        "lower": -0.15682576186159927,
+        "median": -0.06041714944591265,
+        "upper": 0.04042237120773728
+      },
+      "retainedN": 46,
+      "retainedExecutedMean": -0.05805053314956181
+    }
+  },
+  "limitations": [
+    "Symbol-fresh дизайн: календарь пересекается с dev первого исследования, символы ранее не открывались.",
+    "OI-proxy каскадов, не прямые ликвидации; покрытие метрик у части символов <100%.",
+    "После reveal эти символы сожжены для гипотезы; ретюны запрещены."
+  ]
+}

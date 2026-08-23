@@ -1,0 +1,101 @@
+{
+  "studyId": "d6-cascade",
+  "generatedAt": "2026-08-22T20:20:09.871Z",
+  "lineVerdict": "INCONCLUSIVE DATA",
+  "preregistrationSha256": "a7fa407a2dae04dd01759633051a9556290118a47ec4e3684a79721f5f41f039",
+  "acquisitionManifestSha256": "5fa7d805e4d7c237cc110cc9ad30bfbcdd488f59fac7e9df5bc4291ac2725c50",
+  "cutoffUtc": "2025-02-12T03:00:00.000Z",
+  "universe": [
+    "ACEUSDT",
+    "COTIUSDT",
+    "WLDUSDT",
+    "BICOUSDT",
+    "NEARUSDT",
+    "UNIUSDT",
+    "1000SHIBUSDT",
+    "1000RATSUSDT",
+    "TAOUSDT",
+    "RIFUSDT",
+    "BCHUSDT",
+    "ONGUSDT",
+    "FILUSDT",
+    "LTCUSDT"
+  ],
+  "events": {
+    "oosBars": 186760,
+    "admittedAfterGap": 54,
+    "h24ExcludedNoHorizon": 0
+  },
+  "armH24": {
+    "definition": "long next-open → close of entry+23 bars; net = price − 0.001 + actual funding",
+    "n": 54,
+    "mean": 0.0065291962470624635,
+    "total": 0.35257659734137303,
+    "pf": 1.1570191533346914,
+    "wr": 0.3888888888888889,
+    "maxDd": 0.5647196839711757,
+    "outcomes": {
+      "h24": 54
+    },
+    "ci95": {
+      "lower": -0.03189318214875047,
+      "median": 0.005811033367375025,
+      "upper": 0.047754424185999664
+    },
+    "gatePower": false,
+    "verdict": "INCONCLUSIVE DATA",
+    "grossMeanDescriptive": 0.007529196247062466
+  },
+  "armCanon": {
+    "definition": "engine safe: stop 2×step, add entry∓step, partial 25% @mean, full @opposite inner; netR@5bps + fundingContributionR",
+    "n": 53,
+    "mean": -0.11709091740844634,
+    "total": -6.205818622647656,
+    "pf": 0.6458538815800815,
+    "wr": 0.5849056603773585,
+    "maxDd": 10.482271757309292,
+    "outcomes": {
+      "partial-stop": 10,
+      "full-tp": 34,
+      "stop": 9
+    },
+    "ci95": {
+      "lower": -0.33077069420228683,
+      "median": -0.11650150849088932,
+      "upper": 0.06075975937854403
+    },
+    "gatePower": false,
+    "verdict": "INCONCLUSIVE DATA",
+    "grossMeanRDescriptive": -0.13324831124507627
+  },
+  "fundingSignDiagnostics": {
+    "h24": {
+      "pairedDelta": -0.00927521758932666,
+      "ci": {
+        "lower": -0.028229959509007373,
+        "median": -0.008819066804816181,
+        "upper": 0.006937632728007783
+      },
+      "retainedN": 22,
+      "retainedExecutedMean": -0.006740234203739395
+    },
+    "canon": {
+      "pairedDelta": 0.0031567777172975364,
+      "ci": {
+        "lower": -0.1529746575338092,
+        "median": 0.0018997556422351305,
+        "upper": 0.17215147756765875
+      },
+      "retainedN": 21,
+      "retainedExecutedMean": -0.28754806683956613
+    },
+    "note": "третья репликация направления на новой линии; в гейты не входит"
+  },
+  "gatesNote": "GO_line ⇔ хотя бы одна co-primary рука прошла power gate и CI95-low>0 (обе руки объявлены заранее)",
+  "limitations": [
+    "Вселенная сокращена до 14 символов с закэшированными метриками (сетевые ограничения автора); критерий сокращения не связан с исходами.",
+    "OI-proxy каскадов (sum_open_interest 5m), не прямые ликвидации; покрытие метрик у части символов <100%.",
+    "Dev-фаза (census) выбрала событие из 64 ячеек описательно; плато монотонности снижает, но не устраняет selection-риск.",
+    "После reveal OOS сожжён для этой гипотезы: ретюны/спасы/подмены рук запрещены."
+  ]
+}
