@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-20T13:57:42.871Z",
+  "status": "FINAL_SINGLE_HOLDOUT_REVEAL",
+  "verdict": "KILL",
+  "protocol": {
+    "frozenRule": "admit = (recoveryFromExtremeOverInner >= 0.3203983409316291)",
+    "oneWayCostBps": 5,
+    "fundingModeled": false,
+    "bootstrap": {
+      "method": "paired hierarchical symbol then symbol-calendar-month percentile bootstrap",
+      "resamples": 10000,
+      "seed": 20260821
+    },
+    "retuned": false,
+    "subgroupOrPnlRescue": false,
+    "losingSymbolsExcluded": false,
+    "vendorShapesUsed": false,
+    "revealCount": 1
+  },
+  "acquisitionProvenance": {
+    "universeFreeze": {
+      "path": "ci-results/stateful-apex-s4-holdout-universe-freeze.json",
+      "sha256": "59a39d1099cf931fe727840740cba730d7ea8ce202c34ed23b9b1c17fbafbdcf",
+      "freezeHash": "0f72ae18bfadef715bec8bfa7372f6551825f6c9b6256afafa2858ef71761c94"
+    },
+    "acquisition": {
+      "path": "ci-results/stateful-apex-s4-holdout-acquisition.json",
+      "sha256": "c0c1a422939cc60cdcdc3bf176d4fe862fa75a98e4a9148b599b59e3dc9ccac7"
+    },
+    "frozenRule": {
+      "path": "ci-results/stateful-apex-s4-v2-freeze.json",
+      "sha256": "2352906513514b43a068fcb810c015e63138a349a32b6a84ee8d9ef71ec64955",
+      "markdownSha256": "d93cfc58c02bb2f7402744fbe102bbd73c885f1562bebdab44124586a3650423",
+      "configHash": "6b5fa5c9de7f26ac3f71ba258065c5ab5a22fd4eb17b57d7634013acc42b765f",
+      "protocolHash": "b7119204cb71c3ccb3582e4dfd1c5cfc03943a46ff6e370cd5e8257ee8e7fc70"
+    },
+    "series": [
+      {
+        "rank": 1,
+        "symbol": "ZECUSDT",
+        "ccxtSymbol": "ZEC/USDT:USDT",
+        "file": "data/holdouts/stateful-apex-s4-v2/ZECUSDT-1h.json",
+        "rows": 20000,
+        "firstTimestamp": 1715230800000,
+        "firstUtc": "2024-05-09T05:00:00.000Z",
+        "lastTimestamp": 1787227200000,
+        "lastUtc": "2026-08-20T12:00:00.000Z",
+        "sha256": "d28460d5aef1bb3168b6da5f9701314a23530c53ae78b795223ec237ad89fc08",
+        "schemaErrors": 0,
+        "missingBars": 0,
+        "duplicateBars": 0,
+        "offGridBars": 0
+      },
+      {
+        "rank": 2,
+        "symbol": "1000PEPEUSDT",
+        "ccxtSymbol": "1000PEPE/USDT:USDT",
+        "file": "data/holdouts/stateful-apex-s4-v2/1000PEPEUSDT-1h.json",
+        "rows": 20000,
+        "firstTimestamp": 1715230800000,
+        "firstUtc": "2024-05-09T05:00:00.000Z",
+        "lastTimestamp": 1787227200000,
+        "lastUtc": "2026-08-20T12:00:00.000Z",
+        "sha256": "ce80063f7281e9648836c7a9a34b872f789bc3087c10b2003d3a1115fed5efda",
+        "schemaErrors": 0,
+        "missingBars": 0,
+        "duplicateBars": 0,
+        "offGridBars": 0
+      },
+      {
+        "rank": 3,
+        "symbol": "BOMEUSDT",
+        "ccxtSymbol": "BOME/USDT:USDT",
+        "file": "data/holdouts/stateful-apex-s4-v2/BOMEUSDT-1h.json",
+        "rows": 20000,
+        "firstTimestamp": 1715230800000,
+        "firstUtc": "2024-05-09T05:00:00.000Z",
+        "lastTimestamp": 1787227200000,
+        "lastUtc": "2026-08-20T12:00:00.000Z",
+        "sha256": "72e8218ec60bbd9511d9fa1b0ed865bfd18409701c7b4f49c2f91df239227c28",
+        "schemaErrors": 0,
+        "missingBars": 0,
+        "duplicateBars": 0,
+        "offGridBars": 0
+      }
+    ]
+  },
+  "integrity": {
+    "passed": true,
+    "errors": [],
+    "counters": {
+      "filesRead": 3,
+      "rowsParsed": 60000,
+      "eligibleRows": 59370,
+      "eventsDetected": 409,
+      "featuresComputed": 409,
+      "labelsComputed": 409,
+      "pnlComputed": 399,
+      "metricsComputed": 1,
+      "s1UntouchedOosRevealCount": 0,
+      "ondoVirtualReuseCount": 0
+    }
+  },
+  "v1Unfiltered": {
+    "metrics": {
+      "detectedN": 409,
+      "admittedN": 409,
+      "validLabelN": 399,
+      "resolvedN": 399,
+      "censoredN": 0,
+      "meanNetR": -0.022054398144052252,
+      "profitFactor": 0.960336960134689,
+      "winRate": 0.46616541353383456,
+      "maxDrawdownR": 43.74857894923218
+    },
+    "ci95": {
+      "low": -0.14444346894031518,
+      "high": 0.09871610488312263
+    }
+  },
+  "v2Frozen": {
+    "metrics": {
+      "detectedN": 409,
+      "admittedN": 182,
+      "validLabelN": 174,
+      "resolvedN": 174,
+      "censoredN": 0,
+      "meanNetR": -0.0003223925815887831,
+      "profitFactor": 0.9993514385173843,
+      "winRate": 0.5344827586206896,
+      "maxDrawdownR": 15.812746721935198
+    },
+    "ci95": {
+      "low": -0.19157443528524865,
+      "high": 0.2315451869609924
+    }
+  },
+  "pairedDeltaMeanNetR": {
+    "estimate": 0.02173200556246347,
+    "ci95": {
+      "low": -0.1491154575057822,
+      "high": 0.22547679719259667
+    },
+    "validBootstrapDraws": 10000
+  },
+  "breadth": {
+    "positiveSymbols": 2,
+    "estimableSymbols": 3,
+    "fractionPositiveSymbols": 0.6666666666666666,
+    "positiveSeries": 2,
+    "estimableSeries": 3,
+    "fractionPositiveSeries": 0.6666666666666666
+  },
+  "bySymbol": [
+    {
+      "symbol": "ZECUSDT",
+      "v1": {
+        "detectedN": 132,
+        "admittedN": 132,
+        "validLabelN": 128,
+        "resolvedN": 128,
+        "censoredN": 0,
+        "meanNetR": -0.08988798895466558,
+        "profitFactor": 0.8443738777399413,
+        "winRate": 0.4453125,
+        "maxDrawdownR": 22.278992705101203
+      },
+      "v2": {
+        "detectedN": 132,
+        "admittedN": 59,
+        "validLabelN": 55,
+        "resolvedN": 55,
+        "censoredN": 0,
+        "meanNetR": 0.01978504759704644,
+        "profitFactor": 1.0439510610454958,
+        "winRate": 0.5818181818181818,
+        "maxDrawdownR": 3.9766208041287827
+      }
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "v1": {
+        "detectedN": 139,
+        "admittedN": 139,
+        "validLabelN": 135,
+        "resolvedN": 135,
+        "censoredN": 0,
+        "meanNetR": -0.02023019267719592,
+        "profitFactor": 0.9641237256157429,
+        "winRate": 0.4666666666666667,
+        "maxDrawdownR": 20.104138183082505
+      },
+      "v2": {
+        "detectedN": 139,
+        "admittedN": 67,
+        "validLabelN": 64,
+        "resolvedN": 64,
+        "censoredN": 0,
+        "meanNetR": -0.14126618558087412,
+        "profitFactor": 0.7574432152769405,
+        "winRate": 0.46875,
+        "maxDrawdownR": 14.26672693249273
+      }
+    },
+    {
+      "symbol": "BOMEUSDT",
+      "v1": {
+        "detectedN": 138,
+        "admittedN": 138,
+        "validLabelN": 136,
+        "resolvedN": 136,
+        "censoredN": 0,
+        "meanNetR": 0.03997818925104262,
+        "profitFactor": 1.0757191158588557,
+        "winRate": 0.4852941176470588,
+        "maxDrawdownR": 14.748078091691163
+      },
+      "v2": {
+        "detectedN": 138,
+        "admittedN": 56,
+        "validLabelN": 55,
+        "resolvedN": 55,
+        "censoredN": 0,
+        "meanNetR": 0.1435774900025807,
+        "profitFactor": 1.3228347782297785,
+        "winRate": 0.5636363636363636,
+        "maxDrawdownR": 9.437352747381972
+      }
+    }
+  ],
+  "bySeries": [
+    {
+      "series": "data/holdouts/stateful-apex-s4-v2/ZECUSDT-1h.json",
+      "symbol": "ZECUSDT",
+      "v1": {
+        "detectedN": 132,
+        "admittedN": 132,
+        "validLabelN": 128,
+        "resolvedN": 128,
+        "censoredN": 0,
+        "meanNetR": -0.08988798895466558,
+        "profitFactor": 0.8443738777399413,
+        "winRate": 0.4453125,
+        "maxDrawdownR": 22.278992705101203
+      },
+      "v2": {
+        "detectedN": 132,
+        "admittedN": 59,
+        "validLabelN": 55,
+        "resolvedN": 55,
+        "censoredN": 0,
+        "meanNetR": 0.01978504759704644,
+        "profitFactor": 1.0439510610454958,
+        "winRate": 0.5818181818181818,
+        "maxDrawdownR": 3.9766208041287827
+      }
+    },
+    {
+      "series": "data/holdouts/stateful-apex-s4-v2/1000PEPEUSDT-1h.json",
+      "symbol": "1000PEPEUSDT",
+      "v1": {
+        "detectedN": 139,
+        "admittedN": 139,
+        "validLabelN": 135,
+        "resolvedN": 135,
+        "censoredN": 0,
+        "meanNetR": -0.02023019267719592,
+        "profitFactor": 0.9641237256157429,
+        "winRate": 0.4666666666666667,
+        "maxDrawdownR": 20.104138183082505
+      },
+      "v2": {
+        "detectedN": 139,
+        "admittedN": 67,
+        "validLabelN": 64,
+        "resolvedN": 64,
+        "censoredN": 0,
+        "meanNetR": -0.14126618558087412,
+        "profitFactor": 0.7574432152769405,
+        "winRate": 0.46875,
+        "maxDrawdownR": 14.26672693249273
+      }
+    },
+    {
+      "series": "data/holdouts/stateful-apex-s4-v2/BOMEUSDT-1h.json",
+      "symbol": "BOMEUSDT",
+      "v1": {
+        "detectedN": 138,
+        "admittedN": 138,
+        "validLabelN": 136,
+        "resolvedN": 136,
+        "censoredN": 0,
+        "meanNetR": 0.03997818925104262,
+        "profitFactor": 1.0757191158588557,
+        "winRate": 0.4852941176470588,
+        "maxDrawdownR": 14.748078091691163
+      },
+      "v2": {
+        "detectedN": 138,
+        "admittedN": 56,
+        "validLabelN": 55,
+        "resolvedN": 55,
+        "censoredN": 0,
+        "meanNetR": 0.1435774900025807,
+        "profitFactor": 1.3228347782297785,
+        "winRate": 0.5636363636363636,
+        "maxDrawdownR": 9.437352747381972
+      }
+    }
+  ],
+  "gates": {
+    "minimumBreadth": true,
+    "v2MeanPositive": false,
+    "v2CiLowPositive": false,
+    "pairedDeltaPositive": true,
+    "pairedDeltaCiLowPositive": false,
+    "positiveSymbolBreadth60Pct": true,
+    "positiveSeriesBreadth60Pct": true
+  }
+}

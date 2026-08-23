@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-20T12:20:39.889Z",
+  "status": "INTERNAL_HOLDOUT_EVALUATED",
+  "verdict": "KILL",
+  "protocol": {
+    "freezeJson": "ci-results/stateful-apex-s3-v2-freeze.json",
+    "freezeJsonSha256": "b315aa41e8d4a3aa75c3359405167f1f8c1d01d5b09d56f3d47a1e902dae2c7f",
+    "freezeMarkdown": "ci-results/stateful-apex-s3-v2-freeze.md",
+    "freezeMarkdownSha256": "d36a31c978d07e264497c319c1993a5bbe2b3f2ca90c01d9227d0412e6a2c657",
+    "configHash": "92ff4fe9de8299039de493a03f947efd096024c85b60031a7933cf91696aca98",
+    "splitAssignmentHash": "aa169cbccd97cfb8754eb25773b0058ff65cfc9bda81b2e6520131ecfd542a6a",
+    "rule": "admit = (newAdverseExtremes <= 1)",
+    "oneWayCostBps": 5,
+    "bootstrap": {
+      "method": "paired hierarchical percentile cluster bootstrap: outer symbol, inner symbol×calendar-month",
+      "seed": 20260820,
+      "resamples": 10000
+    },
+    "vendorShapesRemovedBeforeDetection": true,
+    "retunedAfterReveal": false,
+    "additionalThresholdsOrSubgroupsAfterReveal": false,
+    "integrityErrors": []
+  },
+  "revealAudit": {
+    "internalHoldoutRevealCount": 1,
+    "internalHoldoutSymbols": [
+      "ONDOUSDT",
+      "VIRTUALUSDT"
+    ],
+    "internalHoldoutSeries": [
+      "csv/BINANCE_ONDOUSDT.P, 60.csv",
+      "csv/BINANCE_VIRTUALUSDT.P, 60.csv"
+    ],
+    "filesRead": 2,
+    "rowsParsed": 37455,
+    "untouchedOosS1RevealCount": 0,
+    "untouchedOosS1RawFilesRead": 0,
+    "untouchedOosS1RowsParsed": 0,
+    "untouchedOosS1LabelsComputed": 0
+  },
+  "v1Unfiltered": {
+    "metrics": {
+      "detectedN": 270,
+      "admittedN": 270,
+      "validLabelN": 261,
+      "resolvedN": 259,
+      "censoredN": 2,
+      "netMeanR5bps": -0.09033076383591229,
+      "profitFactor": 0.8402478200864302,
+      "winRate": 0.44787644787644787,
+      "maxDrawdownR": 39.17769588034381
+    },
+    "ci95": {
+      "low": -0.24970963484059866,
+      "high": 0.05873497856316478
+    }
+  },
+  "v2FrozenRule": {
+    "metrics": {
+      "detectedN": 270,
+      "admittedN": 187,
+      "validLabelN": 186,
+      "resolvedN": 184,
+      "censoredN": 2,
+      "netMeanR5bps": 0.0022711731551871067,
+      "profitFactor": 1.0047205117999194,
+      "winRate": 0.5271739130434783,
+      "maxDrawdownR": 22.858451745876312
+    },
+    "ci95": {
+      "low": -0.15045768110007318,
+      "high": 0.1371045092698884
+    }
+  },
+  "pairedDeltaMeanR": {
+    "estimate": 0.09260193699109939,
+    "ci95": {
+      "low": -0.020649579934230573,
+      "high": 0.20598876827457555
+    }
+  },
+  "breadth": {
+    "positiveSymbols": 1,
+    "symbols": 2,
+    "positiveSymbolFraction": 0.5,
+    "positiveSeries": 1,
+    "series": 2
+  },
+  "bySymbol": [
+    {
+      "symbol": "ONDOUSDT",
+      "v1": {
+        "detectedN": 161,
+        "admittedN": 161,
+        "validLabelN": 158,
+        "resolvedN": 157,
+        "censoredN": 1,
+        "netMeanR5bps": -0.04970505280715295,
+        "profitFactor": 0.9096490036181583,
+        "winRate": 0.46496815286624205,
+        "maxDrawdownR": 26.94471707578745
+      },
+      "v2": {
+        "detectedN": 161,
+        "admittedN": 109,
+        "validLabelN": 108,
+        "resolvedN": 107,
+        "censoredN": 1,
+        "netMeanR5bps": 0.03124921840317782,
+        "profitFactor": 1.0668934875424527,
+        "winRate": 0.5420560747663551,
+        "maxDrawdownR": 15.718421824918146
+      }
+    },
+    {
+      "symbol": "VIRTUALUSDT",
+      "v1": {
+        "detectedN": 109,
+        "admittedN": 109,
+        "validLabelN": 103,
+        "resolvedN": 102,
+        "censoredN": 1,
+        "netMeanR5bps": -0.15286249551743394,
+        "profitFactor": 0.7404750159226958,
+        "winRate": 0.4215686274509804,
+        "maxDrawdownR": 18.72638853777167
+      },
+      "v2": {
+        "detectedN": 109,
+        "admittedN": 78,
+        "validLabelN": 78,
+        "resolvedN": 77,
+        "censoredN": 1,
+        "netMeanR5bps": -0.03799701959202077,
+        "profitFactor": 0.9240902072689391,
+        "winRate": 0.5064935064935064,
+        "maxDrawdownR": 9.58631299238079
+      }
+    }
+  ],
+  "bySeries": [
+    {
+      "series": "csv/BINANCE_ONDOUSDT.P, 60.csv",
+      "symbol": "ONDOUSDT",
+      "v1": {
+        "detectedN": 161,
+        "admittedN": 161,
+        "validLabelN": 158,
+        "resolvedN": 157,
+        "censoredN": 1,
+        "netMeanR5bps": -0.04970505280715295,
+        "profitFactor": 0.9096490036181583,
+        "winRate": 0.46496815286624205,
+        "maxDrawdownR": 26.94471707578745
+      },
+      "v2": {
+        "detectedN": 161,
+        "admittedN": 109,
+        "validLabelN": 108,
+        "resolvedN": 107,
+        "censoredN": 1,
+        "netMeanR5bps": 0.03124921840317782,
+        "profitFactor": 1.0668934875424527,
+        "winRate": 0.5420560747663551,
+        "maxDrawdownR": 15.718421824918146
+      }
+    },
+    {
+      "series": "csv/BINANCE_VIRTUALUSDT.P, 60.csv",
+      "symbol": "VIRTUALUSDT",
+      "v1": {
+        "detectedN": 109,
+        "admittedN": 109,
+        "validLabelN": 103,
+        "resolvedN": 102,
+        "censoredN": 1,
+        "netMeanR5bps": -0.15286249551743394,
+        "profitFactor": 0.7404750159226958,
+        "winRate": 0.4215686274509804,
+        "maxDrawdownR": 18.72638853777167
+      },
+      "v2": {
+        "detectedN": 109,
+        "admittedN": 78,
+        "validLabelN": 78,
+        "resolvedN": 77,
+        "censoredN": 1,
+        "netMeanR5bps": -0.03799701959202077,
+        "profitFactor": 0.9240902072689391,
+        "winRate": 0.5064935064935064,
+        "maxDrawdownR": 9.58631299238079
+      }
+    }
+  ],
+  "successGate": {
+    "v2MeanRPositive": true,
+    "v2CiLowPositive": false,
+    "positiveSymbolsAtLeast60Pct": false,
+    "atLeastTwoPositiveSeries": false,
+    "improvementOverUnfilteredV1": true
+  }
+}

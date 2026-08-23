@@ -1,0 +1,1363 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-20T11:29:06.820Z",
+  "protocol": {
+    "manifest": "ci-results/stateful-apex-s1-manifest.json",
+    "manifestConfigHash": "a0b6fab77ef278b1b264beee35c6032fa81241b775b76328b1146980d3fe839e",
+    "stateMachineHash": "5f82d45de35ede30e08599372e5cabd46bb04402ddc47de488fad1bfecb449c8",
+    "oneWayCostBps": 5,
+    "bootstrapSeed": 20260820,
+    "bootstrapResamples": 10000,
+    "vendorShapesUsed": false,
+    "stateMachineChanged": false,
+    "splitsChanged": false,
+    "primaryLabelsChanged": false,
+    "integrityErrors": []
+  },
+  "frozenSelection": {
+    "arm": "primary-threshold-free-all-confirmed-events",
+    "selectedBeforeValidation": true,
+    "selectionRule": "No train optimization; only the preregistered primary arm is eligible.",
+    "attributionArms": "A0/A1 not implemented and not eligible as winners."
+  },
+  "train": {
+    "split": "train",
+    "primary": {
+      "events": 5822,
+      "validLabels": 4847,
+      "invalidLabels": 975,
+      "resolved": 4845,
+      "censored": 2,
+      "censorRate": 0.0004126263668248401,
+      "count": 4845,
+      "meanR": -8.253474680240927,
+      "medianR": -1.033521296591325,
+      "profitFactor": 0.04184338611783215,
+      "winRate": 0.34654282765737876,
+      "maxDrawdownR": 39988.08482576732,
+      "meanMfeR": 1.3487656484199262,
+      "meanMaeR": 1.3455509483723007,
+      "targetBeforeStop": {
+        "target": 2183,
+        "stop": 2662,
+        "censored": 2
+      }
+    },
+    "ci95": {
+      "method": "hierarchical percentile cluster bootstrap: outer symbol, inner symbol×calendar-month",
+      "resamples": 10000,
+      "seed": 20260820,
+      "low": -14.0244987011877,
+      "high": -0.054757455647395974
+    },
+    "bySymbol": [
+      {
+        "symbol": "ADAUSDT",
+        "metrics": {
+          "events": 363,
+          "validLabels": 345,
+          "invalidLabels": 18,
+          "resolved": 345,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 345,
+          "meanR": -0.1365965664898251,
+          "medianR": -1.0170796789907304,
+          "profitFactor": 0.7682452867623144,
+          "winRate": 0.43478260869565216,
+          "maxDrawdownR": 47.125815438989704,
+          "meanMfeR": 0.817455779124936,
+          "meanMaeR": 0.9055401079819443,
+          "targetBeforeStop": {
+            "target": 150,
+            "stop": 195,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "symbol": "BNBUSDT",
+        "metrics": {
+          "events": 1408,
+          "validLabels": 1169,
+          "invalidLabels": 239,
+          "resolved": 1168,
+          "censored": 1,
+          "censorRate": 0.000855431993156544,
+          "count": 1168,
+          "meanR": -12.875705170296287,
+          "medianR": -1.6876952054820293,
+          "profitFactor": 0.013603843557305236,
+          "winRate": 0.23116438356164384,
+          "maxDrawdownR": 15038.823638906078,
+          "meanMfeR": 1.8350792850921298,
+          "meanMaeR": 1.8338781810716647,
+          "targetBeforeStop": {
+            "target": 533,
+            "stop": 635,
+            "censored": 1
+          }
+        }
+      },
+      {
+        "symbol": "BTCUSDT",
+        "metrics": {
+          "events": 1204,
+          "validLabels": 974,
+          "invalidLabels": 230,
+          "resolved": 973,
+          "censored": 1,
+          "censorRate": 0.001026694045174538,
+          "count": 973,
+          "meanR": -12.07116590432658,
+          "medianR": -1.041905664469966,
+          "profitFactor": 0.03478713548990102,
+          "winRate": 0.39568345323741005,
+          "maxDrawdownR": 11746.114988349453,
+          "meanMfeR": 1.42801286369022,
+          "meanMaeR": 1.2808871724307076,
+          "targetBeforeStop": {
+            "target": 439,
+            "stop": 534,
+            "censored": 1
+          }
+        }
+      },
+      {
+        "symbol": "DOGEUSDT",
+        "metrics": {
+          "events": 445,
+          "validLabels": 421,
+          "invalidLabels": 24,
+          "resolved": 421,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 421,
+          "meanR": -0.0415890873202261,
+          "medianR": -1.0154832112467316,
+          "profitFactor": 0.9272702809362531,
+          "winRate": 0.4584323040380047,
+          "maxDrawdownR": 44.98876199406208,
+          "meanMfeR": 1.007229455848992,
+          "meanMaeR": 0.8927970415384123,
+          "targetBeforeStop": {
+            "target": 193,
+            "stop": 228,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "symbol": "ETHUSDT",
+        "metrics": {
+          "events": 1684,
+          "validLabels": 1252,
+          "invalidLabels": 432,
+          "resolved": 1252,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 1252,
+          "meanR": -10.475636223102352,
+          "medianR": -1.0690517122163503,
+          "profitFactor": 0.026921238925914404,
+          "winRate": 0.2979233226837061,
+          "maxDrawdownR": 13115.496551324153,
+          "meanMfeR": 1.305146180619667,
+          "meanMaeR": 1.4691069575226294,
+          "targetBeforeStop": {
+            "target": 560,
+            "stop": 692,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "symbol": "LDOUSDT",
+        "metrics": {
+          "events": 347,
+          "validLabels": 334,
+          "invalidLabels": 13,
+          "resolved": 334,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 334,
+          "meanR": 0.12222406714059826,
+          "medianR": 0.05464393163068465,
+          "profitFactor": 1.2341340480295568,
+          "winRate": 0.5029940119760479,
+          "maxDrawdownR": 15.052655937830506,
+          "meanMfeR": 1.1220453138043702,
+          "meanMaeR": 0.831854311178269,
+          "targetBeforeStop": {
+            "target": 168,
+            "stop": 166,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "symbol": "XRPUSDT",
+        "metrics": {
+          "events": 371,
+          "validLabels": 352,
+          "invalidLabels": 19,
+          "resolved": 352,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 352,
+          "meanR": -0.18383019275999327,
+          "medianR": -1.022561988038825,
+          "profitFactor": 0.7095905878866723,
+          "winRate": 0.3977272727272727,
+          "maxDrawdownR": 73.80279498804789,
+          "meanMfeR": 0.813928655475592,
+          "meanMaeR": 0.9234591041106562,
+          "targetBeforeStop": {
+            "target": 140,
+            "stop": 212,
+            "censored": 0
+          }
+        }
+      }
+    ],
+    "bySeries": [
+      {
+        "series": "csv/BINANCE_ADAUSDT.P, 15.csv",
+        "symbol": "ADAUSDT",
+        "metrics": {
+          "events": 146,
+          "validLabels": 138,
+          "invalidLabels": 8,
+          "resolved": 138,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 138,
+          "meanR": -0.0705187700847812,
+          "medianR": -1.0249912794786444,
+          "profitFactor": 0.8722866285792011,
+          "winRate": 0.4782608695652174,
+          "maxDrawdownR": 16.57531884008061,
+          "meanMfeR": 0.8312028800383897,
+          "meanMaeR": 0.8651121335360141,
+          "targetBeforeStop": {
+            "target": 66,
+            "stop": 72,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_ADAUSDT.P, 45.csv",
+        "symbol": "ADAUSDT",
+        "metrics": {
+          "events": 217,
+          "validLabels": 207,
+          "invalidLabels": 10,
+          "resolved": 207,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 207,
+          "meanR": -0.18064843075985454,
+          "medianR": -1.0166471667077155,
+          "profitFactor": 0.7058926670966323,
+          "winRate": 0.4057971014492754,
+          "maxDrawdownR": 37.39422516728989,
+          "meanMfeR": 0.8082910451826333,
+          "meanMaeR": 0.9324920909458987,
+          "targetBeforeStop": {
+            "target": 84,
+            "stop": 123,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BNBUSDT, 1.csv",
+        "symbol": "BNBUSDT",
+        "metrics": {
+          "events": 270,
+          "validLabels": 250,
+          "invalidLabels": 20,
+          "resolved": 250,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 250,
+          "meanR": -3.104830493528208,
+          "medianR": -1.3950419645027474,
+          "profitFactor": 0.04319791818327124,
+          "winRate": 0.228,
+          "maxDrawdownR": 776.3897678017006,
+          "meanMfeR": 1.4467074867286598,
+          "meanMaeR": 1.4398916258327834,
+          "targetBeforeStop": {
+            "target": 120,
+            "stop": 130,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BNBUSDT, 10S.csv",
+        "symbol": "BNBUSDT",
+        "metrics": {
+          "events": 306,
+          "validLabels": 234,
+          "invalidLabels": 72,
+          "resolved": 234,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 234,
+          "meanR": -18.05905466333237,
+          "medianR": -7.467832424100019,
+          "profitFactor": 0.00008969347084382747,
+          "winRate": 0.004273504273504274,
+          "maxDrawdownR": 4225.8187912197745,
+          "meanMfeR": 2.968265184466389,
+          "meanMaeR": 1.64160376802654,
+          "targetBeforeStop": {
+            "target": 103,
+            "stop": 131,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BNBUSDT, 1S.csv",
+        "symbol": "BNBUSDT",
+        "metrics": {
+          "events": 238,
+          "validLabels": 134,
+          "invalidLabels": 104,
+          "resolved": 134,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 134,
+          "meanR": -56.54276193162791,
+          "medianR": -29.317178998145334,
+          "profitFactor": 0,
+          "winRate": 0,
+          "maxDrawdownR": 7576.730098838139,
+          "meanMfeR": 2.477031184216924,
+          "meanMaeR": 2.2625670217853644,
+          "targetBeforeStop": {
+            "target": 42,
+            "stop": 92,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BNBUSDT, 5.csv",
+        "symbol": "BNBUSDT",
+        "metrics": {
+          "events": 183,
+          "validLabels": 171,
+          "invalidLabels": 12,
+          "resolved": 170,
+          "censored": 1,
+          "censorRate": 0.005847953216374269,
+          "count": 170,
+          "meanR": -0.34701142362925036,
+          "medianR": -1.0917690640489002,
+          "profitFactor": 0.5451694292270154,
+          "winRate": 0.47058823529411764,
+          "maxDrawdownR": 60.10651726135308,
+          "meanMfeR": 1.0327846390980606,
+          "meanMaeR": 0.9367380347652606,
+          "targetBeforeStop": {
+            "target": 84,
+            "stop": 86,
+            "censored": 1
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BNBUSDT.P, 1.csv",
+        "symbol": "BNBUSDT",
+        "metrics": {
+          "events": 240,
+          "validLabels": 219,
+          "invalidLabels": 21,
+          "resolved": 219,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 219,
+          "meanR": -10.723748958118763,
+          "medianR": -1.3838501965627856,
+          "profitFactor": 0.01368331310487595,
+          "winRate": 0.2602739726027397,
+          "maxDrawdownR": 2349.4734945811174,
+          "meanMfeR": 1.8676673191618651,
+          "meanMaeR": 3.6183404518731552,
+          "targetBeforeStop": {
+            "target": 107,
+            "stop": 112,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BNBUSDT.P, 5.csv",
+        "symbol": "BNBUSDT",
+        "metrics": {
+          "events": 171,
+          "validLabels": 161,
+          "invalidLabels": 10,
+          "resolved": 161,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 161,
+          "meanR": -0.3265475877088497,
+          "medianR": -1.0986779246511496,
+          "profitFactor": 0.5664629378574427,
+          "winRate": 0.4658385093167702,
+          "maxDrawdownR": 52.5741616211248,
+          "meanMfeR": 1.0646538171311493,
+          "meanMaeR": 0.8938674638015516,
+          "targetBeforeStop": {
+            "target": 77,
+            "stop": 84,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BTCUSDT, 15.csv",
+        "symbol": "BTCUSDT",
+        "metrics": {
+          "events": 175,
+          "validLabels": 169,
+          "invalidLabels": 6,
+          "resolved": 169,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 169,
+          "meanR": -0.3352736544193122,
+          "medianR": -1.0516636672701012,
+          "profitFactor": 0.5917645768070611,
+          "winRate": 0.44970414201183434,
+          "maxDrawdownR": 62.35888897013077,
+          "meanMfeR": 1.1471377282579096,
+          "meanMaeR": 1.0770584305322155,
+          "targetBeforeStop": {
+            "target": 76,
+            "stop": 93,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BTCUSDT, 5S.csv",
+        "symbol": "BTCUSDT",
+        "metrics": {
+          "events": 328,
+          "validLabels": 126,
+          "invalidLabels": 202,
+          "resolved": 125,
+          "censored": 1,
+          "censorRate": 0.007936507936507936,
+          "count": 125,
+          "meanR": -92.6775954284229,
+          "medianR": -16.449132785989946,
+          "profitFactor": 0,
+          "winRate": 0,
+          "maxDrawdownR": 11584.699428552864,
+          "meanMfeR": 4.209158712657643,
+          "meanMaeR": 3.534143911481864,
+          "targetBeforeStop": {
+            "target": 51,
+            "stop": 74,
+            "censored": 1
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BTCUSDT, 60.csv",
+        "symbol": "BTCUSDT",
+        "metrics": {
+          "events": 177,
+          "validLabels": 172,
+          "invalidLabels": 5,
+          "resolved": 172,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 172,
+          "meanR": -0.050052403564927454,
+          "medianR": -1.0266150836538275,
+          "profitFactor": 0.9171636731109897,
+          "winRate": 0.45348837209302323,
+          "maxDrawdownR": 21.365975277262404,
+          "meanMfeR": 0.9677134962565274,
+          "meanMaeR": 0.9096586281793974,
+          "targetBeforeStop": {
+            "target": 78,
+            "stop": 94,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BTCUSDT.P, 15.csv",
+        "symbol": "BTCUSDT",
+        "metrics": {
+          "events": 169,
+          "validLabels": 164,
+          "invalidLabels": 5,
+          "resolved": 164,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 164,
+          "meanR": -0.17514769093229138,
+          "medianR": -1.0442862712658005,
+          "profitFactor": 0.7417571499112274,
+          "winRate": 0.4695121951219512,
+          "maxDrawdownR": 41.962228322132816,
+          "meanMfeR": 1.1085187248521522,
+          "meanMaeR": 1.006431256368159,
+          "targetBeforeStop": {
+            "target": 77,
+            "stop": 87,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BTCUSDT.P, 5.csv",
+        "symbol": "BTCUSDT",
+        "metrics": {
+          "events": 184,
+          "validLabels": 176,
+          "invalidLabels": 8,
+          "resolved": 176,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 176,
+          "meanR": -0.35847353753047584,
+          "medianR": -1.1141106999542552,
+          "profitFactor": 0.5185883515888148,
+          "winRate": 0.44886363636363635,
+          "maxDrawdownR": 66.78340441172612,
+          "meanMfeR": 0.9275758823119904,
+          "meanMaeR": 0.8190899287321546,
+          "targetBeforeStop": {
+            "target": 82,
+            "stop": 94,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_BTCUSDT.P, 60.csv",
+        "symbol": "BTCUSDT",
+        "metrics": {
+          "events": 171,
+          "validLabels": 167,
+          "invalidLabels": 4,
+          "resolved": 167,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 167,
+          "meanR": -0.0207136013689424,
+          "medianR": -1.0263296172375578,
+          "profitFactor": 0.9650045204261388,
+          "winRate": 0.4491017964071856,
+          "maxDrawdownR": 18.689735361542454,
+          "meanMfeR": 0.9291443583535208,
+          "meanMaeR": 0.9256482682200902,
+          "targetBeforeStop": {
+            "target": 75,
+            "stop": 92,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_DOGEUSDT, 30.csv",
+        "symbol": "DOGEUSDT",
+        "metrics": {
+          "events": 218,
+          "validLabels": 203,
+          "invalidLabels": 15,
+          "resolved": 203,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 203,
+          "meanR": -0.09495368195939452,
+          "medianR": -1.0176871924007895,
+          "profitFactor": 0.8353853661576427,
+          "winRate": 0.4630541871921182,
+          "maxDrawdownR": 34.31129848319515,
+          "meanMfeR": 1.106643703398645,
+          "meanMaeR": 0.9156924119696936,
+          "targetBeforeStop": {
+            "target": 94,
+            "stop": 109,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_DOGEUSDT, 45.csv",
+        "symbol": "DOGEUSDT",
+        "metrics": {
+          "events": 227,
+          "validLabels": 218,
+          "invalidLabels": 9,
+          "resolved": 218,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 218,
+          "meanR": 0.00810363154101791,
+          "medianR": -1.0145541665708195,
+          "profitFactor": 1.0142875595101872,
+          "winRate": 0.4541284403669725,
+          "maxDrawdownR": 29.643907282693775,
+          "meanMfeR": 0.9146556381766097,
+          "meanMaeR": 0.8714770406322208,
+          "targetBeforeStop": {
+            "target": 99,
+            "stop": 119,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_ETHUSDT, 1.csv",
+        "symbol": "ETHUSDT",
+        "metrics": {
+          "events": 274,
+          "validLabels": 242,
+          "invalidLabels": 32,
+          "resolved": 242,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 242,
+          "meanR": -1.8281773231707457,
+          "medianR": -1.4197063108936177,
+          "profitFactor": 0.08661505435005874,
+          "winRate": 0.24380165289256198,
+          "maxDrawdownR": 442.9123970538313,
+          "meanMfeR": 1.0522817646986333,
+          "meanMaeR": 0.946826858774462,
+          "targetBeforeStop": {
+            "target": 116,
+            "stop": 126,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_ETHUSDT, 120.csv",
+        "symbol": "ETHUSDT",
+        "metrics": {
+          "events": 144,
+          "validLabels": 136,
+          "invalidLabels": 8,
+          "resolved": 136,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 136,
+          "meanR": -0.19582668875160214,
+          "medianR": -1.014830442075246,
+          "profitFactor": 0.7006561586553388,
+          "winRate": 0.36764705882352944,
+          "maxDrawdownR": 30.975750409092637,
+          "meanMfeR": 0.8209488581177473,
+          "meanMaeR": 0.9403199170780696,
+          "targetBeforeStop": {
+            "target": 50,
+            "stop": 86,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_ETHUSDT, 15.csv",
+        "symbol": "ETHUSDT",
+        "metrics": {
+          "events": 172,
+          "validLabels": 160,
+          "invalidLabels": 12,
+          "resolved": 160,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 160,
+          "meanR": -0.14579648990020805,
+          "medianR": -1.0356986549137361,
+          "profitFactor": 0.7613422725599387,
+          "winRate": 0.44375,
+          "maxDrawdownR": 27.688365326586506,
+          "meanMfeR": 0.9612393362564445,
+          "meanMaeR": 0.9378839984713041,
+          "targetBeforeStop": {
+            "target": 71,
+            "stop": 89,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_ETHUSDT, 1S.csv",
+        "symbol": "ETHUSDT",
+        "metrics": {
+          "events": 316,
+          "validLabels": 113,
+          "invalidLabels": 203,
+          "resolved": 113,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 113,
+          "meanR": -79.21976955484412,
+          "medianR": -24.10282947737976,
+          "profitFactor": 0,
+          "winRate": 0,
+          "maxDrawdownR": 8951.833959697386,
+          "meanMfeR": 3.600485677724994,
+          "meanMaeR": 5.72376389672857,
+          "targetBeforeStop": {
+            "target": 43,
+            "stop": 70,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_ETHUSDT, 30.csv",
+        "symbol": "ETHUSDT",
+        "metrics": {
+          "events": 236,
+          "validLabels": 218,
+          "invalidLabels": 18,
+          "resolved": 218,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 218,
+          "meanR": -0.05962812631135329,
+          "medianR": -1.0235925184728019,
+          "profitFactor": 0.8976246004187316,
+          "winRate": 0.47706422018348627,
+          "maxDrawdownR": 37.61161883317302,
+          "meanMfeR": 0.996503141003097,
+          "meanMaeR": 0.941942342369017,
+          "targetBeforeStop": {
+            "target": 104,
+            "stop": 114,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_ETHUSDT, 5.csv",
+        "symbol": "ETHUSDT",
+        "metrics": {
+          "events": 186,
+          "validLabels": 180,
+          "invalidLabels": 6,
+          "resolved": 180,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 180,
+          "meanR": -0.28124267952305393,
+          "medianR": -1.0660825573087562,
+          "profitFactor": 0.5801606870973355,
+          "winRate": 0.4888888888888889,
+          "maxDrawdownR": 55.68279904113526,
+          "meanMfeR": 0.8356979988214706,
+          "meanMaeR": 0.8889927062125268,
+          "targetBeforeStop": {
+            "target": 89,
+            "stop": 91,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_ETHUSDT, 5S.csv",
+        "symbol": "ETHUSDT",
+        "metrics": {
+          "events": 356,
+          "validLabels": 203,
+          "invalidLabels": 153,
+          "resolved": 203,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 203,
+          "meanR": -17.771730037020536,
+          "medianR": -9.432999645716418,
+          "profitFactor": 0.00006009144214690861,
+          "winRate": 0.0049261083743842365,
+          "maxDrawdownR": 3607.661197515169,
+          "meanMfeR": 1.6720457461292813,
+          "meanMaeR": 1.5768346031125933,
+          "targetBeforeStop": {
+            "target": 87,
+            "stop": 116,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_LDOUSDT, 15.csv",
+        "symbol": "LDOUSDT",
+        "metrics": {
+          "events": 176,
+          "validLabels": 173,
+          "invalidLabels": 3,
+          "resolved": 173,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 173,
+          "meanR": 0.12859394006596817,
+          "medianR": 0.3800637784345503,
+          "profitFactor": 1.2589323761471416,
+          "winRate": 0.5375722543352601,
+          "maxDrawdownR": 16.915768530245014,
+          "meanMfeR": 1.114473730104658,
+          "meanMaeR": 0.799770633667964,
+          "targetBeforeStop": {
+            "target": 93,
+            "stop": 80,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_LDOUSDT.P, 60.csv",
+        "symbol": "LDOUSDT",
+        "metrics": {
+          "events": 171,
+          "validLabels": 161,
+          "invalidLabels": 10,
+          "resolved": 161,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 161,
+          "meanR": 0.11537942107793361,
+          "medianR": -1.0088912030061055,
+          "profitFactor": 1.2100429532651298,
+          "winRate": 0.4658385093167702,
+          "maxDrawdownR": 15.052655937830506,
+          "meanMfeR": 1.1301812391462978,
+          "meanMaeR": 0.8663293186893434,
+          "targetBeforeStop": {
+            "target": 75,
+            "stop": 86,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_XRPUSDT, 30.csv",
+        "symbol": "XRPUSDT",
+        "metrics": {
+          "events": 199,
+          "validLabels": 188,
+          "invalidLabels": 11,
+          "resolved": 188,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 188,
+          "meanR": -0.2125760757849707,
+          "medianR": -1.0271571220676337,
+          "profitFactor": 0.669125977381779,
+          "winRate": 0.39361702127659576,
+          "maxDrawdownR": 43.95907243036155,
+          "meanMfeR": 0.8108458234333928,
+          "meanMaeR": 0.9289260986917415,
+          "targetBeforeStop": {
+            "target": 74,
+            "stop": 114,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_XRPUSDT, 60.csv",
+        "symbol": "XRPUSDT",
+        "metrics": {
+          "events": 172,
+          "validLabels": 164,
+          "invalidLabels": 8,
+          "resolved": 164,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 164,
+          "meanR": -0.15087759514599466,
+          "medianR": -1.0164685580555555,
+          "profitFactor": 0.7574914547576053,
+          "winRate": 0.4024390243902439,
+          "maxDrawdownR": 32.23585815410931,
+          "meanMfeR": 0.817462633670308,
+          "meanMaeR": 0.9171920615420962,
+          "targetBeforeStop": {
+            "target": 66,
+            "stop": 98,
+            "censored": 0
+          }
+        }
+      }
+    ],
+    "bySide": [
+      {
+        "side": "long",
+        "metrics": {
+          "events": 3007,
+          "validLabels": 2532,
+          "invalidLabels": 475,
+          "resolved": 2532,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 2532,
+          "meanR": -9.443083098249659,
+          "medianR": -1.0325325272730521,
+          "profitFactor": 0.03551555321987238,
+          "winRate": 0.34360189573459715,
+          "maxDrawdownR": 23909.940490764075,
+          "meanMfeR": 1.1940979598091348,
+          "meanMaeR": 1.3675963529348591,
+          "targetBeforeStop": {
+            "target": 1121,
+            "stop": 1411,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "side": "short",
+        "metrics": {
+          "events": 2815,
+          "validLabels": 2315,
+          "invalidLabels": 500,
+          "resolved": 2313,
+          "censored": 2,
+          "censorRate": 0.0008639308855291577,
+          "count": 2313,
+          "meanR": -6.951231483354611,
+          "medianR": -1.0364631841505434,
+          "profitFactor": 0.051101439698499146,
+          "winRate": 0.3497622135754431,
+          "maxDrawdownR": 16078.19842099921,
+          "meanMfeR": 1.5179313449912186,
+          "meanMaeR": 1.3214390847211575,
+          "targetBeforeStop": {
+            "target": 1062,
+            "stop": 1251,
+            "censored": 2
+          }
+        }
+      }
+    ],
+    "breadth": {
+      "positiveSymbols": 1,
+      "symbols": 7,
+      "positiveSymbolFraction": 0.14285714285714285,
+      "positiveSeries": 3,
+      "series": 27,
+      "maxSymbolContributionFraction": null,
+      "leaveOneSymbolOut": [
+        {
+          "omitted": "ADAUSDT",
+          "meanR": -8.875768668961843
+        },
+        {
+          "omitted": "BNBUSDT",
+          "meanR": -6.785221970862477
+        },
+        {
+          "omitted": "BTCUSDT",
+          "meanR": -7.2941220043537225
+        },
+        {
+          "omitted": "DOGEUSDT",
+          "meanR": -9.034940284811368
+        },
+        {
+          "omitted": "ETHUSDT",
+          "meanR": -7.479150646936591
+        },
+        {
+          "omitted": "LDOUSDT",
+          "meanR": -8.873621738903177
+        },
+        {
+          "omitted": "XRPUSDT",
+          "meanR": -8.8856836407558
+        }
+      ],
+      "allLeaveOneOutPositive": false
+    },
+    "randomMatchedBaseline": {
+      "events": 5822,
+      "validLabels": 4933,
+      "invalidLabels": 889,
+      "resolved": 4930,
+      "censored": 3,
+      "censorRate": 0.000608149199270221,
+      "count": 4930,
+      "meanR": -5.858327729334968,
+      "medianR": -0.03496163220150472,
+      "profitFactor": 0.03144776735581311,
+      "winRate": 0.46572008113590263,
+      "maxDrawdownR": 28881.555705621355,
+      "meanMfeR": 1.0575183929877623,
+      "meanMaeR": 0.8593713002485254,
+      "targetBeforeStop": {
+        "target": 3302,
+        "stop": 1628,
+        "censored": 3
+      }
+    }
+  },
+  "validation": {
+    "split": "validation",
+    "primary": {
+      "events": 825,
+      "validLabels": 802,
+      "invalidLabels": 23,
+      "resolved": 799,
+      "censored": 3,
+      "censorRate": 0.003740648379052369,
+      "count": 799,
+      "meanR": -0.20007688050318762,
+      "medianR": 0.08774817549069269,
+      "profitFactor": 0.7162951802676131,
+      "winRate": 0.5006257822277848,
+      "maxDrawdownR": 174.4228595909409,
+      "meanMfeR": 1.1487854599372913,
+      "meanMaeR": 1.3493866797076224,
+      "targetBeforeStop": {
+        "target": 400,
+        "stop": 399,
+        "censored": 3
+      }
+    },
+    "ci95": {
+      "method": "hierarchical percentile cluster bootstrap: outer symbol, inner symbol×calendar-month",
+      "resamples": 10000,
+      "seed": 20260820,
+      "low": -0.5861350977540138,
+      "high": 0.052962683692939536
+    },
+    "bySymbol": [
+      {
+        "symbol": "ONDOUSDT",
+        "metrics": {
+          "events": 336,
+          "validLabels": 329,
+          "invalidLabels": 7,
+          "resolved": 328,
+          "censored": 1,
+          "censorRate": 0.00303951367781155,
+          "count": 328,
+          "meanR": -0.013848960372067506,
+          "medianR": -1.0073021719350388,
+          "profitFactor": 0.974763454371658,
+          "winRate": 0.49085365853658536,
+          "maxDrawdownR": 26.94471707578745,
+          "meanMfeR": 1.038831692247384,
+          "meanMaeR": 0.8518106400378698,
+          "targetBeforeStop": {
+            "target": 161,
+            "stop": 167,
+            "censored": 1
+          }
+        }
+      },
+      {
+        "symbol": "VIRTUALUSDT",
+        "metrics": {
+          "events": 489,
+          "validLabels": 473,
+          "invalidLabels": 16,
+          "resolved": 471,
+          "censored": 2,
+          "censorRate": 0.004228329809725159,
+          "count": 471,
+          "meanR": -0.32976426437369166,
+          "medianR": 0.18851129518340315,
+          "profitFactor": 0.5949779365182664,
+          "winRate": 0.5074309978768577,
+          "maxDrawdownR": 162.34258710776942,
+          "meanMfeR": 1.2252649304869283,
+          "meanMaeR": 1.6954807960952516,
+          "targetBeforeStop": {
+            "target": 239,
+            "stop": 232,
+            "censored": 2
+          }
+        }
+      }
+    ],
+    "bySeries": [
+      {
+        "series": "csv/BINANCE_ONDOUSDT, 5.csv",
+        "symbol": "ONDOUSDT",
+        "metrics": {
+          "events": 175,
+          "validLabels": 171,
+          "invalidLabels": 4,
+          "resolved": 171,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 171,
+          "meanR": 0.01907154554786472,
+          "medianR": 0.3154802456090038,
+          "profitFactor": 1.0348331603155119,
+          "winRate": 0.5146198830409356,
+          "maxDrawdownR": 18.60264114742703,
+          "meanMfeR": 1.0294916444632631,
+          "meanMaeR": 0.8042309076485428,
+          "targetBeforeStop": {
+            "target": 88,
+            "stop": 83,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_ONDOUSDT.P, 60.csv",
+        "symbol": "ONDOUSDT",
+        "metrics": {
+          "events": 161,
+          "validLabels": 158,
+          "invalidLabels": 3,
+          "resolved": 157,
+          "censored": 1,
+          "censorRate": 0.006329113924050633,
+          "count": 157,
+          "meanR": -0.04970505280715295,
+          "medianR": -1.0087440142133428,
+          "profitFactor": 0.9096490036181583,
+          "winRate": 0.46496815286624205,
+          "maxDrawdownR": 26.94471707578745,
+          "meanMfeR": 1.048940224975766,
+          "meanMaeR": 0.9033051605351784,
+          "targetBeforeStop": {
+            "target": 73,
+            "stop": 84,
+            "censored": 1
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_VIRTUALUSDT, 5.csv",
+        "symbol": "VIRTUALUSDT",
+        "metrics": {
+          "events": 199,
+          "validLabels": 194,
+          "invalidLabels": 5,
+          "resolved": 193,
+          "censored": 1,
+          "censorRate": 0.005154639175257732,
+          "count": 193,
+          "meanR": -0.693731542810017,
+          "medianR": 0.24477449179037183,
+          "profitFactor": 0.4202695133595237,
+          "winRate": 0.5284974093264249,
+          "maxDrawdownR": 149.36023715523848,
+          "meanMfeR": 1.7517070548022138,
+          "meanMaeR": 2.953113448013074,
+          "targetBeforeStop": {
+            "target": 102,
+            "stop": 91,
+            "censored": 1
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_VIRTUALUSDT.P, 5.csv",
+        "symbol": "VIRTUALUSDT",
+        "metrics": {
+          "events": 181,
+          "validLabels": 176,
+          "invalidLabels": 5,
+          "resolved": 176,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 176,
+          "meanR": -0.033163671675552536,
+          "medianR": 0.26691338885748817,
+          "profitFactor": 0.9368662001053095,
+          "winRate": 0.5340909090909091,
+          "maxDrawdownR": 19.00570257842246,
+          "meanMfeR": 0.8888514638118704,
+          "meanMaeR": 0.7862088485603256,
+          "targetBeforeStop": {
+            "target": 94,
+            "stop": 82,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "series": "csv/BINANCE_VIRTUALUSDT.P, 60.csv",
+        "symbol": "VIRTUALUSDT",
+        "metrics": {
+          "events": 109,
+          "validLabels": 103,
+          "invalidLabels": 6,
+          "resolved": 102,
+          "censored": 1,
+          "censorRate": 0.009708737864077669,
+          "count": 102,
+          "meanR": -0.15286249551743394,
+          "medianR": -1.0083398300954451,
+          "profitFactor": 0.7404750159226958,
+          "winRate": 0.4215686274509804,
+          "maxDrawdownR": 18.72638853777167,
+          "meanMfeR": 0.808556173376686,
+          "meanMaeR": 0.8804432067174855,
+          "targetBeforeStop": {
+            "target": 43,
+            "stop": 59,
+            "censored": 1
+          }
+        }
+      }
+    ],
+    "bySide": [
+      {
+        "side": "long",
+        "metrics": {
+          "events": 432,
+          "validLabels": 421,
+          "invalidLabels": 11,
+          "resolved": 421,
+          "censored": 0,
+          "censorRate": 0,
+          "count": 421,
+          "meanR": -0.05148177074059511,
+          "medianR": -1.0068833392465055,
+          "profitFactor": 0.9069226679979524,
+          "winRate": 0.4916864608076009,
+          "maxDrawdownR": 47.93527532090036,
+          "meanMfeR": 0.9655587875694077,
+          "meanMaeR": 0.8303133202671271,
+          "targetBeforeStop": {
+            "target": 207,
+            "stop": 214,
+            "censored": 0
+          }
+        }
+      },
+      {
+        "side": "short",
+        "metrics": {
+          "events": 393,
+          "validLabels": 381,
+          "invalidLabels": 12,
+          "resolved": 378,
+          "censored": 3,
+          "censorRate": 0.007874015748031496,
+          "count": 378,
+          "meanR": -0.36557566677316466,
+          "medianR": 0.17353945885612965,
+          "profitFactor": 0.5820346448775354,
+          "winRate": 0.5105820105820106,
+          "maxDrawdownR": 181.44718605174592,
+          "meanMfeR": 1.3512485283542928,
+          "meanMaeR": 1.9229559299030246,
+          "targetBeforeStop": {
+            "target": 193,
+            "stop": 185,
+            "censored": 3
+          }
+        }
+      }
+    ],
+    "breadth": {
+      "positiveSymbols": 0,
+      "symbols": 2,
+      "positiveSymbolFraction": 0,
+      "positiveSeries": 1,
+      "series": 5,
+      "maxSymbolContributionFraction": null,
+      "leaveOneSymbolOut": [
+        {
+          "omitted": "ONDOUSDT",
+          "meanR": -0.32976426437369166
+        },
+        {
+          "omitted": "VIRTUALUSDT",
+          "meanR": -0.013848960372067506
+        }
+      ],
+      "allLeaveOneOutPositive": false
+    },
+    "randomMatchedBaseline": {
+      "events": 825,
+      "validLabels": 803,
+      "invalidLabels": 22,
+      "resolved": 803,
+      "censored": 0,
+      "censorRate": 0,
+      "count": 803,
+      "meanR": -0.0013106952223715424,
+      "medianR": 0.07893350654452021,
+      "profitFactor": 0.99560147266851,
+      "winRate": 0.6562889165628891,
+      "maxDrawdownR": 36.6241722289734,
+      "meanMfeR": 0.5083845715137554,
+      "meanMaeR": 0.5198165552958798,
+      "targetBeforeStop": {
+        "target": 579,
+        "stop": 224,
+        "censored": 0
+      }
+    }
+  },
+  "validationDecision": "KILL_V1_NO_OOS_REVEAL",
+  "oosRevealCount": 0,
+  "untouchedOos": null,
+  "preregisteredProjectBaseline": {
+    "source": "docs/strategies/zonda-reversal.md §3",
+    "note": "Independent OWN2 project baseline uses a different 7 bps/side universe/execution and is contextual, not a like-for-like selection target.",
+    "rows": [
+      {
+        "mode": "Safe",
+        "meanR": -0.063,
+        "ci95": [
+          -0.13,
+          0.003
+        ],
+        "profitFactor": 0.779,
+        "count": 398
+      },
+      {
+        "mode": "Risk",
+        "meanR": -0.016,
+        "ci95": [
+          -0.1,
+          0.072
+        ],
+        "profitFactor": 0.961,
+        "count": 422
+      },
+      {
+        "mode": "Standard",
+        "meanR": 0.017,
+        "ci95": [
+          -0.105,
+          0.133
+        ],
+        "profitFactor": 1.032,
+        "count": 322
+      }
+    ]
+  },
+  "verdict": "KILL_VALIDATION_NO_EDGE",
+  "successGate": {
+    "netMeanPositive": false,
+    "ciLowPositive": false,
+    "positiveAssetFractionAtLeast60Pct": false,
+    "atLeastTwoPositiveSeries": false,
+    "noAssetOver50PctPooledNetR": false,
+    "leaveOneAssetOutKeepsPositiveSign": false
+  },
+  "limitations": [
+    "Censored outcomes are published and excluded from realised meanR/PF/WR because no realised target/stop R exists.",
+    "Pooled drawdown orders simultaneous cross-series events by timestamp then series name; per-series drawdowns are also published.",
+    "Funding is unavailable in OHLCV and is not invented; futures results therefore omit funding.",
+    "A0/A1 were not run because the frozen docs name them but do not fully freeze independent episode/cooldown semantics."
+  ]
+}

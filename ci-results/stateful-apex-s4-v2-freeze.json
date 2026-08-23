@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-20T13:46:32.626Z",
+  "status": "RULE_FROZEN_HOLDOUT_BLOCKED_NO_REVEAL",
+  "config": {
+    "protocolVersion": "stateful-apex-s4-v2-freeze-v1",
+    "stage": "FREEZE_ONLY_BLOCKED_BEFORE_HOLDOUT_REVEAL",
+    "candidate": {
+      "feature": "recoveryFromExtremeOverInner",
+      "associationOutcome": "favorableThenStop"
+    },
+    "causalTiming": {
+      "knownAt": "REVERSAL_CONFIRMED close; before next-bar-open entry",
+      "definition": "recoveryFromExtremeOverInner = recoveryFromExtreme / innerWidth; long recoveryFromExtreme = confirmationClose - episode adverse low extreme; short = episode adverse high extreme - confirmationClose; innerWidth is contemporaneous |Mean - same-side Inner| at confirmation.",
+      "stateUpdateOrder": "On the confirmation bar the adverse extreme is checked first. Confirmation is possible only when that bar creates no new adverse extreme and closes closer to Mean than the preceding close; feature payload is then captured before emission.",
+      "entry": "open of the next bar after confirmation",
+      "outcomeLeakage": false
+    },
+    "rule": {
+      "name": "minimum-recovery-before-entry-v2",
+      "formula": "admit = (recoveryFromExtremeOverInner >= 0.3203983409316291)",
+      "feature": "recoveryFromExtremeOverInner",
+      "operator": ">=",
+      "cutoff": 0.3203983409316291,
+      "degreesOfFreedom": 1,
+      "directionRationale": "The preregistered association is negative: larger causal recovery is associated with lower favorableThenStop incidence. Therefore the rule admits the upper half; the operator is not selected from PnL."
+    },
+    "cutoffSource": {
+      "population": "all eligible S4 diagnostic development events",
+      "statistic": "empirical median q=0.5 with linear interpolation",
+      "featureValues": 2770,
+      "admittedFeatureValues": 1385,
+      "labelFree": true,
+      "labelsReadForCutoff": 0,
+      "pnlGridRun": false,
+      "operatorsTried": 1,
+      "subgroupsTried": 0
+    },
+    "execution": {
+      "stateMachine": "apex-state-v1 unchanged",
+      "entry": "next-bar open unchanged",
+      "target": "Mean frozen at confirmation unchanged",
+      "stop": "same-side Outer frozen at confirmation unchanged",
+      "sameBarCollision": "stop-first unchanged",
+      "costBpsPerSide": 5,
+      "fundingModeled": false
+    },
+    "bootstrap": {
+      "primary": "hierarchical cluster bootstrap: symbols, then calendar-month clusters within sampled symbol; preserve all events/series in cluster",
+      "resamples": 10000,
+      "seed": 20260821,
+      "confidenceInterval": "percentile 95%",
+      "pairedBaseline": "unfiltered v1 on identical frozen holdout events"
+    },
+    "decisionGates": {
+      "minimumHoldoutBreadthBeforeReveal": "at least 3 previously unused whole symbols and at least 3 independent series",
+      "successRequiresAll": [
+        "v2 holdout mean netR > 0 at 5 bps/side",
+        "v2 holdout hierarchical-bootstrap CI95 lower bound > 0",
+        "paired mean netR delta (v2 - v1) > 0 and paired hierarchical-bootstrap CI95 lower bound > 0",
+        "at least 60% of estimable holdout symbols have positive v2 mean netR",
+        "at least 60% of estimable holdout independent series have positive v2 mean netR"
+      ],
+      "decision": "PROMOTE only if every gate passes; otherwise KILL."
+    },
+    "forbiddenPostRevealActions": [
+      "change feature, operator, cutoff, entry, target, stop, collision order, costs, bootstrap, or gates",
+      "rerun or reuse the holdout for tuning after the single reveal",
+      "perform PnL grids, alternative operators, subgroup/asset/TF/market/side rescue, or threshold retuning",
+      "exclude series/events based on revealed labels, PnL, coverage, or observed performance",
+      "read S1 untouched OOS or reuse ONDO/VIRTUAL",
+      "use Vendor Shapes as feature, target, matcher, boundary, or selection criterion"
+    ]
+  },
+  "holdout": {
+    "status": "BLOCKED_NOT_SELECTED_NOT_REVEALED",
+    "blocker": "No new independent internal-holdout universe was specified by the preregistration or another pre-existing selection rule. The remaining local CSV inventory mixes previously used research series and potential candidates; choosing among them now would require subjective post-diagnostic selection. No raw candidate holdout file was opened.",
+    "exclusions": [
+      "all S1 untouched-oos series",
+      "all ONDOUSDT series",
+      "all VIRTUALUSDT series",
+      "all series used in S4 development",
+      "Vendor Shapes and vendor-shape-derived selection"
+    ],
+    "acceptableDatasetAcquisitionMethods": [
+      "Before download, freeze a venue/market, fixed symbol list from an external label-free rule, timeframe(s), UTC start/end, bar schema, and missing-data policy; then acquire a future non-overlapping period.",
+      "Before download, freeze a deterministic label-free universe rule from a dated exchange listing snapshot (for example rank by contemporaneous quote volume with fixed exclusions), plus fixed N, timeframe(s), and UTC window.",
+      "Use an author-supplied new export only if its exact symbol/market/timeframe/window list is declared in writing before any file is opened and none of the exclusions apply."
+    ],
+    "revealCounters": {
+      "newInternalHoldoutFilesRead": 0,
+      "newInternalHoldoutRowsParsed": 0,
+      "newInternalHoldoutEventsDetected": 0,
+      "newInternalHoldoutFeaturesComputed": 0,
+      "newInternalHoldoutLabelsComputed": 0,
+      "newInternalHoldoutPnlComputed": 0,
+      "newInternalHoldoutMetricsComputed": 0,
+      "s1UntouchedOosRevealCount": 0,
+      "ondoVirtualReuseCount": 0
+    }
+  },
+  "inputs": {
+    "preregistration": {
+      "path": "ci-results/stateful-apex-s4-loss-source-diagnostic-preregistration.md",
+      "sha256": "751fcedb42cf05d02ec480ce052abb7db813759a60651060da752661daf45464"
+    },
+    "diagnosticJson": {
+      "path": "ci-results/stateful-apex-s4-loss-source-diagnostic.json",
+      "sha256": "859f7423a5ad48995eaeaea00ed3499b88bce8590babe0ffb2436d2ac8dfcf12"
+    },
+    "diagnosticMarkdown": {
+      "path": "ci-results/stateful-apex-s4-loss-source-diagnostic.md",
+      "sha256": "0d1bb7783ac9102c83824b118cd15f784dfe58ec0231df5afa49c018c6f380e9"
+    },
+    "manifest": {
+      "path": "ci-results/stateful-apex-s1-manifest.json",
+      "sha256": "1eafaf72b8a5efd571a680e497f90c1416bd346eae543857c891a87d6bbb30ba"
+    }
+  },
+  "codeHashes": {
+    "stateMachine": "5f82d45de35ede30e08599372e5cabd46bb04402ddc47de488fad1bfecb449c8",
+    "diagnosticRunner": "d73bc8d8cd61009542abb5e9f084a234c4fef6b2aedf33924060ea649a85ad10",
+    "freezeRunner": "94c204d0d372e6c6aded2c2033ccbbc62c48bc61796bdcdfc23fa02332ca879c"
+  },
+  "upstreamAssociation": {
+    "family": "stop/path",
+    "feature": "recoveryFromExtremeOverInner",
+    "outcome": "favorableThenStop",
+    "kind": "binary",
+    "n": 2638,
+    "effect": -0.14932790280654443,
+    "clusterCi95": {
+      "low": -0.2591921036107465,
+      "high": -0.08586303441421962
+    },
+    "rawP": 0.0005999400059994001,
+    "q": 0.003562143785621438,
+    "symbolBreadth": {
+      "estimable": 6,
+      "agreement": 1
+    },
+    "seriesBreadth": {
+      "estimable": 15,
+      "agreement": 1
+    },
+    "foldSigns": {
+      "early": -0.18117226392121202,
+      "middle": -0.15181818181818182,
+      "late": -0.11993644100801237
+    },
+    "losoSignsAgree": true,
+    "proxyOrLeakage": false,
+    "passesCandidateScreens": true
+  },
+  "integrityErrors": [],
+  "configHash": "6b5fa5c9de7f26ac3f71ba258065c5ab5a22fd4eb17b57d7634013acc42b765f",
+  "protocolHash": "b7119204cb71c3ccb3582e4dfd1c5cfc03943a46ff6e370cd5e8257ee8e7fc70"
+}

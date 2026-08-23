@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-20T14:13:47.955Z",
+  "decision": "NO_CANDIDATE",
+  "candidate": null,
+  "protocol": {
+    "stage": "DEVELOPMENT_ONLY",
+    "designArtifact": "ci-results/stateful-apex-s5-favorable-management-preregistration.md",
+    "designSha256": "4e50fe56cd34ef01fedefed4b79d5081cd0d3db29763f73a6273ae74259f52c3",
+    "manifest": "ci-results/stateful-apex-s1-manifest.json",
+    "manifestSha256": "1eafaf72b8a5efd571a680e497f90c1416bd346eae543857c891a87d6bbb30ba",
+    "runnerSha256": "20b1ea30699690482ccf9f5e9f2b853d414ac9c18e067d6a9d9d208f5db987b9",
+    "costBpsPerSide": 5,
+    "resamples": 10000,
+    "seed": 20260822,
+    "noPnlGrid": true,
+    "noSrcCoreChanges": true,
+    "vendorShapesUsed": false
+  },
+  "integrity": {
+    "passed": true,
+    "allowedSeries": 15,
+    "allowedSymbols": [
+      "ADAUSDT",
+      "BTCUSDT",
+      "DOGEUSDT",
+      "ETHUSDT",
+      "LDOUSDT",
+      "XRPUSDT"
+    ],
+    "rowsParsed": 367595,
+    "eventsDetected": 2770,
+    "validPairedEvents": 2638,
+    "invalidEvents": 132,
+    "s1UntouchedOosFilesRead": 0,
+    "ondoVirtualFilesRead": 0,
+    "s4HoldoutFilesRead": 0,
+    "vendorShapeUses": 0,
+    "vendorShapeRowsValidatedThenDiscarded": 370745
+  },
+  "attribution": {
+    "baselineFavorableThenStop": 325,
+    "saved": 325,
+    "savedRate": 1,
+    "savedWilson95Lower": 0.9883182040534958,
+    "baselineWinners": 1182,
+    "winnerClipped": 175,
+    "activated": 603,
+    "activationRate": 0.22858225928733888,
+    "activationToBe": 500,
+    "activationToTarget": 103,
+    "activationSymbols": 6,
+    "activationSeries": 15
+  },
+  "economics": {
+    "meanGrossDelta": -0.014908423046861291,
+    "meanNetDelta": -0.014917595531193076,
+    "totalGrossDelta": -39.32841999762009,
+    "totalNetDelta": -39.352617011287336,
+    "primaryHierarchicalCi95": {
+      "gross": {
+        "low": -0.0596492059839799,
+        "high": 0.03162601825347214
+      },
+      "net": {
+        "low": -0.05967625174607941,
+        "high": 0.03162125204055232
+      }
+    },
+    "seriesClusterSensitivityCi95": {
+      "gross": {
+        "low": -0.04788127492461059,
+        "high": 0.015009385477162898
+      },
+      "net": {
+        "low": -0.047895192552532787,
+        "high": 0.014998837441592415
+      }
+    }
+  },
+  "breadth": {
+    "symbols": {
+      "estimable": 6,
+      "positive": 2,
+      "rate": 0.3333333333333333
+    },
+    "series": {
+      "estimable": 15,
+      "positive": 6,
+      "rate": 0.4
+    }
+  },
+  "screens": {
+    "netDeltaPositiveCi": false,
+    "grossDeltaPositiveCi": false,
+    "breadth": false,
+    "attribution": true,
+    "pathFeasibility": true,
+    "integrity": true
+  },
+  "pathFeasibility": {
+    "rule": "Inner touch observed on completed bar; BE effective only from next bar; activation-bar target/stop resolved before activation; post-activation collision BE-first.",
+    "sameBarActivationsUsed": 0,
+    "feasibleWaypointEvents": 919
+  },
+  "perSymbol": [
+    {
+      "symbol": "ADAUSDT",
+      "n": 345,
+      "meanNetDelta": 0.06355997941650669,
+      "saved": 53,
+      "clipped": 17
+    },
+    {
+      "symbol": "BTCUSDT",
+      "n": 672,
+      "meanNetDelta": -0.03593430818175518,
+      "saved": 74,
+      "clipped": 48
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "n": 421,
+      "meanNetDelta": -0.011703355106356813,
+      "saved": 51,
+      "clipped": 29
+    },
+    {
+      "symbol": "ETHUSDT",
+      "n": 514,
+      "meanNetDelta": -0.03517250311289251,
+      "saved": 61,
+      "clipped": 38
+    },
+    {
+      "symbol": "LDOUSDT",
+      "n": 334,
+      "meanNetDelta": -0.07372812054504384,
+      "saved": 42,
+      "clipped": 26
+    },
+    {
+      "symbol": "XRPUSDT",
+      "n": 352,
+      "meanNetDelta": 0.0298239106534233,
+      "saved": 44,
+      "clipped": 17
+    }
+  ],
+  "perSeries": [
+    {
+      "series": "csv/BINANCE_ADAUSDT.P, 15.csv",
+      "n": 138,
+      "meanNetDelta": 0.03703845967892372,
+      "saved": 18,
+      "clipped": 7
+    },
+    {
+      "series": "csv/BINANCE_ADAUSDT.P, 45.csv",
+      "n": 207,
+      "meanNetDelta": 0.08124099257489532,
+      "saved": 35,
+      "clipped": 10
+    },
+    {
+      "series": "csv/BINANCE_BTCUSDT, 15.csv",
+      "n": 169,
+      "meanNetDelta": -0.0198318602611672,
+      "saved": 19,
+      "clipped": 11
+    },
+    {
+      "series": "csv/BINANCE_BTCUSDT, 60.csv",
+      "n": 172,
+      "meanNetDelta": 0.0171304244993423,
+      "saved": 24,
+      "clipped": 11
+    },
+    {
+      "series": "csv/BINANCE_BTCUSDT.P, 15.csv",
+      "n": 164,
+      "meanNetDelta": -0.04584518017154079,
+      "saved": 13,
+      "clipped": 10
+    },
+    {
+      "series": "csv/BINANCE_BTCUSDT.P, 60.csv",
+      "n": 167,
+      "meanNetDelta": -0.09715026454943958,
+      "saved": 18,
+      "clipped": 16
+    },
+    {
+      "series": "csv/BINANCE_DOGEUSDT, 30.csv",
+      "n": 203,
+      "meanNetDelta": -0.01759841211808763,
+      "saved": 28,
+      "clipped": 16
+    },
+    {
+      "series": "csv/BINANCE_DOGEUSDT, 45.csv",
+      "n": 218,
+      "meanNetDelta": -0.006213921283506558,
+      "saved": 23,
+      "clipped": 13
+    },
+    {
+      "series": "csv/BINANCE_ETHUSDT, 120.csv",
+      "n": 136,
+      "meanNetDelta": -0.03962911013040439,
+      "saved": 18,
+      "clipped": 10
+    },
+    {
+      "series": "csv/BINANCE_ETHUSDT, 15.csv",
+      "n": 160,
+      "meanNetDelta": -0.01740957858774299,
+      "saved": 16,
+      "clipped": 9
+    },
+    {
+      "series": "csv/BINANCE_ETHUSDT, 30.csv",
+      "n": 218,
+      "meanNetDelta": -0.04542924334060952,
+      "saved": 27,
+      "clipped": 19
+    },
+    {
+      "series": "csv/BINANCE_LDOUSDT, 15.csv",
+      "n": 173,
+      "meanNetDelta": 0.0370894469682492,
+      "saved": 24,
+      "clipped": 10
+    },
+    {
+      "series": "csv/BINANCE_LDOUSDT.P, 60.csv",
+      "n": 161,
+      "meanNetDelta": -0.1928053825313774,
+      "saved": 18,
+      "clipped": 16
+    },
+    {
+      "series": "csv/BINANCE_XRPUSDT, 30.csv",
+      "n": 188,
+      "meanNetDelta": 0.05053699089003557,
+      "saved": 27,
+      "clipped": 10
+    },
+    {
+      "series": "csv/BINANCE_XRPUSDT, 60.csv",
+      "n": 164,
+      "meanNetDelta": 0.006079647943160459,
+      "saved": 17,
+      "clipped": 7
+    }
+  ]
+}

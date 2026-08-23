@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-20T13:55:04.787Z",
+  "status": "HOLDOUT_ACQUIRED_VALIDATED_NOT_REVEALED",
+  "blocker": null,
+  "protocol": {
+    "freezePath": "ci-results/stateful-apex-s4-holdout-universe-freeze.json",
+    "freezeFileSha256": "59a39d1099cf931fe727840740cba730d7ea8ce202c34ed23b9b1c17fbafbdcf",
+    "freezeHash": "0f72ae18bfadef715bec8bfa7372f6551825f6c9b6256afafa2858ef71761c94",
+    "venue": "Binance USDT-M perpetual",
+    "mechanism": "tools/shared/candleFetcher.fetchCandlesPaginated via ccxt.binanceusdm.fetchOHLCV",
+    "timeframe": "1h",
+    "utcWindow": {
+      "startInclusive": "2024-05-09T05:00:00.000Z",
+      "endExclusive": "2026-08-20T13:00:00.000Z"
+    },
+    "rowTargetPerSymbol": 20000,
+    "missingDataPolicyAppliedExactly": true,
+    "interpolation": false,
+    "symbolReplacement": false
+  },
+  "series": [
+    {
+      "rank": 1,
+      "symbol": "ZECUSDT",
+      "ccxtSymbol": "ZEC/USDT:USDT",
+      "file": "data/holdouts/stateful-apex-s4-v2/ZECUSDT-1h.json",
+      "rows": 20000,
+      "firstTimestamp": 1715230800000,
+      "firstUtc": "2024-05-09T05:00:00.000Z",
+      "lastTimestamp": 1787227200000,
+      "lastUtc": "2026-08-20T12:00:00.000Z",
+      "sha256": "d28460d5aef1bb3168b6da5f9701314a23530c53ae78b795223ec237ad89fc08",
+      "schemaErrors": 0,
+      "missingBars": 0,
+      "duplicateBars": 0,
+      "offGridBars": 0
+    },
+    {
+      "rank": 2,
+      "symbol": "1000PEPEUSDT",
+      "ccxtSymbol": "1000PEPE/USDT:USDT",
+      "file": "data/holdouts/stateful-apex-s4-v2/1000PEPEUSDT-1h.json",
+      "rows": 20000,
+      "firstTimestamp": 1715230800000,
+      "firstUtc": "2024-05-09T05:00:00.000Z",
+      "lastTimestamp": 1787227200000,
+      "lastUtc": "2026-08-20T12:00:00.000Z",
+      "sha256": "ce80063f7281e9648836c7a9a34b872f789bc3087c10b2003d3a1115fed5efda",
+      "schemaErrors": 0,
+      "missingBars": 0,
+      "duplicateBars": 0,
+      "offGridBars": 0
+    },
+    {
+      "rank": 3,
+      "symbol": "BOMEUSDT",
+      "ccxtSymbol": "BOME/USDT:USDT",
+      "file": "data/holdouts/stateful-apex-s4-v2/BOMEUSDT-1h.json",
+      "rows": 20000,
+      "firstTimestamp": 1715230800000,
+      "firstUtc": "2024-05-09T05:00:00.000Z",
+      "lastTimestamp": 1787227200000,
+      "lastUtc": "2026-08-20T12:00:00.000Z",
+      "sha256": "72e8218ec60bbd9511d9fa1b0ed865bfd18409701c7b4f49c2f91df239227c28",
+      "schemaErrors": 0,
+      "missingBars": 0,
+      "duplicateBars": 0,
+      "offGridBars": 0
+    }
+  ],
+  "integrity": {
+    "requestedSymbols": [
+      "ZECUSDT",
+      "1000PEPEUSDT",
+      "BOMEUSDT"
+    ],
+    "acquiredSymbols": [
+      "ZECUSDT",
+      "1000PEPEUSDT",
+      "BOMEUSDT"
+    ],
+    "wholeSymbolCount": 3,
+    "schemaErrors": 0,
+    "missingBars": 0,
+    "duplicateBars": 0,
+    "offGridBars": 0,
+    "nonOverlapWithPriorInventory": true,
+    "priorLocalOhlcvUsedForSelectionOrFallback": false
+  },
+  "revealCounters": {
+    "revealCount": 0,
+    "eventsDetected": 0,
+    "labelsComputed": 0,
+    "pnlComputed": 0,
+    "metricsComputed": 0,
+    "s1UntouchedOosRevealCount": 0,
+    "ondoVirtualReuseCount": 0
+  }
+}
