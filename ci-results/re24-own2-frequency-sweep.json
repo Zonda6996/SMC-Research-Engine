@@ -1,0 +1,504 @@
+{
+  "generatedAt": "2026-08-19T17:18:37.776Z",
+  "note": "OWN2 threshold sweep for signal frequency vs vendor. src/core untouched; canonical Apex bands; replay base {fullFixAtMean:true, addEnabled:false} mode safe; costs 0/5 bps. Selection on train: net@5>=0 -> max recall else max F1.",
+  "grid": {
+    "relVol": [
+      0,
+      0.8,
+      1,
+      1.2,
+      1.4
+    ],
+    "distMean": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "pen": [
+      -0.6,
+      -0.35,
+      -0.1
+    ],
+    "canon": {
+      "minimumRelativeVolume": 1.4,
+      "minimumDistanceMeanPct": 3,
+      "minimumPenetrationInner": -0.35
+    },
+    "costBps": [
+      0,
+      5
+    ],
+    "trainOosSplit": 0.65
+  },
+  "series": [
+    {
+      "key": "VIRTUAL 5m",
+      "file": "csv/BINANCE_VIRTUALUSDT, 5.csv",
+      "authorWR": 78.7,
+      "authorRefR": 15.24,
+      "nShapesTotal": 107,
+      "freqShapesPerMonth": 44.86024844720497,
+      "gate": {
+        "cfg": {
+          "relVol": 1.4,
+          "distMean": 3,
+          "pen": -0.35
+        },
+        "freqPerMonth": 185.31055900621118,
+        "nSignals": 442,
+        "full": {
+          "match": {
+            "recall": 0.29906542056074764,
+            "precision": 0.07239819004524888,
+            "f1": 0.11657559198542805,
+            "matched": 32,
+            "nShapes": 107,
+            "nSignals": 442
+          },
+          "net0": 5.556103793958658,
+          "net5": -0.04755544775651249,
+          "moneyWR": 0.806060606060606,
+          "vendorWR": 0.8181818181818182,
+          "nTrades": 165
+        },
+        "train": {
+          "match": {
+            "recall": 0.28205128205128205,
+            "precision": 0.07482993197278912,
+            "f1": 0.11827956989247312,
+            "matched": 22,
+            "nShapes": 78,
+            "nSignals": 294
+          },
+          "net0": 3.1492672242037023,
+          "net5": -0.08552208479649726,
+          "moneyWR": 0.8018018018018018,
+          "vendorWR": 0.8108108108108109,
+          "nTrades": 111
+        },
+        "oos": {
+          "match": {
+            "recall": 0.3448275862068966,
+            "precision": 0.06756756756756757,
+            "f1": 0.11299435028248589,
+            "matched": 10,
+            "nShapes": 29,
+            "nSignals": 148
+          },
+          "net0": 2.4068365697549527,
+          "net5": 0.03796663703998454,
+          "moneyWR": 0.8148148148148148,
+          "vendorWR": 0.8333333333333334,
+          "nTrades": 54
+        }
+      },
+      "best": {
+        "cfg": {
+          "relVol": 0,
+          "distMean": 0,
+          "pen": -0.1
+        },
+        "freqPerMonth": 464.1149068322981,
+        "nSignals": 1107,
+        "full": {
+          "match": {
+            "recall": 0.14018691588785046,
+            "precision": 0.013550135501355014,
+            "f1": 0.024711696869851734,
+            "matched": 15,
+            "nShapes": 107,
+            "nSignals": 1107
+          },
+          "net0": 7.99753607780548,
+          "net5": 2.8074549302379124,
+          "moneyWR": 0.8092105263157895,
+          "vendorWR": 0.8223684210526315,
+          "nTrades": 152
+        },
+        "train": {
+          "match": {
+            "recall": 0.1282051282051282,
+            "precision": 0.014204545454545454,
+            "f1": 0.02557544757033248,
+            "matched": 10,
+            "nShapes": 78,
+            "nSignals": 704
+          },
+          "net0": 4.742909615878666,
+          "net5": 1.9730525129892966,
+          "moneyWR": 0.8041237113402062,
+          "vendorWR": 0.8144329896907216,
+          "nTrades": 97
+        },
+        "oos": {
+          "match": {
+            "recall": 0.1724137931034483,
+            "precision": 0.01240694789081886,
+            "f1": 0.02314814814814815,
+            "matched": 5,
+            "nShapes": 29,
+            "nSignals": 403
+          },
+          "net0": 3.254626461926815,
+          "net5": 0.8344024172486162,
+          "moneyWR": 0.8181818181818182,
+          "vendorWR": 0.8363636363636363,
+          "nTrades": 55
+        }
+      },
+      "selectedBy": "max recall | net@5(train)≥0"
+    },
+    {
+      "key": "ONDO 5m",
+      "file": "csv/BINANCE_ONDOUSDT, 5.csv",
+      "authorWR": 83.7,
+      "authorRefR": 12.12,
+      "nShapesTotal": 95,
+      "freqShapesPerMonth": 39.82725993497986,
+      "gate": {
+        "cfg": {
+          "relVol": 1.4,
+          "distMean": 3,
+          "pen": -0.35
+        },
+        "freqPerMonth": 148.40894754718812,
+        "nSignals": 354,
+        "full": {
+          "match": {
+            "recall": 0.29473684210526313,
+            "precision": 0.07909604519774012,
+            "f1": 0.1247216035634744,
+            "matched": 28,
+            "nShapes": 95,
+            "nSignals": 354
+          },
+          "net0": 7.838512391737613,
+          "net5": 3.769788924345392,
+          "moneyWR": 0.8467153284671532,
+          "vendorWR": 0.8613138686131386,
+          "nTrades": 137
+        },
+        "train": {
+          "match": {
+            "recall": 0.23333333333333334,
+            "precision": 0.06278026905829596,
+            "f1": 0.0989399293286219,
+            "matched": 14,
+            "nShapes": 60,
+            "nSignals": 223
+          },
+          "net0": 4.8868986829769945,
+          "net5": 2.461028210021861,
+          "moneyWR": 0.8666666666666667,
+          "vendorWR": 0.8666666666666667,
+          "nTrades": 90
+        },
+        "oos": {
+          "match": {
+            "recall": 0.4,
+            "precision": 0.10687022900763359,
+            "f1": 0.16867469879518074,
+            "matched": 14,
+            "nShapes": 35,
+            "nSignals": 131
+          },
+          "net0": 2.9516137087606173,
+          "net5": 1.3087607143235307,
+          "moneyWR": 0.8085106382978723,
+          "vendorWR": 0.851063829787234,
+          "nTrades": 47
+        }
+      },
+      "best": {
+        "cfg": {
+          "relVol": 0,
+          "distMean": 0,
+          "pen": -0.6
+        },
+        "freqPerMonth": 1577.5787277403074,
+        "nSignals": 3763,
+        "full": {
+          "match": {
+            "recall": 0.9473684210526315,
+            "precision": 0.02391708743024183,
+            "f1": 0.04665629860031104,
+            "matched": 90,
+            "nShapes": 95,
+            "nSignals": 3763
+          },
+          "net0": 12.504562386786692,
+          "net5": 4.698193781721697,
+          "moneyWR": 0.8455598455598455,
+          "vendorWR": 0.8725868725868726,
+          "nTrades": 259
+        },
+        "train": {
+          "match": {
+            "recall": 0.95,
+            "precision": 0.022993142396127472,
+            "f1": 0.044899566758566364,
+            "matched": 57,
+            "nShapes": 60,
+            "nSignals": 2479
+          },
+          "net0": 10.259838961286839,
+          "net5": 5.609898366122977,
+          "moneyWR": 0.8647058823529412,
+          "vendorWR": 0.888235294117647,
+          "nTrades": 170
+        },
+        "oos": {
+          "match": {
+            "recall": 0.9428571428571428,
+            "precision": 0.02570093457943925,
+            "f1": 0.050037907505686124,
+            "matched": 33,
+            "nShapes": 35,
+            "nSignals": 1284
+          },
+          "net0": 2.2447234254998456,
+          "net5": -0.9117045844012781,
+          "moneyWR": 0.8089887640449438,
+          "vendorWR": 0.8426966292134831,
+          "nTrades": 89
+        }
+      },
+      "selectedBy": "max recall | net@5(train)≥0"
+    },
+    {
+      "key": "LDO 15m",
+      "file": "csv/BINANCE_LDOUSDT, 15.csv",
+      "authorWR": 62.9,
+      "authorRefR": 15.25,
+      "nShapesTotal": 95,
+      "freqShapesPerMonth": 12.41548305123202,
+      "gate": {
+        "cfg": {
+          "relVol": 1.4,
+          "distMean": 3,
+          "pen": -0.35
+        },
+        "freqPerMonth": 50.83813586241322,
+        "nSignals": 389,
+        "full": {
+          "match": {
+            "recall": 0.3368421052631579,
+            "precision": 0.08226221079691516,
+            "f1": 0.1322314049586777,
+            "matched": 32,
+            "nShapes": 95,
+            "nSignals": 389
+          },
+          "net0": -5.3268700643607945,
+          "net5": -7.515258980226015,
+          "moneyWR": 0.7655172413793103,
+          "vendorWR": 0.7793103448275862,
+          "nTrades": 145
+        },
+        "train": {
+          "match": {
+            "recall": 0.3548387096774194,
+            "precision": 0.08661417322834646,
+            "f1": 0.13924050632911392,
+            "matched": 22,
+            "nShapes": 62,
+            "nSignals": 254
+          },
+          "net0": -5.785369304016823,
+          "net5": -7.199777443688075,
+          "moneyWR": 0.7608695652173914,
+          "vendorWR": 0.7608695652173914,
+          "nTrades": 92
+        },
+        "oos": {
+          "match": {
+            "recall": 0.30303030303030304,
+            "precision": 0.07407407407407407,
+            "f1": 0.11904761904761904,
+            "matched": 10,
+            "nShapes": 33,
+            "nSignals": 135
+          },
+          "net0": 0.45849923965602973,
+          "net5": -0.3154815365379378,
+          "moneyWR": 0.7735849056603774,
+          "vendorWR": 0.8113207547169812,
+          "nTrades": 53
+        }
+      },
+      "best": {
+        "cfg": {
+          "relVol": 1.4,
+          "distMean": 0,
+          "pen": -0.35
+        },
+        "freqPerMonth": 50.83813586241322,
+        "nSignals": 389,
+        "full": {
+          "match": {
+            "recall": 0.3368421052631579,
+            "precision": 0.08226221079691516,
+            "f1": 0.1322314049586777,
+            "matched": 32,
+            "nShapes": 95,
+            "nSignals": 389
+          },
+          "net0": -5.3268700643607945,
+          "net5": -7.515258980226015,
+          "moneyWR": 0.7655172413793103,
+          "vendorWR": 0.7793103448275862,
+          "nTrades": 145
+        },
+        "train": {
+          "match": {
+            "recall": 0.3548387096774194,
+            "precision": 0.08661417322834646,
+            "f1": 0.13924050632911392,
+            "matched": 22,
+            "nShapes": 62,
+            "nSignals": 254
+          },
+          "net0": -5.785369304016823,
+          "net5": -7.199777443688075,
+          "moneyWR": 0.7608695652173914,
+          "vendorWR": 0.7608695652173914,
+          "nTrades": 92
+        },
+        "oos": {
+          "match": {
+            "recall": 0.30303030303030304,
+            "precision": 0.07407407407407407,
+            "f1": 0.11904761904761904,
+            "matched": 10,
+            "nShapes": 33,
+            "nSignals": 135
+          },
+          "net0": 0.45849923965602973,
+          "net5": -0.3154815365379378,
+          "moneyWR": 0.7735849056603774,
+          "vendorWR": 0.8113207547169812,
+          "nTrades": 53
+        }
+      },
+      "selectedBy": "max F1(train) [нет конфига с net@5≥0]"
+    },
+    {
+      "key": "AVAX 5m",
+      "file": "csv/BINANCE_AVAXUSDT, 5.csv",
+      "authorWR": 91,
+      "authorRefR": 12.62,
+      "nShapesTotal": 68,
+      "freqShapesPerMonth": 28.509316770186334,
+      "gate": {
+        "cfg": {
+          "relVol": 1.4,
+          "distMean": 3,
+          "pen": -0.35
+        },
+        "freqPerMonth": 145.90062111801242,
+        "nSignals": 348,
+        "full": {
+          "match": {
+            "recall": 0.23529411764705882,
+            "precision": 0.04597701149425287,
+            "f1": 0.07692307692307693,
+            "matched": 16,
+            "nShapes": 68,
+            "nSignals": 348
+          },
+          "net0": -2.062302802964917,
+          "net5": -7.806864197688077,
+          "moneyWR": 0.7801418439716312,
+          "vendorWR": 0.7872340425531915,
+          "nTrades": 141
+        },
+        "train": {
+          "match": {
+            "recall": 0.2553191489361702,
+            "precision": 0.053811659192825115,
+            "f1": 0.08888888888888889,
+            "matched": 12,
+            "nShapes": 47,
+            "nSignals": 223
+          },
+          "net0": -0.8082782586006267,
+          "net5": -4.053565996791588,
+          "moneyWR": 0.7888888888888889,
+          "vendorWR": 0.8,
+          "nTrades": 90
+        },
+        "oos": {
+          "match": {
+            "recall": 0.19047619047619047,
+            "precision": 0.032,
+            "f1": 0.05479452054794521,
+            "matched": 4,
+            "nShapes": 21,
+            "nSignals": 125
+          },
+          "net0": -1.2540245443642908,
+          "net5": -3.7532982008964924,
+          "moneyWR": 0.7647058823529411,
+          "vendorWR": 0.7647058823529411,
+          "nTrades": 51
+        }
+      },
+      "best": {
+        "cfg": {
+          "relVol": 1,
+          "distMean": 0,
+          "pen": -0.1
+        },
+        "freqPerMonth": 146.3198757763975,
+        "nSignals": 349,
+        "full": {
+          "match": {
+            "recall": 0.10294117647058823,
+            "precision": 0.02005730659025788,
+            "f1": 0.03357314148681056,
+            "matched": 7,
+            "nShapes": 68,
+            "nSignals": 349
+          },
+          "net0": 7.98610936424941,
+          "net5": 3.405645326777651,
+          "moneyWR": 0.8272727272727273,
+          "vendorWR": 0.8363636363636363,
+          "nTrades": 110
+        },
+        "train": {
+          "match": {
+            "recall": 0.1276595744680851,
+            "precision": 0.02666666666666667,
+            "f1": 0.04411764705882353,
+            "matched": 6,
+            "nShapes": 47,
+            "nSignals": 225
+          },
+          "net0": 4.395352982915667,
+          "net5": 1.7439342844695969,
+          "moneyWR": 0.8309859154929577,
+          "vendorWR": 0.8450704225352113,
+          "nTrades": 71
+        },
+        "oos": {
+          "match": {
+            "recall": 0.047619047619047616,
+            "precision": 0.008064516129032258,
+            "f1": 0.01379310344827586,
+            "matched": 1,
+            "nShapes": 21,
+            "nSignals": 124
+          },
+          "net0": 3.590756381333742,
+          "net5": 1.6617110423080532,
+          "moneyWR": 0.8205128205128205,
+          "vendorWR": 0.8205128205128205,
+          "nTrades": 39
+        }
+      },
+      "selectedBy": "max recall | net@5(train)≥0"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "generatedAt": "2026-08-19T09:11:27.185Z",
+  "note": "RE12c: vendor-raw label taxonomy (partial-then-stop = Partial/WIN per author), partial+add, no full-fix-at-mean, safe only (ETH/SOL 2h). Entries = vendor CSV shapes into canonical ArrowTradeReplay. Stop calibrated by V-WIN stop-rate. base {fullFixAtMean:false, addEnabled:true}. Engine src/core untouched.",
+  "modes": [
+    "safe"
+  ],
+  "costBps": [
+    0,
+    5
+  ],
+  "stopGrid": [
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1,
+    1.1,
+    1.25,
+    1.5,
+    1.75,
+    2
+  ],
+  "series": [
+    {
+      "key": "ETH 2h",
+      "vendor": {
+        "wr": 81,
+        "stopRatePct": 19,
+        "partialPct": 28.6,
+        "fullFixPct": 52.4,
+        "trades": 84
+      },
+      "modes": [
+        {
+          "mode": "safe",
+          "matchedStopSteps": 2,
+          "achievedStopRateWin": 0.19047619047619047,
+          "raw": {
+            "fullTp": 56,
+            "partialStop": 12,
+            "stop": 16,
+            "timeout": 0,
+            "partialTaken": 63,
+            "total": 84
+          },
+          "taxonomyWin": {
+            "wr": 0.8095238095238095,
+            "stopRate": 0.19047619047619047,
+            "partialPct": 0.14285714285714285,
+            "fullfixPct": 0.6666666666666666,
+            "terminal": 84
+          },
+          "taxonomyStrict": {
+            "wr": 0.6666666666666666,
+            "stopRate": 0.3333333333333333,
+            "partialPct": 0,
+            "fullfixPct": 0.6666666666666666,
+            "terminal": 84
+          },
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 84,
+              "wrMoney": 0.6547619047619048,
+              "totalR": -4.246650295125654,
+              "meanR": -0.05055536065625779,
+              "pf": 0.8350474493710914
+            },
+            {
+              "bps": 5,
+              "n": 84,
+              "wrMoney": 0.6547619047619048,
+              "totalR": -4.863942947033745,
+              "meanR": -0.05790408270278268,
+              "pf": 0.813233112973594
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "SOL 2h",
+      "vendor": {
+        "wr": 88.6,
+        "stopRatePct": 11.4,
+        "partialPct": 28.4,
+        "fullFixPct": 60.2,
+        "trades": 88
+      },
+      "modes": [
+        {
+          "mode": "safe",
+          "matchedStopSteps": 1.75,
+          "achievedStopRateWin": 0.11494252873563218,
+          "raw": {
+            "fullTp": 57,
+            "partialStop": 20,
+            "stop": 10,
+            "timeout": 0,
+            "partialTaken": 74,
+            "total": 87
+          },
+          "taxonomyWin": {
+            "wr": 0.8850574712643678,
+            "stopRate": 0.11494252873563218,
+            "partialPct": 0.22988505747126436,
+            "fullfixPct": 0.6551724137931034,
+            "terminal": 87
+          },
+          "taxonomyStrict": {
+            "wr": 0.6551724137931034,
+            "stopRate": 0.3448275862068966,
+            "partialPct": 0,
+            "fullfixPct": 0.6551724137931034,
+            "terminal": 87
+          },
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 87,
+              "wrMoney": 0.6436781609195402,
+              "totalR": -0.04709205124524557,
+              "meanR": -0.0005412879453476502,
+              "pf": 0.9981508302415023
+            },
+            {
+              "bps": 5,
+              "n": 87,
+              "wrMoney": 0.6436781609195402,
+              "totalR": -0.5798460090409447,
+              "meanR": -0.006664896655643043,
+              "pf": 0.9774600827577544
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

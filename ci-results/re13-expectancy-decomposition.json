@@ -1,0 +1,924 @@
+{
+  "generatedAt": "2026-08-19T10:14:35.149Z",
+  "note": "RE13 Phase-0 expectancy decomposition across all vendor CSVs. safe, fullFixAtMean:false+add, admitted replay, stopSteps=2 (canonical, not fit), costs 0 & 5 bps. V-WIN labels. Engine untouched.",
+  "mode": "safe",
+  "stopSteps": 2,
+  "costBps": [
+    0,
+    5
+  ],
+  "rows": [
+    {
+      "asset": "AVAX",
+      "tf": "5m",
+      "market": "spot",
+      "file": "BINANCE_AVAXUSDT, 5.csv",
+      "cost0": {
+        "n": 67,
+        "fullfix": 51,
+        "partial": 12,
+        "stop": 4,
+        "excluded": 0,
+        "labelWR": 0.9402985074626866,
+        "wrMoney": 0.7611940298507462,
+        "avgWin": 0.4346697924563537,
+        "avgLoss": 0.8517167251776214,
+        "payoff": 0.5103454935274464,
+        "breakevenWR": 0.6621001646878008,
+        "edgeWR": 0.0990938651629455,
+        "totalR": 8.5406918124321,
+        "meanR": 0.12747301212585221,
+        "pf": 1.6267262606187354,
+        "byBucket": {
+          "fullTp": {
+            "n": 51,
+            "totalR": 22.168159415274037
+          },
+          "partialStop": {
+            "n": 12,
+            "totalR": -9.627467602841943
+          },
+          "stop": {
+            "n": 4,
+            "totalR": -4
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 67,
+        "fullfix": 51,
+        "partial": 12,
+        "stop": 4,
+        "excluded": 0,
+        "labelWR": 0.9402985074626866,
+        "wrMoney": 0.746268656716418,
+        "avgWin": 0.40910944432990637,
+        "avgLoss": 0.8585423817455691,
+        "payoff": 0.47651630604200834,
+        "breakevenWR": 0.6772698654988976,
+        "edgeWR": 0.0689987912175204,
+        "totalR": 5.860251726820643,
+        "meanR": 0.08746644368389019,
+        "pf": 1.4015185471823777,
+        "byBucket": {
+          "fullTp": {
+            "n": 51,
+            "totalR": 20.441665300927568
+          },
+          "partialStop": {
+            "n": 12,
+            "totalR": -10.333732864672323
+          },
+          "stop": {
+            "n": 4,
+            "totalR": -4.247680709434599
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "BNB",
+      "tf": "1m",
+      "market": "perp",
+      "file": "BINANCE_BNBUSDT.P, 1.csv",
+      "cost0": {
+        "n": 106,
+        "fullfix": 77,
+        "partial": 21,
+        "stop": 8,
+        "excluded": 0,
+        "labelWR": 0.9245283018867925,
+        "wrMoney": 0.6981132075471698,
+        "avgWin": 0.41500925788353754,
+        "avgLoss": 0.7715620214072471,
+        "payoff": 0.5378819153470058,
+        "breakevenWR": 0.6502449830644905,
+        "edgeWR": 0.047868224482679245,
+        "totalR": 6.0207003983498595,
+        "meanR": 0.05679906036179113,
+        "pf": 1.243851929239951,
+        "byBucket": {
+          "fullTp": {
+            "n": 77,
+            "totalR": 30.346828507293637
+          },
+          "partialStop": {
+            "n": 21,
+            "totalR": -16.326128108943767
+          },
+          "stop": {
+            "n": 8,
+            "totalR": -8
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 106,
+        "fullfix": 77,
+        "partial": 21,
+        "stop": 8,
+        "excluded": 0,
+        "labelWR": 0.9245283018867925,
+        "wrMoney": 0.5094339622641509,
+        "avgWin": 0.24714627840797293,
+        "avgLoss": 0.8130227623825275,
+        "payoff": 0.3039844514115713,
+        "breakevenWR": 0.766880309744103,
+        "edgeWR": -0.2574463474799521,
+        "totalR": -28.931284609860885,
+        "meanR": -0.27293664726283856,
+        "pf": 0.3156761610812472,
+        "byBucket": {
+          "fullTp": {
+            "n": 77,
+            "totalR": 8.495757992439565
+          },
+          "partialStop": {
+            "n": 21,
+            "totalR": -25.950930844901876
+          },
+          "stop": {
+            "n": 8,
+            "totalR": -11.476111757398579
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "BNB",
+      "tf": "5m",
+      "market": "perp",
+      "file": "BINANCE_BNBUSDT.P, 5.csv",
+      "cost0": {
+        "n": 91,
+        "fullfix": 64,
+        "partial": 17,
+        "stop": 10,
+        "excluded": 0,
+        "labelWR": 0.8901098901098901,
+        "wrMoney": 0.6923076923076923,
+        "avgWin": 0.474089286108585,
+        "avgLoss": 0.8431912376096242,
+        "payoff": 0.5622559449889304,
+        "breakevenWR": 0.6400999805490166,
+        "edgeWR": 0.05220771175867567,
+        "totalR": 6.258270371771385,
+        "meanR": 0.06877220188759764,
+        "pf": 1.2650758762250933,
+        "byBucket": {
+          "fullTp": {
+            "n": 64,
+            "totalR": 29.7010350059778
+          },
+          "partialStop": {
+            "n": 17,
+            "totalR": -13.442764634206421
+          },
+          "stop": {
+            "n": 10,
+            "totalR": -10
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 91,
+        "fullfix": 64,
+        "partial": 17,
+        "stop": 10,
+        "excluded": 0,
+        "labelWR": 0.8901098901098901,
+        "wrMoney": 0.6923076923076923,
+        "avgWin": 0.4022228557334756,
+        "avgLoss": 0.9428129067927855,
+        "payoff": 0.4266200142526024,
+        "breakevenWR": 0.7009575009529737,
+        "edgeWR": -0.00864980864528142,
+        "totalR": -1.0587214789890318,
+        "meanR": -0.011634301966912437,
+        "pf": 0.9598950320683552,
+        "byBucket": {
+          "fullTp": {
+            "n": 64,
+            "totalR": 25.095611744639392
+          },
+          "partialStop": {
+            "n": 17,
+            "totalR": -15.059260844395352
+          },
+          "stop": {
+            "n": 10,
+            "totalR": -11.095072379233075
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "BTC",
+      "tf": "15m",
+      "market": "perp",
+      "file": "BINANCE_BTCUSDT.P, 15.csv",
+      "cost0": {
+        "n": 97,
+        "fullfix": 63,
+        "partial": 18,
+        "stop": 16,
+        "excluded": 0,
+        "labelWR": 0.8350515463917526,
+        "wrMoney": 0.6391752577319587,
+        "avgWin": 0.41301949472102956,
+        "avgLoss": 0.8642974739027048,
+        "payoff": 0.4778672936021143,
+        "breakevenWR": 0.6766507414631436,
+        "edgeWR": -0.03747548373118492,
+        "totalR": -4.643202913890843,
+        "meanR": -0.04786807127722518,
+        "pf": 0.8465077772380311,
+        "byBucket": {
+          "fullTp": {
+            "n": 63,
+            "totalR": 25.54574067952688
+          },
+          "partialStop": {
+            "n": 18,
+            "totalR": -14.18894359341772
+          },
+          "stop": {
+            "n": 16,
+            "totalR": -16
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 97,
+        "fullfix": 63,
+        "partial": 18,
+        "stop": 16,
+        "excluded": 0,
+        "labelWR": 0.8350515463917526,
+        "wrMoney": 0.6391752577319587,
+        "avgWin": 0.38319942574737026,
+        "avgLoss": 0.9103501403516467,
+        "payoff": 0.4209363065505206,
+        "breakevenWR": 0.703761312445883,
+        "edgeWR": -0.06458605471392431,
+        "totalR": -8.10389051597069,
+        "meanR": -0.08354526305124423,
+        "pf": 0.7456586001752079,
+        "byBucket": {
+          "fullTp": {
+            "n": 63,
+            "totalR": 23.682250147646013
+          },
+          "partialStop": {
+            "n": 18,
+            "totalR": -15.059928966740957
+          },
+          "stop": {
+            "n": 16,
+            "totalR": -16.726211696875744
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "BTC",
+      "tf": "5m",
+      "market": "perp",
+      "file": "BINANCE_BTCUSDT.P, 5.csv",
+      "cost0": {
+        "n": 79,
+        "fullfix": 52,
+        "partial": 19,
+        "stop": 8,
+        "excluded": 0,
+        "labelWR": 0.8987341772151899,
+        "wrMoney": 0.6329113924050633,
+        "avgWin": 0.41780749283084795,
+        "avgLoss": 0.7956825626142795,
+        "payoff": 0.5250931872355071,
+        "breakevenWR": 0.6556976376064413,
+        "edgeWR": -0.022786245201377953,
+        "totalR": -2.1844196742717177,
+        "meanR": -0.027650881952806555,
+        "pf": 0.9053330814405294,
+        "byBucket": {
+          "fullTp": {
+            "n": 52,
+            "totalR": 20.572774208958336
+          },
+          "partialStop": {
+            "n": 19,
+            "totalR": -14.75719388323005
+          },
+          "stop": {
+            "n": 8,
+            "totalR": -8
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 79,
+        "fullfix": 52,
+        "partial": 19,
+        "stop": 8,
+        "excluded": 0,
+        "labelWR": 0.8987341772151899,
+        "wrMoney": 0.6075949367088608,
+        "avgWin": 0.3568218398857283,
+        "avgLoss": 0.8428636780143478,
+        "payoff": 0.423344663191969,
+        "breakevenWR": 0.7025705198889892,
+        "edgeWR": -0.09497558318012844,
+        "totalR": -9.001325703929819,
+        "meanR": -0.11394083169531416,
+        "pf": 0.6555014139746617,
+        "byBucket": {
+          "fullTp": {
+            "n": 52,
+            "totalR": 16.543296291780454
+          },
+          "partialStop": {
+            "n": 19,
+            "totalR": -16.76830637572351
+          },
+          "stop": {
+            "n": 8,
+            "totalR": -8.776315619986764
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "BTC",
+      "tf": "1h",
+      "market": "perp",
+      "file": "BINANCE_BTCUSDT.P, 60.csv",
+      "cost0": {
+        "n": 100,
+        "fullfix": 69,
+        "partial": 17,
+        "stop": 14,
+        "excluded": 0,
+        "labelWR": 0.86,
+        "wrMoney": 0.69,
+        "avgWin": 0.43281032556203697,
+        "avgLoss": 0.8883095802141702,
+        "payoff": 0.48722915434243885,
+        "breakevenWR": 0.6723913373269894,
+        "edgeWR": 0.017608662673010533,
+        "totalR": 2.326315477141269,
+        "meanR": 0.02326315477141269,
+        "pf": 1.0844777951492994,
+        "byBucket": {
+          "fullTp": {
+            "n": 69,
+            "totalR": 29.86391246378055
+          },
+          "partialStop": {
+            "n": 17,
+            "totalR": -13.537596986639274
+          },
+          "stop": {
+            "n": 14,
+            "totalR": -14
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 100,
+        "fullfix": 69,
+        "partial": 17,
+        "stop": 14,
+        "excluded": 0,
+        "labelWR": 0.86,
+        "wrMoney": 0.68,
+        "avgWin": 0.4252778218047447,
+        "avgLoss": 0.8790058062873952,
+        "payoff": 0.48381685167810834,
+        "breakevenWR": 0.6739376216606919,
+        "edgeWR": 0.0060623783393081165,
+        "totalR": 0.7907060815259818,
+        "meanR": 0.007907060815259818,
+        "pf": 1.0281108098159801,
+        "byBucket": {
+          "fullTp": {
+            "n": 69,
+            "totalR": 28.913638431971936
+          },
+          "partialStop": {
+            "n": 17,
+            "totalR": -13.844614882643675
+          },
+          "stop": {
+            "n": 14,
+            "totalR": -14.278317467802268
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "ETH",
+      "tf": "2h",
+      "market": "spot",
+      "file": "BINANCE_ETHUSDT, 120.csv",
+      "cost0": {
+        "n": 84,
+        "fullfix": 56,
+        "partial": 12,
+        "stop": 16,
+        "excluded": 0,
+        "labelWR": 0.8095238095238095,
+        "wrMoney": 0.6547619047619048,
+        "avgWin": 0.39087323032597454,
+        "avgLoss": 0.8877475159673881,
+        "payoff": 0.44029774603203,
+        "breakevenWR": 0.6943008851850008,
+        "edgeWR": -0.039538980423096004,
+        "totalR": -4.246650295125654,
+        "meanR": -0.05055536065625779,
+        "pf": 0.8350474493710914,
+        "byBucket": {
+          "fullTp": {
+            "n": 56,
+            "totalR": 21.442093529689622
+          },
+          "partialStop": {
+            "n": 12,
+            "totalR": -9.688743824815282
+          },
+          "stop": {
+            "n": 16,
+            "totalR": -16
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 84,
+        "fullfix": 56,
+        "partial": 12,
+        "stop": 16,
+        "excluded": 0,
+        "labelWR": 0.8095238095238095,
+        "wrMoney": 0.6547619047619048,
+        "avgWin": 0.3850711272041945,
+        "avgLoss": 0.8980294808022223,
+        "payoff": 0.42879564138607684,
+        "breakevenWR": 0.699890152961202,
+        "edgeWR": -0.04512824819929728,
+        "totalR": -4.863942947033745,
+        "meanR": -0.05790408270278268,
+        "pf": 0.813233112973594,
+        "byBucket": {
+          "fullTp": {
+            "n": 56,
+            "totalR": 21.117595748425014
+          },
+          "partialStop": {
+            "n": 12,
+            "totalR": -9.806356873990648
+          },
+          "stop": {
+            "n": 16,
+            "totalR": -16.17518182146812
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "LDO",
+      "tf": "15m",
+      "market": "spot",
+      "file": "BINANCE_LDOUSDT, 15.csv",
+      "cost0": {
+        "n": 93,
+        "fullfix": 60,
+        "partial": 24,
+        "stop": 9,
+        "excluded": 0,
+        "labelWR": 0.9032258064516129,
+        "wrMoney": 0.6451612903225806,
+        "avgWin": 0.4692913314186827,
+        "avgLoss": 0.8338765540820787,
+        "payoff": 0.5627827393891329,
+        "breakevenWR": 0.6398842108986206,
+        "edgeWR": 0.005277079423960052,
+        "totalR": 0.6395536004123469,
+        "meanR": 0.006876920434541365,
+        "pf": 1.023241344343878,
+        "byBucket": {
+          "fullTp": {
+            "n": 60,
+            "totalR": 28.15747988512096
+          },
+          "partialStop": {
+            "n": 24,
+            "totalR": -18.517926284708597
+          },
+          "stop": {
+            "n": 9,
+            "totalR": -9
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 93,
+        "fullfix": 60,
+        "partial": 24,
+        "stop": 9,
+        "excluded": 0,
+        "labelWR": 0.9032258064516129,
+        "wrMoney": 0.6451612903225806,
+        "avgWin": 0.4567809168447331,
+        "avgLoss": 0.8538463457852098,
+        "payoff": 0.5349685210922471,
+        "breakevenWR": 0.6514791582099831,
+        "edgeWR": -0.006317867887402517,
+        "totalR": -0.770074400227928,
+        "meanR": -0.008280369894923957,
+        "pf": 0.9726700383495401,
+        "byBucket": {
+          "fullTp": {
+            "n": 60,
+            "totalR": 27.406855010683987
+          },
+          "partialStop": {
+            "n": 24,
+            "totalR": -18.987080091341326
+          },
+          "stop": {
+            "n": 9,
+            "totalR": -9.189849319570602
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "ONDO",
+      "tf": "5m",
+      "market": "spot",
+      "file": "BINANCE_ONDOUSDT, 5.csv",
+      "cost0": {
+        "n": 94,
+        "fullfix": 68,
+        "partial": 21,
+        "stop": 5,
+        "excluded": 0,
+        "labelWR": 0.9468085106382979,
+        "wrMoney": 0.723404255319149,
+        "avgWin": 0.47010739738207574,
+        "avgLoss": 0.8279246918418693,
+        "payoff": 0.5678142009948226,
+        "breakevenWR": 0.6378306813176405,
+        "edgeWR": 0.08557357400150845,
+        "totalR": 10.441261034092548,
+        "meanR": 0.11107724504353775,
+        "pf": 1.4850525256787668,
+        "byBucket": {
+          "fullTp": {
+            "n": 68,
+            "totalR": 31.967303021981152
+          },
+          "partialStop": {
+            "n": 21,
+            "totalR": -16.526041987888608
+          },
+          "stop": {
+            "n": 5,
+            "totalR": -5
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 94,
+        "fullfix": 68,
+        "partial": 21,
+        "stop": 5,
+        "excluded": 0,
+        "labelWR": 0.9468085106382979,
+        "wrMoney": 0.723404255319149,
+        "avgWin": 0.4439408089113707,
+        "avgLoss": 0.8698889961661064,
+        "payoff": 0.5103419066892066,
+        "breakevenWR": 0.6621017370775879,
+        "edgeWR": 0.06130251824156108,
+        "totalR": 7.5708611056544255,
+        "meanR": 0.08054107559206836,
+        "pf": 1.334740371341002,
+        "byBucket": {
+          "fullTp": {
+            "n": 68,
+            "totalR": 30.187975005973207
+          },
+          "partialStop": {
+            "n": 21,
+            "totalR": -17.343376472845012
+          },
+          "stop": {
+            "n": 5,
+            "totalR": -5.273737427473755
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "SOL",
+      "tf": "2h",
+      "market": "spot",
+      "file": "BINANCE_SOLUSDT, 120.csv",
+      "cost0": {
+        "n": 87,
+        "fullfix": 59,
+        "partial": 18,
+        "stop": 10,
+        "excluded": 0,
+        "labelWR": 0.8850574712643678,
+        "wrMoney": 0.6666666666666666,
+        "avgWin": 0.3739462538803454,
+        "avgLoss": 0.832631029888881,
+        "payoff": 0.44911400182893796,
+        "breakevenWR": 0.6900768322836521,
+        "edgeWR": -0.0234101656169855,
+        "totalR": -2.45741714171752,
+        "meanR": -0.028246174042730113,
+        "pf": 0.8982280036578759,
+        "byBucket": {
+          "fullTp": {
+            "n": 59,
+            "totalR": 21.686669938139975
+          },
+          "partialStop": {
+            "n": 18,
+            "totalR": -14.144087079857496
+          },
+          "stop": {
+            "n": 10,
+            "totalR": -10
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 87,
+        "fullfix": 59,
+        "partial": 18,
+        "stop": 10,
+        "excluded": 0,
+        "labelWR": 0.8850574712643678,
+        "wrMoney": 0.6666666666666666,
+        "avgWin": 0.3697955703733038,
+        "avgLoss": 0.8396623347346583,
+        "payoff": 0.4404098589109191,
+        "breakevenWR": 0.6942468449612605,
+        "edgeWR": -0.027580178294593916,
+        "totalR": -2.90206462565348,
+        "meanR": -0.03335706466268368,
+        "pf": 0.8808197178218381,
+        "byBucket": {
+          "fullTp": {
+            "n": 59,
+            "totalR": 21.44493294249306
+          },
+          "partialStop": {
+            "n": 18,
+            "totalR": -14.277709555775454
+          },
+          "stop": {
+            "n": 10,
+            "totalR": -10.069288012371084
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "VIRTUAL",
+      "tf": "5m",
+      "market": "spot",
+      "file": "BINANCE_VIRTUALUSDT, 5.csv",
+      "cost0": {
+        "n": 107,
+        "fullfix": 74,
+        "partial": 26,
+        "stop": 7,
+        "excluded": 0,
+        "labelWR": 0.9345794392523364,
+        "wrMoney": 0.6915887850467289,
+        "avgWin": 0.4479271037216181,
+        "avgLoss": 0.8318115458433564,
+        "payoff": 0.5384958960475527,
+        "breakevenWR": 0.6499854842440811,
+        "edgeWR": 0.04160330080264785,
+        "totalR": 5.696824662568986,
+        "meanR": 0.05324135198662604,
+        "pf": 1.207536251742997,
+        "byBucket": {
+          "fullTp": {
+            "n": 74,
+            "totalR": 33.14660567539974
+          },
+          "partialStop": {
+            "n": 26,
+            "totalR": -20.449781012830762
+          },
+          "stop": {
+            "n": 7,
+            "totalR": -7
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 107,
+        "fullfix": 74,
+        "partial": 26,
+        "stop": 7,
+        "excluded": 0,
+        "labelWR": 0.9345794392523364,
+        "wrMoney": 0.6915887850467289,
+        "avgWin": 0.4175644845389915,
+        "avgLoss": 0.8755769093112516,
+        "payoff": 0.47690212030312334,
+        "breakevenWR": 0.6770929408610756,
+        "edgeWR": 0.014495844185653306,
+        "totalR": 2.0057338486140726,
+        "meanR": 0.018745176155271707,
+        "pf": 1.0694168758312463,
+        "byBucket": {
+          "fullTp": {
+            "n": 74,
+            "totalR": 30.89977185588537
+          },
+          "partialStop": {
+            "n": 26,
+            "totalR": -21.544033069585677
+          },
+          "stop": {
+            "n": 7,
+            "totalR": -7.350004937685625
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    },
+    {
+      "asset": "VIRTUAL",
+      "tf": "5m",
+      "market": "perp",
+      "file": "BINANCE_VIRTUALUSDT.P, 5.csv",
+      "cost0": {
+        "n": 100,
+        "fullfix": 70,
+        "partial": 20,
+        "stop": 10,
+        "excluded": 0,
+        "labelWR": 0.9,
+        "wrMoney": 0.7,
+        "avgWin": 0.5377511658105006,
+        "avgLoss": 0.8631462762748616,
+        "payoff": 0.6230127854241687,
+        "breakevenWR": 0.616138091443718,
+        "edgeWR": 0.08386190855628195,
+        "totalR": 11.748193318489186,
+        "meanR": 0.11748193318489186,
+        "pf": 1.4536964993230603,
+        "byBucket": {
+          "fullTp": {
+            "n": 70,
+            "totalR": 37.64258160673504
+          },
+          "partialStop": {
+            "n": 20,
+            "totalR": -15.894388288245844
+          },
+          "stop": {
+            "n": 10,
+            "totalR": -10
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      },
+      "cost5": {
+        "n": 100,
+        "fullfix": 70,
+        "partial": 20,
+        "stop": 10,
+        "excluded": 0,
+        "labelWR": 0.9,
+        "wrMoney": 0.7,
+        "avgWin": 0.5076808521287929,
+        "avgLoss": 0.9016396761659415,
+        "payoff": 0.5630640105453358,
+        "breakevenWR": 0.6397690646406163,
+        "edgeWR": 0.06023093535938362,
+        "totalR": 8.488469364037243,
+        "meanR": 0.08488469364037243,
+        "pf": 1.3138160246057837,
+        "byBucket": {
+          "fullTp": {
+            "n": 70,
+            "totalR": 35.5376596490155
+          },
+          "partialStop": {
+            "n": 20,
+            "totalR": -16.66307983813365
+          },
+          "stop": {
+            "n": 10,
+            "totalR": -10.386110446844588
+          },
+          "timeout": {
+            "n": 0,
+            "totalR": 0
+          }
+        }
+      }
+    }
+  ]
+}

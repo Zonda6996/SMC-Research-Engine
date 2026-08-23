@@ -1,0 +1,547 @@
+{
+  "generatedAt": "2026-08-19T14:07:34.932Z",
+  "note": "RE22 intrabar-sequence selector over real fine sub-bars vs vendor shapes. Vendor zone lines used as-is (§2.1). src/core untouched.",
+  "grid": {
+    "REQ": [
+      false,
+      true
+    ],
+    "MAXT": [
+      "Infinity",
+      1,
+      2,
+      3
+    ],
+    "MINT": [
+      1,
+      2
+    ],
+    "TOLS": [
+      0,
+      1,
+      2
+    ]
+  },
+  "gateCfg": {
+    "requireCoincide": false,
+    "maxTouches": null,
+    "minTouches": 1,
+    "tol": 1
+  },
+  "pairs": [
+    {
+      "coarseFile": "BINANCE_ETHUSDT, 5.csv",
+      "fineFile": "BINANCE_ETHUSDT, 1.csv",
+      "coarseTf": "5m",
+      "fineTf": "1m",
+      "tfSec": 300,
+      "overlap": {
+        "startT": 1785715200,
+        "endT": 1787145900,
+        "nFineOverlap": 23844
+      },
+      "shapesOverlap": 24,
+      "nCandTouches": 43,
+      "nCandWithFine": 43,
+      "noFineShapes": 0,
+      "gate": {
+        "recall": 0.125,
+        "precision": 0.06976744186046512,
+        "f1": 0.08955223880597014,
+        "shapes": 24,
+        "nFires": 43,
+        "matched": 3,
+        "density": 1.7916666666666667
+      },
+      "best": {
+        "recall": 0.125,
+        "precision": 0.0967741935483871,
+        "f1": 0.10909090909090909,
+        "shapes": 24,
+        "nFires": 31,
+        "matched": 3,
+        "density": 1.2916666666666667
+      },
+      "bestCfg": {
+        "requireCoincide": false,
+        "maxTouches": 3,
+        "minTouches": 1,
+        "tol": 1
+      },
+      "oos": {
+        "mode": "split",
+        "train": {
+          "recall": 0.15384615384615385,
+          "precision": 0.09523809523809523,
+          "f1": 0.11764705882352941,
+          "shapes": 13,
+          "nFires": 21,
+          "matched": 2,
+          "density": 1.6153846153846154
+        },
+        "oos": {
+          "recall": 0.09090909090909091,
+          "precision": 0.1,
+          "f1": 0.09523809523809525,
+          "shapes": 11,
+          "nFires": 10,
+          "matched": 1,
+          "density": 0.9090909090909091
+        },
+        "oosCfg": {
+          "requireCoincide": false,
+          "maxTouches": 3,
+          "minTouches": 1,
+          "tol": 1
+        }
+      },
+      "intrabarProfile": {
+        "medNTouchesArrows": 3,
+        "medNTouchesAllTouches": 2,
+        "coincideFracArrows": 1,
+        "coincideFracAllTouches": 0.813953488372093
+      },
+      "arrows": [
+        {
+          "t": 1787019300,
+          "side": "buy",
+          "nTouches": 3,
+          "coincide": true,
+          "touchSubIdx": 1,
+          "volSpikeSubIdx": 1,
+          "hasFine": true
+        }
+      ]
+    },
+    {
+      "coarseFile": "BINANCE_ETHUSDT, 1.csv",
+      "fineFile": "BINANCE_ETHUSDT, 5S.csv",
+      "coarseTf": "1m",
+      "fineTf": "5s",
+      "tfSec": 60,
+      "overlap": {
+        "startT": 1787011200,
+        "endT": 1787145820,
+        "nFineOverlap": 26336
+      },
+      "shapesOverlap": 14,
+      "nCandTouches": 28,
+      "nCandWithFine": 28,
+      "noFineShapes": 0,
+      "gate": {
+        "recall": 0.21428571428571427,
+        "precision": 0.10714285714285714,
+        "f1": 0.14285714285714285,
+        "shapes": 14,
+        "nFires": 28,
+        "matched": 3,
+        "density": 2
+      },
+      "best": {
+        "recall": 0.35714285714285715,
+        "precision": 0.23809523809523808,
+        "f1": 0.2857142857142857,
+        "shapes": 14,
+        "nFires": 21,
+        "matched": 5,
+        "density": 1.5
+      },
+      "bestCfg": {
+        "requireCoincide": false,
+        "maxTouches": "Infinity",
+        "minTouches": 2,
+        "tol": 2
+      },
+      "oos": {
+        "mode": "split",
+        "train": {
+          "recall": 0.5555555555555556,
+          "precision": 0.4166666666666667,
+          "f1": 0.4761904761904762,
+          "shapes": 9,
+          "nFires": 12,
+          "matched": 5,
+          "density": 1.3333333333333333
+        },
+        "oos": {
+          "recall": 0,
+          "precision": 0,
+          "f1": 0,
+          "shapes": 5,
+          "nFires": 9,
+          "matched": 0,
+          "density": 1.8
+        },
+        "oosCfg": {
+          "requireCoincide": false,
+          "maxTouches": "Infinity",
+          "minTouches": 2,
+          "tol": 2
+        }
+      },
+      "intrabarProfile": {
+        "medNTouchesArrows": 4,
+        "medNTouchesAllTouches": 5,
+        "coincideFracArrows": 0,
+        "coincideFracAllTouches": 0.5
+      },
+      "arrows": [
+        {
+          "t": 1787056260,
+          "side": "buy",
+          "nTouches": 4,
+          "coincide": false,
+          "touchSubIdx": 0,
+          "volSpikeSubIdx": 3,
+          "hasFine": true
+        }
+      ]
+    },
+    {
+      "coarseFile": "BINANCE_ETHUSDT, 1.csv",
+      "fineFile": "BINANCE_ETHUSDT, 1S.csv",
+      "coarseTf": "1m",
+      "fineTf": "1s",
+      "tfSec": 60,
+      "overlap": {
+        "startT": 1787097600,
+        "endT": 1787145736,
+        "nFineOverlap": 30205
+      },
+      "shapesOverlap": 5,
+      "nCandTouches": 11,
+      "nCandWithFine": 11,
+      "noFineShapes": 0,
+      "gate": {
+        "recall": 0,
+        "precision": 0,
+        "f1": 0,
+        "shapes": 5,
+        "nFires": 11,
+        "matched": 0,
+        "density": 2.2
+      },
+      "best": {
+        "recall": 0,
+        "precision": 0,
+        "f1": 0,
+        "shapes": 5,
+        "nFires": 11,
+        "matched": 0,
+        "density": 2.2
+      },
+      "bestCfg": {
+        "requireCoincide": false,
+        "maxTouches": "Infinity",
+        "minTouches": 1,
+        "tol": 0
+      },
+      "oos": {
+        "mode": "underpowered",
+        "nOverlapShapes": 5,
+        "full": {
+          "recall": 0,
+          "precision": 0,
+          "f1": 0,
+          "shapes": 5,
+          "nFires": 11,
+          "matched": 0,
+          "density": 2.2
+        },
+        "fullCfg": {
+          "requireCoincide": false,
+          "maxTouches": "Infinity",
+          "minTouches": 1,
+          "tol": 0
+        }
+      },
+      "intrabarProfile": {
+        "medNTouchesArrows": null,
+        "medNTouchesAllTouches": 17,
+        "coincideFracArrows": null,
+        "coincideFracAllTouches": 0.2727272727272727
+      },
+      "arrows": []
+    },
+    {
+      "coarseFile": "BINANCE_ETHUSDT, 5.csv",
+      "fineFile": "BINANCE_ETHUSDT, 1S.csv",
+      "coarseTf": "5m",
+      "fineTf": "1s",
+      "tfSec": 300,
+      "overlap": {
+        "startT": 1787097600,
+        "endT": 1787145900,
+        "nFineOverlap": 30205
+      },
+      "shapesOverlap": 1,
+      "nCandTouches": 2,
+      "nCandWithFine": 2,
+      "noFineShapes": 0,
+      "gate": {
+        "recall": 0,
+        "precision": 0,
+        "f1": 0,
+        "shapes": 1,
+        "nFires": 2,
+        "matched": 0,
+        "density": 2
+      },
+      "best": {
+        "recall": 0,
+        "precision": 0,
+        "f1": 0,
+        "shapes": 1,
+        "nFires": 2,
+        "matched": 0,
+        "density": 2
+      },
+      "bestCfg": {
+        "requireCoincide": false,
+        "maxTouches": "Infinity",
+        "minTouches": 1,
+        "tol": 0
+      },
+      "oos": {
+        "mode": "underpowered",
+        "nOverlapShapes": 1,
+        "full": {
+          "recall": 0,
+          "precision": 0,
+          "f1": 0,
+          "shapes": 1,
+          "nFires": 2,
+          "matched": 0,
+          "density": 2
+        },
+        "fullCfg": {
+          "requireCoincide": false,
+          "maxTouches": "Infinity",
+          "minTouches": 1,
+          "tol": 0
+        }
+      },
+      "intrabarProfile": {
+        "medNTouchesArrows": null,
+        "medNTouchesAllTouches": 40,
+        "coincideFracArrows": null,
+        "coincideFracAllTouches": 1
+      },
+      "arrows": []
+    },
+    {
+      "coarseFile": "BINANCE_BNBUSDT, 5.csv",
+      "fineFile": "BINANCE_BNBUSDT, 1.csv",
+      "coarseTf": "5m",
+      "fineTf": "1m",
+      "tfSec": 300,
+      "overlap": {
+        "startT": 1785715200,
+        "endT": 1787145900,
+        "nFineOverlap": 23845
+      },
+      "shapesOverlap": 29,
+      "nCandTouches": 40,
+      "nCandWithFine": 40,
+      "noFineShapes": 0,
+      "gate": {
+        "recall": 0.06896551724137931,
+        "precision": 0.05,
+        "f1": 0.057971014492753624,
+        "shapes": 29,
+        "nFires": 40,
+        "matched": 2,
+        "density": 1.3793103448275863
+      },
+      "best": {
+        "recall": 0.10344827586206896,
+        "precision": 0.1111111111111111,
+        "f1": 0.10714285714285715,
+        "shapes": 29,
+        "nFires": 27,
+        "matched": 3,
+        "density": 0.9310344827586207
+      },
+      "bestCfg": {
+        "requireCoincide": false,
+        "maxTouches": "Infinity",
+        "minTouches": 2,
+        "tol": 2
+      },
+      "oos": {
+        "mode": "split",
+        "train": {
+          "recall": 0.05,
+          "precision": 0.07142857142857142,
+          "f1": 0.058823529411764705,
+          "shapes": 20,
+          "nFires": 14,
+          "matched": 1,
+          "density": 0.7
+        },
+        "oos": {
+          "recall": 0,
+          "precision": 0,
+          "f1": 0,
+          "shapes": 9,
+          "nFires": 7,
+          "matched": 0,
+          "density": 0.7777777777777778
+        },
+        "oosCfg": {
+          "requireCoincide": false,
+          "maxTouches": 3,
+          "minTouches": 2,
+          "tol": 1
+        }
+      },
+      "intrabarProfile": {
+        "medNTouchesArrows": null,
+        "medNTouchesAllTouches": 2,
+        "coincideFracArrows": null,
+        "coincideFracAllTouches": 0.875
+      },
+      "arrows": []
+    },
+    {
+      "coarseFile": "BINANCE_BNBUSDT, 1.csv",
+      "fineFile": "BINANCE_BNBUSDT, 10S.csv",
+      "coarseTf": "1m",
+      "fineTf": "10s",
+      "tfSec": 60,
+      "overlap": {
+        "startT": 1786924800,
+        "endT": 1787145540,
+        "nFineOverlap": 22032
+      },
+      "shapesOverlap": 18,
+      "nCandTouches": 49,
+      "nCandWithFine": 49,
+      "noFineShapes": 0,
+      "gate": {
+        "recall": 0.2777777777777778,
+        "precision": 0.10204081632653061,
+        "f1": 0.1492537313432836,
+        "shapes": 18,
+        "nFires": 49,
+        "matched": 5,
+        "density": 2.7222222222222223
+      },
+      "best": {
+        "recall": 0.16666666666666666,
+        "precision": 0.375,
+        "f1": 0.23076923076923078,
+        "shapes": 18,
+        "nFires": 8,
+        "matched": 3,
+        "density": 0.4444444444444444
+      },
+      "bestCfg": {
+        "requireCoincide": false,
+        "maxTouches": 2,
+        "minTouches": 2,
+        "tol": 2
+      },
+      "oos": {
+        "mode": "split",
+        "train": {
+          "recall": 0.2,
+          "precision": 0.16666666666666666,
+          "f1": 0.1818181818181818,
+          "shapes": 10,
+          "nFires": 12,
+          "matched": 2,
+          "density": 1.2
+        },
+        "oos": {
+          "recall": 0.125,
+          "precision": 0.1111111111111111,
+          "f1": 0.11764705882352941,
+          "shapes": 8,
+          "nFires": 9,
+          "matched": 1,
+          "density": 1.125
+        },
+        "oosCfg": {
+          "requireCoincide": false,
+          "maxTouches": 2,
+          "minTouches": 1,
+          "tol": 1
+        }
+      },
+      "intrabarProfile": {
+        "medNTouchesArrows": null,
+        "medNTouchesAllTouches": 3,
+        "coincideFracArrows": null,
+        "coincideFracAllTouches": 0.6938775510204082
+      },
+      "arrows": []
+    },
+    {
+      "coarseFile": "BINANCE_BNBUSDT, 1.csv",
+      "fineFile": "BINANCE_BNBUSDT, 1S.csv",
+      "coarseTf": "1m",
+      "fineTf": "1s",
+      "tfSec": 60,
+      "overlap": {
+        "startT": 1787097600,
+        "endT": 1787145589,
+        "nFineOverlap": 30447
+      },
+      "shapesOverlap": 5,
+      "nCandTouches": 14,
+      "nCandWithFine": 14,
+      "noFineShapes": 0,
+      "gate": {
+        "recall": 0.2,
+        "precision": 0.07142857142857142,
+        "f1": 0.10526315789473682,
+        "shapes": 5,
+        "nFires": 14,
+        "matched": 1,
+        "density": 2.8
+      },
+      "best": {
+        "recall": 0.4,
+        "precision": 0.14285714285714285,
+        "f1": 0.21052631578947364,
+        "shapes": 5,
+        "nFires": 14,
+        "matched": 2,
+        "density": 2.8
+      },
+      "bestCfg": {
+        "requireCoincide": false,
+        "maxTouches": "Infinity",
+        "minTouches": 1,
+        "tol": 2
+      },
+      "oos": {
+        "mode": "underpowered",
+        "nOverlapShapes": 5,
+        "full": {
+          "recall": 0.4,
+          "precision": 0.14285714285714285,
+          "f1": 0.21052631578947364,
+          "shapes": 5,
+          "nFires": 14,
+          "matched": 2,
+          "density": 2.8
+        },
+        "fullCfg": {
+          "requireCoincide": false,
+          "maxTouches": "Infinity",
+          "minTouches": 1,
+          "tol": 2
+        }
+      },
+      "intrabarProfile": {
+        "medNTouchesArrows": null,
+        "medNTouchesAllTouches": 15.5,
+        "coincideFracArrows": null,
+        "coincideFracAllTouches": 0.14285714285714285
+      },
+      "arrows": []
+    }
+  ]
+}

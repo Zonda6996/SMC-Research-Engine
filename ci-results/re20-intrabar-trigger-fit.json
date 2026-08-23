@@ -1,0 +1,359 @@
+{
+  "generatedAt": "2026-08-19T13:38:56.554Z",
+  "grid": {
+    "VOL": [
+      0,
+      1.2,
+      1.4,
+      1.6,
+      2
+    ],
+    "DIRS": [
+      "off",
+      "reject",
+      "dip"
+    ],
+    "TOLS": [
+      0,
+      1,
+      2
+    ]
+  },
+  "apriori": {
+    "volMin": 1.4,
+    "dir": "off",
+    "tol": 1
+  },
+  "rows": [
+    {
+      "file": "BINANCE_BNBUSDT, 1.csv",
+      "tf": "1m",
+      "shapes": 106,
+      "apr": {
+        "recall": 0.10377358490566038,
+        "precision": 0.04564315352697095,
+        "f1": 0.06340057636887608,
+        "shapes": 106,
+        "nFires": 241,
+        "matched": 11,
+        "density": 2.2735849056603774
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.2641509433962264,
+        "precision": 0.13270142180094788,
+        "f1": 0.17665615141955837,
+        "shapes": 106,
+        "nFires": 211,
+        "matched": 28,
+        "density": 1.990566037735849
+      },
+      "bestCfg": {
+        "volMin": 1.2,
+        "dir": "reject",
+        "tol": 2
+      }
+    },
+    {
+      "file": "BINANCE_BNBUSDT, 10S.csv",
+      "tf": "10s",
+      "shapes": 47,
+      "apr": {
+        "recall": 0.1702127659574468,
+        "precision": 0.02476780185758514,
+        "f1": 0.04324324324324324,
+        "shapes": 47,
+        "nFires": 323,
+        "matched": 8,
+        "density": 6.872340425531915
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.3617021276595745,
+        "precision": 0.06513409961685823,
+        "f1": 0.11038961038961038,
+        "shapes": 47,
+        "nFires": 261,
+        "matched": 17,
+        "density": 5.553191489361702
+      },
+      "bestCfg": {
+        "volMin": 1.6,
+        "dir": "reject",
+        "tol": 0
+      }
+    },
+    {
+      "file": "BINANCE_BNBUSDT, 1S.csv",
+      "tf": "1s",
+      "shapes": 8,
+      "apr": {
+        "recall": 0.125,
+        "precision": 0.0035842293906810036,
+        "f1": 0.006968641114982578,
+        "shapes": 8,
+        "nFires": 279,
+        "matched": 1,
+        "density": 34.875
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.125,
+        "precision": 0.0035842293906810036,
+        "f1": 0.006968641114982578,
+        "shapes": 8,
+        "nFires": 279,
+        "matched": 1,
+        "density": 34.875
+      },
+      "bestCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      }
+    },
+    {
+      "file": "BINANCE_BNBUSDT, 5.csv",
+      "tf": "5m",
+      "shapes": 94,
+      "apr": {
+        "recall": 0.09574468085106383,
+        "precision": 0.05263157894736842,
+        "f1": 0.06792452830188679,
+        "shapes": 94,
+        "nFires": 171,
+        "matched": 9,
+        "density": 1.8191489361702127
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.20212765957446807,
+        "precision": 0.14728682170542637,
+        "f1": 0.17040358744394618,
+        "shapes": 94,
+        "nFires": 129,
+        "matched": 19,
+        "density": 1.372340425531915
+      },
+      "bestCfg": {
+        "volMin": 1.4,
+        "dir": "reject",
+        "tol": 2
+      }
+    },
+    {
+      "file": "BINANCE_BTCUSDT, 5S.csv",
+      "tf": "5s",
+      "shapes": 15,
+      "apr": {
+        "recall": 0.2,
+        "precision": 0.006224066390041493,
+        "f1": 0.012072434607645873,
+        "shapes": 15,
+        "nFires": 482,
+        "matched": 3,
+        "density": 32.13333333333333
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.2,
+        "precision": 0.006224066390041493,
+        "f1": 0.012072434607645873,
+        "shapes": 15,
+        "nFires": 482,
+        "matched": 3,
+        "density": 32.13333333333333
+      },
+      "bestCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      }
+    },
+    {
+      "file": "BINANCE_ETHUSDT, 1.csv",
+      "tf": "1m",
+      "shapes": 116,
+      "apr": {
+        "recall": 0.14655172413793102,
+        "precision": 0.05782312925170068,
+        "f1": 0.08292682926829267,
+        "shapes": 116,
+        "nFires": 294,
+        "matched": 17,
+        "density": 2.5344827586206895
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.29310344827586204,
+        "precision": 0.13765182186234817,
+        "f1": 0.18732782369146,
+        "shapes": 116,
+        "nFires": 247,
+        "matched": 34,
+        "density": 2.1293103448275863
+      },
+      "bestCfg": {
+        "volMin": 1.2,
+        "dir": "reject",
+        "tol": 2
+      }
+    },
+    {
+      "file": "BINANCE_ETHUSDT, 120.csv",
+      "tf": "2h",
+      "shapes": 85,
+      "apr": {
+        "recall": 0.058823529411764705,
+        "precision": 0.0364963503649635,
+        "f1": 0.04504504504504504,
+        "shapes": 85,
+        "nFires": 137,
+        "matched": 5,
+        "density": 1.611764705882353
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.2235294117647059,
+        "precision": 0.18269230769230768,
+        "f1": 0.20105820105820107,
+        "shapes": 85,
+        "nFires": 104,
+        "matched": 19,
+        "density": 1.223529411764706
+      },
+      "bestCfg": {
+        "volMin": 1.6,
+        "dir": "reject",
+        "tol": 1
+      }
+    },
+    {
+      "file": "BINANCE_ETHUSDT, 1S.csv",
+      "tf": "1s",
+      "shapes": 10,
+      "apr": {
+        "recall": 0.4,
+        "precision": 0.008456659619450317,
+        "f1": 0.016563146997929608,
+        "shapes": 10,
+        "nFires": 473,
+        "matched": 4,
+        "density": 47.3
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.4,
+        "precision": 0.008456659619450317,
+        "f1": 0.016563146997929608,
+        "shapes": 10,
+        "nFires": 473,
+        "matched": 4,
+        "density": 47.3
+      },
+      "bestCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      }
+    },
+    {
+      "file": "BINANCE_ETHUSDT, 5.csv",
+      "tf": "5m",
+      "shapes": 89,
+      "apr": {
+        "recall": 0.12359550561797752,
+        "precision": 0.06077348066298342,
+        "f1": 0.08148148148148149,
+        "shapes": 89,
+        "nFires": 181,
+        "matched": 11,
+        "density": 2.033707865168539
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.20224719101123595,
+        "precision": 0.1125,
+        "f1": 0.14457831325301207,
+        "shapes": 89,
+        "nFires": 160,
+        "matched": 18,
+        "density": 1.797752808988764
+      },
+      "bestCfg": {
+        "volMin": 0,
+        "dir": "reject",
+        "tol": 2
+      }
+    },
+    {
+      "file": "BINANCE_ETHUSDT, 5S.csv",
+      "tf": "5s",
+      "shapes": 40,
+      "apr": {
+        "recall": 0.325,
+        "precision": 0.02981651376146789,
+        "f1": 0.0546218487394958,
+        "shapes": 40,
+        "nFires": 436,
+        "matched": 13,
+        "density": 10.9
+      },
+      "aprCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      },
+      "best": {
+        "recall": 0.325,
+        "precision": 0.02981651376146789,
+        "f1": 0.0546218487394958,
+        "shapes": 40,
+        "nFires": 436,
+        "matched": 13,
+        "density": 10.9
+      },
+      "bestCfg": {
+        "volMin": 1.4,
+        "dir": "off",
+        "tol": 1
+      }
+    }
+  ]
+}

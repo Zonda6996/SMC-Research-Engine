@@ -1,0 +1,487 @@
+{
+  "generatedAt": "2026-08-19T16:20:12.001Z",
+  "oiSource": {
+    "endpoint": "https://fapi.binance.com/futures/data/openInterestHist",
+    "period": "5m",
+    "field": "sumOpenInterest",
+    "availabilityDays": 30,
+    "serverTimeMs": 1787156405723,
+    "note": "Binance USDT-M perp OI; ETH arrow files are spot (caveat)"
+  },
+  "grid": {
+    "oiModes": [
+      "none",
+      "absZ",
+      "deltaZ",
+      "atTrailExtremum",
+      "signedByDir"
+    ],
+    "thrs": [
+      0.5,
+      1,
+      1.5,
+      2
+    ],
+    "tols": [
+      0,
+      1,
+      2
+    ],
+    "W": 48,
+    "L": 48,
+    "trainOosSplit": 0.65
+  },
+  "pairs": [
+    {
+      "arrowFile": "BINANCE_ETHUSDT, 1.csv",
+      "oiSymbol": "ETHUSDT",
+      "spot": true,
+      "window": {
+        "firstBarSec": 1785715200,
+        "lastBarSec": 1787145780,
+        "oiStartMs": 1785715200000,
+        "oiEndMs": 1787146080000,
+        "oiPoints": 8308
+      },
+      "shapesInWindow": 116,
+      "shapesNoOi": 0,
+      "nTouches": 383,
+      "gate": {
+        "recall": 0.13793103448275862,
+        "precision": 0.04177545691906005,
+        "f1": 0.06412825651302606,
+        "shapes": 116,
+        "nFires": 383,
+        "matched": 16,
+        "density": 3.3017241379310347
+      },
+      "best": {
+        "recall": 0.20689655172413793,
+        "precision": 0.06266318537859007,
+        "f1": 0.09619238476953906,
+        "shapes": 116,
+        "nFires": 383,
+        "matched": 24,
+        "density": 3.3017241379310347
+      },
+      "bestCfg": {
+        "oi": "none",
+        "thr": 0,
+        "tol": 2
+      },
+      "oos": {
+        "mode": "split",
+        "train": {
+          "recall": 0.14864864864864866,
+          "precision": 0.0728476821192053,
+          "f1": 0.09777777777777777,
+          "shapes": 74,
+          "nFires": 151,
+          "matched": 11,
+          "density": 2.0405405405405403
+        },
+        "oos": {
+          "recall": 0.11904761904761904,
+          "precision": 0.07575757575757576,
+          "f1": 0.09259259259259259,
+          "shapes": 42,
+          "nFires": 66,
+          "matched": 5,
+          "density": 1.5714285714285714
+        },
+        "cfg": {
+          "oi": "absZ",
+          "thr": 1,
+          "tol": 2
+        }
+      },
+      "contrast": {
+        "medZArrows": 1.4237297544007301,
+        "medZTouches": -0.18637143055386338,
+        "medAbsDeltaArrows": 0.8564459949115926,
+        "medAbsDeltaTouches": 0.41050786087480684,
+        "trailHighArrows": 0,
+        "trailHighTouches": 0.10966057441253264,
+        "trailLowArrows": 0,
+        "trailLowTouches": 0.08093994778067885
+      },
+      "arrows": [
+        {
+          "tSec": 1787056260,
+          "side": "buy",
+          "oiZ": 1.4237297544007301,
+          "oiDeltaZ": -0.8564459949115926,
+          "atTrailHigh": false,
+          "atTrailLow": false
+        }
+      ]
+    },
+    {
+      "arrowFile": "BINANCE_ETHUSDT, 5.csv",
+      "oiSymbol": "ETHUSDT",
+      "spot": true,
+      "window": {
+        "firstBarSec": 1780876800,
+        "lastBarSec": 1787145600,
+        "oiStartMs": 1784650805723,
+        "oiEndMs": 1787145900000,
+        "oiPoints": 8308
+      },
+      "shapesInWindow": 39,
+      "shapesNoOi": 0,
+      "nTouches": 73,
+      "gate": {
+        "recall": 0.10256410256410256,
+        "precision": 0.0547945205479452,
+        "f1": 0.07142857142857142,
+        "shapes": 39,
+        "nFires": 73,
+        "matched": 4,
+        "density": 1.8717948717948718
+      },
+      "best": {
+        "recall": 0.15384615384615385,
+        "precision": 0.0821917808219178,
+        "f1": 0.10714285714285714,
+        "shapes": 39,
+        "nFires": 73,
+        "matched": 6,
+        "density": 1.8717948717948718
+      },
+      "bestCfg": {
+        "oi": "none",
+        "thr": 0,
+        "tol": 2
+      },
+      "oos": {
+        "mode": "split",
+        "train": {
+          "recall": 0.16,
+          "precision": 0.125,
+          "f1": 0.14035087719298245,
+          "shapes": 25,
+          "nFires": 32,
+          "matched": 4,
+          "density": 1.28
+        },
+        "oos": {
+          "recall": 0,
+          "precision": 0,
+          "f1": 0,
+          "shapes": 14,
+          "nFires": 11,
+          "matched": 0,
+          "density": 0.7857142857142857
+        },
+        "cfg": {
+          "oi": "deltaZ",
+          "thr": 0.5,
+          "tol": 2
+        }
+      },
+      "contrast": {
+        "medZArrows": -1.7812783851581184,
+        "medZTouches": 0.24449527074117053,
+        "medAbsDeltaArrows": 0.292761312152947,
+        "medAbsDeltaTouches": 0.6967101002319321,
+        "trailHighArrows": 0,
+        "trailHighTouches": 0.1643835616438356,
+        "trailLowArrows": 0,
+        "trailLowTouches": 0.1232876712328767
+      },
+      "arrows": [
+        {
+          "tSec": 1784706000,
+          "side": "buy",
+          "oiZ": -0.4055038034730935,
+          "oiDeltaZ": 0.08631762677385096,
+          "atTrailHigh": false,
+          "atTrailLow": false
+        },
+        {
+          "tSec": 1787019300,
+          "side": "buy",
+          "oiZ": -3.1570529668431435,
+          "oiDeltaZ": 0.49920499753204306,
+          "atTrailHigh": false,
+          "atTrailLow": false
+        }
+      ]
+    },
+    {
+      "arrowFile": "BINANCE_BNBUSDT.P, 5.csv",
+      "oiSymbol": "BNBUSDT",
+      "spot": false,
+      "window": {
+        "firstBarSec": 1780876800,
+        "lastBarSec": 1787036400,
+        "oiStartMs": 1784650805723,
+        "oiEndMs": 1787036700000,
+        "oiPoints": 7939
+      },
+      "shapesInWindow": 39,
+      "shapesNoOi": 0,
+      "nTouches": 66,
+      "gate": {
+        "recall": 0.10256410256410256,
+        "precision": 0.06060606060606061,
+        "f1": 0.0761904761904762,
+        "shapes": 39,
+        "nFires": 66,
+        "matched": 4,
+        "density": 1.6923076923076923
+      },
+      "best": {
+        "recall": 0.20512820512820512,
+        "precision": 0.12121212121212122,
+        "f1": 0.1523809523809524,
+        "shapes": 39,
+        "nFires": 66,
+        "matched": 8,
+        "density": 1.6923076923076923
+      },
+      "bestCfg": {
+        "oi": "none",
+        "thr": 0,
+        "tol": 2
+      },
+      "oos": {
+        "mode": "split",
+        "train": {
+          "recall": 0.20689655172413793,
+          "precision": 0.13636363636363635,
+          "f1": 0.16438356164383564,
+          "shapes": 29,
+          "nFires": 44,
+          "matched": 6,
+          "density": 1.5172413793103448
+        },
+        "oos": {
+          "recall": 0.2,
+          "precision": 0.09090909090909091,
+          "f1": 0.12500000000000003,
+          "shapes": 10,
+          "nFires": 22,
+          "matched": 2,
+          "density": 2.2
+        },
+        "cfg": {
+          "oi": "none",
+          "thr": 0,
+          "tol": 2
+        }
+      },
+      "contrast": {
+        "medZArrows": null,
+        "medZTouches": -0.18117945960033974,
+        "medAbsDeltaArrows": null,
+        "medAbsDeltaTouches": 0.5434747419471297,
+        "trailHighArrows": null,
+        "trailHighTouches": 0.12121212121212122,
+        "trailLowArrows": null,
+        "trailLowTouches": 0.15151515151515152
+      },
+      "arrows": []
+    },
+    {
+      "arrowFile": "BINANCE_BNBUSDT.P, 1.csv",
+      "oiSymbol": "BNBUSDT",
+      "spot": false,
+      "window": {
+        "firstBarSec": 1785715200,
+        "lastBarSec": 1787045940,
+        "oiStartMs": 1785715200000,
+        "oiEndMs": 1787046240000,
+        "oiPoints": 4429
+      },
+      "shapesInWindow": 107,
+      "shapesNoOi": 0,
+      "nTouches": 243,
+      "gate": {
+        "recall": 0.1308411214953271,
+        "precision": 0.05761316872427984,
+        "f1": 0.08,
+        "shapes": 107,
+        "nFires": 243,
+        "matched": 14,
+        "density": 2.2710280373831777
+      },
+      "best": {
+        "recall": 0.18691588785046728,
+        "precision": 0.10256410256410256,
+        "f1": 0.1324503311258278,
+        "shapes": 107,
+        "nFires": 195,
+        "matched": 20,
+        "density": 1.8224299065420562
+      },
+      "bestCfg": {
+        "oi": "absZ",
+        "thr": 0.5,
+        "tol": 2
+      },
+      "oos": {
+        "mode": "split",
+        "train": {
+          "recall": 0.21875,
+          "precision": 0.08974358974358974,
+          "f1": 0.12727272727272726,
+          "shapes": 64,
+          "nFires": 156,
+          "matched": 14,
+          "density": 2.4375
+        },
+        "oos": {
+          "recall": 0.20930232558139536,
+          "precision": 0.10344827586206896,
+          "f1": 0.13846153846153844,
+          "shapes": 43,
+          "nFires": 87,
+          "matched": 9,
+          "density": 2.0232558139534884
+        },
+        "cfg": {
+          "oi": "none",
+          "thr": 0,
+          "tol": 2
+        }
+      },
+      "contrast": {
+        "medZArrows": -0.9128330709150466,
+        "medZTouches": 0.15335212074718352,
+        "medAbsDeltaArrows": 0.28052040214547225,
+        "medAbsDeltaTouches": 0.37425740107975536,
+        "trailHighArrows": 0,
+        "trailHighTouches": 0.09876543209876543,
+        "trailLowArrows": 0,
+        "trailLowTouches": 0.11934156378600823
+      },
+      "arrows": [
+        {
+          "tSec": 1785952920,
+          "side": "sell",
+          "oiZ": -1.8626545694882208,
+          "oiDeltaZ": 0.28052040214547225,
+          "atTrailHigh": false,
+          "atTrailLow": false
+        },
+        {
+          "tSec": 1786477500,
+          "side": "sell",
+          "oiZ": 1.3615502146501892,
+          "oiDeltaZ": 0.11930781596100143,
+          "atTrailHigh": false,
+          "atTrailLow": false
+        },
+        {
+          "tSec": 1786583820,
+          "side": "sell",
+          "oiZ": 0.4433702454400552,
+          "oiDeltaZ": 0.9962368794195117,
+          "atTrailHigh": false,
+          "atTrailLow": false
+        },
+        {
+          "tSec": 1786828320,
+          "side": "buy",
+          "oiZ": -1.5266020336336064,
+          "oiDeltaZ": 0.06347892174470725,
+          "atTrailHigh": false,
+          "atTrailLow": false
+        },
+        {
+          "tSec": 1787000220,
+          "side": "sell",
+          "oiZ": -0.9128330709150466,
+          "oiDeltaZ": 0.663264070167801,
+          "atTrailHigh": false,
+          "atTrailLow": false
+        }
+      ]
+    },
+    {
+      "arrowFile": "BINANCE_BNBUSDT, 1.csv",
+      "oiSymbol": "BNBUSDT",
+      "spot": true,
+      "window": {
+        "firstBarSec": 1785715200,
+        "lastBarSec": 1787145900,
+        "oiStartMs": 1785715200000,
+        "oiEndMs": 1787146200000,
+        "oiPoints": 4762
+      },
+      "shapesInWindow": 106,
+      "shapesNoOi": 0,
+      "nTouches": 267,
+      "gate": {
+        "recall": 0.10377358490566038,
+        "precision": 0.04119850187265917,
+        "f1": 0.058981233243967826,
+        "shapes": 106,
+        "nFires": 267,
+        "matched": 11,
+        "density": 2.518867924528302
+      },
+      "best": {
+        "recall": 0.14150943396226415,
+        "precision": 0.14423076923076922,
+        "f1": 0.14285714285714282,
+        "shapes": 106,
+        "nFires": 104,
+        "matched": 15,
+        "density": 0.9811320754716981
+      },
+      "bestCfg": {
+        "oi": "deltaZ",
+        "thr": 0.5,
+        "tol": 2
+      },
+      "oos": {
+        "mode": "split",
+        "train": {
+          "recall": 0.12698412698412698,
+          "precision": 0.12121212121212122,
+          "f1": 0.12403100775193798,
+          "shapes": 63,
+          "nFires": 66,
+          "matched": 8,
+          "density": 1.0476190476190477
+        },
+        "oos": {
+          "recall": 0.16279069767441862,
+          "precision": 0.18421052631578946,
+          "f1": 0.17283950617283952,
+          "shapes": 43,
+          "nFires": 38,
+          "matched": 7,
+          "density": 0.8837209302325582
+        },
+        "cfg": {
+          "oi": "deltaZ",
+          "thr": 0.5,
+          "tol": 2
+        }
+      },
+      "contrast": {
+        "medZArrows": -0.5502382422870007,
+        "medZTouches": 0.07762746336509709,
+        "medAbsDeltaArrows": 0.6817747148366697,
+        "medAbsDeltaTouches": 0.3471948076394413,
+        "trailHighArrows": 0,
+        "trailHighTouches": 0.10486891385767791,
+        "trailLowArrows": 0,
+        "trailLowTouches": 0.12734082397003746
+      },
+      "arrows": [
+        {
+          "tSec": 1786849980,
+          "side": "buy",
+          "oiZ": -0.5502382422870007,
+          "oiDeltaZ": 0.6817747148366697,
+          "atTrailHigh": false,
+          "atTrailLow": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,333 @@
+{
+  "generatedAt": "2026-08-18T12:50:39.703Z",
+  "note": "Entries = vendor CSV shapes directly (NOT via OWN2 detector). buy→long, sell→short. Signals built from candle+canon Apex bands at shape bar; engine applies occupancy/cooldown. Costs = engine default ~7bps/side.",
+  "authorRef": "LDO m15 +15.25R / WR 62.9% / 89 trades (spot; no CSV shapes for LDO — context only)",
+  "caveats": "Feed = Binance futures CSV (.P); author LDO reference was spot; canon stop 2× may differ from author stop.",
+  "primary": {
+    "override": {
+      "fullFixAtMean": true,
+      "addEnabled": false
+    },
+    "aggregate": {
+      "n": 440,
+      "wr": 0.7136363636363636,
+      "vendorWr": 0.8568181818181818,
+      "totalR": -23.923663253513354,
+      "meanR": -0.05437196193980308,
+      "pf": 0.6657509148588724,
+      "long": {
+        "n": 228,
+        "totalR": -9.58592412544297,
+        "meanR": -0.04204352686597794
+      },
+      "short": {
+        "n": 212,
+        "totalR": -14.337739128070393,
+        "meanR": -0.06763084494372827
+      }
+    },
+    "aggVendorShapes": 468,
+    "aggFinalized": 440,
+    "perSeries": [
+      {
+        "key": "VIRTUAL 5m",
+        "asset": "VIRTUAL",
+        "tf": "5m",
+        "author": true,
+        "vendorShapes": 100,
+        "rawShapes": 100,
+        "finalizedTrades": 95,
+        "metrics": {
+          "n": 95,
+          "wr": 0.8,
+          "vendorWr": 0.8947368421052632,
+          "totalR": 1.536879090691778,
+          "meanR": 0.01617767463886082,
+          "pf": 1.1393036627206772,
+          "long": {
+            "n": 52,
+            "totalR": 3.341660966674468,
+            "meanR": 0.06426271089758592
+          },
+          "short": {
+            "n": 43,
+            "totalR": -1.804781875982691,
+            "meanR": -0.041971671534481184
+          }
+        }
+      },
+      {
+        "key": "BNB 5m",
+        "asset": "BNB",
+        "tf": "5m",
+        "author": false,
+        "vendorShapes": 91,
+        "rawShapes": 92,
+        "finalizedTrades": 83,
+        "metrics": {
+          "n": 83,
+          "wr": 0.6867469879518072,
+          "vendorWr": 0.8674698795180723,
+          "totalR": -6.020177933902984,
+          "meanR": -0.07253226426389137,
+          "pf": 0.5372512808797457,
+          "long": {
+            "n": 36,
+            "totalR": -3.014733523876803,
+            "meanR": -0.08374259788546674
+          },
+          "short": {
+            "n": 47,
+            "totalR": -3.0054444100261777,
+            "meanR": -0.06394562574523782
+          }
+        }
+      },
+      {
+        "key": "BTC 5m",
+        "asset": "BTC",
+        "tf": "5m",
+        "author": false,
+        "vendorShapes": 80,
+        "rawShapes": 82,
+        "finalizedTrades": 79,
+        "metrics": {
+          "n": 79,
+          "wr": 0.5822784810126582,
+          "vendorWr": 0.8481012658227848,
+          "totalR": -9.716574117784514,
+          "meanR": -0.12299460908587993,
+          "pf": 0.3885685565050187,
+          "long": {
+            "n": 37,
+            "totalR": -6.793351730238149,
+            "meanR": -0.1836041008172473
+          },
+          "short": {
+            "n": 42,
+            "totalR": -2.9232223875463657,
+            "meanR": -0.06960053303681824
+          }
+        }
+      },
+      {
+        "key": "BTC 15m",
+        "asset": "BTC",
+        "tf": "15m",
+        "author": false,
+        "vendorShapes": 97,
+        "rawShapes": 97,
+        "finalizedTrades": 88,
+        "metrics": {
+          "n": 88,
+          "wr": 0.7045454545454546,
+          "vendorWr": 0.8181818181818182,
+          "totalR": -7.450119072631138,
+          "meanR": -0.08466044400717203,
+          "pf": 0.5636186754273294,
+          "long": {
+            "n": 46,
+            "totalR": -1.0866501725983975,
+            "meanR": -0.023622829839095597
+          },
+          "short": {
+            "n": 42,
+            "totalR": -6.363468900032743,
+            "meanR": -0.15151116428649386
+          }
+        }
+      },
+      {
+        "key": "BTC 1h",
+        "asset": "BTC",
+        "tf": "1h",
+        "author": false,
+        "vendorShapes": 100,
+        "rawShapes": 100,
+        "finalizedTrades": 95,
+        "metrics": {
+          "n": 95,
+          "wr": 0.7684210526315789,
+          "vendorWr": 0.8526315789473684,
+          "totalR": -2.273671219886502,
+          "meanR": -0.02393338126196318,
+          "pf": 0.8439286652426279,
+          "long": {
+            "n": 57,
+            "totalR": -2.032849665404092,
+            "meanR": -0.03566402921761565
+          },
+          "short": {
+            "n": 38,
+            "totalR": -0.2408215544824107,
+            "meanR": -0.006337409328484492
+          }
+        }
+      }
+    ]
+  },
+  "stop1x": {
+    "override": {
+      "fullFixAtMean": true,
+      "addEnabled": false,
+      "stopSteps": 1
+    },
+    "aggregate": {
+      "n": 463,
+      "wr": 0.6349892008639308,
+      "vendorWr": 0.7278617710583153,
+      "totalR": -60.01298216156412,
+      "meanR": -0.12961767205521407,
+      "pf": 0.5913087116698414,
+      "long": {
+        "n": 241,
+        "totalR": -29.1198036069256,
+        "meanR": -0.12082906060964979
+      },
+      "short": {
+        "n": 222,
+        "totalR": -30.89317855463856,
+        "meanR": -0.13915846195783135
+      }
+    },
+    "aggVendorShapes": 468,
+    "aggFinalized": 463,
+    "perSeries": [
+      {
+        "key": "VIRTUAL 5m",
+        "asset": "VIRTUAL",
+        "tf": "5m",
+        "author": true,
+        "vendorShapes": 100,
+        "rawShapes": 100,
+        "finalizedTrades": 97,
+        "metrics": {
+          "n": 97,
+          "wr": 0.7422680412371134,
+          "vendorWr": 0.7731958762886598,
+          "totalR": -1.1021056649859347,
+          "meanR": -0.011361914072019945,
+          "pf": 0.9540408496874878,
+          "long": {
+            "n": 54,
+            "totalR": 6.694031301646611,
+            "meanR": 0.12396354262308538
+          },
+          "short": {
+            "n": 43,
+            "totalR": -7.796136966632544,
+            "meanR": -0.18130551085191965
+          }
+        }
+      },
+      {
+        "key": "BNB 5m",
+        "asset": "BNB",
+        "tf": "5m",
+        "author": false,
+        "vendorShapes": 91,
+        "rawShapes": 92,
+        "finalizedTrades": 90,
+        "metrics": {
+          "n": 90,
+          "wr": 0.5777777777777777,
+          "vendorWr": 0.7444444444444445,
+          "totalR": -17.180728233728594,
+          "meanR": -0.19089698037476216,
+          "pf": 0.422755629402316,
+          "long": {
+            "n": 40,
+            "totalR": -9.07935711646446,
+            "meanR": -0.22698392791161148
+          },
+          "short": {
+            "n": 50,
+            "totalR": -8.10137111726413,
+            "meanR": -0.16202742234528258
+          }
+        }
+      },
+      {
+        "key": "BTC 5m",
+        "asset": "BTC",
+        "tf": "5m",
+        "author": false,
+        "vendorShapes": 80,
+        "rawShapes": 82,
+        "finalizedTrades": 80,
+        "metrics": {
+          "n": 80,
+          "wr": 0.5625,
+          "vendorWr": 0.75,
+          "totalR": -15.546339952811087,
+          "meanR": -0.19432924941013857,
+          "pf": 0.4368894549023365,
+          "long": {
+            "n": 37,
+            "totalR": -8.990122836842525,
+            "meanR": -0.24297629288763584
+          },
+          "short": {
+            "n": 43,
+            "totalR": -6.556217115968562,
+            "meanR": -0.15247016548764097
+          }
+        }
+      },
+      {
+        "key": "BTC 15m",
+        "asset": "BTC",
+        "tf": "15m",
+        "author": false,
+        "vendorShapes": 97,
+        "rawShapes": 97,
+        "finalizedTrades": 97,
+        "metrics": {
+          "n": 97,
+          "wr": 0.6288659793814433,
+          "vendorWr": 0.711340206185567,
+          "totalR": -12.478487364176518,
+          "meanR": -0.12864419963068574,
+          "pf": 0.5983142310399583,
+          "long": {
+            "n": 50,
+            "totalR": -6.992402948644491,
+            "meanR": -0.13984805897288982
+          },
+          "short": {
+            "n": 47,
+            "totalR": -5.486084415532026,
+            "meanR": -0.11672520033046863
+          }
+        }
+      },
+      {
+        "key": "BTC 1h",
+        "asset": "BTC",
+        "tf": "1h",
+        "author": false,
+        "vendorShapes": 100,
+        "rawShapes": 100,
+        "finalizedTrades": 99,
+        "metrics": {
+          "n": 99,
+          "wr": 0.6464646464646465,
+          "vendorWr": 0.6666666666666666,
+          "totalR": -13.705320945862015,
+          "meanR": -0.13843758531173753,
+          "pf": 0.6018800905023601,
+          "long": {
+            "n": 60,
+            "totalR": -10.751952006620728,
+            "meanR": -0.17919920011034546
+          },
+          "short": {
+            "n": 39,
+            "totalR": -2.9533689392412823,
+            "meanR": -0.07572740869849441
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "generatedAt": "2026-08-19T11:52:51.632Z",
+  "note": "RE17 strict OOS validation of static-full. chrono 65/35 split, apriori stop=3 vs train-selected stop. pooled OOS bootstrap CI. 5 bps. Engine untouched, target hardcoded 2x.",
+  "trainFraction": 0.65,
+  "aprioriStop": 3,
+  "cost": 5,
+  "boot": 3000,
+  "seed": 20260819,
+  "aprioriOos": {
+    "mean": 0.024190624122966596,
+    "lo": -0.06479320280041465,
+    "hi": 0.10655357170303707,
+    "posSeries": 8,
+    "killPass": false,
+    "poolN": 385
+  },
+  "trainSelectedOos": {
+    "mean": 0.007494293914924783,
+    "lo": -0.08105349054526634,
+    "hi": 0.09301482296384299,
+    "posSeries": 8,
+    "killPass": false,
+    "poolN": 386
+  },
+  "series": [
+    {
+      "asset": "AVAX",
+      "tf": "5m",
+      "market": "spot",
+      "aprTrain": 0.24753165264032848,
+      "aprOos": 0.01749340732479694,
+      "aprN": 24,
+      "selStop": 3,
+      "selTrain": 0.24753165264032848,
+      "selOos": 0.01749340732479694,
+      "selN": 24
+    },
+    {
+      "asset": "BNB",
+      "tf": "1m",
+      "market": "perp",
+      "aprTrain": -0.018338531081098366,
+      "aprOos": -0.26991151750626036,
+      "aprN": 38,
+      "selStop": 3,
+      "selTrain": -0.018338531081098366,
+      "selOos": -0.26991151750626036,
+      "selN": 38
+    },
+    {
+      "asset": "BNB",
+      "tf": "5m",
+      "market": "perp",
+      "aprTrain": -0.29594367983362296,
+      "aprOos": 0.1559519032947365,
+      "aprN": 31,
+      "selStop": 5,
+      "selTrain": -0.018272008665669526,
+      "selOos": 0.07222417566553448,
+      "selN": 31
+    },
+    {
+      "asset": "BTC",
+      "tf": "15m",
+      "market": "perp",
+      "aprTrain": -0.19436728291732758,
+      "aprOos": 0.14062225257670363,
+      "aprN": 33,
+      "selStop": 4,
+      "selTrain": -0.13414759084258762,
+      "selOos": 0.04159974086100912,
+      "selN": 33
+    },
+    {
+      "asset": "BTC",
+      "tf": "5m",
+      "market": "perp",
+      "aprTrain": -0.04161268954908057,
+      "aprOos": 0.10414802388756761,
+      "aprN": 28,
+      "selStop": 5,
+      "selTrain": 0.06836198954101906,
+      "selOos": 0.08332262589191634,
+      "selN": 27
+    },
+    {
+      "asset": "BTC",
+      "tf": "1h",
+      "market": "perp",
+      "aprTrain": 0.2336005811901328,
+      "aprOos": 0.020170131823579972,
+      "aprN": 33,
+      "selStop": 3,
+      "selTrain": 0.2336005811901328,
+      "selOos": 0.020170131823579972,
+      "selN": 33
+    },
+    {
+      "asset": "ETH",
+      "tf": "2h",
+      "market": "spot",
+      "aprTrain": 0.005660328560987199,
+      "aprOos": -0.17763338741711826,
+      "aprN": 30,
+      "selStop": 3,
+      "selTrain": 0.005660328560987199,
+      "selOos": -0.17763338741711826,
+      "selN": 30
+    },
+    {
+      "asset": "LDO",
+      "tf": "15m",
+      "market": "spot",
+      "aprTrain": -0.06723237514602824,
+      "aprOos": -0.08693542759843839,
+      "aprN": 32,
+      "selStop": 1,
+      "selTrain": 0.18052886995467973,
+      "selOos": -0.07861147960111353,
+      "selN": 34
+    },
+    {
+      "asset": "ONDO",
+      "tf": "5m",
+      "market": "spot",
+      "aprTrain": 0.2314698010590061,
+      "aprOos": -0.1925255416392428,
+      "aprN": 33,
+      "selStop": 3,
+      "selTrain": 0.2314698010590061,
+      "selOos": -0.1925255416392428,
+      "selN": 33
+    },
+    {
+      "asset": "SOL",
+      "tf": "2h",
+      "market": "spot",
+      "aprTrain": 0.17619966285055247,
+      "aprOos": 0.23672010268002278,
+      "aprN": 30,
+      "selStop": 3,
+      "selTrain": 0.17619966285055247,
+      "selOos": 0.23672010268002278,
+      "selN": 30
+    },
+    {
+      "asset": "VIRTUAL",
+      "tf": "5m",
+      "market": "spot",
+      "aprTrain": 0.11517660885992567,
+      "aprOos": 0.1652994891374567,
+      "aprN": 38,
+      "selStop": 3,
+      "selTrain": 0.11517660885992567,
+      "selOos": 0.1652994891374567,
+      "selN": 38
+    },
+    {
+      "asset": "VIRTUAL",
+      "tf": "5m",
+      "market": "perp",
+      "aprTrain": 0.19610326719815366,
+      "aprOos": 0.20499080950632523,
+      "aprN": 35,
+      "selStop": 3,
+      "selTrain": 0.19610326719815366,
+      "selOos": 0.20499080950632523,
+      "selN": 35
+    }
+  ]
+}

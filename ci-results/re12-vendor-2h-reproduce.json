@@ -1,0 +1,299 @@
+{
+  "generatedAt": "2026-08-18T16:29:44.361Z",
+  "note": "Reproduce vendor 2h GGI Reversal stats (ETH/SOL). Entries = vendor CSV shapes into canonical ArrowTradeReplay. Stop calibrated by matching stop-rate. base {fullFixAtMean:true, addEnabled:false}; modes safe/standard/risk; costs 0 & 5 bps/side.",
+  "modes": [
+    "safe",
+    "standard",
+    "risk"
+  ],
+  "costBps": [
+    0,
+    5
+  ],
+  "stopGrid": [
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1,
+    1.1,
+    1.25,
+    1.5,
+    1.75,
+    2
+  ],
+  "series": [
+    {
+      "key": "ETH 2h",
+      "vendor": {
+        "wr": 81,
+        "stopRatePct": 19,
+        "partialPct": 28.6,
+        "fullFixPct": 52.4,
+        "trades": 84
+      },
+      "modes": [
+        {
+          "mode": "safe",
+          "matchedStopSteps": 2,
+          "achievedStopRate": 0.19753086419753085,
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 81,
+              "wr": 0.7777777777777778,
+              "stopRate": 0.19753086419753085,
+              "partialPct": 0,
+              "fullfixPct": 0.8024691358024691,
+              "totalR": -5.241599820234118,
+              "meanR": -0.06471110889177924,
+              "pf": 0.6783754303848573,
+              "buckets": {
+                "stop": 16,
+                "partial": 0,
+                "fullfix": 65,
+                "timeout": 0
+              }
+            },
+            {
+              "bps": 5,
+              "n": 81,
+              "wr": 0.7283950617283951,
+              "stopRate": 0.19753086419753085,
+              "partialPct": 0,
+              "fullfixPct": 0.8024691358024691,
+              "totalR": -5.829159071749927,
+              "meanR": -0.07196492681172749,
+              "pf": 0.6457897014514388,
+              "buckets": {
+                "stop": 16,
+                "partial": 0,
+                "fullfix": 65,
+                "timeout": 0
+              }
+            }
+          ]
+        },
+        {
+          "mode": "standard",
+          "matchedStopSteps": 2,
+          "achievedStopRate": 0.5714285714285714,
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 49,
+              "wr": 0.42857142857142855,
+              "stopRate": 0.5714285714285714,
+              "partialPct": 0,
+              "fullfixPct": 0.42857142857142855,
+              "totalR": -6.999999999999998,
+              "meanR": -0.14285714285714282,
+              "pf": 0.75,
+              "buckets": {
+                "stop": 28,
+                "partial": 0,
+                "fullfix": 21,
+                "timeout": 0
+              }
+            },
+            {
+              "bps": 5,
+              "n": 49,
+              "wr": 0.42857142857142855,
+              "stopRate": 0.5714285714285714,
+              "partialPct": 0,
+              "fullfixPct": 0.42857142857142855,
+              "totalR": -7.415124264070314,
+              "meanR": -0.15132906661367987,
+              "pf": 0.7374721305120258,
+              "buckets": {
+                "stop": 28,
+                "partial": 0,
+                "fullfix": 21,
+                "timeout": 0
+              }
+            }
+          ]
+        },
+        {
+          "mode": "risk",
+          "matchedStopSteps": 1.75,
+          "achievedStopRate": 0.26506024096385544,
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 83,
+              "wr": 0.7349397590361446,
+              "stopRate": 0.26506024096385544,
+              "partialPct": 0,
+              "fullfixPct": 0.7349397590361446,
+              "totalR": -4.2974393949174825,
+              "meanR": -0.05177637825201786,
+              "pf": 0.8046618456855689,
+              "buckets": {
+                "stop": 22,
+                "partial": 0,
+                "fullfix": 61,
+                "timeout": 0
+              }
+            },
+            {
+              "bps": 5,
+              "n": 83,
+              "wr": 0.6867469879518072,
+              "stopRate": 0.26506024096385544,
+              "partialPct": 0,
+              "fullfixPct": 0.7349397590361446,
+              "totalR": -5.271835396025039,
+              "meanR": -0.06351608910873541,
+              "pf": 0.7636884665085885,
+              "buckets": {
+                "stop": 22,
+                "partial": 0,
+                "fullfix": 61,
+                "timeout": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "SOL 2h",
+      "vendor": {
+        "wr": 88.6,
+        "stopRatePct": 11.4,
+        "partialPct": 28.4,
+        "fullFixPct": 60.2,
+        "trades": 88
+      },
+      "modes": [
+        {
+          "mode": "safe",
+          "matchedStopSteps": 2,
+          "achievedStopRate": 0.12195121951219512,
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 82,
+              "wr": 0.8414634146341463,
+              "stopRate": 0.12195121951219512,
+              "partialPct": 0,
+              "fullfixPct": 0.8780487804878049,
+              "totalR": 2.1048202827395674,
+              "meanR": 0.02566854003340936,
+              "pf": 1.205324522558688,
+              "buckets": {
+                "stop": 10,
+                "partial": 0,
+                "fullfix": 72,
+                "timeout": 0
+              }
+            },
+            {
+              "bps": 5,
+              "n": 82,
+              "wr": 0.7926829268292683,
+              "stopRate": 0.12195121951219512,
+              "partialPct": 0,
+              "fullfixPct": 0.8780487804878049,
+              "totalR": 1.6857949305513604,
+              "meanR": 0.02055847476282147,
+              "pf": 1.1632555263724689,
+              "buckets": {
+                "stop": 10,
+                "partial": 0,
+                "fullfix": 72,
+                "timeout": 0
+              }
+            }
+          ]
+        },
+        {
+          "mode": "standard",
+          "matchedStopSteps": 2,
+          "achievedStopRate": 0.41304347826086957,
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 46,
+              "wr": 0.5869565217391305,
+              "stopRate": 0.41304347826086957,
+              "partialPct": 0,
+              "fullfixPct": 0.5869565217391305,
+              "totalR": 8,
+              "meanR": 0.17391304347826086,
+              "pf": 1.4210526315789473,
+              "buckets": {
+                "stop": 19,
+                "partial": 0,
+                "fullfix": 27,
+                "timeout": 0
+              }
+            },
+            {
+              "bps": 5,
+              "n": 46,
+              "wr": 0.5869565217391305,
+              "stopRate": 0.41304347826086957,
+              "partialPct": 0,
+              "fullfixPct": 0.5869565217391305,
+              "totalR": 7.736656771386497,
+              "meanR": 0.16818819068231514,
+              "pf": 1.4048500029274842,
+              "buckets": {
+                "stop": 19,
+                "partial": 0,
+                "fullfix": 27,
+                "timeout": 0
+              }
+            }
+          ]
+        },
+        {
+          "mode": "risk",
+          "matchedStopSteps": 1.75,
+          "achievedStopRate": 0.1744186046511628,
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 86,
+              "wr": 0.813953488372093,
+              "stopRate": 0.1744186046511628,
+              "partialPct": 0,
+              "fullfixPct": 0.8255813953488372,
+              "totalR": 5.564160551221672,
+              "meanR": 0.06469954129327525,
+              "pf": 1.370809939783546,
+              "buckets": {
+                "stop": 15,
+                "partial": 0,
+                "fullfix": 71,
+                "timeout": 0
+              }
+            },
+            {
+              "bps": 5,
+              "n": 86,
+              "wr": 0.7790697674418605,
+              "stopRate": 0.1744186046511628,
+              "partialPct": 0,
+              "fullfixPct": 0.8255813953488372,
+              "totalR": 4.8385557759045135,
+              "meanR": 0.05626227646400597,
+              "pf": 1.3192519945981687,
+              "buckets": {
+                "stop": 15,
+                "partial": 0,
+                "fullfix": 71,
+                "timeout": 0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

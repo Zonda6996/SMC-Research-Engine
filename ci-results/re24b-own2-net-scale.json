@@ -1,0 +1,240 @@
+{
+  "generatedAt": "2026-08-19T17:22:17.122Z",
+  "stopGrid": [
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1,
+    1.1,
+    1.25,
+    1.5,
+    2
+  ],
+  "spacing": [
+    0,
+    20,
+    50,
+    100
+  ],
+  "costBps": [
+    0,
+    5,
+    7
+  ],
+  "canon": {
+    "warmupBars": 200,
+    "relativeVolumePeriod": 20,
+    "minimumRelativeVolume": 1.4,
+    "minimumDistanceMeanPct": 3,
+    "minimumPenetrationInner": -0.35
+  },
+  "series": [
+    {
+      "key": "VIRTUAL 5m",
+      "nSignalsCanon": 442,
+      "freqPerMonth": 185.31055900621118,
+      "matchedStopSteps": 1,
+      "matchedStopPct": 1.6231021601420152,
+      "bestSpacing": 100,
+      "bestStopSteps": 1.1,
+      "best": {
+        "byCost": [
+          {
+            "bps": 0,
+            "m": {
+              "n": 112,
+              "totalR": 20.826584669495585,
+              "moneyWR": 0.8035714285714286,
+              "vendorWR": 0.8035714285714286,
+              "avgStopPct": 1.7592131736601586
+            }
+          },
+          {
+            "bps": 5,
+            "m": {
+              "n": 112,
+              "totalR": 13.778035544769947,
+              "moneyWR": 0.75,
+              "vendorWR": 0.8035714285714286,
+              "avgStopPct": 1.7592131736601586
+            }
+          },
+          {
+            "bps": 7,
+            "m": {
+              "n": 112,
+              "totalR": 10.958615894879694,
+              "moneyWR": 0.75,
+              "vendorWR": 0.8035714285714286,
+              "avgStopPct": 1.7592131736601586
+            }
+          }
+        ],
+        "freqPerMonth": 49.47204968944099
+      },
+      "author": {
+        "key": "VIRTUAL 5m",
+        "file": "csv/BINANCE_VIRTUALUSDT, 5.csv",
+        "authorWR": 78.7,
+        "authorRefR": 15.24,
+        "authorAvgStopPct": 1.58
+      }
+    },
+    {
+      "key": "ONDO 5m",
+      "nSignalsCanon": 354,
+      "freqPerMonth": 148.40894754718812,
+      "matchedStopSteps": 1.1,
+      "matchedStopPct": 2.0457400486108717,
+      "bestSpacing": 20,
+      "bestStopSteps": 1,
+      "best": {
+        "byCost": [
+          {
+            "bps": 0,
+            "m": {
+              "n": 150,
+              "totalR": 20.34066484245775,
+              "moneyWR": 0.76,
+              "vendorWR": 0.76,
+              "avgStopPct": 1.8575685494778011
+            }
+          },
+          {
+            "bps": 5,
+            "m": {
+              "n": 150,
+              "totalR": 11.371166523770896,
+              "moneyWR": 0.7066666666666667,
+              "vendorWR": 0.76,
+              "avgStopPct": 1.8575685494778011
+            }
+          },
+          {
+            "bps": 7,
+            "m": {
+              "n": 150,
+              "totalR": 7.7833671962961715,
+              "moneyWR": 0.7,
+              "vendorWR": 0.76,
+              "avgStopPct": 1.8575685494778011
+            }
+          }
+        ],
+        "freqPerMonth": 84.26609733611528
+      },
+      "author": {
+        "key": "ONDO 5m",
+        "file": "csv/BINANCE_ONDOUSDT, 5.csv",
+        "authorWR": 83.7,
+        "authorRefR": 12.12,
+        "authorAvgStopPct": 2.14
+      }
+    },
+    {
+      "key": "LDO 15m",
+      "nSignalsCanon": 389,
+      "freqPerMonth": 50.83813586241322,
+      "matchedStopSteps": 0.5,
+      "matchedStopPct": 1.732837376052099,
+      "bestSpacing": 100,
+      "bestStopSteps": 1,
+      "best": {
+        "byCost": [
+          {
+            "bps": 0,
+            "m": {
+              "n": 109,
+              "totalR": 8.163271007958363,
+              "moneyWR": 0.7247706422018348,
+              "vendorWR": 0.7247706422018348,
+              "avgStopPct": 3.4567000347333474
+            }
+          },
+          {
+            "bps": 5,
+            "m": {
+              "n": 109,
+              "totalR": 4.823860623840572,
+              "moneyWR": 0.6788990825688074,
+              "vendorWR": 0.7247706422018348,
+              "avgStopPct": 3.4567000347333474
+            }
+          },
+          {
+            "bps": 7,
+            "m": {
+              "n": 109,
+              "totalR": 3.4880964701934563,
+              "moneyWR": 0.6788990825688074,
+              "vendorWR": 0.7247706422018348,
+              "avgStopPct": 3.4567000347333474
+            }
+          }
+        ],
+        "freqPerMonth": 14.375822480373916
+      },
+      "author": {
+        "key": "LDO 15m",
+        "file": "csv/BINANCE_LDOUSDT, 15.csv",
+        "authorWR": 62.9,
+        "authorRefR": 15.25,
+        "authorAvgStopPct": 1.86
+      }
+    },
+    {
+      "key": "AVAX 5m",
+      "nSignalsCanon": 348,
+      "freqPerMonth": 145.90062111801242,
+      "matchedStopSteps": 1.25,
+      "matchedStopPct": 1.6508430889159835,
+      "bestSpacing": 50,
+      "bestStopSteps": 0.7,
+      "best": {
+        "byCost": [
+          {
+            "bps": 0,
+            "m": {
+              "n": 146,
+              "totalR": 24.101299850131475,
+              "moneyWR": 0.6506849315068494,
+              "vendorWR": 0.6506849315068494,
+              "avgStopPct": 0.9213310767516912
+            }
+          },
+          {
+            "bps": 5,
+            "m": {
+              "n": 146,
+              "totalR": 6.914346783401763,
+              "moneyWR": 0.6506849315068494,
+              "vendorWR": 0.6506849315068494,
+              "avgStopPct": 0.9213310767516912
+            }
+          },
+          {
+            "bps": 7,
+            "m": {
+              "n": 146,
+              "totalR": 0.039565556709885596,
+              "moneyWR": 0.6438356164383562,
+              "vendorWR": 0.6506849315068494,
+              "avgStopPct": 0.9213310767516912
+            }
+          }
+        ],
+        "freqPerMonth": 62.04968944099379
+      },
+      "author": {
+        "key": "AVAX 5m",
+        "file": "csv/BINANCE_AVAXUSDT, 5.csv",
+        "authorWR": 91,
+        "authorRefR": 12.62,
+        "authorAvgStopPct": 1.7
+      }
+    }
+  ]
+}

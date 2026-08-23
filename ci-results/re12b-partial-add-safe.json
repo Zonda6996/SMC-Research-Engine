@@ -1,0 +1,133 @@
+{
+  "generatedAt": "2026-08-19T07:28:02.404Z",
+  "note": "RE12b: partial + add, NO full-fix-at-mean, safe only (ETH/SOL 2h). Entries = vendor CSV shapes into canonical ArrowTradeReplay. Stop calibrated by matching stop-rate. base {fullFixAtMean:false, addEnabled:true}; mode safe; costs 0 & 5 bps/side. Sibling arm {fullFixAtMean:true} in re12-vendor-2h-reproduce.*.",
+  "modes": [
+    "safe"
+  ],
+  "costBps": [
+    0,
+    5
+  ],
+  "stopGrid": [
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1,
+    1.1,
+    1.25,
+    1.5,
+    1.75,
+    2
+  ],
+  "series": [
+    {
+      "key": "ETH 2h",
+      "vendor": {
+        "wr": 81,
+        "stopRatePct": 19,
+        "partialPct": 28.6,
+        "fullFixPct": 52.4,
+        "trades": 84
+      },
+      "modes": [
+        {
+          "mode": "safe",
+          "matchedStopSteps": 2,
+          "achievedStopRate": 0.38333333333333336,
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 60,
+              "wr": 0.6,
+              "stopRate": 0.38333333333333336,
+              "partialPct": 0,
+              "fullfixPct": 0.6166666666666667,
+              "totalR": -6.324271304969933,
+              "meanR": -0.1054045217494989,
+              "pf": 0.698071931354878,
+              "buckets": {
+                "stop": 23,
+                "partial": 0,
+                "fullfix": 37,
+                "timeout": 0
+              }
+            },
+            {
+              "bps": 5,
+              "n": 60,
+              "wr": 0.6,
+              "stopRate": 0.38333333333333336,
+              "partialPct": 0,
+              "fullfixPct": 0.6166666666666667,
+              "totalR": -6.792294139622649,
+              "meanR": -0.11320490232704414,
+              "pf": 0.6794217880259835,
+              "buckets": {
+                "stop": 23,
+                "partial": 0,
+                "fullfix": 37,
+                "timeout": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "SOL 2h",
+      "vendor": {
+        "wr": 88.6,
+        "stopRatePct": 11.4,
+        "partialPct": 28.4,
+        "fullFixPct": 60.2,
+        "trades": 88
+      },
+      "modes": [
+        {
+          "mode": "safe",
+          "matchedStopSteps": 1.75,
+          "achievedStopRate": 0.3275862068965517,
+          "byCost": [
+            {
+              "bps": 0,
+              "n": 58,
+              "wr": 0.6551724137931034,
+              "stopRate": 0.3275862068965517,
+              "partialPct": 0,
+              "fullfixPct": 0.6724137931034483,
+              "totalR": 1.4508187783018531,
+              "meanR": 0.02501411686727333,
+              "pf": 1.0861955770278136,
+              "buckets": {
+                "stop": 19,
+                "partial": 0,
+                "fullfix": 39,
+                "timeout": 0
+              }
+            },
+            {
+              "bps": 5,
+              "n": 58,
+              "wr": 0.6551724137931034,
+              "stopRate": 0.3275862068965517,
+              "partialPct": 0,
+              "fullfixPct": 0.6724137931034483,
+              "totalR": 1.1107791254113422,
+              "meanR": 0.019151364231230036,
+              "pf": 1.0653765659280898,
+              "buckets": {
+                "stop": 19,
+                "partial": 0,
+                "fullfix": 39,
+                "timeout": 0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1095 @@
+{
+  "generatedAt": "2026-08-18T10:31:02.363Z",
+  "corpus": "csv/ BINANCE (vendor zone+shapes+volume inline)",
+  "datasets": [
+    {
+      "id": "btc-5m",
+      "role": "development",
+      "timeframeMs": 300000,
+      "rows": 20532,
+      "buys": 38,
+      "sells": 44,
+      "zeroVolumeBars": 0,
+      "gaps": 0
+    },
+    {
+      "id": "btc-15m",
+      "role": "development",
+      "timeframeMs": 900000,
+      "rows": 22012,
+      "buys": 50,
+      "sells": 47,
+      "zeroVolumeBars": 0,
+      "gaps": 0
+    },
+    {
+      "id": "bnb-5m",
+      "role": "oos-asset",
+      "timeframeMs": 300000,
+      "rows": 20533,
+      "buys": 41,
+      "sells": 51,
+      "zeroVolumeBars": 0,
+      "gaps": 0
+    },
+    {
+      "id": "virtual-5m",
+      "role": "oos-asset",
+      "timeframeMs": 300000,
+      "rows": 20533,
+      "buys": 55,
+      "sells": 45,
+      "zeroVolumeBars": 0,
+      "gaps": 0
+    },
+    {
+      "id": "btc-60m",
+      "role": "oos-timeframe",
+      "timeframeMs": 3600000,
+      "rows": 23047,
+      "buys": 61,
+      "sells": 39,
+      "zeroVolumeBars": 0,
+      "gaps": 0
+    },
+    {
+      "id": "bnb-1m",
+      "role": "oos-asset-tf",
+      "timeframeMs": 60000,
+      "rows": 22178,
+      "buys": 53,
+      "sells": 54,
+      "zeroVolumeBars": 0,
+      "gaps": 1
+    }
+  ],
+  "gridSize": 61442,
+  "stages": {
+    "families": 80,
+    "topFamilies": 10,
+    "stage2Candidates": 640,
+    "scoreConfigs": 20,
+    "stage3Configs": 240
+  },
+  "anomalies": [
+    "bnb-1m: irregular/gap bars 1"
+  ],
+  "own2": {
+    "fit": {
+      "slices": [
+        {
+          "datasetId": "btc-5m",
+          "metrics": {
+            "tp": 12,
+            "fp": 155,
+            "fn": 26,
+            "precision": 0.0718562874251497,
+            "recall": 0.3157894736842105,
+            "f1": 0.11707317073170732,
+            "predictions": 167,
+            "truth": 38
+          }
+        },
+        {
+          "datasetId": "btc-15m",
+          "metrics": {
+            "tp": 14,
+            "fp": 182,
+            "fn": 31,
+            "precision": 0.07142857142857142,
+            "recall": 0.3111111111111111,
+            "f1": 0.11618257261410789,
+            "predictions": 196,
+            "truth": 45
+          }
+        }
+      ],
+      "aggregate": {
+        "tp": 26,
+        "fp": 337,
+        "fn": 57,
+        "precision": 0.07162534435261708,
+        "recall": 0.3132530120481928,
+        "f1": 0.11659192825112108,
+        "predictions": 363,
+        "truth": 83
+      }
+    },
+    "validation": {
+      "slices": [
+        {
+          "datasetId": "btc-5m",
+          "metrics": {
+            "tp": 7,
+            "fp": 94,
+            "fn": 17,
+            "precision": 0.06930693069306931,
+            "recall": 0.2916666666666667,
+            "f1": 0.112,
+            "predictions": 101,
+            "truth": 24
+          }
+        },
+        {
+          "datasetId": "btc-15m",
+          "metrics": {
+            "tp": 6,
+            "fp": 76,
+            "fn": 19,
+            "precision": 0.07317073170731707,
+            "recall": 0.24,
+            "f1": 0.11214953271028037,
+            "predictions": 82,
+            "truth": 25
+          }
+        }
+      ],
+      "aggregate": {
+        "tp": 13,
+        "fp": 170,
+        "fn": 36,
+        "precision": 0.07103825136612021,
+        "recall": 0.2653061224489796,
+        "f1": 0.11206896551724138,
+        "predictions": 183,
+        "truth": 49
+      }
+    },
+    "sealed": {
+      "tolerance1": {
+        "slices": [
+          {
+            "datasetId": "btc-5m",
+            "metrics": {
+              "tp": 3,
+              "fp": 93,
+              "fn": 17,
+              "precision": 0.03125,
+              "recall": 0.15,
+              "f1": 0.05172413793103448,
+              "predictions": 96,
+              "truth": 20
+            }
+          },
+          {
+            "datasetId": "btc-15m",
+            "metrics": {
+              "tp": 5,
+              "fp": 104,
+              "fn": 22,
+              "precision": 0.045871559633027525,
+              "recall": 0.18518518518518517,
+              "f1": 0.07352941176470588,
+              "predictions": 109,
+              "truth": 27
+            }
+          }
+        ],
+        "aggregate": {
+          "tp": 8,
+          "fp": 197,
+          "fn": 39,
+          "precision": 0.03902439024390244,
+          "recall": 0.1702127659574468,
+          "f1": 0.06349206349206349,
+          "predictions": 205,
+          "truth": 47
+        }
+      },
+      "tolerance0": {
+        "slices": [
+          {
+            "datasetId": "btc-5m",
+            "metrics": {
+              "tp": 3,
+              "fp": 93,
+              "fn": 17,
+              "precision": 0.03125,
+              "recall": 0.15,
+              "f1": 0.05172413793103448,
+              "predictions": 96,
+              "truth": 20
+            }
+          },
+          {
+            "datasetId": "btc-15m",
+            "metrics": {
+              "tp": 5,
+              "fp": 104,
+              "fn": 22,
+              "precision": 0.045871559633027525,
+              "recall": 0.18518518518518517,
+              "f1": 0.07352941176470588,
+              "predictions": 109,
+              "truth": 27
+            }
+          }
+        ],
+        "aggregate": {
+          "tp": 8,
+          "fp": 197,
+          "fn": 39,
+          "precision": 0.03902439024390244,
+          "recall": 0.1702127659574468,
+          "f1": 0.06349206349206349,
+          "predictions": 205,
+          "truth": 47
+        }
+      }
+    },
+    "oos": {
+      "tolerance1": {
+        "slices": [
+          {
+            "datasetId": "bnb-5m",
+            "metrics": {
+              "tp": 16,
+              "fp": 335,
+              "fn": 76,
+              "precision": 0.045584045584045586,
+              "recall": 0.17391304347826086,
+              "f1": 0.07223476297968397,
+              "predictions": 351,
+              "truth": 92
+            }
+          },
+          {
+            "datasetId": "virtual-5m",
+            "metrics": {
+              "tp": 28,
+              "fp": 317,
+              "fn": 72,
+              "precision": 0.08115942028985507,
+              "recall": 0.28,
+              "f1": 0.1258426966292135,
+              "predictions": 345,
+              "truth": 100
+            }
+          },
+          {
+            "datasetId": "btc-60m",
+            "metrics": {
+              "tp": 31,
+              "fp": 406,
+              "fn": 69,
+              "precision": 0.07093821510297482,
+              "recall": 0.31,
+              "f1": 0.1154562383612663,
+              "predictions": 437,
+              "truth": 100
+            }
+          },
+          {
+            "datasetId": "bnb-1m",
+            "metrics": {
+              "tp": 7,
+              "fp": 281,
+              "fn": 100,
+              "precision": 0.024305555555555556,
+              "recall": 0.06542056074766354,
+              "f1": 0.035443037974683546,
+              "predictions": 288,
+              "truth": 107
+            }
+          }
+        ],
+        "aggregate": {
+          "tp": 82,
+          "fp": 1339,
+          "fn": 317,
+          "precision": 0.057705840957072485,
+          "recall": 0.20551378446115287,
+          "f1": 0.09010989010989011,
+          "predictions": 1421,
+          "truth": 399
+        }
+      },
+      "tolerance0": {
+        "slices": [
+          {
+            "datasetId": "bnb-5m",
+            "metrics": {
+              "tp": 15,
+              "fp": 336,
+              "fn": 77,
+              "precision": 0.042735042735042736,
+              "recall": 0.16304347826086957,
+              "f1": 0.06772009029345373,
+              "predictions": 351,
+              "truth": 92
+            }
+          },
+          {
+            "datasetId": "virtual-5m",
+            "metrics": {
+              "tp": 24,
+              "fp": 321,
+              "fn": 76,
+              "precision": 0.06956521739130435,
+              "recall": 0.24,
+              "f1": 0.10786516853932585,
+              "predictions": 345,
+              "truth": 100
+            }
+          },
+          {
+            "datasetId": "btc-60m",
+            "metrics": {
+              "tp": 28,
+              "fp": 409,
+              "fn": 72,
+              "precision": 0.06407322654462243,
+              "recall": 0.28,
+              "f1": 0.1042830540037244,
+              "predictions": 437,
+              "truth": 100
+            }
+          },
+          {
+            "datasetId": "bnb-1m",
+            "metrics": {
+              "tp": 6,
+              "fp": 282,
+              "fn": 101,
+              "precision": 0.020833333333333332,
+              "recall": 0.056074766355140186,
+              "f1": 0.030379746835443037,
+              "predictions": 288,
+              "truth": 107
+            }
+          }
+        ],
+        "aggregate": {
+          "tp": 73,
+          "fp": 1348,
+          "fn": 326,
+          "precision": 0.05137227304714989,
+          "recall": 0.18295739348370926,
+          "f1": 0.08021978021978023,
+          "predictions": 1421,
+          "truth": 399
+        }
+      }
+    }
+  },
+  "winnerConfig": {
+    "weights": {
+      "osc": 1,
+      "mom": 0,
+      "volrange": 0,
+      "dist": 1
+    },
+    "smooth": 8,
+    "arm": 15,
+    "release": 15,
+    "cooldown": 32,
+    "memory": 192,
+    "directional": true
+  },
+  "fg": {
+    "fit": {
+      "slices": [
+        {
+          "datasetId": "btc-5m",
+          "metrics": {
+            "tp": 3,
+            "fp": 101,
+            "fn": 35,
+            "precision": 0.028846153846153848,
+            "recall": 0.07894736842105263,
+            "f1": 0.04225352112676056,
+            "predictions": 104,
+            "truth": 38
+          }
+        },
+        {
+          "datasetId": "btc-15m",
+          "metrics": {
+            "tp": 10,
+            "fp": 85,
+            "fn": 35,
+            "precision": 0.10526315789473684,
+            "recall": 0.2222222222222222,
+            "f1": 0.14285714285714285,
+            "predictions": 95,
+            "truth": 45
+          }
+        }
+      ],
+      "aggregate": {
+        "tp": 13,
+        "fp": 186,
+        "fn": 70,
+        "precision": 0.06532663316582915,
+        "recall": 0.1566265060240964,
+        "f1": 0.09219858156028368,
+        "predictions": 199,
+        "truth": 83
+      }
+    },
+    "validation": {
+      "slices": [
+        {
+          "datasetId": "btc-5m",
+          "metrics": {
+            "tp": 4,
+            "fp": 48,
+            "fn": 20,
+            "precision": 0.07692307692307693,
+            "recall": 0.16666666666666666,
+            "f1": 0.10526315789473684,
+            "predictions": 52,
+            "truth": 24
+          }
+        },
+        {
+          "datasetId": "btc-15m",
+          "metrics": {
+            "tp": 8,
+            "fp": 43,
+            "fn": 17,
+            "precision": 0.1568627450980392,
+            "recall": 0.32,
+            "f1": 0.21052631578947367,
+            "predictions": 51,
+            "truth": 25
+          }
+        }
+      ],
+      "aggregate": {
+        "tp": 12,
+        "fp": 91,
+        "fn": 37,
+        "precision": 0.11650485436893204,
+        "recall": 0.24489795918367346,
+        "f1": 0.15789473684210525,
+        "predictions": 103,
+        "truth": 49
+      }
+    },
+    "sealed": {
+      "tolerance1": {
+        "slices": [
+          {
+            "datasetId": "btc-5m",
+            "metrics": {
+              "tp": 5,
+              "fp": 65,
+              "fn": 15,
+              "precision": 0.07142857142857142,
+              "recall": 0.25,
+              "f1": 0.1111111111111111,
+              "predictions": 70,
+              "truth": 20
+            }
+          },
+          {
+            "datasetId": "btc-15m",
+            "metrics": {
+              "tp": 5,
+              "fp": 52,
+              "fn": 22,
+              "precision": 0.08771929824561403,
+              "recall": 0.18518518518518517,
+              "f1": 0.11904761904761904,
+              "predictions": 57,
+              "truth": 27
+            }
+          }
+        ],
+        "aggregate": {
+          "tp": 10,
+          "fp": 117,
+          "fn": 37,
+          "precision": 0.07874015748031496,
+          "recall": 0.2127659574468085,
+          "f1": 0.11494252873563218,
+          "predictions": 127,
+          "truth": 47
+        }
+      },
+      "tolerance0": {
+        "slices": [
+          {
+            "datasetId": "btc-5m",
+            "metrics": {
+              "tp": 4,
+              "fp": 66,
+              "fn": 16,
+              "precision": 0.05714285714285714,
+              "recall": 0.2,
+              "f1": 0.08888888888888889,
+              "predictions": 70,
+              "truth": 20
+            }
+          },
+          {
+            "datasetId": "btc-15m",
+            "metrics": {
+              "tp": 2,
+              "fp": 55,
+              "fn": 25,
+              "precision": 0.03508771929824561,
+              "recall": 0.07407407407407407,
+              "f1": 0.047619047619047616,
+              "predictions": 57,
+              "truth": 27
+            }
+          }
+        ],
+        "aggregate": {
+          "tp": 6,
+          "fp": 121,
+          "fn": 41,
+          "precision": 0.047244094488188976,
+          "recall": 0.1276595744680851,
+          "f1": 0.06896551724137931,
+          "predictions": 127,
+          "truth": 47
+        }
+      }
+    },
+    "oos": {
+      "tolerance1": {
+        "slices": [
+          {
+            "datasetId": "bnb-5m",
+            "metrics": {
+              "tp": 14,
+              "fp": 215,
+              "fn": 78,
+              "precision": 0.0611353711790393,
+              "recall": 0.15217391304347827,
+              "f1": 0.08722741433021806,
+              "predictions": 229,
+              "truth": 92
+            }
+          },
+          {
+            "datasetId": "virtual-5m",
+            "metrics": {
+              "tp": 16,
+              "fp": 225,
+              "fn": 84,
+              "precision": 0.06639004149377593,
+              "recall": 0.16,
+              "f1": 0.093841642228739,
+              "predictions": 241,
+              "truth": 100
+            }
+          },
+          {
+            "datasetId": "btc-60m",
+            "metrics": {
+              "tp": 15,
+              "fp": 209,
+              "fn": 85,
+              "precision": 0.06696428571428571,
+              "recall": 0.15,
+              "f1": 0.09259259259259259,
+              "predictions": 224,
+              "truth": 100
+            }
+          },
+          {
+            "datasetId": "bnb-1m",
+            "metrics": {
+              "tp": 18,
+              "fp": 289,
+              "fn": 89,
+              "precision": 0.05863192182410423,
+              "recall": 0.16822429906542055,
+              "f1": 0.08695652173913043,
+              "predictions": 307,
+              "truth": 107
+            }
+          }
+        ],
+        "aggregate": {
+          "tp": 63,
+          "fp": 938,
+          "fn": 336,
+          "precision": 0.06293706293706294,
+          "recall": 0.15789473684210525,
+          "f1": 0.09,
+          "predictions": 1001,
+          "truth": 399
+        }
+      },
+      "tolerance0": {
+        "slices": [
+          {
+            "datasetId": "bnb-5m",
+            "metrics": {
+              "tp": 3,
+              "fp": 226,
+              "fn": 89,
+              "precision": 0.013100436681222707,
+              "recall": 0.03260869565217391,
+              "f1": 0.018691588785046728,
+              "predictions": 229,
+              "truth": 92
+            }
+          },
+          {
+            "datasetId": "virtual-5m",
+            "metrics": {
+              "tp": 7,
+              "fp": 234,
+              "fn": 93,
+              "precision": 0.029045643153526972,
+              "recall": 0.07,
+              "f1": 0.04105571847507331,
+              "predictions": 241,
+              "truth": 100
+            }
+          },
+          {
+            "datasetId": "btc-60m",
+            "metrics": {
+              "tp": 9,
+              "fp": 215,
+              "fn": 91,
+              "precision": 0.04017857142857143,
+              "recall": 0.09,
+              "f1": 0.05555555555555555,
+              "predictions": 224,
+              "truth": 100
+            }
+          },
+          {
+            "datasetId": "bnb-1m",
+            "metrics": {
+              "tp": 12,
+              "fp": 295,
+              "fn": 95,
+              "precision": 0.03908794788273615,
+              "recall": 0.11214953271028037,
+              "f1": 0.057971014492753624,
+              "predictions": 307,
+              "truth": 107
+            }
+          }
+        ],
+        "aggregate": {
+          "tp": 31,
+          "fp": 970,
+          "fn": 368,
+          "precision": 0.030969030969030968,
+          "recall": 0.07769423558897243,
+          "f1": 0.04428571428571428,
+          "predictions": 1001,
+          "truth": 399
+        }
+      }
+    }
+  },
+  "verdict": "F&G НЕ бьёт OWN2 на OOS",
+  "topN": [
+    {
+      "config": {
+        "weights": {
+          "osc": 1,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 1
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 32,
+        "memory": 192,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 12,
+        "fp": 91,
+        "fn": 37,
+        "precision": 0.11650485436893204,
+        "recall": 0.24489795918367346,
+        "f1": 0.15789473684210525,
+        "predictions": 103,
+        "truth": 49
+      },
+      "objective": 0.21151502486246873
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 2,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 2
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 32,
+        "memory": 192,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 12,
+        "fp": 91,
+        "fn": 37,
+        "precision": 0.11650485436893204,
+        "recall": 0.24489795918367346,
+        "f1": 0.15789473684210525,
+        "predictions": 103,
+        "truth": 49
+      },
+      "objective": 0.21151502486246873
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 1,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 1
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 32,
+        "memory": 256,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 12,
+        "fp": 94,
+        "fn": 37,
+        "precision": 0.11320754716981132,
+        "recall": 0.24489795918367346,
+        "f1": 0.15483870967741936,
+        "predictions": 106,
+        "truth": 49
+      },
+      "objective": 0.20599167058283727
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 2,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 2
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 32,
+        "memory": 256,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 12,
+        "fp": 94,
+        "fn": 37,
+        "precision": 0.11320754716981132,
+        "recall": 0.24489795918367346,
+        "f1": 0.15483870967741936,
+        "predictions": 106,
+        "truth": 49
+      },
+      "objective": 0.20599167058283727
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 1,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 1
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 12,
+        "memory": 192,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 13,
+        "fp": 114,
+        "fn": 36,
+        "precision": 0.10236220472440945,
+        "recall": 0.2653061224489796,
+        "f1": 0.14772727272727273,
+        "predictions": 127,
+        "truth": 49
+      },
+      "objective": 0.19037340145046486
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 2,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 2
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 12,
+        "memory": 192,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 13,
+        "fp": 114,
+        "fn": 36,
+        "precision": 0.10236220472440945,
+        "recall": 0.2653061224489796,
+        "f1": 0.14772727272727273,
+        "predictions": 127,
+        "truth": 49
+      },
+      "objective": 0.19037340145046486
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 1,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 1
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 12,
+        "memory": 256,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 13,
+        "fp": 118,
+        "fn": 36,
+        "precision": 0.09923664122137404,
+        "recall": 0.2653061224489796,
+        "f1": 0.14444444444444443,
+        "predictions": 131,
+        "truth": 49
+      },
+      "objective": 0.18459993829672
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 2,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 2
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 12,
+        "memory": 256,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 13,
+        "fp": 118,
+        "fn": 36,
+        "precision": 0.09923664122137404,
+        "recall": 0.2653061224489796,
+        "f1": 0.14444444444444443,
+        "predictions": 131,
+        "truth": 49
+      },
+      "objective": 0.18459993829672
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 1,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 1
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 32,
+        "memory": 96,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 10,
+        "fp": 86,
+        "fn": 39,
+        "precision": 0.10416666666666667,
+        "recall": 0.20408163265306123,
+        "f1": 0.13793103448275862,
+        "predictions": 96,
+        "truth": 49
+      },
+      "objective": 0.1833088303130961
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 2,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 2
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 32,
+        "memory": 96,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 10,
+        "fp": 86,
+        "fn": 39,
+        "precision": 0.10416666666666667,
+        "recall": 0.20408163265306123,
+        "f1": 0.13793103448275862,
+        "predictions": 96,
+        "truth": 49
+      },
+      "objective": 0.1833088303130961
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 1,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 1
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 20,
+        "memory": 192,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 12,
+        "fp": 109,
+        "fn": 37,
+        "precision": 0.09917355371900827,
+        "recall": 0.24489795918367346,
+        "f1": 0.1411764705882353,
+        "predictions": 121,
+        "truth": 49
+      },
+      "objective": 0.18142177605394502
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 2,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 2
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 20,
+        "memory": 192,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 12,
+        "fp": 109,
+        "fn": 37,
+        "precision": 0.09917355371900827,
+        "recall": 0.24489795918367346,
+        "f1": 0.1411764705882353,
+        "predictions": 121,
+        "truth": 49
+      },
+      "objective": 0.18142177605394502
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 1,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 1
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 32,
+        "memory": 128,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 10,
+        "fp": 90,
+        "fn": 39,
+        "precision": 0.1,
+        "recall": 0.20408163265306123,
+        "f1": 0.1342281879194631,
+        "predictions": 100,
+        "truth": 49
+      },
+      "objective": 0.1763064373023237
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 2,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 2
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 32,
+        "memory": 128,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 10,
+        "fp": 90,
+        "fn": 39,
+        "precision": 0.1,
+        "recall": 0.20408163265306123,
+        "f1": 0.1342281879194631,
+        "predictions": 100,
+        "truth": 49
+      },
+      "objective": 0.1763064373023237
+    },
+    {
+      "config": {
+        "weights": {
+          "osc": 1,
+          "mom": 0,
+          "volrange": 0,
+          "dist": 1
+        },
+        "smooth": 8,
+        "arm": 15,
+        "release": 15,
+        "cooldown": 20,
+        "memory": 256,
+        "directional": true
+      },
+      "validationAggregate": {
+        "tp": 12,
+        "fp": 113,
+        "fn": 37,
+        "precision": 0.096,
+        "recall": 0.24489795918367346,
+        "f1": 0.13793103448275862,
+        "predictions": 125,
+        "truth": 49
+      },
+      "objective": 0.17560599079264264
+    }
+  ]
+}
