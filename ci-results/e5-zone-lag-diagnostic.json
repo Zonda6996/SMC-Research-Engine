@@ -1,0 +1,2695 @@
+{
+  "generatedAt": "2026-08-17T17:36:01.835Z",
+  "pairs": [
+    {
+      "key": "5m VIRTUAL",
+      "vendorN": 94,
+      "candles": 19075,
+      "own2": 323
+    },
+    {
+      "key": "5m BNB",
+      "vendorN": 89,
+      "candles": 19477,
+      "own2": 323
+    },
+    {
+      "key": "5m ETH",
+      "vendorN": 71,
+      "candles": 19625,
+      "own2": 311
+    },
+    {
+      "key": "15m OP",
+      "vendorN": 34,
+      "candles": 6356,
+      "own2": 45
+    },
+    {
+      "key": "15m CRV",
+      "vendorN": 27,
+      "candles": 6146,
+      "own2": 66
+    },
+    {
+      "key": "15m ONDO",
+      "vendorN": 26,
+      "candles": 6586,
+      "own2": 70
+    }
+  ],
+  "block1_lagCurve": [
+    {
+      "tol": 0,
+      "vendorN": 341,
+      "ourN": 1138,
+      "recall": 0.020527859237536656,
+      "precision": 0.006151142355008787,
+      "density": 3.337243401759531
+    },
+    {
+      "tol": 1,
+      "vendorN": 341,
+      "ourN": 1138,
+      "recall": 0.187683284457478,
+      "precision": 0.06239015817223199,
+      "density": 3.337243401759531
+    },
+    {
+      "tol": 2,
+      "vendorN": 341,
+      "ourN": 1138,
+      "recall": 0.2375366568914956,
+      "precision": 0.08611599297012303,
+      "density": 3.337243401759531
+    },
+    {
+      "tol": 3,
+      "vendorN": 341,
+      "ourN": 1138,
+      "recall": 0.2873900293255132,
+      "precision": 0.10456942003514938,
+      "density": 3.337243401759531
+    },
+    {
+      "tol": 5,
+      "vendorN": 341,
+      "ourN": 1138,
+      "recall": 0.3343108504398827,
+      "precision": 0.1256590509666081,
+      "density": 3.337243401759531
+    },
+    {
+      "tol": 8,
+      "vendorN": 341,
+      "ourN": 1138,
+      "recall": 0.3812316715542522,
+      "precision": 0.15817223198594024,
+      "density": 3.337243401759531
+    }
+  ],
+  "block2_zoneCoverage": {
+    "perPair": [
+      {
+        "key": "5m VIRTUAL",
+        "vendorN": 93,
+        "cover0": 0.989247311827957,
+        "coverPm1": 1
+      },
+      {
+        "key": "5m BNB",
+        "vendorN": 88,
+        "cover0": 0.9772727272727273,
+        "coverPm1": 1
+      },
+      {
+        "key": "5m ETH",
+        "vendorN": 70,
+        "cover0": 0.9857142857142858,
+        "coverPm1": 0.9857142857142858
+      },
+      {
+        "key": "15m OP",
+        "vendorN": 33,
+        "cover0": 1,
+        "coverPm1": 1
+      },
+      {
+        "key": "15m CRV",
+        "vendorN": 26,
+        "cover0": 0.9230769230769231,
+        "coverPm1": 1
+      },
+      {
+        "key": "15m ONDO",
+        "vendorN": 25,
+        "cover0": 0.96,
+        "coverPm1": 1
+      }
+    ],
+    "aggregate": {
+      "vendorN": 335,
+      "cover0": 0.9791044776119403,
+      "coverPm1": 0.9970149253731343
+    },
+    "canonDistMult": 0.8
+  },
+  "strictZoneCoverage": {
+    "edgeDefinition": {
+      "outer": {
+        "long": "low<=greenLo",
+        "short": "high>=redHi"
+      },
+      "inner": {
+        "long": "low<=greenHi",
+        "short": "high>=redLo"
+      }
+    },
+    "inner": {
+      "perPair": [
+        {
+          "key": "5m VIRTUAL",
+          "vendorN": 93,
+          "cover0": 0.06451612903225806,
+          "coverPm1": 0.1827956989247312
+        },
+        {
+          "key": "5m BNB",
+          "vendorN": 88,
+          "cover0": 0.056818181818181816,
+          "coverPm1": 0.25
+        },
+        {
+          "key": "5m ETH",
+          "vendorN": 70,
+          "cover0": 0.12857142857142856,
+          "coverPm1": 0.24285714285714285
+        },
+        {
+          "key": "15m OP",
+          "vendorN": 33,
+          "cover0": 0.06060606060606061,
+          "coverPm1": 0.18181818181818182
+        },
+        {
+          "key": "15m CRV",
+          "vendorN": 26,
+          "cover0": 0.038461538461538464,
+          "coverPm1": 0.11538461538461539
+        },
+        {
+          "key": "15m ONDO",
+          "vendorN": 25,
+          "cover0": 0.08,
+          "coverPm1": 0.16
+        }
+      ],
+      "aggregate": {
+        "vendorN": 335,
+        "cover0": 0.07462686567164178,
+        "coverPm1": 0.20597014925373133
+      },
+      "activationDensity": 0.11296625222024867
+    },
+    "outer": {
+      "perPair": [
+        {
+          "key": "5m VIRTUAL",
+          "vendorN": 93,
+          "cover0": 0,
+          "coverPm1": 0
+        },
+        {
+          "key": "5m BNB",
+          "vendorN": 88,
+          "cover0": 0,
+          "coverPm1": 0.011363636363636364
+        },
+        {
+          "key": "5m ETH",
+          "vendorN": 70,
+          "cover0": 0,
+          "coverPm1": 0
+        },
+        {
+          "key": "15m OP",
+          "vendorN": 33,
+          "cover0": 0,
+          "coverPm1": 0
+        },
+        {
+          "key": "15m CRV",
+          "vendorN": 26,
+          "cover0": 0,
+          "coverPm1": 0
+        },
+        {
+          "key": "15m ONDO",
+          "vendorN": 25,
+          "cover0": 0,
+          "coverPm1": 0
+        }
+      ],
+      "aggregate": {
+        "vendorN": 335,
+        "cover0": 0,
+        "coverPm1": 0.0029850746268656717
+      },
+      "activationDensity": 0.02055127952108414
+    },
+    "softActivationDensityCanon": 0.7486875863430037
+  },
+  "strictTriggerSweep": {
+    "grid": {
+      "edgeMode": [
+        "inner",
+        "outer"
+      ],
+      "candleDir": [
+        false,
+        true
+      ],
+      "armReset": [
+        false,
+        true
+      ],
+      "relVolMin": [
+        0,
+        1,
+        1.4
+      ],
+      "spacing": [
+        1,
+        3,
+        10
+      ]
+    },
+    "relVolPeriod": 20,
+    "matchTolBars": 1,
+    "densityWindow": [
+      0.6,
+      1.6
+    ],
+    "own2Baseline": {
+      "vendorN": 341,
+      "ourN": 1138,
+      "recall": 0.187683284457478,
+      "precision": 0.06239015817223199,
+      "density": 3.337243401759531
+    },
+    "eligibleCount": 9,
+    "top15": [
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 239,
+        "recall": 0.002932551319648094,
+        "precision": 0.0041841004184100415,
+        "density": 0.7008797653958945
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 251,
+        "recall": 0.002932551319648094,
+        "precision": 0.00398406374501992,
+        "density": 0.7360703812316716
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 0,
+        "vendorN": 341,
+        "ourN": 294,
+        "recall": 0.002932551319648094,
+        "precision": 0.0034013605442176865,
+        "density": 0.8621700879765396
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 357,
+        "recall": 0.002932551319648094,
+        "precision": 0.0028011204481792717,
+        "density": 1.0469208211143695
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 430,
+        "recall": 0.002932551319648094,
+        "precision": 0.002325581395348837,
+        "density": 1.2609970674486803
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 209,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.6129032258064516
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 218,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.6392961876832844
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 262,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.7683284457478006
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 380,
+        "recall": 0,
+        "precision": 0,
+        "density": 1.1143695014662756
+      }
+    ],
+    "best": {
+      "edgeMode": "outer",
+      "candleDir": false,
+      "armReset": false,
+      "relVolMin": 1.4,
+      "spacing": 10,
+      "filters": 1,
+      "vendorN": 341,
+      "ourN": 239,
+      "recall": 0.002932551319648094,
+      "precision": 0.0041841004184100415,
+      "density": 0.7008797653958945,
+      "perPair": [
+        {
+          "key": "5m VIRTUAL",
+          "vendorN": 94,
+          "ourN": 54,
+          "density": 0.574468085106383,
+          "recall": 0,
+          "precision": 0,
+          "own2Recall": 0.18085106382978725
+        },
+        {
+          "key": "5m BNB",
+          "vendorN": 89,
+          "ourN": 80,
+          "density": 0.898876404494382,
+          "recall": 0.011235955056179775,
+          "precision": 0.0125,
+          "own2Recall": 0.23595505617977527
+        },
+        {
+          "key": "5m ETH",
+          "vendorN": 71,
+          "ourN": 79,
+          "density": 1.1126760563380282,
+          "recall": 0,
+          "precision": 0,
+          "own2Recall": 0.23943661971830985
+        },
+        {
+          "key": "15m OP",
+          "vendorN": 34,
+          "ourN": 4,
+          "density": 0.11764705882352941,
+          "recall": 0,
+          "precision": 0,
+          "own2Recall": 0.08823529411764706
+        },
+        {
+          "key": "15m CRV",
+          "vendorN": 27,
+          "ourN": 12,
+          "density": 0.4444444444444444,
+          "recall": 0,
+          "precision": 0,
+          "own2Recall": 0.07407407407407407
+        },
+        {
+          "key": "15m ONDO",
+          "vendorN": 26,
+          "ourN": 10,
+          "density": 0.38461538461538464,
+          "recall": 0,
+          "precision": 0,
+          "own2Recall": 0.15384615384615385
+        }
+      ]
+    },
+    "minimalTrigger": {
+      "edgeMode": "outer",
+      "candleDir": false,
+      "armReset": false,
+      "relVolMin": 0,
+      "spacing": 10,
+      "filters": 0,
+      "vendorN": 341,
+      "ourN": 294,
+      "recall": 0.002932551319648094,
+      "precision": 0.0034013605442176865,
+      "density": 0.8621700879765396
+    },
+    "beatsOwn2": false,
+    "vendorDensityAchievable": true,
+    "gridSize": 72,
+    "all": [
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 1,
+        "filters": 0,
+        "vendorN": 341,
+        "ourN": 8586,
+        "recall": 0.20234604105571846,
+        "precision": 0.012928022361984625,
+        "density": 25.178885630498534
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 3,
+        "filters": 0,
+        "vendorN": 341,
+        "ourN": 3393,
+        "recall": 0.13196480938416422,
+        "precision": 0.013262599469496022,
+        "density": 9.950146627565982
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 0,
+        "vendorN": 341,
+        "ourN": 1469,
+        "recall": 0.02932551319648094,
+        "precision": 0.0068073519400953025,
+        "density": 4.30791788856305
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 1,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 4053,
+        "recall": 0.15542521994134897,
+        "precision": 0.017024426350851222,
+        "density": 11.885630498533724
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 2155,
+        "recall": 0.09090909090909091,
+        "precision": 0.014385150812064965,
+        "density": 6.319648093841642
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 1215,
+        "recall": 0.02932551319648094,
+        "precision": 0.00823045267489712,
+        "density": 3.563049853372434
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 1,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 2806,
+        "recall": 0.12023460410557185,
+        "precision": 0.018175338560228082,
+        "density": 8.228739002932551
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 1685,
+        "recall": 0.07917888563049853,
+        "precision": 0.016023738872403562,
+        "density": 4.941348973607038
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 1090,
+        "recall": 0.03519061583577713,
+        "precision": 0.011009174311926606,
+        "density": 3.196480938416422
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 1,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 563,
+        "recall": 0.008797653958944282,
+        "precision": 0.0053285968028419185,
+        "density": 1.651026392961877
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 563,
+        "recall": 0.008797653958944282,
+        "precision": 0.0053285968028419185,
+        "density": 1.651026392961877
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 563,
+        "recall": 0.008797653958944282,
+        "precision": 0.0053285968028419185,
+        "density": 1.651026392961877
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 563,
+        "recall": 0.011730205278592375,
+        "precision": 0.007104795737122558,
+        "density": 1.651026392961877
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 563,
+        "recall": 0.011730205278592375,
+        "precision": 0.007104795737122558,
+        "density": 1.651026392961877
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 563,
+        "recall": 0.011730205278592375,
+        "precision": 0.007104795737122558,
+        "density": 1.651026392961877
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 562,
+        "recall": 0.017595307917888565,
+        "precision": 0.010676156583629894,
+        "density": 1.6480938416422288
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 562,
+        "recall": 0.017595307917888565,
+        "precision": 0.010676156583629894,
+        "density": 1.6480938416422288
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 562,
+        "recall": 0.017595307917888565,
+        "precision": 0.010676156583629894,
+        "density": 1.6480938416422288
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 1,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 3665,
+        "recall": 0.17888563049853373,
+        "precision": 0.020736698499317873,
+        "density": 10.747800586510264
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 2200,
+        "recall": 0.13196480938416422,
+        "precision": 0.020454545454545454,
+        "density": 6.451612903225806
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 1131,
+        "recall": 0.08211143695014662,
+        "precision": 0.02475685234305924,
+        "density": 3.3167155425219943
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 1438,
+        "recall": 0.1348973607038123,
+        "precision": 0.034075104311543813,
+        "density": 4.217008797653959
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 1117,
+        "recall": 0.11436950146627566,
+        "precision": 0.03491495076096687,
+        "density": 3.275659824046921
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 779,
+        "recall": 0.08211143695014662,
+        "precision": 0.03594351732991014,
+        "density": 2.2844574780058653
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 810,
+        "recall": 0.093841642228739,
+        "precision": 0.040740740740740744,
+        "density": 2.375366568914956
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 697,
+        "recall": 0.08504398826979472,
+        "precision": 0.04160688665710186,
+        "density": 2.0439882697947214
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 565,
+        "recall": 0.06744868035190615,
+        "precision": 0.04070796460176991,
+        "density": 1.656891495601173
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 563,
+        "recall": 0.10263929618768329,
+        "precision": 0.06216696269982238,
+        "density": 1.651026392961877
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 563,
+        "recall": 0.10263929618768329,
+        "precision": 0.06216696269982238,
+        "density": 1.651026392961877
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 563,
+        "recall": 0.10263929618768329,
+        "precision": 0.06216696269982238,
+        "density": 1.651026392961877
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 1,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 562,
+        "recall": 0.12609970674486803,
+        "precision": 0.07651245551601424,
+        "density": 1.6480938416422288
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 562,
+        "recall": 0.12609970674486803,
+        "precision": 0.07651245551601424,
+        "density": 1.6480938416422288
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 10,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 562,
+        "recall": 0.12609970674486803,
+        "precision": 0.07651245551601424,
+        "density": 1.6480938416422288
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 1,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 550,
+        "recall": 0.11436950146627566,
+        "precision": 0.07090909090909091,
+        "density": 1.6129032258064515
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 3,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 550,
+        "recall": 0.11436950146627566,
+        "precision": 0.07090909090909091,
+        "density": 1.6129032258064515
+      },
+      {
+        "edgeMode": "inner",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 10,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 550,
+        "recall": 0.11436950146627566,
+        "precision": 0.07090909090909091,
+        "density": 1.6129032258064515
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 1,
+        "filters": 0,
+        "vendorN": 341,
+        "ourN": 1562,
+        "recall": 0.002932551319648094,
+        "precision": 0.0006402048655569782,
+        "density": 4.580645161290323
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 3,
+        "filters": 0,
+        "vendorN": 341,
+        "ourN": 637,
+        "recall": 0.002932551319648094,
+        "precision": 0.0015698587127158557,
+        "density": 1.8680351906158357
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 0,
+        "vendorN": 341,
+        "ourN": 294,
+        "recall": 0.002932551319648094,
+        "precision": 0.0034013605442176865,
+        "density": 0.8621700879765396
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 1,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 810,
+        "recall": 0.002932551319648094,
+        "precision": 0.0012345679012345679,
+        "density": 2.375366568914956
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 430,
+        "recall": 0.002932551319648094,
+        "precision": 0.002325581395348837,
+        "density": 1.2609970674486803
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 251,
+        "recall": 0.002932551319648094,
+        "precision": 0.00398406374501992,
+        "density": 0.7360703812316716
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 1,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 611,
+        "recall": 0.002932551319648094,
+        "precision": 0.0016366612111292963,
+        "density": 1.7917888563049853
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 357,
+        "recall": 0.002932551319648094,
+        "precision": 0.0028011204481792717,
+        "density": 1.0469208211143695
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 239,
+        "recall": 0.002932551319648094,
+        "precision": 0.0041841004184100415,
+        "density": 0.7008797653958945
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 1,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": false,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 1,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 621,
+        "recall": 0,
+        "precision": 0,
+        "density": 1.8211143695014662
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 3,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 380,
+        "recall": 0,
+        "precision": 0,
+        "density": 1.1143695014662756
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 1,
+        "vendorN": 341,
+        "ourN": 218,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.6392961876832844
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 262,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.7683284457478006
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 209,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.6129032258064516
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 158,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.4633431085043988
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 162,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.4750733137829912
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 137,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.40175953079178883
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": false,
+        "relVolMin": 1.4,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 121,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.3548387096774194
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 1,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 3,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 0,
+        "spacing": 10,
+        "filters": 2,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 1,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 3,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1,
+        "spacing": 10,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0.002932551319648094,
+        "precision": 0.006493506493506494,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 1,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 3,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.45161290322580644
+      },
+      {
+        "edgeMode": "outer",
+        "candleDir": true,
+        "armReset": true,
+        "relVolMin": 1.4,
+        "spacing": 10,
+        "filters": 3,
+        "vendorN": 341,
+        "ourN": 154,
+        "recall": 0,
+        "precision": 0,
+        "density": 0.45161290322580644
+      }
+    ]
+  },
+  "block3_geoSweep": {
+    "canon": {
+      "cfg": {
+        "devLookback": 122,
+        "devSigma": 4,
+        "widthScale": 1,
+        "distMult": 0.8
+      },
+      "activationDensity": 0.7486875863430037,
+      "zoneCoverage": 0.9970149253731343
+    },
+    "densityBudget": 1.1230313795145055,
+    "top15": [
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.745898296164726,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.746043023485297,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7462272218932965,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7482928754687191,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7486875863430037,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7486875863430037,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7505164133938557,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7506216696269983,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7506479836852838,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7525820669692783,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.752753108348135,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7527794224064206,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7756200249983554,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7757779093480692,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7758173804354976,
+        "zoneCoverage": 0.9970149253731343
+      }
+    ],
+    "constrainedBest": {
+      "cfg": {
+        "devLookback": 160,
+        "devSigma": 4,
+        "widthScale": 1,
+        "distMult": 0.8
+      },
+      "activationDensity": 0.745898296164726,
+      "zoneCoverage": 0.9970149253731343
+    },
+    "gridSize": 108,
+    "all": [
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8198276429182291,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8127096901519637,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.8012893888559963,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8153147819222419,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8012893888559963,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7792645220709163,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8093283336622591,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7854088546806132,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7525820669692783,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8198276429182291,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8126439050062496,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.8012630747977106,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8153937240970989,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8012630747977106,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7794750345372015,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.809262548516545,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7852378133017565,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.752753108348135,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8198407999473719,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8124465495691073,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.8013025458851392,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8153016248930991,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8013025458851392,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7795013485954871,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8093283336622591,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7852378133017565,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 60,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7527794224064206,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8198802710348003,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8119860535491086,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.8003420827577133,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8150384843102427,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8003420827577133,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7783172159726334,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8087099532925466,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7841589369120453,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7505164133938557,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8198802710348003,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8119860535491086,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.8002236694954279,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8150384843102427,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8002236694954279,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7780409183606342,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8088283665548319,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.784172093941188,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7506479836852838,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.819906585093086,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8119728965199657,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.8003026116702848,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8149858561936715,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8003026116702848,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7780014472732057,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8087888954674035,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7841194658246168,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 90,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7506216696269983,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8197223866850865,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8119071113742516,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7996973883297152,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8148411288731005,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7996973883297152,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7767646865337807,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8081310440102625,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.783080060522334,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7482928754687191,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8197487007433721,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8118676402868232,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7996184461548582,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8148279718439576,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7996184461548582,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7768699427669232,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8082363002434051,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7829484902309058,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7486875863430037,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8197487007433721,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8117886981119663,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.79948687586343,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.814735872639958,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.79948687586343,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7769488849417802,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8081705150976909,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7830669034931912,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 122,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7486875863430037,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8195645023353727,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8115781856456812,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7988027103480034,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8147095585816723,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7988027103480034,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7758173804354976,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.807881060456549,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7822774817446221,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 3,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7462272218932965,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8195513453062299,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8116044997039669,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7987763962897177,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8147621866982435,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7987763962897177,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7757779093480692,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8076442339319782,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7822643247154792,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 4,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.745898296164726,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.819538188277087,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.8114203012959673,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 0.6,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7986974541148608,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8147490296691007,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7986974541148608,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 0.8,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.7756200249983554,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.4
+        },
+        "activationDensity": 0.8076047628445497,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.6
+        },
+        "activationDensity": 0.7818038286954806,
+        "zoneCoverage": 0.9970149253731343
+      },
+      {
+        "cfg": {
+          "devLookback": 160,
+          "devSigma": 5,
+          "widthScale": 1,
+          "distMult": 0.8
+        },
+        "activationDensity": 0.746043023485297,
+        "zoneCoverage": 0.9970149253731343
+      }
+    ]
+  },
+  "verdict": {
+    "lagSaturates": false,
+    "lagRecall": {
+      "pm0": 0.020527859237536656,
+      "pm3": 0.2873900293255132,
+      "pm8": 0.3812316715542522,
+      "gain0to3": 0.2668621700879766,
+      "gain3to8": 0.09384164222873898
+    },
+    "geoHelps": false,
+    "canonZoneCoverage": 0.9970149253731343,
+    "bestZoneCoverage": 0.9970149253731343
+  }
+}

@@ -1,0 +1,450 @@
+{
+  "generatedAt": "2026-08-17T13:52:45.797Z",
+  "protocol": "E5-ldo-spot-reproduce-1.0 (canonical ArrowTradeReplay, OWN2 relVol1.4, mode=safe, feed=Binance SPOT archives)",
+  "note": "ДИАГНОСТИКА объекта, gross-of-placebo, БЕЗ OOS. Фид = Binance spot (как у вендора). net 7bps внутри движка.",
+  "symbol": "LDO/USDT",
+  "tf": "15m",
+  "relVol": 1.4,
+  "vendor": {
+    "long": {
+      "trades": 41,
+      "wr": 58.5,
+      "take": 24,
+      "stop": 17,
+      "resultPct": 7.96,
+      "avgStopPct": -1.9,
+      "resultR": 4.2
+    },
+    "short": {
+      "trades": 48,
+      "wr": 66.7,
+      "take": 32,
+      "stop": 16,
+      "resultPct": 20.37,
+      "avgStopPct": -1.82,
+      "resultR": 11.17
+    },
+    "total": {
+      "trades": 89,
+      "wr": 62.9,
+      "take": 56,
+      "stop": 33,
+      "resultPct": 28.32,
+      "avgStopPct": -1.86,
+      "resultR": 15.25
+    }
+  },
+  "arms": [
+    {
+      "name": "BASE (канон Safe: partial25%+moving, add, stop2x)",
+      "override": {}
+    },
+    {
+      "name": "MEANFIX -add (fix100%@mean, no add, stop2x)",
+      "override": {
+        "fullFixAtMean": true,
+        "addEnabled": false
+      }
+    },
+    {
+      "name": "MEANFIX -add stop1x (короче, НЕ канон — арм с WR≈62%)",
+      "override": {
+        "fullFixAtMean": true,
+        "addEnabled": false,
+        "stopSteps": 1
+      }
+    }
+  ],
+  "sections": [
+    {
+      "label": "SPOT last-40000 (~40k гипотеза)",
+      "candles": 40000,
+      "from": "2025-06-26",
+      "to": "2026-08-16",
+      "days": 416.65625,
+      "own2": 717,
+      "arms": [
+        {
+          "arm": "BASE (канон Safe: partial25%+moving, add, stop2x)",
+          "addEnabled": true,
+          "total": {
+            "trades": 168,
+            "take": 95,
+            "partial": 42,
+            "stop": 31,
+            "timeout": 0,
+            "open": 1,
+            "wr": 0.8154761904761905,
+            "resultR": -21.35033169628423,
+            "resultPct": -193.39667464120265,
+            "avgStopPct": -11.59331686019476
+          },
+          "long": {
+            "trades": 75,
+            "take": 43,
+            "partial": 20,
+            "stop": 12,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.84,
+            "resultR": -10.498837255719758,
+            "resultPct": -79.62287767168424,
+            "avgStopPct": -12.378119172660213
+          },
+          "short": {
+            "trades": 93,
+            "take": 52,
+            "partial": 22,
+            "stop": 19,
+            "timeout": 0,
+            "open": 1,
+            "wr": 0.7956989247311828,
+            "resultR": -10.851494440564485,
+            "resultPct": -113.77379696951826,
+            "avgStopPct": -11.097652241795533
+          }
+        },
+        {
+          "arm": "MEANFIX -add (fix100%@mean, no add, stop2x)",
+          "addEnabled": false,
+          "total": {
+            "trades": 268,
+            "take": 213,
+            "partial": 0,
+            "stop": 55,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.7947761194029851,
+            "resultR": -12.009932423114883,
+            "resultPct": -78.0304521066395,
+            "avgStopPct": -7.616401870586907
+          },
+          "long": {
+            "trades": 124,
+            "take": 95,
+            "partial": 0,
+            "stop": 29,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.7661290322580645,
+            "resultR": -11.606067963589952,
+            "resultPct": -69.98147012328084,
+            "avgStopPct": -7.75753240262925
+          },
+          "short": {
+            "trades": 144,
+            "take": 118,
+            "partial": 0,
+            "stop": 26,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.8194444444444444,
+            "resultR": -0.40386445952492617,
+            "resultPct": -8.048981983358694,
+            "avgStopPct": -7.458987046385835
+          }
+        },
+        {
+          "arm": "MEANFIX -add stop1x (короче, НЕ канон — арм с WR≈62%)",
+          "addEnabled": false,
+          "total": {
+            "trades": 332,
+            "take": 217,
+            "partial": 0,
+            "stop": 115,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.6536144578313253,
+            "resultR": -22.605683323369643,
+            "resultPct": -64.11978275691453,
+            "avgStopPct": -3.877252144396743
+          },
+          "long": {
+            "trades": 156,
+            "take": 99,
+            "partial": 0,
+            "stop": 57,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.6346153846153846,
+            "resultR": -18.42554475457606,
+            "resultPct": -53.03700581518392,
+            "avgStopPct": -3.974185506163084
+          },
+          "short": {
+            "trades": 176,
+            "take": 118,
+            "partial": 0,
+            "stop": 58,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.6704545454545454,
+            "resultR": -4.180138568793596,
+            "resultPct": -11.082776941730646,
+            "avgStopPct": -3.781990047488438
+          }
+        }
+      ]
+    },
+    {
+      "label": "SPOT last-20000 (~20k, окно как у baseline)",
+      "candles": 20000,
+      "from": "2026-01-20",
+      "to": "2026-08-16",
+      "days": 208.32291666666666,
+      "own2": 369,
+      "arms": [
+        {
+          "arm": "BASE (канон Safe: partial25%+moving, add, stop2x)",
+          "addEnabled": true,
+          "total": {
+            "trades": 85,
+            "take": 46,
+            "partial": 22,
+            "stop": 17,
+            "timeout": 0,
+            "open": 1,
+            "wr": 0.8,
+            "resultR": -13.606465626920354,
+            "resultPct": -141.9283290376518,
+            "avgStopPct": -11.194619323158095
+          },
+          "long": {
+            "trades": 42,
+            "take": 23,
+            "partial": 11,
+            "stop": 8,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.8095238095238095,
+            "resultR": -8.271674724694167,
+            "resultPct": -86.92129676053816,
+            "avgStopPct": -12.189834440821537
+          },
+          "short": {
+            "trades": 43,
+            "take": 23,
+            "partial": 11,
+            "stop": 9,
+            "timeout": 0,
+            "open": 1,
+            "wr": 0.7906976744186046,
+            "resultR": -5.334790902226182,
+            "resultPct": -55.007032277113616,
+            "avgStopPct": -10.30998366301281
+          }
+        },
+        {
+          "arm": "MEANFIX -add (fix100%@mean, no add, stop2x)",
+          "addEnabled": false,
+          "total": {
+            "trades": 136,
+            "take": 105,
+            "partial": 0,
+            "stop": 31,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.7720588235294118,
+            "resultR": -9.10776442493636,
+            "resultPct": -60.128810698836695,
+            "avgStopPct": -7.1777589557579216
+          },
+          "long": {
+            "trades": 64,
+            "take": 46,
+            "partial": 0,
+            "stop": 18,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.71875,
+            "resultR": -9.545812233089034,
+            "resultPct": -67.07554273098421,
+            "avgStopPct": -7.461129667094592
+          },
+          "short": {
+            "trades": 72,
+            "take": 59,
+            "partial": 0,
+            "stop": 13,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.8194444444444444,
+            "resultR": 0.4380478081526767,
+            "resultPct": 6.946732032147484,
+            "avgStopPct": -6.7853995092917625
+          }
+        },
+        {
+          "arm": "MEANFIX -add stop1x (короче, НЕ канон — арм с WR≈62%)",
+          "addEnabled": false,
+          "total": {
+            "trades": 168,
+            "take": 105,
+            "partial": 0,
+            "stop": 63,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.625,
+            "resultR": -16.937318779840595,
+            "resultPct": -48.41475335560343,
+            "avgStopPct": -3.581660546777975
+          },
+          "long": {
+            "trades": 81,
+            "take": 49,
+            "partial": 0,
+            "stop": 32,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.6049382716049383,
+            "resultR": -12.484093194525679,
+            "resultPct": -36.14716204118609,
+            "avgStopPct": -3.649929414199725
+          },
+          "short": {
+            "trades": 87,
+            "take": 56,
+            "partial": 0,
+            "stop": 31,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.6436781609195402,
+            "resultR": -4.453225585314912,
+            "resultPct": -12.267591314417341,
+            "avgStopPct": -3.5111894578264957
+          }
+        }
+      ]
+    },
+    {
+      "label": "FUTURES 20000 (perp, референс baseline)",
+      "candles": 20000,
+      "from": "2026-01-21",
+      "to": "2026-08-17",
+      "days": 208.32291666666666,
+      "own2": 285,
+      "arms": [
+        {
+          "arm": "BASE (канон Safe: partial25%+moving, add, stop2x)",
+          "addEnabled": true,
+          "total": {
+            "trades": 71,
+            "take": 39,
+            "partial": 19,
+            "stop": 13,
+            "timeout": 0,
+            "open": 1,
+            "wr": 0.8169014084507042,
+            "resultR": -5.544265867643882,
+            "resultPct": -62.77951915157912,
+            "avgStopPct": -11.289985595218253
+          },
+          "long": {
+            "trades": 35,
+            "take": 19,
+            "partial": 10,
+            "stop": 6,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.8285714285714286,
+            "resultR": -4.661405099234083,
+            "resultPct": -61.633199516292365,
+            "avgStopPct": -11.98478010965276
+          },
+          "short": {
+            "trades": 36,
+            "take": 20,
+            "partial": 9,
+            "stop": 7,
+            "timeout": 0,
+            "open": 1,
+            "wr": 0.8055555555555556,
+            "resultR": -0.8828607684097992,
+            "resultPct": -1.146319635286746,
+            "avgStopPct": -10.694447439988679
+          }
+        },
+        {
+          "arm": "MEANFIX -add (fix100%@mean, no add, stop2x)",
+          "addEnabled": false,
+          "total": {
+            "trades": 112,
+            "take": 87,
+            "partial": 0,
+            "stop": 25,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.7767857142857143,
+            "resultR": -6.1566360400263145,
+            "resultPct": -37.02206867848082,
+            "avgStopPct": -7.362607126619009
+          },
+          "long": {
+            "trades": 52,
+            "take": 39,
+            "partial": 0,
+            "stop": 13,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.75,
+            "resultR": -6.0191557590125875,
+            "resultPct": -37.86670651107936,
+            "avgStopPct": -7.398923141130439
+          },
+          "short": {
+            "trades": 60,
+            "take": 48,
+            "partial": 0,
+            "stop": 12,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.8,
+            "resultR": -0.137480281013726,
+            "resultPct": 0.8446378325985364,
+            "avgStopPct": -7.323264777564962
+          }
+        },
+        {
+          "arm": "MEANFIX -add stop1x (короче, НЕ канон — арм с WR≈62%)",
+          "addEnabled": false,
+          "total": {
+            "trades": 145,
+            "take": 90,
+            "partial": 0,
+            "stop": 55,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.6206896551724138,
+            "resultR": -11.890202904962612,
+            "resultPct": -42.85548343396335,
+            "avgStopPct": -3.861725791224996
+          },
+          "long": {
+            "trades": 70,
+            "take": 42,
+            "partial": 0,
+            "stop": 28,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.6,
+            "resultR": -10.079725586718357,
+            "resultPct": -33.5704509232643,
+            "avgStopPct": -3.9271213365241064
+          },
+          "short": {
+            "trades": 75,
+            "take": 48,
+            "partial": 0,
+            "stop": 27,
+            "timeout": 0,
+            "open": 0,
+            "wr": 0.64,
+            "resultR": -1.810477318244252,
+            "resultPct": -9.285032510699034,
+            "avgStopPct": -3.7939081886925834
+          }
+        }
+      ]
+    }
+  ]
+}

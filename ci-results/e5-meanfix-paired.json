@@ -1,0 +1,395 @@
+{
+  "generatedAt": "2026-08-17T12:46:34.098Z",
+  "protocol": "E5-meanfix-paired-1.0 (fork of E3-placebo-net)",
+  "leg": "pd_premium (D3, relVol 1.4, premium-4h)",
+  "config": {
+    "seed": 20260807,
+    "kPlacebo": 20,
+    "placeboWindowDays": 30,
+    "bootstrapSamples": 2000,
+    "cost": "7bps/side",
+    "base": {
+      "partialFrac": 0.25,
+      "breakeven": false,
+      "stopMult": 12,
+      "addOn": false,
+      "fullFixAtMean": false
+    },
+    "meanfix": {
+      "partialFrac": 1,
+      "breakeven": false,
+      "stopMult": 12,
+      "addOn": false,
+      "fullFixAtMean": true
+    },
+    "killCriteria": {
+      "excessMin": 0.05,
+      "pMax": 0.0167,
+      "oosExcessMin": 0
+    },
+    "inSample": [
+      "BTC",
+      "ETH",
+      "SOL",
+      "XRP",
+      "BNB",
+      "DOGE"
+    ],
+    "oos": [
+      "1000PEPE",
+      "AAVE",
+      "ARB",
+      "ENA",
+      "OP",
+      "SUI"
+    ],
+    "ltfMinutes": [
+      5,
+      15,
+      30,
+      60
+    ]
+  },
+  "tfResults": [
+    {
+      "tfMinutes": 5,
+      "tfName": "5m",
+      "inAssets": [
+        "BTC",
+        "ETH",
+        "SOL",
+        "XRP",
+        "BNB",
+        "DOGE"
+      ],
+      "oosAssets": [
+        "1000PEPE",
+        "AAVE",
+        "ARB",
+        "ENA",
+        "OP",
+        "SUI"
+      ],
+      "timestop": 117,
+      "arms": [
+        {
+          "arm": "BASE",
+          "inSample": {
+            "n": 204,
+            "endMarkRate": 0.49019607843137253,
+            "sumNetR": -8.492530499280758,
+            "sumNetPct": -12.260390697342359,
+            "meanNetR": -0.041630051467062536,
+            "meanExcess": 0.06857754005260129,
+            "pValue": 0.1215,
+            "clusters": 135,
+            "shortShare": 0.75
+          },
+          "oos": {
+            "n": 174,
+            "endMarkRate": 0.6666666666666666,
+            "sumNetR": -0.007883023668777023,
+            "sumNetPct": 7.480780772681587,
+            "meanNetR": -0.000045304733728603576,
+            "meanExcess": 0.07493748246055146,
+            "pValue": 0.05,
+            "clusters": 134,
+            "shortShare": 0.764367816091954
+          },
+          "kill": {
+            "killed": true,
+            "reasons": [
+              "bootstrap p 0.1215 > 0.0167"
+            ]
+          }
+        },
+        {
+          "arm": "MEANFIX",
+          "inSample": {
+            "n": 204,
+            "endMarkRate": 0.00980392156862745,
+            "sumNetR": -22.734570383579804,
+            "sumNetPct": -34.03999024422004,
+            "meanNetR": -0.11144397246852845,
+            "meanExcess": 0.06865464460069079,
+            "pValue": 0.0515,
+            "clusters": 135,
+            "shortShare": 0.75
+          },
+          "oos": {
+            "n": 174,
+            "endMarkRate": 0.011494252873563218,
+            "sumNetR": -2.4038490205670557,
+            "sumNetPct": 0.6292137959635111,
+            "meanNetR": -0.013815224256132505,
+            "meanExcess": 0.11913376457744332,
+            "pValue": 0,
+            "clusters": 134,
+            "shortShare": 0.764367816091954
+          },
+          "kill": {
+            "killed": true,
+            "reasons": [
+              "bootstrap p 0.0515 > 0.0167"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tfMinutes": 15,
+      "tfName": "15m",
+      "inAssets": [
+        "BTC",
+        "ETH",
+        "SOL",
+        "XRP",
+        "BNB",
+        "DOGE"
+      ],
+      "oosAssets": [
+        "1000PEPE",
+        "ARB",
+        "OP",
+        "SUI"
+      ],
+      "timestop": 156,
+      "arms": [
+        {
+          "arm": "BASE",
+          "inSample": {
+            "n": 204,
+            "endMarkRate": 0.5098039215686274,
+            "sumNetR": -6.9434530854415755,
+            "sumNetPct": -23.03229019668184,
+            "meanNetR": -0.034036534732556745,
+            "meanExcess": 0.0431883315830128,
+            "pValue": 0.2065,
+            "clusters": 138,
+            "shortShare": 0.9411764705882353
+          },
+          "oos": {
+            "n": 118,
+            "endMarkRate": 0.4661016949152542,
+            "sumNetR": -4.990881185917916,
+            "sumNetPct": -42.1515415951241,
+            "meanNetR": -0.04229560327049081,
+            "meanExcess": -0.0183825860637408,
+            "pValue": 0.61,
+            "clusters": 88,
+            "shortShare": 0.9576271186440678
+          },
+          "kill": {
+            "killed": true,
+            "reasons": [
+              "in-sample excess 0.0432R < +0.05R",
+              "bootstrap p 0.2065 > 0.0167",
+              "OOS excess -0.0184R < 0"
+            ]
+          }
+        },
+        {
+          "arm": "MEANFIX",
+          "inSample": {
+            "n": 204,
+            "endMarkRate": 0,
+            "sumNetR": -2.3881258132944496,
+            "sumNetPct": -18.821426461971477,
+            "meanNetR": -0.011706499084776714,
+            "meanExcess": 0.1288650179138121,
+            "pValue": 0,
+            "clusters": 138,
+            "shortShare": 0.9411764705882353
+          },
+          "oos": {
+            "n": 118,
+            "endMarkRate": 0,
+            "sumNetR": -8.373013331824001,
+            "sumNetPct": -57.06884617392559,
+            "meanNetR": -0.0709577401002034,
+            "meanExcess": 0.05435116374938901,
+            "pValue": 0.1575,
+            "clusters": 88,
+            "shortShare": 0.9576271186440678
+          },
+          "kill": {
+            "killed": false,
+            "reasons": []
+          }
+        }
+      ]
+    },
+    {
+      "tfMinutes": 30,
+      "tfName": "30m",
+      "inAssets": [
+        "BTC",
+        "ETH",
+        "SOL",
+        "XRP",
+        "BNB",
+        "DOGE"
+      ],
+      "oosAssets": [
+        "1000PEPE",
+        "AAVE",
+        "ARB",
+        "ENA",
+        "OP",
+        "SUI"
+      ],
+      "timestop": 141,
+      "arms": [
+        {
+          "arm": "BASE",
+          "inSample": {
+            "n": 221,
+            "endMarkRate": 0.5067873303167421,
+            "sumNetR": -4.6441914065517125,
+            "sumNetPct": 9.481474310123177,
+            "meanNetR": -0.02101444075362766,
+            "meanExcess": 0.03744566001597351,
+            "pValue": 0.2405,
+            "clusters": 163,
+            "shortShare": 0.9909502262443439
+          },
+          "oos": {
+            "n": 213,
+            "endMarkRate": 0.48826291079812206,
+            "sumNetR": 8.916212413247989,
+            "sumNetPct": 181.18956878930138,
+            "meanNetR": 0.04186015217487318,
+            "meanExcess": 0.08342908714660721,
+            "pValue": 0.0495,
+            "clusters": 166,
+            "shortShare": 0.9859154929577465
+          },
+          "kill": {
+            "killed": true,
+            "reasons": [
+              "in-sample excess 0.0374R < +0.05R",
+              "bootstrap p 0.2405 > 0.0167"
+            ]
+          }
+        },
+        {
+          "arm": "MEANFIX",
+          "inSample": {
+            "n": 221,
+            "endMarkRate": 0,
+            "sumNetR": -12.28606617238511,
+            "sumNetPct": -64.23082882158552,
+            "meanNetR": -0.055593059603552535,
+            "meanExcess": 0.07750654933682757,
+            "pValue": 0.022,
+            "clusters": 163,
+            "shortShare": 0.9909502262443439
+          },
+          "oos": {
+            "n": 213,
+            "endMarkRate": 0.004694835680751174,
+            "sumNetR": -9.369093108801742,
+            "sumNetPct": -45.227956535558164,
+            "meanNetR": -0.043986352623482355,
+            "meanExcess": 0.08196326835585634,
+            "pValue": 0.0205,
+            "clusters": 166,
+            "shortShare": 0.9859154929577465
+          },
+          "kill": {
+            "killed": true,
+            "reasons": [
+              "bootstrap p 0.0220 > 0.0167"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tfMinutes": 60,
+      "tfName": "1h",
+      "inAssets": [
+        "BTC",
+        "ETH",
+        "SOL",
+        "XRP",
+        "BNB",
+        "DOGE"
+      ],
+      "oosAssets": [
+        "1000PEPE",
+        "AAVE",
+        "ARB",
+        "ENA",
+        "OP",
+        "SUI"
+      ],
+      "timestop": 147,
+      "arms": [
+        {
+          "arm": "BASE",
+          "inSample": {
+            "n": 225,
+            "endMarkRate": 0.5066666666666667,
+            "sumNetR": -9.08499955203079,
+            "sumNetPct": -115.26460374722252,
+            "meanNetR": -0.040377775786803516,
+            "meanExcess": 0.029255937273988106,
+            "pValue": 0.2545,
+            "clusters": 181,
+            "shortShare": 0.9911111111111112
+          },
+          "oos": {
+            "n": 203,
+            "endMarkRate": 0.5123152709359606,
+            "sumNetR": 4.329237654532481,
+            "sumNetPct": 45.000225357991184,
+            "meanNetR": 0.021326293864692022,
+            "meanExcess": 0.0783947300208003,
+            "pValue": 0.059,
+            "clusters": 168,
+            "shortShare": 0.9852216748768473
+          },
+          "kill": {
+            "killed": true,
+            "reasons": [
+              "in-sample excess 0.0293R < +0.05R",
+              "bootstrap p 0.2545 > 0.0167"
+            ]
+          }
+        },
+        {
+          "arm": "MEANFIX",
+          "inSample": {
+            "n": 225,
+            "endMarkRate": 0,
+            "sumNetR": -11.840080405197705,
+            "sumNetPct": -155.89675917432066,
+            "meanNetR": -0.052622579578656466,
+            "meanExcess": 0.06718625330269667,
+            "pValue": 0.0185,
+            "clusters": 181,
+            "shortShare": 0.9911111111111112
+          },
+          "oos": {
+            "n": 203,
+            "endMarkRate": 0,
+            "sumNetR": -1.6524149078165793,
+            "sumNetPct": -30.433627273858207,
+            "meanNetR": -0.008139974915352607,
+            "meanExcess": 0.1105329266939051,
+            "pValue": 0,
+            "clusters": 168,
+            "shortShare": 0.9852216748768473
+          },
+          "kill": {
+            "killed": true,
+            "reasons": [
+              "bootstrap p 0.0185 > 0.0167"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

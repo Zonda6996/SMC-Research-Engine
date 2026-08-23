@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-08-17T14:35:55.095Z",
+  "relVol": 1.4,
+  "feed": "futures",
+  "tolBars": 1,
+  "source": "tg_topic_16293_scalp.json",
+  "results": [
+    {
+      "symbol": "VIRTUAL",
+      "tf": "5m",
+      "days": 64.65275462962963,
+      "vendorN": 94,
+      "ourN": 323,
+      "recallDir": 0.18085106382978725,
+      "recallTime": 0.18085106382978725,
+      "precision": 0.058823529411764705,
+      "dirAgree": 1
+    },
+    {
+      "symbol": "BNB",
+      "tf": "5m",
+      "days": 66.8333912037037,
+      "vendorN": 89,
+      "ourN": 323,
+      "recallDir": 0.23595505617977527,
+      "recallTime": 0.23595505617977527,
+      "precision": 0.07739938080495357,
+      "dirAgree": 1
+    },
+    {
+      "symbol": "ETH",
+      "tf": "5m",
+      "days": 67.13195601851852,
+      "vendorN": 71,
+      "ourN": 311,
+      "recallDir": 0.23943661971830985,
+      "recallTime": 0.23943661971830985,
+      "precision": 0.05787781350482315,
+      "dirAgree": 1
+    },
+    {
+      "symbol": "OP",
+      "tf": "15m",
+      "days": 61.75008101851852,
+      "vendorN": 34,
+      "ourN": 45,
+      "recallDir": 0.08823529411764706,
+      "recallTime": 0.08823529411764706,
+      "precision": 0.06666666666666667,
+      "dirAgree": 1
+    },
+    {
+      "symbol": "CRV",
+      "tf": "15m",
+      "days": 59.65657407407407,
+      "vendorN": 27,
+      "ourN": 66,
+      "recallDir": 0.07407407407407407,
+      "recallTime": 0.07407407407407407,
+      "precision": 0.030303030303030304,
+      "dirAgree": 1
+    },
+    {
+      "symbol": "ONDO",
+      "tf": "15m",
+      "days": 63.67710648148148,
+      "vendorN": 26,
+      "ourN": 70,
+      "recallDir": 0.15384615384615385,
+      "recallTime": 0.15384615384615385,
+      "precision": 0.05714285714285714,
+      "dirAgree": 1
+    }
+  ]
+}

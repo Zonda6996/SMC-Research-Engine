@@ -1,0 +1,271 @@
+{
+  "generatedAt": "2026-08-17T14:22:48.046Z",
+  "symbol": "AVAX/USDT",
+  "tf": "5m",
+  "vendor": {
+    "A": {
+      "label": "A «оптимальный» AvgStop −1.7%",
+      "total": {
+        "trades": 67,
+        "wr": 91,
+        "take": 61,
+        "stop": 6,
+        "resultPct": 23.24,
+        "resultR": 12.62
+      },
+      "long": {
+        "trades": 27,
+        "take": 25,
+        "stop": 2,
+        "resultR": 5.55
+      },
+      "short": {
+        "trades": 40,
+        "take": 36,
+        "stop": 4,
+        "resultR": 7.07
+      },
+      "avgStop": -1.7
+    },
+    "B": {
+      "label": "B «стоп короче» AvgStop −0.35%",
+      "total": {
+        "trades": 68,
+        "wr": 47.1,
+        "take": 32,
+        "stop": 36,
+        "resultPct": 10.73,
+        "resultR": 26.25
+      },
+      "long": {
+        "trades": 27,
+        "take": 14,
+        "stop": 13,
+        "resultR": 12.05
+      },
+      "short": {
+        "trades": 41,
+        "take": 18,
+        "stop": 23,
+        "resultR": 14.2
+      },
+      "avgStop": -0.35
+    }
+  },
+  "windows": [
+    {
+      "window": "~2 месяца",
+      "candles": 17280,
+      "own2": 296,
+      "canon": {
+        "sd": 1,
+        "ss": 2,
+        "total": {
+          "trades": 118,
+          "take": 89,
+          "stop": 29,
+          "timeout": 0,
+          "wr": 0.7542372881355932,
+          "resultR": -12.409459951765808,
+          "resultPct": -22.6064257947304,
+          "avgStopPct": -2.5023442319512155
+        },
+        "long": {
+          "trades": 62,
+          "take": 47,
+          "stop": 15,
+          "timeout": 0,
+          "wr": 0.7580645161290323,
+          "resultR": -5.911657370196741,
+          "resultPct": -12.720410478103789,
+          "avgStopPct": -2.588602294867118
+        },
+        "short": {
+          "trades": 56,
+          "take": 42,
+          "stop": 14,
+          "timeout": 0,
+          "wr": 0.75,
+          "resultR": -6.497802581569063,
+          "resultPct": -9.886015316626619,
+          "avgStopPct": -2.409924878827034
+        }
+      },
+      "matchA": {
+        "sd": 1.5,
+        "ss": 2,
+        "total": {
+          "trades": 136,
+          "take": 96,
+          "stop": 40,
+          "timeout": 0,
+          "wr": 0.7058823529411765,
+          "resultR": -10.208032046357816,
+          "resultPct": -12.011768070804845,
+          "avgStopPct": -1.7807854949623922
+        },
+        "long": {
+          "trades": 73,
+          "take": 51,
+          "stop": 22,
+          "timeout": 0,
+          "wr": 0.6986301369863014,
+          "resultR": -6.084042006141965,
+          "resultPct": -9.71859012490093,
+          "avgStopPct": -1.8509054677253183
+        },
+        "short": {
+          "trades": 63,
+          "take": 45,
+          "stop": 18,
+          "timeout": 0,
+          "wr": 0.7142857142857143,
+          "resultR": -4.12399004021585,
+          "resultPct": -2.2931779459039228,
+          "avgStopPct": -1.695083306029927
+        }
+      },
+      "matchB": {
+        "sd": 3,
+        "ss": 0.5,
+        "total": {
+          "trades": 203,
+          "take": 41,
+          "stop": 162,
+          "timeout": 0,
+          "wr": 0.2019704433497537,
+          "resultR": -128.87330529479937,
+          "resultPct": -21.267751474580933,
+          "avgStopPct": -0.34789247754953617
+        },
+        "long": {
+          "trades": 103,
+          "take": 19,
+          "stop": 84,
+          "timeout": 0,
+          "wr": 0.18446601941747573,
+          "resultR": -71.61166296259397,
+          "resultPct": -12.562932278513884,
+          "avgStopPct": -0.34429191674824705
+        },
+        "short": {
+          "trades": 100,
+          "take": 22,
+          "stop": 78,
+          "timeout": 0,
+          "wr": 0.22,
+          "resultR": -57.26164233220538,
+          "resultPct": -8.70481919606705,
+          "avgStopPct": -0.3517700045663095
+        }
+      }
+    },
+    {
+      "window": "~1 год",
+      "candles": 105120,
+      "own2": 1482,
+      "canon": {
+        "sd": 1,
+        "ss": 2,
+        "total": {
+          "trades": 631,
+          "take": 508,
+          "stop": 123,
+          "timeout": 0,
+          "wr": 0.8050713153724247,
+          "resultR": -30.095025268616794,
+          "resultPct": -73.55375050540441,
+          "avgStopPct": -3.2745241300525985
+        },
+        "long": {
+          "trades": 335,
+          "take": 270,
+          "stop": 65,
+          "timeout": 0,
+          "wr": 0.8059701492537313,
+          "resultR": -18.224985649844253,
+          "resultPct": -51.27576973915583,
+          "avgStopPct": -3.4334200239610464
+        },
+        "short": {
+          "trades": 296,
+          "take": 238,
+          "stop": 58,
+          "timeout": 0,
+          "wr": 0.8040540540540541,
+          "resultR": -11.870039618772543,
+          "resultPct": -22.27798076624852,
+          "avgStopPct": -3.096451145500021
+        }
+      },
+      "matchA": {
+        "sd": 1,
+        "ss": 1,
+        "total": {
+          "trades": 772,
+          "take": 511,
+          "stop": 261,
+          "timeout": 0,
+          "wr": 0.6619170984455959,
+          "resultR": -63.339290764542056,
+          "resultPct": -86.55089236478888,
+          "avgStopPct": -1.7795057783702668
+        },
+        "long": {
+          "trades": 408,
+          "take": 271,
+          "stop": 137,
+          "timeout": 0,
+          "wr": 0.6642156862745098,
+          "resultR": -36.01300043398876,
+          "resultPct": -54.08780355945501,
+          "avgStopPct": -1.854868948553117
+        },
+        "short": {
+          "trades": 364,
+          "take": 240,
+          "stop": 124,
+          "timeout": 0,
+          "wr": 0.6593406593406593,
+          "resultR": -27.32629033055329,
+          "resultPct": -32.46308880533375,
+          "avgStopPct": -1.696241630668248
+        }
+      },
+      "matchB": {
+        "sd": 4,
+        "ss": 0.5,
+        "total": {
+          "trades": 1089,
+          "take": 181,
+          "stop": 908,
+          "timeout": 0,
+          "wr": 0.16620752984389348,
+          "resultR": -735.8877464760841,
+          "resultPct": -134.91768595647835,
+          "avgStopPct": -0.34753485100907583
+        },
+        "long": {
+          "trades": 582,
+          "take": 90,
+          "stop": 492,
+          "timeout": 0,
+          "wr": 0.15463917525773196,
+          "resultR": -448.6172373245579,
+          "resultPct": -88.2170582017564,
+          "avgStopPct": -0.357233754716556
+        },
+        "short": {
+          "trades": 507,
+          "take": 91,
+          "stop": 416,
+          "timeout": 0,
+          "wr": 0.1794871794871795,
+          "resultR": -287.2705091515242,
+          "resultPct": -46.70062775472193,
+          "avgStopPct": -0.33606403220119013
+        }
+      }
+    }
+  ]
+}

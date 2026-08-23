@@ -1,0 +1,249 @@
+{
+  "generatedAt": "2026-08-17T12:04:42.133Z",
+  "protocol": "E3-placebo-net-1.0",
+  "config": {
+    "seed": 20260807,
+    "kPlacebo": 20,
+    "placeboWindowDays": 30,
+    "bootstrapSamples": 2000,
+    "clusterMs": 14400000,
+    "cost": "7bps/side; costR=turnover*0.0007/oneR; oneR=stopDistance",
+    "base": {
+      "partialFrac": 0.25,
+      "breakeven": false,
+      "stopMult": 12,
+      "addOn": false
+    },
+    "killCriteria": {
+      "excessMin": 0.05,
+      "pMax": 0.0167,
+      "oosExcessMin": 0
+    },
+    "zc5InSample": [
+      "BTC",
+      "ETH",
+      "SOL",
+      "XRP",
+      "BNB",
+      "DOGE"
+    ],
+    "oosSymbols": [
+      "1000PEPE",
+      "AAVE",
+      "ARB",
+      "ENA",
+      "OP",
+      "SUI"
+    ],
+    "pdTfMinutes": 60
+  },
+  "legs": [
+    {
+      "name": "ZC5 SELECTIVE",
+      "timestop": 113,
+      "inSample": {
+        "n": 53,
+        "endMarkRate": 0.5094339622641509,
+        "meanNetR": -0.042780624450356255,
+        "meanPlaceboR": -0.04749505227696764,
+        "meanExcess": 0.004714427826611398,
+        "pValue": 0.479,
+        "clusters": 48,
+        "shortShare": 0.8867924528301887
+      },
+      "oos": {
+        "n": 116,
+        "endMarkRate": 0.6293103448275862,
+        "meanNetR": -0.08688512007948598,
+        "meanPlaceboR": -0.06677556830089579,
+        "meanExcess": -0.020109551778590206,
+        "pValue": 0.6415,
+        "clusters": 111,
+        "shortShare": 0.8017241379310345
+      },
+      "verdict": "KILLED",
+      "killReasons": [
+        "mean excess 0.0047R < +0.05R (in-sample)",
+        "bootstrap p 0.4790 > 0.0167",
+        "OOS mean excess -0.0201R < 0"
+      ],
+      "perAsset": {
+        "BTC": {
+          "inSample": true,
+          "n": 6,
+          "meanNetR": -0.09552080473807316,
+          "meanExcess": -0.016982441279014205
+        },
+        "ETH": {
+          "inSample": true,
+          "n": 6,
+          "meanNetR": -0.025908640654522853,
+          "meanExcess": 0.04152563363908502
+        },
+        "SOL": {
+          "inSample": true,
+          "n": 6,
+          "meanNetR": 0.06739795182240223,
+          "meanExcess": 0.15127530887144827
+        },
+        "XRP": {
+          "inSample": true,
+          "n": 11,
+          "meanNetR": 0.0406324376647629,
+          "meanExcess": 0.13118064911318558
+        },
+        "BNB": {
+          "inSample": true,
+          "n": 11,
+          "meanNetR": 0.045270403371616655,
+          "meanExcess": 0.02259663172614942
+        },
+        "DOGE": {
+          "inSample": true,
+          "n": 13,
+          "meanNetR": -0.22216272198829953,
+          "meanExcess": -0.19204587860087655
+        },
+        "1000PEPE": {
+          "inSample": false,
+          "n": 13,
+          "meanNetR": 0.15851678691069354,
+          "meanExcess": 0.19650613270675107
+        },
+        "AAVE": {
+          "inSample": false,
+          "n": 14,
+          "meanNetR": -0.15550399566869255,
+          "meanExcess": -0.10590504539652525
+        },
+        "ARB": {
+          "inSample": false,
+          "n": 23,
+          "meanNetR": -0.24443579240397637,
+          "meanExcess": -0.14613309834346055
+        },
+        "ENA": {
+          "inSample": false,
+          "n": 28,
+          "meanNetR": -0.1076512476615346,
+          "meanExcess": -0.00709387280226897
+        },
+        "OP": {
+          "inSample": false,
+          "n": 20,
+          "meanNetR": -0.04280691737613833,
+          "meanExcess": -0.04564079501549009
+        },
+        "SUI": {
+          "inSample": false,
+          "n": 18,
+          "meanNetR": -0.02610776179780555,
+          "meanExcess": 0.05932713915111387
+        }
+      }
+    },
+    {
+      "name": "pd_premium (D3)",
+      "timestop": 147,
+      "inSample": {
+        "n": 225,
+        "endMarkRate": 0.5066666666666667,
+        "meanNetR": -0.040377775786803516,
+        "meanPlaceboR": -0.0745921860779324,
+        "meanExcess": 0.034214410291128865,
+        "pValue": 0.2235,
+        "clusters": 181,
+        "shortShare": 0.9911111111111112
+      },
+      "oos": {
+        "n": 203,
+        "endMarkRate": 0.5123152709359606,
+        "meanNetR": 0.021326293864692022,
+        "meanPlaceboR": -0.062024910456511054,
+        "meanExcess": 0.0833512043212031,
+        "pValue": 0.044,
+        "clusters": 168,
+        "shortShare": 0.9852216748768473
+      },
+      "verdict": "KILLED",
+      "killReasons": [
+        "mean excess 0.0342R < +0.05R (in-sample)",
+        "bootstrap p 0.2235 > 0.0167"
+      ],
+      "perAsset": {
+        "BTC": {
+          "inSample": true,
+          "n": 37,
+          "meanNetR": -0.015298125917666118,
+          "meanExcess": 0.06382795418749176
+        },
+        "ETH": {
+          "inSample": true,
+          "n": 38,
+          "meanNetR": 0.01824542615863854,
+          "meanExcess": 0.08768385358408334
+        },
+        "SOL": {
+          "inSample": true,
+          "n": 33,
+          "meanNetR": -0.08247125922753526,
+          "meanExcess": -0.009128857896420841
+        },
+        "XRP": {
+          "inSample": true,
+          "n": 41,
+          "meanNetR": -0.0689446702071797,
+          "meanExcess": 0.004075824950956074
+        },
+        "BNB": {
+          "inSample": true,
+          "n": 43,
+          "meanNetR": 0.019619137223233038,
+          "meanExcess": 0.10682152426924335
+        },
+        "DOGE": {
+          "inSample": true,
+          "n": 33,
+          "meanNetR": -0.13659499862731517,
+          "meanExcess": -0.07438062065494364
+        },
+        "1000PEPE": {
+          "inSample": false,
+          "n": 34,
+          "meanNetR": 0.00046256408094634305,
+          "meanExcess": 0.07002959112199848
+        },
+        "AAVE": {
+          "inSample": false,
+          "n": 40,
+          "meanNetR": -0.08785690954192038,
+          "meanExcess": 0.002880100534152788
+        },
+        "ARB": {
+          "inSample": false,
+          "n": 29,
+          "meanNetR": 0.09708371430666929,
+          "meanExcess": 0.1329447698895154
+        },
+        "ENA": {
+          "inSample": false,
+          "n": 33,
+          "meanNetR": 0.1278847109120565,
+          "meanExcess": 0.207978416521692
+        },
+        "OP": {
+          "inSample": false,
+          "n": 31,
+          "meanNetR": 0.0652154264177493,
+          "meanExcess": 0.083623410758078
+        },
+        "SUI": {
+          "inSample": false,
+          "n": 36,
+          "meanNetR": -0.034153181569010524,
+          "meanExcess": 0.030918682004943507
+        }
+      }
+    }
+  ]
+}
