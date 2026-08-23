@@ -1,0 +1,170 @@
+{
+  "studyId": "d6-partial",
+  "generatedAt": "2026-08-23T20:07:40.972Z",
+  "lineVerdict": "GO",
+  "bestArmFrozenRule": "among GO arms with breadth>=9/12 pick highest CI-lower",
+  "bestArm": {
+    "id": "C-H72",
+    "ciLow": 0.0037528034837020505
+  },
+  "preregistrationSha256": "8e2afcd6deeae676051279653db1852678e04c1cc7d472850c4c7f5122089d5b",
+  "manifestSha256": "ffbc2f36fa25b0ae903a55c105ad6a46f0f13c3102b243ab179fc843c067403c",
+  "eventsTotal": 118,
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "BNBUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "LTCUSDT",
+    "LINKUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "TRXUSDT"
+  ],
+  "mfeDiagnostics": {
+    "arm": "C-H72",
+    "n": 118,
+    "note": "доля сделок с максимальным благоприятным ходом (high от entryOpen) ≥ порога до выхода; диагностическая метрика",
+    "thresholds": [
+      {
+        "r": 1,
+        "count": 39,
+        "share": 0.3305084745762712
+      },
+      {
+        "r": 1.5,
+        "count": 28,
+        "share": 0.23728813559322035
+      },
+      {
+        "r": 2,
+        "count": 21,
+        "share": 0.17796610169491525
+      },
+      {
+        "r": 3,
+        "count": 16,
+        "share": 0.13559322033898305
+      }
+    ]
+  },
+  "arms": {
+    "C-H72": {
+      "n": 118,
+      "mean": 0.03111304715793684,
+      "total": 3.671339564636547,
+      "pf": 2.4545059375903726,
+      "wr": 0.576271186440678,
+      "maxDd": 0.5199511983743346,
+      "breadthPositiveSymbols": "10/12",
+      "outcomes": {
+        "stop": 39,
+        "timeout": 79
+      },
+      "ci95": {
+        "lower": 0.0037528034837020505,
+        "median": 0.031243439230513762,
+        "upper": 0.056002916025109824
+      },
+      "gatePower": true,
+      "verdict": "GO",
+      "grossMean": 0.032113047157936836,
+      "excludedNoHorizon": 0
+    },
+    "P1R": {
+      "n": 118,
+      "mean": 0.024731030062240617,
+      "total": 2.9182615473443927,
+      "pf": 2.1842388622370645,
+      "wr": 0.5847457627118644,
+      "maxDd": 0.5199511983743346,
+      "breadthPositiveSymbols": "10/12",
+      "outcomes": {
+        "stop": 36,
+        "timeout": 79,
+        "post-partial-stop": 3
+      },
+      "ci95": {
+        "lower": -0.0010573710628320777,
+        "median": 0.024716979236107762,
+        "upper": 0.047592102054576965
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.02573103006224062,
+      "excludedNoHorizon": 0
+    },
+    "P1R-BE": {
+      "n": 118,
+      "mean": 0.022308364157127853,
+      "total": 2.6323869705410865,
+      "pf": 2.06951815484012,
+      "wr": 0.6101694915254238,
+      "maxDd": 0.5199511983743346,
+      "breadthPositiveSymbols": "10/12",
+      "outcomes": {
+        "stop": 36,
+        "timeout": 69,
+        "be-stop": 13
+      },
+      "ci95": {
+        "lower": -0.0035409764305202695,
+        "median": 0.022238004725934245,
+        "upper": 0.04534739120645171
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.023308364157127857,
+      "excludedNoHorizon": 0
+    },
+    "P15R": {
+      "n": 118,
+      "mean": 0.026700859379760942,
+      "total": 3.150701406811791,
+      "pf": 2.2713617096114267,
+      "wr": 0.6016949152542372,
+      "maxDd": 0.5199511983743346,
+      "breadthPositiveSymbols": "10/12",
+      "outcomes": {
+        "stop": 37,
+        "timeout": 79,
+        "post-partial-stop": 2
+      },
+      "ci95": {
+        "lower": 0.00037425984914121963,
+        "median": 0.026736338777828786,
+        "upper": 0.05014746808337241
+      },
+      "gatePower": true,
+      "verdict": "GO",
+      "grossMean": 0.02770085937976094,
+      "excludedNoHorizon": 0
+    },
+    "P15R-BE": {
+      "n": 118,
+      "mean": 0.024492578347702854,
+      "total": 2.890124245028937,
+      "pf": 2.166214384265489,
+      "wr": 0.6016949152542372,
+      "maxDd": 0.5199511983743348,
+      "breadthPositiveSymbols": "10/12",
+      "outcomes": {
+        "stop": 37,
+        "timeout": 71,
+        "be-stop": 10
+      },
+      "ci95": {
+        "lower": -0.0019731384634569028,
+        "median": 0.024467724490929203,
+        "upper": 0.04804875144312552
+      },
+      "gatePower": true,
+      "verdict": "KILL",
+      "grossMean": 0.025492578347702854,
+      "excludedNoHorizon": 0
+    }
+  }
+}
