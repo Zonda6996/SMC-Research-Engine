@@ -1,0 +1,245 @@
+{
+  "studyId": "d6-census-multitf",
+  "generatedAt": "2026-08-23T22:40:57.291Z",
+  "note": "ДИАГНОСТИКА без вердиктов; окна пропорциональны (8 баров ТФ); пороги = утверждённые режимы; in-sample оговорка",
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "BNBUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "LTCUSDT",
+    "LINKUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "TRXUSDT"
+  ],
+  "tfs": [
+    "5m",
+    "15m",
+    "30m",
+    "1h",
+    "2h",
+    "4h"
+  ],
+  "modes": [
+    {
+      "id": "SAFE",
+      "oiDrop": -0.2,
+      "priceDrop": -0.05
+    },
+    {
+      "id": "STANDARD",
+      "oiDrop": -0.15,
+      "priceDrop": -0.05
+    },
+    {
+      "id": "RISK",
+      "oiDrop": -0.12,
+      "priceDrop": -0.05
+    }
+  ],
+  "holdHours": 72,
+  "results": [
+    {
+      "tf": "5m",
+      "mode": "SAFE",
+      "n": 1,
+      "symbolsWithEvents": 1,
+      "wr": 1,
+      "grossMean": 0.291951404707669,
+      "netMean": 0.290951404707669,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 1
+    },
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "n": 10,
+      "symbolsWithEvents": 7,
+      "wr": 0.7,
+      "grossMean": 0.13725149469693837,
+      "netMean": 0.13625149469693837,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 7
+    },
+    {
+      "tf": "5m",
+      "mode": "RISK",
+      "n": 30,
+      "symbolsWithEvents": 11,
+      "wr": 0.6,
+      "grossMean": 0.06450420081217292,
+      "netMean": 0.06350420081217291,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 18
+    },
+    {
+      "tf": "15m",
+      "mode": "SAFE",
+      "n": 15,
+      "symbolsWithEvents": 8,
+      "wr": 0.6666666666666666,
+      "grossMean": 0.06506324275895971,
+      "netMean": 0.06406324275895971,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 9
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "n": 36,
+      "symbolsWithEvents": 10,
+      "wr": 0.5833333333333334,
+      "grossMean": 0.0286383894194638,
+      "netMean": 0.027638389419463793,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 19
+    },
+    {
+      "tf": "15m",
+      "mode": "RISK",
+      "n": 74,
+      "symbolsWithEvents": 12,
+      "wr": 0.5540540540540541,
+      "grossMean": 0.025779229621419233,
+      "netMean": 0.024779229621419218,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 31
+    },
+    {
+      "tf": "30m",
+      "mode": "SAFE",
+      "n": 22,
+      "symbolsWithEvents": 10,
+      "wr": 0.5,
+      "grossMean": 0.02663604971933002,
+      "netMean": 0.02563604971933002,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 11
+    },
+    {
+      "tf": "30m",
+      "mode": "STANDARD",
+      "n": 66,
+      "symbolsWithEvents": 12,
+      "wr": 0.5909090909090909,
+      "grossMean": 0.03986771843401951,
+      "netMean": 0.03886771843401951,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 30
+    },
+    {
+      "tf": "30m",
+      "mode": "RISK",
+      "n": 116,
+      "symbolsWithEvents": 12,
+      "wr": 0.5258620689655172,
+      "grossMean": 0.027316755771766368,
+      "netMean": 0.026316755771766356,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 55
+    },
+    {
+      "tf": "1h",
+      "mode": "SAFE",
+      "n": 51,
+      "symbolsWithEvents": 12,
+      "wr": 0.7058823529411765,
+      "grossMean": 0.037797799502303275,
+      "netMean": 0.03679779950230328,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 24
+    },
+    {
+      "tf": "1h",
+      "mode": "STANDARD",
+      "n": 118,
+      "symbolsWithEvents": 12,
+      "wr": 0.576271186440678,
+      "grossMean": 0.03220056182560106,
+      "netMean": 0.031200561825601065,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 59
+    },
+    {
+      "tf": "1h",
+      "mode": "RISK",
+      "n": 185,
+      "symbolsWithEvents": 12,
+      "wr": 0.4972972972972973,
+      "grossMean": 0.026257909249437324,
+      "netMean": 0.025257909249437323,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 95
+    },
+    {
+      "tf": "2h",
+      "mode": "SAFE",
+      "n": 75,
+      "symbolsWithEvents": 12,
+      "wr": 0.56,
+      "grossMean": 0.029047557060806993,
+      "netMean": 0.02804755706080701,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 40
+    },
+    {
+      "tf": "2h",
+      "mode": "STANDARD",
+      "n": 145,
+      "symbolsWithEvents": 12,
+      "wr": 0.4896551724137931,
+      "grossMean": 0.015861066003311417,
+      "netMean": 0.014861066003311432,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 76
+    },
+    {
+      "tf": "2h",
+      "mode": "RISK",
+      "n": 233,
+      "symbolsWithEvents": 12,
+      "wr": 0.4248927038626609,
+      "grossMean": 0.011766860688275888,
+      "netMean": 0.010766860688275889,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 124
+    },
+    {
+      "tf": "4h",
+      "mode": "SAFE",
+      "n": 109,
+      "symbolsWithEvents": 12,
+      "wr": 0.5871559633027523,
+      "grossMean": 0.016472560340961048,
+      "netMean": 0.01547256034096105,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 65
+    },
+    {
+      "tf": "4h",
+      "mode": "STANDARD",
+      "n": 223,
+      "symbolsWithEvents": 12,
+      "wr": 0.5112107623318386,
+      "grossMean": 0.015794228076050205,
+      "netMean": 0.014794228076050197,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 120
+    },
+    {
+      "tf": "4h",
+      "mode": "RISK",
+      "n": 312,
+      "symbolsWithEvents": 12,
+      "wr": 0.46794871794871795,
+      "grossMean": 0.013057187088638962,
+      "netMean": 0.012057187088638965,
+      "excludedNoHorizon": 0,
+      "uniqueDays": 176
+    }
+  ]
+}
