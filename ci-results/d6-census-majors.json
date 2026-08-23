@@ -1,0 +1,329 @@
+{
+  "studyId": "d6-census-majors",
+  "generatedAt": "2026-08-23T18:31:59.033Z",
+  "note": "ДИАГНОСТИКА без вердиктов; выбор правила по карте = in-sample; подтверждение — временной OOS или вселенная Б",
+  "grid": {
+    "oiThr": [
+      -0.05,
+      -0.08,
+      -0.12,
+      -0.15,
+      -0.2
+    ],
+    "pxThr": [
+      -0.03,
+      -0.05
+    ],
+    "windowBars": 8,
+    "gapBars": 8,
+    "holdBars": 72,
+    "stop": "flushLow-0.5*ATR200, стоп первым",
+    "costs": "5bps/side + фактический funding"
+  },
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "BNBUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "LTCUSDT",
+    "LINKUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "TRXUSDT"
+  ],
+  "cells": [
+    {
+      "oiThr": -0.05,
+      "pxThr": -0.03,
+      "n": 1373,
+      "symbolsWithEvents": 12,
+      "wr": 0.2789512017479971,
+      "grossMean": 0.003953264562086495,
+      "netMean": 0.002953264562086492,
+      "outcomes": {
+        "stop": 929,
+        "timeout72": 444
+      },
+      "excludedNoHorizon": 2,
+      "perSymbol": {
+        "BTCUSDT": 116,
+        "ETHUSDT": 91,
+        "SOLUSDT": 169,
+        "XRPUSDT": 142,
+        "BNBUSDT": 50,
+        "DOGEUSDT": 210,
+        "ADAUSDT": 118,
+        "LTCUSDT": 112,
+        "LINKUSDT": 131,
+        "BCHUSDT": 103,
+        "DOTUSDT": 49,
+        "TRXUSDT": 82
+      },
+      "uniqueDays": 606
+    },
+    {
+      "oiThr": -0.05,
+      "pxThr": -0.05,
+      "n": 696,
+      "symbolsWithEvents": 12,
+      "wr": 0.33764367816091956,
+      "grossMean": 0.007673991946049159,
+      "netMean": 0.006673991946049158,
+      "outcomes": {
+        "stop": 420,
+        "timeout72": 276
+      },
+      "excludedNoHorizon": 2,
+      "perSymbol": {
+        "BTCUSDT": 49,
+        "ETHUSDT": 47,
+        "SOLUSDT": 91,
+        "XRPUSDT": 70,
+        "BNBUSDT": 25,
+        "DOGEUSDT": 109,
+        "ADAUSDT": 61,
+        "LTCUSDT": 63,
+        "LINKUSDT": 68,
+        "BCHUSDT": 43,
+        "DOTUSDT": 32,
+        "TRXUSDT": 38
+      },
+      "uniqueDays": 307
+    },
+    {
+      "oiThr": -0.08,
+      "pxThr": -0.03,
+      "n": 584,
+      "symbolsWithEvents": 12,
+      "wr": 0.3852739726027397,
+      "grossMean": 0.011495979758814584,
+      "netMean": 0.010495979758814562,
+      "outcomes": {
+        "stop": 323,
+        "timeout72": 261
+      },
+      "excludedNoHorizon": 1,
+      "perSymbol": {
+        "BTCUSDT": 55,
+        "ETHUSDT": 29,
+        "SOLUSDT": 68,
+        "XRPUSDT": 65,
+        "BNBUSDT": 22,
+        "DOGEUSDT": 97,
+        "ADAUSDT": 44,
+        "LTCUSDT": 47,
+        "LINKUSDT": 53,
+        "BCHUSDT": 37,
+        "DOTUSDT": 17,
+        "TRXUSDT": 50
+      },
+      "uniqueDays": 304
+    },
+    {
+      "oiThr": -0.08,
+      "pxThr": -0.05,
+      "n": 367,
+      "symbolsWithEvents": 12,
+      "wr": 0.4196185286103542,
+      "grossMean": 0.012646911490601041,
+      "netMean": 0.01164691149060104,
+      "outcomes": {
+        "stop": 187,
+        "timeout72": 180
+      },
+      "excludedNoHorizon": 1,
+      "perSymbol": {
+        "BTCUSDT": 31,
+        "ETHUSDT": 23,
+        "SOLUSDT": 45,
+        "XRPUSDT": 45,
+        "BNBUSDT": 11,
+        "DOGEUSDT": 63,
+        "ADAUSDT": 30,
+        "LTCUSDT": 31,
+        "LINKUSDT": 33,
+        "BCHUSDT": 17,
+        "DOTUSDT": 13,
+        "TRXUSDT": 25
+      },
+      "uniqueDays": 173
+    },
+    {
+      "oiThr": -0.12,
+      "pxThr": -0.03,
+      "n": 260,
+      "symbolsWithEvents": 12,
+      "wr": 0.41923076923076924,
+      "grossMean": 0.020620951022067697,
+      "netMean": 0.019620951022067703,
+      "outcomes": {
+        "stop": 121,
+        "timeout72": 139
+      },
+      "excludedNoHorizon": 0,
+      "perSymbol": {
+        "BTCUSDT": 26,
+        "ETHUSDT": 9,
+        "SOLUSDT": 25,
+        "XRPUSDT": 30,
+        "BNBUSDT": 10,
+        "DOGEUSDT": 42,
+        "ADAUSDT": 19,
+        "LTCUSDT": 20,
+        "LINKUSDT": 25,
+        "BCHUSDT": 16,
+        "DOTUSDT": 7,
+        "TRXUSDT": 31
+      },
+      "uniqueDays": 145
+    },
+    {
+      "oiThr": -0.12,
+      "pxThr": -0.05,
+      "n": 185,
+      "symbolsWithEvents": 12,
+      "wr": 0.4972972972972973,
+      "grossMean": 0.02605078046188215,
+      "netMean": 0.025050780461882187,
+      "outcomes": {
+        "stop": 71,
+        "timeout72": 114
+      },
+      "excludedNoHorizon": 0,
+      "perSymbol": {
+        "BTCUSDT": 19,
+        "ETHUSDT": 6,
+        "SOLUSDT": 21,
+        "XRPUSDT": 24,
+        "BNBUSDT": 5,
+        "DOGEUSDT": 29,
+        "ADAUSDT": 17,
+        "LTCUSDT": 17,
+        "LINKUSDT": 21,
+        "BCHUSDT": 6,
+        "DOTUSDT": 5,
+        "TRXUSDT": 15
+      },
+      "uniqueDays": 95
+    },
+    {
+      "oiThr": -0.15,
+      "pxThr": -0.03,
+      "n": 152,
+      "symbolsWithEvents": 12,
+      "wr": 0.5131578947368421,
+      "grossMean": 0.02487052672176994,
+      "netMean": 0.023870526721769952,
+      "outcomes": {
+        "stop": 60,
+        "timeout72": 92
+      },
+      "excludedNoHorizon": 0,
+      "perSymbol": {
+        "BTCUSDT": 12,
+        "ETHUSDT": 7,
+        "SOLUSDT": 14,
+        "XRPUSDT": 20,
+        "BNBUSDT": 6,
+        "DOGEUSDT": 21,
+        "ADAUSDT": 13,
+        "LTCUSDT": 9,
+        "LINKUSDT": 19,
+        "BCHUSDT": 8,
+        "DOTUSDT": 5,
+        "TRXUSDT": 18
+      },
+      "uniqueDays": 78
+    },
+    {
+      "oiThr": -0.15,
+      "pxThr": -0.05,
+      "n": 118,
+      "symbolsWithEvents": 12,
+      "wr": 0.576271186440678,
+      "grossMean": 0.032113047157936836,
+      "netMean": 0.03111304715793684,
+      "outcomes": {
+        "stop": 39,
+        "timeout72": 79
+      },
+      "excludedNoHorizon": 0,
+      "perSymbol": {
+        "BTCUSDT": 8,
+        "ETHUSDT": 3,
+        "SOLUSDT": 14,
+        "XRPUSDT": 19,
+        "BNBUSDT": 2,
+        "DOGEUSDT": 17,
+        "ADAUSDT": 12,
+        "LTCUSDT": 8,
+        "LINKUSDT": 17,
+        "BCHUSDT": 6,
+        "DOTUSDT": 3,
+        "TRXUSDT": 9
+      },
+      "uniqueDays": 59
+    },
+    {
+      "oiThr": -0.2,
+      "pxThr": -0.03,
+      "n": 66,
+      "symbolsWithEvents": 12,
+      "wr": 0.6363636363636364,
+      "grossMean": 0.03378811977088878,
+      "netMean": 0.03278811977088877,
+      "outcomes": {
+        "stop": 21,
+        "timeout72": 45
+      },
+      "excludedNoHorizon": 0,
+      "perSymbol": {
+        "BTCUSDT": 6,
+        "ETHUSDT": 3,
+        "SOLUSDT": 4,
+        "XRPUSDT": 13,
+        "BNBUSDT": 1,
+        "DOGEUSDT": 9,
+        "ADAUSDT": 7,
+        "LTCUSDT": 6,
+        "LINKUSDT": 7,
+        "BCHUSDT": 2,
+        "DOTUSDT": 3,
+        "TRXUSDT": 5
+      },
+      "uniqueDays": 28
+    },
+    {
+      "oiThr": -0.2,
+      "pxThr": -0.05,
+      "n": 51,
+      "symbolsWithEvents": 12,
+      "wr": 0.7058823529411765,
+      "grossMean": 0.03815067486976211,
+      "netMean": 0.037150674869762104,
+      "outcomes": {
+        "stop": 12,
+        "timeout72": 39
+      },
+      "excludedNoHorizon": 0,
+      "perSymbol": {
+        "BTCUSDT": 5,
+        "ETHUSDT": 2,
+        "SOLUSDT": 4,
+        "XRPUSDT": 12,
+        "BNBUSDT": 1,
+        "DOGEUSDT": 6,
+        "ADAUSDT": 7,
+        "LTCUSDT": 4,
+        "LINKUSDT": 6,
+        "BCHUSDT": 1,
+        "DOTUSDT": 1,
+        "TRXUSDT": 2
+      },
+      "uniqueDays": 24
+    }
+  ]
+}
