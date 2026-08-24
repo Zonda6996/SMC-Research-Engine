@@ -23,8 +23,8 @@ const MAJORS = [
 	'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'XRPUSDT', 'BNBUSDT', 'DOGEUSDT',
 	'ADAUSDT', 'LTCUSDT', 'LINKUSDT', 'BCHUSDT', 'DOTUSDT', 'TRXUSDT',
 ]
-const TFS = ['5m', '15m'] as const
-const TF_MS: Record<string, number> = { '5m': 300_000, '15m': 900_000 }
+const TFS = (process.env.D6_APEX_TFS ?? '5m,15m,30m,1h,2h,4h').split(',').map((s) => s.trim())
+const TF_MS: Record<string, number> = { '5m': 300_000, '15m': 900_000, '30m': 1_800_000, '1h': 3_600_000, '2h': 7_200_000, '4h': 14_400_000 }
 const MODES = [
 	{ id: 'SAFE', oiDrop: -0.20, priceDrop: -0.05 },
 	{ id: 'STANDARD', oiDrop: -0.15, priceDrop: -0.05 },

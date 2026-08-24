@@ -301,30 +301,57 @@ async function main(): Promise<void> {
 		const res = tr.filter((t) => t.outcome === 'stop' || t.outcome === 'reclaim' || t.outcome === 'timeout')
 		const wr = res.length ? res.filter((t) => (t.netPct ?? 0) > 0).length / res.length : null
 		const mean = res.length ? res.reduce((s, t) => s + (t.netPct ?? 0), 0) / res.length : null
-		return `| ${m.id} (OI ${(m.oiDrop * 100).toFixed(0)}% / цена ${(m.priceDrop * 100).toFixed(0)}%) | ${sigs.length} | ${tr.length} | ${res.length} | ${wr != null ? (wr * 100).toFixed(1) + '%' : '—'} | ${mean != null ? (mean * 100).toFixed(3) + '%' : '—'} |`
+		return `| ${m.id} | ${m.oiDrop !== -0.15 ? `OI ${(m.oiDrop * 100).toFixed(0)}%` : 'OI 15% (эталон)'} · цена −${Math.abs(m.priceDrop * 100).toFixed(0)}% | ${sigs.length} | ${tr.length} | ${res.length} | ${wr != null ? (wr * 100).toFixed(1) + '%' : '—'} | ${mean != null ? (mean * 100).toFixed(3) + '%' : '—'} |`
 	})
+
+	// События дедуплицируются: один бар-сигнал может триггерить несколько режимов сразу
+	// (режимы отличаются только порогом срабатывания; торговая сделка по событию одна).
+	const eventMap = new Map<string, SignalRecord[]>()
+	for (const s of allSignals) {
+		const k = `${s.symbol}|${s.signalBarOpenMs}`
+		if (!eventMap.has(k)) eventMap.set(k, [])
+		eventMap.get(k)!.push(s)
+	}
+	const events = [...eventMap.values()]
+		.map((group) => group.slice().sort((a, b) => a.signalBarOpenMs - b.signalBarOpenMs))
+		.sort((a, b) => b[0]!.signalBarOpenMs - a[0]!.signalBarOpenMs)
+	const astana = (utcIso: string): string => {
+		const t = new Date(utcIso).getTime() + 5 * HOUR
+		return new Date(t).toISOString().replace('T', ' ').slice(0, 16)
+	}
+	const modeOrder = new Map<string, number>(MODES.map((m, i) => [m.id as string, i]))
 	const md = [
-		'# Doppler paper-forward — статус (режимы SAFE/STANDARD/RISK)',
+		'# Doppler paper-forward — статус',
 		'',
-		`Прогон: ${new Date().toISOString()}; символов: ${universe.length}; новых сигналов: ${newSignals} (пропущено по времени: ${newMissed}).`,
-		`Всего сигналов: ${allSignals.length}; открытых позиций: ${[...openBySymbol.values()].filter((t) => t.outcome === 'open').length}.`,
+		`Прогон: ${astana(new Date().toISOString())} (время Астаны, UTC+5). Мониторинг: ${universe.length} символов.`,
+		'',
+		`**Как читать.** Режимы — это только ПОРОГ срабатывания сигнала (SAFE строгий, RISK мягкий);`,
+		`сделка у всех одинаковая: лонг на открытии следующего часа, стоп под минимумом флаша, выход`,
+		`по возврату цены или максимум через 72 часа. Одно сильное событие триггерит сразу несколько`,
+		`режимов — в торговле это ОДНА позиция. «Упущен» = сигнал найден позже часа входа (для статистики, не сделка).`,
+		'',
+		`Новых сигналов за прогон: ${newSignals} (упущено: ${newMissed}). Всего событий: ${events.length}; открытых позиций: ${[...openBySymbol.values()].filter((t) => t.outcome === 'open').length}.`,
 		`Завершённых сделок: ${resolved.length}; WR ${resolved.length ? (winsN / resolved.length * 100).toFixed(1) : '—'}%; средняя net ${meanNet != null ? (meanNet * 100).toFixed(3) + '%' : '—'}%.`,
 		`MFE: ≥1R дошли ${reachedR(1)}; ≥1.5R: ${reachedR(1.5)}; ≥2R: ${reachedR(2)}; ≥3R: ${reachedR(3)}.`,
 		'',
-		'## По режимам',
-		'| режим | сигналов | сделок | завершено | WR | средняя net |',
-		'|---|---:|---:|---:|---:|---:|',
+		'## Сигналы по режимам',
+		'| режим | порог | сигналов | сделок | завершено | WR | средняя net |',
+		'|---|---|---:|---:|---:|---:|---:|',
 		...perMode,
 		'',
-		'## Последние сигналы',
-		'| режим | закрытие бара (UTC) | символ | вход | стоп | цель | упущен |',
+		'## Последние события (одна строка = одно событие)',
+		'| время (Астана) | символ | режимы | вход | стоп | цель | упущен |',
 		'|---|---|---|---:|---:|---:|---|',
-		...allSignals.slice(-12).reverse().map((s) => `| ${s.mode} | ${s.signalBarCloseUtc} | ${s.symbol.replace('USDT', '')} | ${s.entry ?? '—'} | ${s.stop.toPrecision(6)} | ${s.targetRefLevel.toPrecision(6)} | ${s.missed ? 'да' : 'нет'} |`),
+		...events.slice(0, 15).map((group) => {
+			const s = group[0]!
+			const modes = group.map((g) => g.mode).sort((a, b) => modeOrder.get(a)! - modeOrder.get(b)!).join('+')
+			return `| ${astana(s.signalBarCloseUtc)} | ${s.symbol.replace('USDT', '')} | ${modes} | ${s.entry ?? '—'} | ${s.stop.toPrecision(6)} | ${s.targetRefLevel.toPrecision(6)} | ${s.missed ? 'да' : 'нет'} |`
+		}),
 		'',
-		'_Сигнал: TradingView → актив → 1h → бар времени закрытия; вход = open следующего бара. Режим = порог триггера; стоп/таймаут у всех одинаковые._',
+		'_Вход: TradingView → актив → 1h → бар времени закрытия → вход по открытию следующего бара. Время — Астана (UTC+5)._',
 	]
 	writeFileSync(resolve(STATE_DIR, 'report.md'), md.join('\n'))
-	console.log('\n' + md.slice(2, 6).join('\n'))
+	console.log('\n' + md.slice(2, 10).join('\n'))
 }
 
 void main()
