@@ -1,0 +1,36 @@
+{
+  "studyId": "d6-tidal-portfolio",
+  "generatedAt": "2026-08-24T23:41:01.879Z",
+  "note": "Оценка осуществимости зонтика; нога B in-sample; допущение 50/50 daily; carry net их издержек",
+  "window": {
+    "from": "2021-01-01",
+    "to": "2026-06-30",
+    "days": 2007
+  },
+  "dopplerTrades": 118,
+  "dopplerActiveDays": 58,
+  "correlationDopplerVsCarryOnActiveDays": 0.08406146672374977,
+  "legs": {
+    "carry": {
+      "total": 7.633006530948382,
+      "sharpe": 1.441534110192187,
+      "maxDd": 0.20856696027792876,
+      "days": 2007,
+      "activeDays": 2000
+    },
+    "doppler": {
+      "total": 9.282647874957844,
+      "sharpe": 5.406440782900183,
+      "maxDd": 0.7074189664182171,
+      "days": 2007,
+      "activeDays": 58
+    },
+    "combo5050": {
+      "total": 12.780077241050352,
+      "sharpe": 1.341836073320606,
+      "maxDd": 0.4070675879265886,
+      "days": 2007,
+      "activeDays": 2000
+    }
+  }
+}
