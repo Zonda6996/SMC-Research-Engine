@@ -1,0 +1,183 @@
+{
+  "studyId": "d6-scaled-timeout",
+  "generatedAt": "2026-08-24T22:17:58.987Z",
+  "note": "ДИАГНОСТИКА таймаутов при фиксированном окне 8ч; in-sample",
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "BNBUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "LTCUSDT",
+    "LINKUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "TRXUSDT"
+  ],
+  "results": [
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "holdH": 12,
+      "n": 154,
+      "wr": 0.5584415584415584,
+      "meanNet": 0.018352888913797518,
+      "uniqueDays": 77
+    },
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "holdH": 24,
+      "n": 154,
+      "wr": 0.461038961038961,
+      "meanNet": 0.0150423982838514,
+      "uniqueDays": 77
+    },
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "holdH": 72,
+      "n": 154,
+      "wr": 0.487012987012987,
+      "meanNet": 0.029475484693418645,
+      "uniqueDays": 77
+    },
+    {
+      "tf": "5m",
+      "mode": "SAFE",
+      "holdH": 12,
+      "n": 73,
+      "wr": 0.589041095890411,
+      "meanNet": 0.0219241359496582,
+      "uniqueDays": 34
+    },
+    {
+      "tf": "5m",
+      "mode": "SAFE",
+      "holdH": 24,
+      "n": 73,
+      "wr": 0.4520547945205479,
+      "meanNet": 0.012701799164960944,
+      "uniqueDays": 34
+    },
+    {
+      "tf": "5m",
+      "mode": "SAFE",
+      "holdH": 72,
+      "n": 73,
+      "wr": 0.5342465753424658,
+      "meanNet": 0.03524184662942024,
+      "uniqueDays": 34
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "holdH": 12,
+      "n": 149,
+      "wr": 0.5838926174496645,
+      "meanNet": 0.015191978497647118,
+      "uniqueDays": 76
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "holdH": 24,
+      "n": 149,
+      "wr": 0.4899328859060403,
+      "meanNet": 0.008967539521653654,
+      "uniqueDays": 76
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "holdH": 72,
+      "n": 149,
+      "wr": 0.5033557046979866,
+      "meanNet": 0.02413503893116195,
+      "uniqueDays": 76
+    },
+    {
+      "tf": "15m",
+      "mode": "SAFE",
+      "holdH": 12,
+      "n": 67,
+      "wr": 0.6417910447761194,
+      "meanNet": 0.022201365200734468,
+      "uniqueDays": 31
+    },
+    {
+      "tf": "15m",
+      "mode": "SAFE",
+      "holdH": 24,
+      "n": 67,
+      "wr": 0.4925373134328358,
+      "meanNet": 0.011585542567326815,
+      "uniqueDays": 31
+    },
+    {
+      "tf": "15m",
+      "mode": "SAFE",
+      "holdH": 72,
+      "n": 67,
+      "wr": 0.5970149253731343,
+      "meanNet": 0.03820989592914971,
+      "uniqueDays": 31
+    },
+    {
+      "tf": "30m",
+      "mode": "STANDARD",
+      "holdH": 12,
+      "n": 129,
+      "wr": 0.627906976744186,
+      "meanNet": 0.01743808056692401,
+      "uniqueDays": 65
+    },
+    {
+      "tf": "30m",
+      "mode": "STANDARD",
+      "holdH": 24,
+      "n": 129,
+      "wr": 0.5116279069767442,
+      "meanNet": 0.009278228083146064,
+      "uniqueDays": 65
+    },
+    {
+      "tf": "30m",
+      "mode": "STANDARD",
+      "holdH": 72,
+      "n": 129,
+      "wr": 0.5503875968992248,
+      "meanNet": 0.02955076849294132,
+      "uniqueDays": 65
+    },
+    {
+      "tf": "30m",
+      "mode": "SAFE",
+      "holdH": 12,
+      "n": 58,
+      "wr": 0.6379310344827587,
+      "meanNet": 0.02398647828415361,
+      "uniqueDays": 28
+    },
+    {
+      "tf": "30m",
+      "mode": "SAFE",
+      "holdH": 24,
+      "n": 58,
+      "wr": 0.5517241379310345,
+      "meanNet": 0.012134493301806425,
+      "uniqueDays": 28
+    },
+    {
+      "tf": "30m",
+      "mode": "SAFE",
+      "holdH": 72,
+      "n": 58,
+      "wr": 0.6551724137931034,
+      "meanNet": 0.043906552071267646,
+      "uniqueDays": 28
+    }
+  ]
+}
