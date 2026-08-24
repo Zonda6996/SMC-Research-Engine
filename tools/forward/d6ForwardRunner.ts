@@ -40,6 +40,12 @@ function loadUniverse(): string[] {
 		const m = JSON.parse(readFileSync(resolve(p), 'utf8')) as ManifestA
 		for (const s of m.symbols) out.add(s.symbol)
 	}
+	// Расширение мониторинга: зрелые мид-капы census Б (решение автора 2026-08-24).
+	const extra = 'data/d6-forward-universe.json'
+	if (existsSync(resolve(extra))) {
+		const m = JSON.parse(readFileSync(resolve(extra), 'utf8')) as ManifestA
+		for (const s of m.symbols) out.add(s.symbol)
+	}
 	return [...out].sort()
 }
 
