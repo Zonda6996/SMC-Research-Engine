@@ -1,4 +1,4 @@
-# ROADMAP — живой план (только открытые задачи)
+﻿# ROADMAP — живой план (только открытые задачи)
 
 > **Что это:** план активной работы. **Только открытое** — закрытые треки (RE1–RE25, S1–S5,
 > A/B/D/E, funding-линии, OWN2-корпуса) лежат в `docs/archive/ROADMAP-2026-08-23-full.md`
@@ -12,7 +12,7 @@
 
 ## Трек F — Doppler (D6 Cascade Reversion) — активная линия
 
-> Спека: `docs/strategies/d6-cascade.md` · статус и цифры: `docs/HANDOFF.md` · отвергнутое:
+> Спека: `docs/strategies/doppler.md` · статус и цифры: `docs/HANDOFF.md` · отвергнутое:
 > `docs/NEGATIVE-KNOWLEDGE.md` (раздел D6).
 > Сигнал: каскадный делевериджинг (ΔOI_8h≤−15% И ΔP_8h≤−3%) → LONG next-open, структурный стоп,
 > таймаут 72ч.
