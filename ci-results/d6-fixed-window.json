@@ -1,0 +1,111 @@
+{
+  "studyId": "d6-fixed-window",
+  "generatedAt": "2026-08-24T16:16:43.814Z",
+  "note": "ДИАГНОСТИКА: окно фиксировано 8 часов на всех ТФ (не 8 баров ТФ); in-sample",
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "BNBUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "LTCUSDT",
+    "LINKUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "TRXUSDT"
+  ],
+  "results": [
+    {
+      "tf": "5m",
+      "mode": "SAFE",
+      "windowBars": 96,
+      "n": 73,
+      "symbolsWithEvents": 12,
+      "wr": 0.5342465753424658,
+      "meanNet": 0.03524184662942024,
+      "uniqueDays": 34
+    },
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "windowBars": 96,
+      "n": 154,
+      "symbolsWithEvents": 12,
+      "wr": 0.487012987012987,
+      "meanNet": 0.029475484687157206,
+      "uniqueDays": 77
+    },
+    {
+      "tf": "5m",
+      "mode": "RISK",
+      "windowBars": 96,
+      "n": 256,
+      "symbolsWithEvents": 12,
+      "wr": 0.40625,
+      "meanNet": 0.028065707844333803,
+      "uniqueDays": 131
+    },
+    {
+      "tf": "15m",
+      "mode": "SAFE",
+      "windowBars": 32,
+      "n": 67,
+      "symbolsWithEvents": 12,
+      "wr": 0.5970149253731343,
+      "meanNet": 0.03820989592914971,
+      "uniqueDays": 31
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "windowBars": 32,
+      "n": 149,
+      "symbolsWithEvents": 12,
+      "wr": 0.5033557046979866,
+      "meanNet": 0.024135014189632882,
+      "uniqueDays": 76
+    },
+    {
+      "tf": "15m",
+      "mode": "RISK",
+      "windowBars": 32,
+      "n": 237,
+      "symbolsWithEvents": 12,
+      "wr": 0.4345991561181435,
+      "meanNet": 0.024538657625639754,
+      "uniqueDays": 125
+    },
+    {
+      "tf": "30m",
+      "mode": "SAFE",
+      "windowBars": 16,
+      "n": 58,
+      "symbolsWithEvents": 12,
+      "wr": 0.6551724137931034,
+      "meanNet": 0.04390655207126705,
+      "uniqueDays": 28
+    },
+    {
+      "tf": "30m",
+      "mode": "STANDARD",
+      "windowBars": 16,
+      "n": 129,
+      "symbolsWithEvents": 12,
+      "wr": 0.5503875968992248,
+      "meanNet": 0.02955076849294105,
+      "uniqueDays": 65
+    },
+    {
+      "tf": "30m",
+      "mode": "RISK",
+      "windowBars": 16,
+      "n": 213,
+      "symbolsWithEvents": 12,
+      "wr": 0.460093896713615,
+      "meanNet": 0.02552586829801685,
+      "uniqueDays": 110
+    }
+  ]
+}

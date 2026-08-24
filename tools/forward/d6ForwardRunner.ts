@@ -323,6 +323,8 @@ async function main(): Promise<void> {
 	const md = [
 		'# Doppler paper-forward — статус',
 		'',
+		'<!-- Прогон: npx tsx tools/forward/d6ForwardRunner.ts  (раз в 1-3 дня, ноут держать включённым не нужно) -->',
+		'',
 		`Прогон: ${astana(new Date().toISOString())} (время Астаны, UTC+5). Мониторинг: ${universe.length} символов.`,
 		'',
 		`**Как читать.** Режимы — это только ПОРОГ срабатывания сигнала (SAFE строгий, RISK мягкий);`,
