@@ -1,0 +1,205 @@
+{
+  "studyId": "d6-apex-scalp",
+  "generatedAt": "2026-08-24T12:29:23.254Z",
+  "note": "ДИАГНОСТИКА: каскадные события 5м/15м × позиция входа относительно зоны Apex; in-sample",
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "BNBUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "LTCUSDT",
+    "LINKUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "TRXUSDT"
+  ],
+  "tfs": [
+    "5m",
+    "15m"
+  ],
+  "modes": [
+    {
+      "id": "SAFE",
+      "oiDrop": -0.2,
+      "priceDrop": -0.05
+    },
+    {
+      "id": "STANDARD",
+      "oiDrop": -0.15,
+      "priceDrop": -0.05
+    },
+    {
+      "id": "RISK",
+      "oiDrop": -0.12,
+      "priceDrop": -0.05
+    }
+  ],
+  "holdHours": 72,
+  "results": [
+    {
+      "tf": "5m",
+      "mode": "SAFE",
+      "zone": "in-zone-deep",
+      "n": 1,
+      "wr": 1,
+      "meanNet": 0.290951404707669,
+      "uniqueDays": 1
+    },
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "zone": "in-zone-deep",
+      "n": 7,
+      "wr": 0.8571428571428571,
+      "meanNet": 0.1826884068817139,
+      "uniqueDays": 4
+    },
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "zone": "above-zone",
+      "n": 2,
+      "wr": 0.5,
+      "meanNet": 0.06693292034902099,
+      "uniqueDays": 2
+    },
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "zone": "above-mean",
+      "n": 1,
+      "wr": 0,
+      "meanNet": -0.050169741900655596,
+      "uniqueDays": 1
+    },
+    {
+      "tf": "5m",
+      "mode": "RISK",
+      "zone": "in-zone-deep",
+      "n": 23,
+      "wr": 0.6086956521739131,
+      "meanNet": 0.06497625768902196,
+      "uniqueDays": 12
+    },
+    {
+      "tf": "5m",
+      "mode": "RISK",
+      "zone": "in-zone-shallow",
+      "n": 3,
+      "wr": 1,
+      "meanNet": 0.1615247195715481,
+      "uniqueDays": 2
+    },
+    {
+      "tf": "5m",
+      "mode": "RISK",
+      "zone": "above-zone",
+      "n": 1,
+      "wr": 0,
+      "meanNet": -0.07214320017495812,
+      "uniqueDays": 1
+    },
+    {
+      "tf": "5m",
+      "mode": "RISK",
+      "zone": "above-mean",
+      "n": 3,
+      "wr": 0.3333333333333333,
+      "meanNet": -0.0005862870073345775,
+      "uniqueDays": 3
+    },
+    {
+      "tf": "15m",
+      "mode": "SAFE",
+      "zone": "in-zone-deep",
+      "n": 14,
+      "wr": 0.7142857142857143,
+      "meanNet": 0.07824162715436125,
+      "uniqueDays": 8
+    },
+    {
+      "tf": "15m",
+      "mode": "SAFE",
+      "zone": "in-zone-shallow",
+      "n": 1,
+      "wr": 0,
+      "meanNet": -0.1344341387766621,
+      "uniqueDays": 1
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "zone": "in-zone-deep",
+      "n": 32,
+      "wr": 0.59375,
+      "meanNet": 0.02716954625195162,
+      "uniqueDays": 16
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "zone": "in-zone-shallow",
+      "n": 2,
+      "wr": 0.5,
+      "meanNet": 0.0008942747544079532,
+      "uniqueDays": 2
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "zone": "above-zone",
+      "n": 1,
+      "wr": 1,
+      "meanNet": 0.1566737255610241,
+      "uniqueDays": 1
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "zone": "above-mean",
+      "n": 1,
+      "wr": 0,
+      "meanNet": -0.032908058954282615,
+      "uniqueDays": 1
+    },
+    {
+      "tf": "15m",
+      "mode": "RISK",
+      "zone": "in-zone-deep",
+      "n": 58,
+      "wr": 0.6206896551724138,
+      "meanNet": 0.029571887801541904,
+      "uniqueDays": 23
+    },
+    {
+      "tf": "15m",
+      "mode": "RISK",
+      "zone": "in-zone-shallow",
+      "n": 4,
+      "wr": 0.25,
+      "meanNet": -0.05322671769599788,
+      "uniqueDays": 4
+    },
+    {
+      "tf": "15m",
+      "mode": "RISK",
+      "zone": "above-zone",
+      "n": 9,
+      "wr": 0.3333333333333333,
+      "meanNet": 0.029102240295476207,
+      "uniqueDays": 7
+    },
+    {
+      "tf": "15m",
+      "mode": "RISK",
+      "zone": "above-mean",
+      "n": 3,
+      "wr": 0.3333333333333333,
+      "meanNet": 0.02315929489920328,
+      "uniqueDays": 3
+    }
+  ]
+}

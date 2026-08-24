@@ -1,0 +1,54 @@
+{
+  "studyId": "d6-census-short",
+  "generatedAt": "2026-08-24T12:27:00.966Z",
+  "note": "ДИАГНОСТИКА зеркала SHORT; funding: шорт получает +rate; in-sample",
+  "modes": [
+    {
+      "id": "SAFE",
+      "oiPump": 0.2,
+      "pxPump": 0.05
+    },
+    {
+      "id": "STANDARD",
+      "oiPump": 0.15,
+      "pxPump": 0.05
+    },
+    {
+      "id": "RISK",
+      "oiPump": 0.12,
+      "pxPump": 0.05
+    }
+  ],
+  "results": [
+    {
+      "mode": "SAFE",
+      "n": 135,
+      "wr": 0.21481481481481482,
+      "meanNet": -0.0012795986824214079,
+      "grossMean": -0.00027959868242140675,
+      "stops": 105,
+      "timeouts": 30,
+      "extra": ""
+    },
+    {
+      "mode": "STANDARD",
+      "n": 237,
+      "wr": 0.20675105485232068,
+      "meanNet": 0.00025983924174340913,
+      "grossMean": 0.0012598392417434096,
+      "stops": 184,
+      "timeouts": 53,
+      "extra": ""
+    },
+    {
+      "mode": "RISK",
+      "n": 328,
+      "wr": 0.18292682926829268,
+      "meanNet": -0.002897851108147047,
+      "grossMean": -0.0018978511081470463,
+      "stops": 264,
+      "timeouts": 64,
+      "extra": ""
+    }
+  ]
+}

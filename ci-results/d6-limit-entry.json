@@ -1,0 +1,84 @@
+{
+  "studyId": "d6-limit-entry",
+  "generatedAt": "2026-08-24T12:27:00.967Z",
+  "note": "ДИАГНОСТИКА лимитного входа; STANDARD −15/−5; издержки консервативно 5bps/side у всех",
+  "results": [
+    {
+      "variant": "market",
+      "validityH": 72,
+      "fills": 118,
+      "unfilled": 0,
+      "fillRate": 1,
+      "wr": 0.576271186440678,
+      "meanNet": 0.03120056178880062,
+      "stops": 39,
+      "timeouts": 79
+    },
+    {
+      "variant": "limit@close[i]",
+      "validityH": 24,
+      "fills": 118,
+      "unfilled": 0,
+      "fillRate": 1,
+      "wr": 0.576271186440678,
+      "meanNet": 0.031237473089668837,
+      "stops": 39,
+      "timeouts": 79
+    },
+    {
+      "variant": "limit@close[i]",
+      "validityH": 72,
+      "fills": 118,
+      "unfilled": 0,
+      "fillRate": 1,
+      "wr": 0.576271186440678,
+      "meanNet": 0.031237473089668837,
+      "stops": 39,
+      "timeouts": 79
+    },
+    {
+      "variant": "limit@-0.25R",
+      "validityH": 24,
+      "fills": 118,
+      "unfilled": 0,
+      "fillRate": 1,
+      "wr": 0.576271186440678,
+      "meanNet": 0.03120056178880062,
+      "stops": 39,
+      "timeouts": 79
+    },
+    {
+      "variant": "limit@-0.25R",
+      "validityH": 72,
+      "fills": 118,
+      "unfilled": 0,
+      "fillRate": 1,
+      "wr": 0.576271186440678,
+      "meanNet": 0.03120056178880062,
+      "stops": 39,
+      "timeouts": 79
+    },
+    {
+      "variant": "limit@-0.5R",
+      "validityH": 24,
+      "fills": 118,
+      "unfilled": 0,
+      "fillRate": 1,
+      "wr": 0.576271186440678,
+      "meanNet": 0.03120056178880062,
+      "stops": 39,
+      "timeouts": 79
+    },
+    {
+      "variant": "limit@-0.5R",
+      "validityH": 72,
+      "fills": 118,
+      "unfilled": 0,
+      "fillRate": 1,
+      "wr": 0.576271186440678,
+      "meanNet": 0.03120056178880062,
+      "stops": 39,
+      "timeouts": 79
+    }
+  ]
+}
