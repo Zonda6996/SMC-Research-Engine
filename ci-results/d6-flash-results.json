@@ -1,0 +1,2513 @@
+{
+  "studyId": "d6-flash",
+  "generatedAt": "2026-08-25T11:42:10.203Z",
+  "preregistrationSha256": "5ac19f7c090aa811cbe802ca0b973103fc065f8b41e76fcd3de1a80c76bbc3af",
+  "manifestSha256": "f5d92f0f344e8301c50d75e9910ac11d2da67a288f2c39b415484f67c7bd6f2e",
+  "universe": [
+    "1000PEPEUSDT",
+    "AAVEUSDT",
+    "ARBUSDT",
+    "AVAXUSDT",
+    "BOMEUSDT",
+    "ENAUSDT",
+    "ENSUSDT",
+    "ICPUSDT",
+    "LDOUSDT",
+    "ONDOUSDT",
+    "OPUSDT",
+    "STXUSDT",
+    "SUIUSDT",
+    "TRBUSDT",
+    "ZECUSDT",
+    "ZENUSDT"
+  ],
+  "arms": [
+    {
+      "tf": "5m",
+      "mode": "RISK",
+      "n": 79,
+      "wr": 0.34177215189873417,
+      "meanNet": 0.041496965921398184,
+      "ci": {
+        "lower": -0.01814151271888876,
+        "upper": 0.10950172181660747
+      },
+      "stops": 47,
+      "timeouts": 32,
+      "symbolsWithEvents": 15,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "n": 38,
+      "wr": 0.3684210526315789,
+      "meanNet": 0.0469306439922992,
+      "ci": {
+        "lower": -0.02264812697902354,
+        "upper": 0.13004850791783754
+      },
+      "stops": 22,
+      "timeouts": 16,
+      "symbolsWithEvents": 13,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "5m",
+      "mode": "SAFE",
+      "n": 13,
+      "wr": 0.46153846153846156,
+      "meanNet": 0.06571555405774396,
+      "ci": {
+        "lower": -0.020052351694403708,
+        "upper": 0.15713089666411684
+      },
+      "stops": 7,
+      "timeouts": 6,
+      "symbolsWithEvents": 8,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "15m",
+      "mode": "RISK",
+      "n": 162,
+      "wr": 0.36419753086419754,
+      "meanNet": 0.018197487105633268,
+      "ci": {
+        "lower": -0.012874495705018078,
+        "upper": 0.05240495711940701
+      },
+      "stops": 91,
+      "timeouts": 71,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "n": 82,
+      "wr": 0.3780487804878049,
+      "meanNet": 0.018383936731639065,
+      "ci": {
+        "lower": -0.025627345529065506,
+        "upper": 0.06836012833251089
+      },
+      "stops": 44,
+      "timeouts": 38,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "15m",
+      "mode": "SAFE",
+      "n": 34,
+      "wr": 0.35294117647058826,
+      "meanNet": 0.023438820064744056,
+      "ci": {
+        "lower": -0.031675878661230665,
+        "upper": 0.0833825400839332
+      },
+      "stops": 20,
+      "timeouts": 14,
+      "symbolsWithEvents": 14,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "30m",
+      "mode": "RISK",
+      "n": 243,
+      "wr": 0.3786008230452675,
+      "meanNet": 0.016759361253503916,
+      "ci": {
+        "lower": -0.011905906517425192,
+        "upper": 0.04435379725723369
+      },
+      "stops": 131,
+      "timeouts": 112,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "30m",
+      "mode": "STANDARD",
+      "n": 133,
+      "wr": 0.39849624060150374,
+      "meanNet": 0.022976226510021423,
+      "ci": {
+        "lower": -0.01477793501505304,
+        "upper": 0.06028093023025367
+      },
+      "stops": 71,
+      "timeouts": 62,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "30m",
+      "mode": "SAFE",
+      "n": 53,
+      "wr": 0.3584905660377358,
+      "meanNet": 0.007238693935181647,
+      "ci": {
+        "lower": -0.05224473603015681,
+        "upper": 0.06318271206754426
+      },
+      "stops": 31,
+      "timeouts": 22,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "1h",
+      "mode": "RISK",
+      "n": 398,
+      "wr": 0.38190954773869346,
+      "meanNet": 0.011180396990624234,
+      "ci": {
+        "lower": -0.006653742925380656,
+        "upper": 0.027686265015422987
+      },
+      "stops": 217,
+      "timeouts": 181,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "1h",
+      "mode": "STANDARD",
+      "n": 222,
+      "wr": 0.40540540540540543,
+      "meanNet": 0.012623501801367265,
+      "ci": {
+        "lower": -0.012715424732695133,
+        "upper": 0.0364806341481166
+      },
+      "stops": 116,
+      "timeouts": 106,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "1h",
+      "mode": "SAFE",
+      "n": 102,
+      "wr": 0.3627450980392157,
+      "meanNet": -0.0007295633886794076,
+      "ci": {
+        "lower": -0.04530139177060602,
+        "upper": 0.04229052525878056
+      },
+      "stops": 58,
+      "timeouts": 44,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "2h",
+      "mode": "RISK",
+      "n": 543,
+      "wr": 0.3756906077348066,
+      "meanNet": 0.013443211870470434,
+      "ci": {
+        "lower": -0.0013631659146767067,
+        "upper": 0.028554053976669738
+      },
+      "stops": 294,
+      "timeouts": 249,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "2h",
+      "mode": "STANDARD",
+      "n": 324,
+      "wr": 0.3765432098765432,
+      "meanNet": 0.012958740670601696,
+      "ci": {
+        "lower": -0.007769805897925164,
+        "upper": 0.03438981341483949
+      },
+      "stops": 173,
+      "timeouts": 151,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "2h",
+      "mode": "SAFE",
+      "n": 148,
+      "wr": 0.4189189189189189,
+      "meanNet": 0.015993692975071996,
+      "ci": {
+        "lower": -0.01826225801476435,
+        "upper": 0.0488469341803463
+      },
+      "stops": 71,
+      "timeouts": 77,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "4h",
+      "mode": "RISK",
+      "n": 696,
+      "wr": 0.3649425287356322,
+      "meanNet": 0.005607276520725902,
+      "ci": {
+        "lower": -0.00630864654383699,
+        "upper": 0.017316698117202985
+      },
+      "stops": 368,
+      "timeouts": 328,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    },
+    {
+      "tf": "4h",
+      "mode": "STANDARD",
+      "n": 441,
+      "wr": 0.41043083900226757,
+      "meanNet": 0.017485267229126734,
+      "ci": {
+        "lower": 0.0009889602868395234,
+        "upper": 0.03380271971567013
+      },
+      "stops": 216,
+      "timeouts": 225,
+      "symbolsWithEvents": 16,
+      "verdict": "GO"
+    },
+    {
+      "tf": "4h",
+      "mode": "SAFE",
+      "n": 210,
+      "wr": 0.44285714285714284,
+      "meanNet": 0.0025228862326172868,
+      "ci": {
+        "lower": -0.01848772411553318,
+        "upper": 0.021649330846633605
+      },
+      "stops": 91,
+      "timeouts": 119,
+      "symbolsWithEvents": 16,
+      "verdict": "KILL"
+    }
+  ],
+  "perSymbol": [
+    {
+      "tf": "5m",
+      "symbols": [
+        {
+          "symbol": "TRBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 18,
+              "wr": 0.16666666666666666,
+              "meanNet": 0.006681681880488637
+            },
+            {
+              "mode": "STANDARD",
+              "n": 9,
+              "wr": 0.2222222222222222,
+              "meanNet": 0.04332175933290442
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0,
+              "meanNet": -0.019457431786622653
+            }
+          ]
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 9,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.034303991666519276
+            },
+            {
+              "mode": "STANDARD",
+              "n": 6,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.038092859487117235
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 1,
+              "meanNet": 0.07993780551360488
+            }
+          ]
+        },
+        {
+          "symbol": "ZENUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 8,
+              "wr": 0.25,
+              "meanNet": 0.011160880588990636
+            },
+            {
+              "mode": "STANDARD",
+              "n": 3,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.08657764814752887
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.12751861960555316
+            }
+          ]
+        },
+        {
+          "symbol": "ENSUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 6,
+              "wr": 0.16666666666666666,
+              "meanNet": -0.0010262723590774188
+            },
+            {
+              "mode": "STANDARD",
+              "n": 4,
+              "wr": 0.25,
+              "meanNet": 0.011706218441325612
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.07164546366112756
+            }
+          ]
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 5,
+              "wr": 0,
+              "meanNet": -0.05173253011599096
+            },
+            {
+              "mode": "STANDARD",
+              "n": 3,
+              "wr": 0,
+              "meanNet": -0.03687187020299193
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0,
+              "meanNet": -0.040872191461580304
+            }
+          ]
+        },
+        {
+          "symbol": "ICPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 7,
+              "wr": 0.2857142857142857,
+              "meanNet": 0.006647629652509012
+            },
+            {
+              "mode": "STANDARD",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": 0.08050563106706345
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.25836782471723846
+            }
+          ]
+        },
+        {
+          "symbol": "LDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 6,
+              "wr": 0.5,
+              "meanNet": 0.06843214100397083
+            },
+            {
+              "mode": "STANDARD",
+              "n": 3,
+              "wr": 0.3333333333333333,
+              "meanNet": -0.014189346505105125
+            },
+            {
+              "mode": "SAFE",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            }
+          ]
+        },
+        {
+          "symbol": "STXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 7,
+              "wr": 0.42857142857142855,
+              "meanNet": 0.03382324012593657
+            },
+            {
+              "mode": "STANDARD",
+              "n": 2,
+              "wr": 0,
+              "meanNet": -0.029351052383263763
+            },
+            {
+              "mode": "SAFE",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            }
+          ]
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 3,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.0036838021222328488
+            },
+            {
+              "mode": "STANDARD",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": 0.03139006545998249
+            },
+            {
+              "mode": "SAFE",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            }
+          ]
+        },
+        {
+          "symbol": "ZECUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 3,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.544866738352722
+            },
+            {
+              "mode": "STANDARD",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.38858485866515724
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.38858485866515724
+            }
+          ]
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.1511748624662917
+            },
+            {
+              "mode": "STANDARD",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.1511748624662917
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.1511748624662917
+            }
+          ]
+        },
+        {
+          "symbol": "SUIUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 3,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.09082146207678615
+            },
+            {
+              "mode": "STANDARD",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            },
+            {
+              "mode": "SAFE",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            }
+          ]
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.3938731059768814
+            },
+            {
+              "mode": "STANDARD",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.3938731059768814
+            },
+            {
+              "mode": "SAFE",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            }
+          ]
+        },
+        {
+          "symbol": "OPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.07394010155667738
+            },
+            {
+              "mode": "STANDARD",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.08718480269096579
+            },
+            {
+              "mode": "SAFE",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            }
+          ]
+        },
+        {
+          "symbol": "ARBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.058325460049180725
+            },
+            {
+              "mode": "STANDARD",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            },
+            {
+              "mode": "SAFE",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tf": "15m",
+      "symbols": [
+        {
+          "symbol": "TRBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 27,
+              "wr": 0.14814814814814814,
+              "meanNet": -0.009042909103916207
+            },
+            {
+              "mode": "STANDARD",
+              "n": 14,
+              "wr": 0.21428571428571427,
+              "meanNet": -0.006555229998271445
+            },
+            {
+              "mode": "SAFE",
+              "n": 9,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.014138011789064339
+            }
+          ]
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 18,
+              "wr": 0.3888888888888889,
+              "meanNet": -0.01169054562307171
+            },
+            {
+              "mode": "STANDARD",
+              "n": 10,
+              "wr": 0.5,
+              "meanNet": -0.014007242738049343
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 1,
+              "meanNet": 0.0740285757979459
+            }
+          ]
+        },
+        {
+          "symbol": "ICPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 16,
+              "wr": 0.3125,
+              "meanNet": 0.0044040472819576425
+            },
+            {
+              "mode": "STANDARD",
+              "n": 11,
+              "wr": 0.36363636363636365,
+              "meanNet": -0.0005775161058205696
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0,
+              "meanNet": -0.06084060124199152
+            }
+          ]
+        },
+        {
+          "symbol": "ZENUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 16,
+              "wr": 0.3125,
+              "meanNet": 0.011985187240605363
+            },
+            {
+              "mode": "STANDARD",
+              "n": 5,
+              "wr": 0.4,
+              "meanNet": 0.03125398802550008
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": -0.017104301596177516
+            }
+          ]
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 9,
+              "wr": 0.1111111111111111,
+              "meanNet": -0.012338202145475907
+            },
+            {
+              "mode": "STANDARD",
+              "n": 6,
+              "wr": 0,
+              "meanNet": -0.03334279238132967
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0,
+              "meanNet": -0.03078295638757149
+            }
+          ]
+        },
+        {
+          "symbol": "ENSUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 8,
+              "wr": 0.25,
+              "meanNet": 0.016565620702144977
+            },
+            {
+              "mode": "STANDARD",
+              "n": 7,
+              "wr": 0.2857142857142857,
+              "meanNet": 0.04120085273882904
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": 0.08244408189459722
+            }
+          ]
+        },
+        {
+          "symbol": "ZECUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 10,
+              "wr": 0.5,
+              "meanNet": 0.07772969688429528
+            },
+            {
+              "mode": "STANDARD",
+              "n": 4,
+              "wr": 0.5,
+              "meanNet": 0.13450988987571194
+            },
+            {
+              "mode": "SAFE",
+              "n": 3,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.14952874643153757
+            }
+          ]
+        },
+        {
+          "symbol": "LDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 8,
+              "wr": 0.25,
+              "meanNet": -0.00334902314624115
+            },
+            {
+              "mode": "STANDARD",
+              "n": 5,
+              "wr": 0.4,
+              "meanNet": -0.0026417054829081603
+            },
+            {
+              "mode": "SAFE",
+              "n": 3,
+              "wr": 0,
+              "meanNet": -0.06325274488134786
+            }
+          ]
+        },
+        {
+          "symbol": "STXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 10,
+              "wr": 0.4,
+              "meanNet": 0.039304063025029534
+            },
+            {
+              "mode": "STANDARD",
+              "n": 4,
+              "wr": 0.25,
+              "meanNet": -0.035234087271644135
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.030344799066140404
+            }
+          ]
+        },
+        {
+          "symbol": "SUIUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 11,
+              "wr": 0.8181818181818182,
+              "meanNet": 0.09122912933551935
+            },
+            {
+              "mode": "STANDARD",
+              "n": 4,
+              "wr": 0.75,
+              "meanNet": 0.12144188956764457
+            },
+            {
+              "mode": "SAFE",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            }
+          ]
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 8,
+              "wr": 0.375,
+              "meanNet": -0.010194061158287778
+            },
+            {
+              "mode": "STANDARD",
+              "n": 3,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.059304830618526046
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0,
+              "meanNet": -0.012468105384390134
+            }
+          ]
+        },
+        {
+          "symbol": "OPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 8,
+              "wr": 0.5,
+              "meanNet": 0.023581159695135544
+            },
+            {
+              "mode": "STANDARD",
+              "n": 2,
+              "wr": 0,
+              "meanNet": -0.056739970594397254
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0,
+              "meanNet": -0.0555557746868009
+            }
+          ]
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 4,
+              "wr": 0.75,
+              "meanNet": 0.04206349360184524
+            },
+            {
+              "mode": "STANDARD",
+              "n": 3,
+              "wr": 1,
+              "meanNet": 0.08347858766629919
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.15638369692913281
+            }
+          ]
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 3,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.12883275459064406
+            },
+            {
+              "mode": "STANDARD",
+              "n": 2,
+              "wr": 1,
+              "meanNet": 0.20144902777613677
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 1,
+              "meanNet": 0.17063400104511153
+            }
+          ]
+        },
+        {
+          "symbol": "ARBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 5,
+              "wr": 0.6,
+              "meanNet": 0.06517129633437915
+            },
+            {
+              "mode": "STANDARD",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.07046966369157691
+            },
+            {
+              "mode": "SAFE",
+              "n": 0,
+              "wr": null,
+              "meanNet": null
+            }
+          ]
+        },
+        {
+          "symbol": "ENAUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.01589896529528896
+            },
+            {
+              "mode": "STANDARD",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.01589896529528896
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.01589896529528896
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tf": "30m",
+      "symbols": [
+        {
+          "symbol": "TRBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 34,
+              "wr": 0.17647058823529413,
+              "meanNet": -0.022379181489337933
+            },
+            {
+              "mode": "STANDARD",
+              "n": 23,
+              "wr": 0.17391304347826086,
+              "meanNet": -0.029825957473668653
+            },
+            {
+              "mode": "SAFE",
+              "n": 13,
+              "wr": 0.15384615384615385,
+              "meanNet": -0.02250794908549414
+            }
+          ]
+        },
+        {
+          "symbol": "ZENUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 25,
+              "wr": 0.32,
+              "meanNet": 0.0018913216628201374
+            },
+            {
+              "mode": "STANDARD",
+              "n": 12,
+              "wr": 0.3333333333333333,
+              "meanNet": -0.006726827639689069
+            },
+            {
+              "mode": "SAFE",
+              "n": 5,
+              "wr": 0.4,
+              "meanNet": -0.021953933496184408
+            }
+          ]
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 22,
+              "wr": 0.36363636363636365,
+              "meanNet": 0.007682677630356127
+            },
+            {
+              "mode": "STANDARD",
+              "n": 11,
+              "wr": 0.6363636363636364,
+              "meanNet": 0.034018394739174534
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0.5,
+              "meanNet": -0.010971763845597088
+            }
+          ]
+        },
+        {
+          "symbol": "ENSUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 21,
+              "wr": 0.23809523809523808,
+              "meanNet": -0.0038565335345316417
+            },
+            {
+              "mode": "STANDARD",
+              "n": 11,
+              "wr": 0.2727272727272727,
+              "meanNet": 0.029163088771221903
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0.25,
+              "meanNet": 0.009628927450043685
+            }
+          ]
+        },
+        {
+          "symbol": "ICPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 18,
+              "wr": 0.4444444444444444,
+              "meanNet": 0.020611608480972612
+            },
+            {
+              "mode": "STANDARD",
+              "n": 14,
+              "wr": 0.42857142857142855,
+              "meanNet": 0.024460969187328957
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0.25,
+              "meanNet": -0.059320750281709564
+            }
+          ]
+        },
+        {
+          "symbol": "STXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 18,
+              "wr": 0.3888888888888889,
+              "meanNet": 0.036205172493881714
+            },
+            {
+              "mode": "STANDARD",
+              "n": 9,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.02452641385280989
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0.25,
+              "meanNet": -0.01882866725969287
+            }
+          ]
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 15,
+              "wr": 0.4,
+              "meanNet": 0.026988436255362624
+            },
+            {
+              "mode": "STANDARD",
+              "n": 7,
+              "wr": 0.42857142857142855,
+              "meanNet": 0.028789009314032988
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.012265319641233126
+            }
+          ]
+        },
+        {
+          "symbol": "LDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 12,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.015146598686782179
+            },
+            {
+              "mode": "STANDARD",
+              "n": 8,
+              "wr": 0.375,
+              "meanNet": 0.010334771613746727
+            },
+            {
+              "mode": "SAFE",
+              "n": 3,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.026106245202653408
+            }
+          ]
+        },
+        {
+          "symbol": "OPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 16,
+              "wr": 0.375,
+              "meanNet": 0.010084592806042278
+            },
+            {
+              "mode": "STANDARD",
+              "n": 4,
+              "wr": 0.75,
+              "meanNet": 0.054198347873308114
+            },
+            {
+              "mode": "SAFE",
+              "n": 3,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.00767218368505385
+            }
+          ]
+        },
+        {
+          "symbol": "SUIUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 13,
+              "wr": 0.7692307692307693,
+              "meanNet": 0.08087673266954193
+            },
+            {
+              "mode": "STANDARD",
+              "n": 7,
+              "wr": 0.7142857142857143,
+              "meanNet": 0.07976794348553183
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 1,
+              "meanNet": 0.153388282224598
+            }
+          ]
+        },
+        {
+          "symbol": "ZECUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 14,
+              "wr": 0.5714285714285714,
+              "meanNet": 0.05853220605859807
+            },
+            {
+              "mode": "STANDARD",
+              "n": 6,
+              "wr": 0.5,
+              "meanNet": 0.08457916457691704
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.3531294887417832
+            }
+          ]
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 11,
+              "wr": 0.2727272727272727,
+              "meanNet": -0.0070211315541777565
+            },
+            {
+              "mode": "STANDARD",
+              "n": 7,
+              "wr": 0.14285714285714285,
+              "meanNet": 0.00656652787113208
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0,
+              "meanNet": -0.03543532349838696
+            }
+          ]
+        },
+        {
+          "symbol": "ARBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 10,
+              "wr": 0.5,
+              "meanNet": 0.047639521177856026
+            },
+            {
+              "mode": "STANDARD",
+              "n": 5,
+              "wr": 0.6,
+              "meanNet": 0.09302210874419363
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": 0.0016431799533578179
+            }
+          ]
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 7,
+              "wr": 0.5714285714285714,
+              "meanNet": 0.03099648820968526
+            },
+            {
+              "mode": "STANDARD",
+              "n": 5,
+              "wr": 0.6,
+              "meanNet": 0.03159150545443659
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 1,
+              "meanNet": 0.10407715030266869
+            }
+          ]
+        },
+        {
+          "symbol": "ENAUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 4,
+              "wr": 0.5,
+              "meanNet": -0.007726020399303035
+            },
+            {
+              "mode": "STANDARD",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": 0.03248984007179961
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.02221173593192673
+            }
+          ]
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 3,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.15712614314409315
+            },
+            {
+              "mode": "STANDARD",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": 0.1317553998974518
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": 0.11832925105428813
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tf": "1h",
+      "symbols": [
+        {
+          "symbol": "TRBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 66,
+              "wr": 0.24242424242424243,
+              "meanNet": -0.008707695105323845
+            },
+            {
+              "mode": "STANDARD",
+              "n": 37,
+              "wr": 0.24324324324324326,
+              "meanNet": -0.0030882424166545006
+            },
+            {
+              "mode": "SAFE",
+              "n": 19,
+              "wr": 0.21052631578947367,
+              "meanNet": -0.02089632622477223
+            }
+          ]
+        },
+        {
+          "symbol": "ZENUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 45,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.008527434733991989
+            },
+            {
+              "mode": "STANDARD",
+              "n": 20,
+              "wr": 0.35,
+              "meanNet": 0.0026797201406514037
+            },
+            {
+              "mode": "SAFE",
+              "n": 12,
+              "wr": 0.3333333333333333,
+              "meanNet": -0.006800129710374314
+            }
+          ]
+        },
+        {
+          "symbol": "ENSUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 42,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.006929376069014866
+            },
+            {
+              "mode": "STANDARD",
+              "n": 23,
+              "wr": 0.34782608695652173,
+              "meanNet": 0.01943229648592144
+            },
+            {
+              "mode": "SAFE",
+              "n": 11,
+              "wr": 0.2727272727272727,
+              "meanNet": -0.012952741451816584
+            }
+          ]
+        },
+        {
+          "symbol": "ICPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 28,
+              "wr": 0.5714285714285714,
+              "meanNet": 0.02448017583961138
+            },
+            {
+              "mode": "STANDARD",
+              "n": 21,
+              "wr": 0.5238095238095238,
+              "meanNet": 0.00402615046272271
+            },
+            {
+              "mode": "SAFE",
+              "n": 6,
+              "wr": 0.16666666666666666,
+              "meanNet": -0.06572215748879083
+            }
+          ]
+        },
+        {
+          "symbol": "STXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 29,
+              "wr": 0.3793103448275862,
+              "meanNet": 0.0042232712948243375
+            },
+            {
+              "mode": "STANDARD",
+              "n": 15,
+              "wr": 0.4,
+              "meanNet": 0.006729873035162814
+            },
+            {
+              "mode": "SAFE",
+              "n": 8,
+              "wr": 0.375,
+              "meanNet": -0.006954951468547277
+            }
+          ]
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 24,
+              "wr": 0.3333333333333333,
+              "meanNet": -0.012443236462199407
+            },
+            {
+              "mode": "STANDARD",
+              "n": 15,
+              "wr": 0.4,
+              "meanNet": -0.015571821836197423
+            },
+            {
+              "mode": "SAFE",
+              "n": 6,
+              "wr": 0.5,
+              "meanNet": -0.029256435989632134
+            }
+          ]
+        },
+        {
+          "symbol": "ZECUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 25,
+              "wr": 0.4,
+              "meanNet": 0.018043664510060564
+            },
+            {
+              "mode": "STANDARD",
+              "n": 10,
+              "wr": 0.5,
+              "meanNet": 0.01712629685428692
+            },
+            {
+              "mode": "SAFE",
+              "n": 7,
+              "wr": 0.5714285714285714,
+              "meanNet": 0.026396415686377322
+            }
+          ]
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 22,
+              "wr": 0.3181818181818182,
+              "meanNet": 0.011927575906434373
+            },
+            {
+              "mode": "STANDARD",
+              "n": 13,
+              "wr": 0.38461538461538464,
+              "meanNet": 0.012795807364290961
+            },
+            {
+              "mode": "SAFE",
+              "n": 5,
+              "wr": 0.4,
+              "meanNet": 0.03500187782441559
+            }
+          ]
+        },
+        {
+          "symbol": "OPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 23,
+              "wr": 0.4782608695652174,
+              "meanNet": 0.011763306269758855
+            },
+            {
+              "mode": "STANDARD",
+              "n": 10,
+              "wr": 0.3,
+              "meanNet": -0.015111740566928938
+            },
+            {
+              "mode": "SAFE",
+              "n": 3,
+              "wr": 0.3333333333333333,
+              "meanNet": -0.023955290005986143
+            }
+          ]
+        },
+        {
+          "symbol": "LDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 18,
+              "wr": 0.3888888888888889,
+              "meanNet": 0.022289184288966302
+            },
+            {
+              "mode": "STANDARD",
+              "n": 12,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.01257724375234412
+            },
+            {
+              "mode": "SAFE",
+              "n": 5,
+              "wr": 0.2,
+              "meanNet": 0.007297163588006347
+            }
+          ]
+        },
+        {
+          "symbol": "SUIUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 18,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.06088917056846854
+            },
+            {
+              "mode": "STANDARD",
+              "n": 12,
+              "wr": 0.75,
+              "meanNet": 0.06050578059957779
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0.75,
+              "meanNet": 0.08798011538187288
+            }
+          ]
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 17,
+              "wr": 0.35294117647058826,
+              "meanNet": 0.012337874691913364
+            },
+            {
+              "mode": "STANDARD",
+              "n": 11,
+              "wr": 0.2727272727272727,
+              "meanNet": 0.005465806403258475
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0.25,
+              "meanNet": 0.024865246495659327
+            }
+          ]
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 17,
+              "wr": 0.47058823529411764,
+              "meanNet": 0.006514857822301635
+            },
+            {
+              "mode": "STANDARD",
+              "n": 9,
+              "wr": 0.7777777777777778,
+              "meanNet": 0.05191065492731778
+            },
+            {
+              "mode": "SAFE",
+              "n": 5,
+              "wr": 0.8,
+              "meanNet": 0.04066484474664552
+            }
+          ]
+        },
+        {
+          "symbol": "ARBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 12,
+              "wr": 0.4166666666666667,
+              "meanNet": 0.024259267373865783
+            },
+            {
+              "mode": "STANDARD",
+              "n": 7,
+              "wr": 0.42857142857142855,
+              "meanNet": 0.03683580096222736
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0.5,
+              "meanNet": 0.017298066682733353
+            }
+          ]
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 7,
+              "wr": 0.5714285714285714,
+              "meanNet": 0.11490667439493897
+            },
+            {
+              "mode": "STANDARD",
+              "n": 4,
+              "wr": 0.75,
+              "meanNet": 0.15736309141787283
+            },
+            {
+              "mode": "SAFE",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": 0.08021010219146107
+            }
+          ]
+        },
+        {
+          "symbol": "ENAUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 5,
+              "wr": 0.4,
+              "meanNet": -0.011352738199730168
+            },
+            {
+              "mode": "STANDARD",
+              "n": 3,
+              "wr": 0.3333333333333333,
+              "meanNet": -0.004628289464113655
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.03651477146724182
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tf": "2h",
+      "symbols": [
+        {
+          "symbol": "TRBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 75,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.009713813577466188
+            },
+            {
+              "mode": "STANDARD",
+              "n": 47,
+              "wr": 0.2553191489361702,
+              "meanNet": 0.004771516631656418
+            },
+            {
+              "mode": "SAFE",
+              "n": 31,
+              "wr": 0.3225806451612903,
+              "meanNet": 0.026581020402238736
+            }
+          ]
+        },
+        {
+          "symbol": "ZENUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 68,
+              "wr": 0.3088235294117647,
+              "meanNet": 0.010532465034461456
+            },
+            {
+              "mode": "STANDARD",
+              "n": 40,
+              "wr": 0.3,
+              "meanNet": 0.001496625970784852
+            },
+            {
+              "mode": "SAFE",
+              "n": 20,
+              "wr": 0.3,
+              "meanNet": 0.017592878812529227
+            }
+          ]
+        },
+        {
+          "symbol": "ENSUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 67,
+              "wr": 0.3880597014925373,
+              "meanNet": 0.024294197797914002
+            },
+            {
+              "mode": "STANDARD",
+              "n": 40,
+              "wr": 0.375,
+              "meanNet": 0.007394399341489337
+            },
+            {
+              "mode": "SAFE",
+              "n": 15,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.0012528023922231198
+            }
+          ]
+        },
+        {
+          "symbol": "STXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 43,
+              "wr": 0.3488372093023256,
+              "meanNet": 0.012863934970237492
+            },
+            {
+              "mode": "STANDARD",
+              "n": 24,
+              "wr": 0.4583333333333333,
+              "meanNet": 0.028990668206865505
+            },
+            {
+              "mode": "SAFE",
+              "n": 9,
+              "wr": 0.5555555555555556,
+              "meanNet": 0.043187432468880974
+            }
+          ]
+        },
+        {
+          "symbol": "ZECUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 35,
+              "wr": 0.4857142857142857,
+              "meanNet": 0.015423828096658343
+            },
+            {
+              "mode": "STANDARD",
+              "n": 24,
+              "wr": 0.5,
+              "meanNet": 0.018200848136338255
+            },
+            {
+              "mode": "SAFE",
+              "n": 9,
+              "wr": 0.4444444444444444,
+              "meanNet": 0.0008192967656786473
+            }
+          ]
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 35,
+              "wr": 0.3142857142857143,
+              "meanNet": 0.0018732419358676675
+            },
+            {
+              "mode": "STANDARD",
+              "n": 22,
+              "wr": 0.22727272727272727,
+              "meanNet": 0.005651213834414397
+            },
+            {
+              "mode": "SAFE",
+              "n": 8,
+              "wr": 0.25,
+              "meanNet": -0.037883357536633244
+            }
+          ]
+        },
+        {
+          "symbol": "ICPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 29,
+              "wr": 0.5862068965517241,
+              "meanNet": 0.016863381746184222
+            },
+            {
+              "mode": "STANDARD",
+              "n": 22,
+              "wr": 0.5,
+              "meanNet": 0.031592679123812396
+            },
+            {
+              "mode": "SAFE",
+              "n": 13,
+              "wr": 0.6153846153846154,
+              "meanNet": -0.014477923985686805
+            }
+          ]
+        },
+        {
+          "symbol": "OPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 33,
+              "wr": 0.2727272727272727,
+              "meanNet": -0.0016779021844463289
+            },
+            {
+              "mode": "STANDARD",
+              "n": 16,
+              "wr": 0.3125,
+              "meanNet": -0.010155084678914718
+            },
+            {
+              "mode": "SAFE",
+              "n": 8,
+              "wr": 0.375,
+              "meanNet": 0.00108259011936313
+            }
+          ]
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 33,
+              "wr": 0.2727272727272727,
+              "meanNet": 0.0027282394137769523
+            },
+            {
+              "mode": "STANDARD",
+              "n": 16,
+              "wr": 0.375,
+              "meanNet": 0.017946349210318825
+            },
+            {
+              "mode": "SAFE",
+              "n": 6,
+              "wr": 0.5,
+              "meanNet": 0.042770339737504916
+            }
+          ]
+        },
+        {
+          "symbol": "SUIUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 27,
+              "wr": 0.5555555555555556,
+              "meanNet": 0.05586369474688582
+            },
+            {
+              "mode": "STANDARD",
+              "n": 15,
+              "wr": 0.5333333333333333,
+              "meanNet": 0.03943820181998193
+            },
+            {
+              "mode": "SAFE",
+              "n": 6,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.05983873814621496
+            }
+          ]
+        },
+        {
+          "symbol": "LDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 28,
+              "wr": 0.39285714285714285,
+              "meanNet": 0.022974310149644957
+            },
+            {
+              "mode": "STANDARD",
+              "n": 13,
+              "wr": 0.38461538461538464,
+              "meanNet": 0.019506102242872057
+            },
+            {
+              "mode": "SAFE",
+              "n": 5,
+              "wr": 0.2,
+              "meanNet": 0.01158522154208157
+            }
+          ]
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 23,
+              "wr": 0.34782608695652173,
+              "meanNet": -0.006283247173260742
+            },
+            {
+              "mode": "STANDARD",
+              "n": 14,
+              "wr": 0.2857142857142857,
+              "meanNet": -0.01066341149834015
+            },
+            {
+              "mode": "SAFE",
+              "n": 5,
+              "wr": 0.4,
+              "meanNet": 0.018597506536022778
+            }
+          ]
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 18,
+              "wr": 0.4444444444444444,
+              "meanNet": -0.00793061166526464
+            },
+            {
+              "mode": "STANDARD",
+              "n": 12,
+              "wr": 0.5,
+              "meanNet": 0.0065813027068078005
+            },
+            {
+              "mode": "SAFE",
+              "n": 5,
+              "wr": 0.6,
+              "meanNet": 0.004877434643999823
+            }
+          ]
+        },
+        {
+          "symbol": "ARBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 14,
+              "wr": 0.42857142857142855,
+              "meanNet": 0.019169786247692916
+            },
+            {
+              "mode": "STANDARD",
+              "n": 12,
+              "wr": 0.5,
+              "meanNet": 0.030551793488587182
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0.75,
+              "meanNet": 0.04211535415405411
+            }
+          ]
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 10,
+              "wr": 0.5,
+              "meanNet": 0.042551804609753704
+            },
+            {
+              "mode": "STANDARD",
+              "n": 6,
+              "wr": 0.5,
+              "meanNet": 0.052567272916751874
+            },
+            {
+              "mode": "SAFE",
+              "n": 3,
+              "wr": 0.6666666666666666,
+              "meanNet": 0.09501616383959299
+            }
+          ]
+        },
+        {
+          "symbol": "ENAUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 5,
+              "wr": 0.2,
+              "meanNet": -0.002653300495091776
+            },
+            {
+              "mode": "STANDARD",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.08524202595022923
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 1,
+              "meanNet": 0.014498714700540618
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tf": "4h",
+      "symbols": [
+        {
+          "symbol": "ENSUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 86,
+              "wr": 0.3488372093023256,
+              "meanNet": 0.01331474925116307
+            },
+            {
+              "mode": "STANDARD",
+              "n": 55,
+              "wr": 0.45454545454545453,
+              "meanNet": 0.03105790832878222
+            },
+            {
+              "mode": "SAFE",
+              "n": 33,
+              "wr": 0.5757575757575758,
+              "meanNet": 0.022609359925836816
+            }
+          ]
+        },
+        {
+          "symbol": "TRBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 80,
+              "wr": 0.3375,
+              "meanNet": 0.005827355859569696
+            },
+            {
+              "mode": "STANDARD",
+              "n": 60,
+              "wr": 0.31666666666666665,
+              "meanNet": 0.014160149019425439
+            },
+            {
+              "mode": "SAFE",
+              "n": 32,
+              "wr": 0.3125,
+              "meanNet": 0.007358720780032687
+            }
+          ]
+        },
+        {
+          "symbol": "ZENUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 87,
+              "wr": 0.3218390804597701,
+              "meanNet": 0.0019758977648751366
+            },
+            {
+              "mode": "STANDARD",
+              "n": 57,
+              "wr": 0.2982456140350877,
+              "meanNet": 0.003565106933725604
+            },
+            {
+              "mode": "SAFE",
+              "n": 26,
+              "wr": 0.23076923076923078,
+              "meanNet": -0.024729575475488187
+            }
+          ]
+        },
+        {
+          "symbol": "STXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 56,
+              "wr": 0.375,
+              "meanNet": 0.004302911167412649
+            },
+            {
+              "mode": "STANDARD",
+              "n": 35,
+              "wr": 0.4,
+              "meanNet": 0.0013707379315041732
+            },
+            {
+              "mode": "SAFE",
+              "n": 13,
+              "wr": 0.46153846153846156,
+              "meanNet": -0.008744700654316347
+            }
+          ]
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 56,
+              "wr": 0.375,
+              "meanNet": 0.006076330926678255
+            },
+            {
+              "mode": "STANDARD",
+              "n": 28,
+              "wr": 0.5,
+              "meanNet": 0.017415985104469726
+            },
+            {
+              "mode": "SAFE",
+              "n": 11,
+              "wr": 0.5454545454545454,
+              "meanNet": 0.016553157477891916
+            }
+          ]
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 43,
+              "wr": 0.3953488372093023,
+              "meanNet": 0.013228882367598603
+            },
+            {
+              "mode": "STANDARD",
+              "n": 29,
+              "wr": 0.4827586206896552,
+              "meanNet": 0.061516870768196646
+            },
+            {
+              "mode": "SAFE",
+              "n": 12,
+              "wr": 0.5,
+              "meanNet": -0.025571062274936218
+            }
+          ]
+        },
+        {
+          "symbol": "ZECUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 46,
+              "wr": 0.43478260869565216,
+              "meanNet": 0.006740428018410584
+            },
+            {
+              "mode": "STANDARD",
+              "n": 25,
+              "wr": 0.32,
+              "meanNet": -0.0018488810668671573
+            },
+            {
+              "mode": "SAFE",
+              "n": 13,
+              "wr": 0.5384615384615384,
+              "meanNet": 0.015800474903035797
+            }
+          ]
+        },
+        {
+          "symbol": "OPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 42,
+              "wr": 0.30952380952380953,
+              "meanNet": -0.012177447908419167
+            },
+            {
+              "mode": "STANDARD",
+              "n": 25,
+              "wr": 0.4,
+              "meanNet": 0.01815250795393305
+            },
+            {
+              "mode": "SAFE",
+              "n": 14,
+              "wr": 0.2857142857142857,
+              "meanNet": -0.01948050048392357
+            }
+          ]
+        },
+        {
+          "symbol": "ICPUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 36,
+              "wr": 0.3611111111111111,
+              "meanNet": -0.012697417132683752
+            },
+            {
+              "mode": "STANDARD",
+              "n": 29,
+              "wr": 0.41379310344827586,
+              "meanNet": -0.010955972190322292
+            },
+            {
+              "mode": "SAFE",
+              "n": 15,
+              "wr": 0.4666666666666667,
+              "meanNet": -0.01731487135471928
+            }
+          ]
+        },
+        {
+          "symbol": "SUIUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 35,
+              "wr": 0.4857142857142857,
+              "meanNet": 0.02308429951006169
+            },
+            {
+              "mode": "STANDARD",
+              "n": 24,
+              "wr": 0.5416666666666666,
+              "meanNet": 0.033061082118545485
+            },
+            {
+              "mode": "SAFE",
+              "n": 11,
+              "wr": 0.6363636363636364,
+              "meanNet": 0.0732144853154389
+            }
+          ]
+        },
+        {
+          "symbol": "LDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 36,
+              "wr": 0.25,
+              "meanNet": -0.001846924638384708
+            },
+            {
+              "mode": "STANDARD",
+              "n": 24,
+              "wr": 0.3333333333333333,
+              "meanNet": 0.03540486226281589
+            },
+            {
+              "mode": "SAFE",
+              "n": 6,
+              "wr": 0.16666666666666666,
+              "meanNet": -0.004994607938401119
+            }
+          ]
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 26,
+              "wr": 0.4230769230769231,
+              "meanNet": 0.005645085393731217
+            },
+            {
+              "mode": "STANDARD",
+              "n": 17,
+              "wr": 0.5294117647058824,
+              "meanNet": 0.028379285660489036
+            },
+            {
+              "mode": "SAFE",
+              "n": 5,
+              "wr": 0.2,
+              "meanNet": -0.05185009429493022
+            }
+          ]
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 26,
+              "wr": 0.38461538461538464,
+              "meanNet": 0.0031287212305173284
+            },
+            {
+              "mode": "STANDARD",
+              "n": 13,
+              "wr": 0.5384615384615384,
+              "meanNet": 0.020763371735528925
+            },
+            {
+              "mode": "SAFE",
+              "n": 8,
+              "wr": 0.625,
+              "meanNet": 0.007477390433659633
+            }
+          ]
+        },
+        {
+          "symbol": "ARBUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 23,
+              "wr": 0.391304347826087,
+              "meanNet": 0.022778657148169134
+            },
+            {
+              "mode": "STANDARD",
+              "n": 11,
+              "wr": 0.5454545454545454,
+              "meanNet": 0.0066685522801514015
+            },
+            {
+              "mode": "SAFE",
+              "n": 6,
+              "wr": 0.8333333333333334,
+              "meanNet": 0.0033265101766552147
+            }
+          ]
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 12,
+              "wr": 0.4166666666666667,
+              "meanNet": 0.0032264212531697045
+            },
+            {
+              "mode": "STANDARD",
+              "n": 7,
+              "wr": 0.5714285714285714,
+              "meanNet": 0.01194525960291026
+            },
+            {
+              "mode": "SAFE",
+              "n": 4,
+              "wr": 0.75,
+              "meanNet": 0.040777134580546125
+            }
+          ]
+        },
+        {
+          "symbol": "ENAUSDT",
+          "modes": [
+            {
+              "mode": "RISK",
+              "n": 6,
+              "wr": 0.5,
+              "meanNet": 0.01595312532938244
+            },
+            {
+              "mode": "STANDARD",
+              "n": 2,
+              "wr": 0.5,
+              "meanNet": -0.006003767066860592
+            },
+            {
+              "mode": "SAFE",
+              "n": 1,
+              "wr": 0,
+              "meanNet": -0.002347786612711118
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
