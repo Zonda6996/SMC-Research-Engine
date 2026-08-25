@@ -1,0 +1,154 @@
+{
+  "studyId": "d6-apex",
+  "generatedAt": "2026-08-25T08:38:25.123Z",
+  "verdict": "KILL",
+  "primary": {
+    "deepN": 472,
+    "restN": 526,
+    "deepMean": 0.045280171639991526,
+    "restMean": 0.018768095165480482,
+    "deltaCi95": {
+      "lower": -0.008409418320367918,
+      "upper": 0.051165006651595187
+    }
+  },
+  "powerOk": true,
+  "preregistrationSha256": "2d988479f625063a2d7e35e8d062dc4940b11c5bccd894d0a5739e935cd39847",
+  "manifestSha256": "8e172fc4a0f41b463e305ab7a37e334c70d4205bf26fecd698ec86e82ee250b0",
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "BNBUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "LTCUSDT",
+    "LINKUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "TRXUSDT"
+  ],
+  "perArm": [
+    {
+      "tf": "5m",
+      "mode": "STANDARD",
+      "n": 154,
+      "deepN": 60,
+      "deepMean": 0.036011189348888244,
+      "restMean": 0.025151911063529025,
+      "deepWr": 0.5666666666666667,
+      "delta": 0.010859278285359219
+    },
+    {
+      "tf": "5m",
+      "mode": "SAFE",
+      "n": 73,
+      "deepN": 26,
+      "deepMean": 0.03711078740638081,
+      "restMean": 0.034608747703919494,
+      "deepWr": 0.5769230769230769,
+      "delta": 0.002502039702461316
+    },
+    {
+      "tf": "15m",
+      "mode": "STANDARD",
+      "n": 149,
+      "deepN": 74,
+      "deepMean": 0.0347318952442296,
+      "restMean": 0.01352097837915224,
+      "deepWr": 0.6351351351351351,
+      "delta": 0.02121091686507736
+    },
+    {
+      "tf": "15m",
+      "mode": "SAFE",
+      "n": 67,
+      "deepN": 32,
+      "deepMean": 0.04694849941893319,
+      "restMean": 0.030655975308836066,
+      "deepWr": 0.6875,
+      "delta": 0.016292524110097125
+    },
+    {
+      "tf": "30m",
+      "mode": "STANDARD",
+      "n": 129,
+      "deepN": 74,
+      "deepMean": 0.04108294373169803,
+      "restMean": 0.013844882358734628,
+      "deepWr": 0.6621621621621622,
+      "delta": 0.027238061372963404
+    },
+    {
+      "tf": "30m",
+      "mode": "SAFE",
+      "n": 58,
+      "deepN": 38,
+      "deepMean": 0.057400860928508775,
+      "restMean": 0.019120376730136494,
+      "deepWr": 0.7631578947368421,
+      "delta": 0.03828048419837228
+    },
+    {
+      "tf": "1h",
+      "mode": "STANDARD",
+      "n": 118,
+      "deepN": 59,
+      "deepMean": 0.03953521382330247,
+      "restMean": 0.022690880492571206,
+      "deepWr": 0.711864406779661,
+      "delta": 0.01684433333073126
+    },
+    {
+      "tf": "1h",
+      "mode": "SAFE",
+      "n": 51,
+      "deepN": 31,
+      "deepMean": 0.04701263067128093,
+      "restMean": 0.021864643377407934,
+      "deepWr": 0.7741935483870968,
+      "delta": 0.025147987293873
+    },
+    {
+      "tf": "2h",
+      "mode": "STANDARD",
+      "n": 95,
+      "deepN": 37,
+      "deepMean": 0.05453896957505551,
+      "restMean": 0.014441661957646734,
+      "deepWr": 0.8378378378378378,
+      "delta": 0.040097307617408776
+    },
+    {
+      "tf": "2h",
+      "mode": "SAFE",
+      "n": 39,
+      "deepN": 19,
+      "deepMean": 0.049674871212665186,
+      "restMean": 0.025182047360639493,
+      "deepWr": 0.8421052631578947,
+      "delta": 0.024492823852025693
+    },
+    {
+      "tf": "4h",
+      "mode": "STANDARD",
+      "n": 45,
+      "deepN": 15,
+      "deepMean": 0.10045561312538706,
+      "restMean": -0.009233965681169704,
+      "deepWr": 1,
+      "delta": 0.10968957880655676
+    },
+    {
+      "tf": "4h",
+      "mode": "SAFE",
+      "n": 20,
+      "deepN": 7,
+      "deepMean": 0.09917694415512697,
+      "restMean": -0.01462111465562325,
+      "deepWr": 1,
+      "delta": 0.11379805881075022
+    }
+  ]
+}
