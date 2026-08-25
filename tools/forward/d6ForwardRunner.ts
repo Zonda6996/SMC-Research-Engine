@@ -6,7 +6,8 @@
  *   STANDARD OI −15% / цена −5%   — рабочий режим (утверждённое правило)
  *   RISK     OI −12% / цена −5%   — частота вместо качества
  * База сделки одинакова: бар i закрылся с ΔOI_8h≤порог И ΔP_8h≤порог → LONG на open бара i+1;
- * стоп flushLow−0.5×ATR200; цель reclaim = close[i−8]; таймаут 72ч. Окна в барах (8ч).
+ * стоп flushLow−0.5×ATR200; выход ТОЛЬКО по стопу или таймауту 72ч (reclaim удалён 24.08 —
+ * срезал ~0.6 п.п./сделку, d6-multitf reveal). Окна в барах (8ч).
  * Живой OI: REST futures/data/openInterestHist (5m, окно ~8 суток) ⇒ запускать раз в 1–3 дня.
  * Сигналы старше часа при обнаружении помечаются missed=true (вход упущен, в статистике учитывается).
  * Меж-прогонный min-gap: последний журнальный сигнал режима занимает gap-слот (8 баров).
@@ -168,7 +169,8 @@ async function processSymbol(symbol: string, ctx: Ctx): Promise<{ newSignals: nu
 	let newSignals = 0
 	let newMissed = 0
 
-	// Ведение открытых позиций (по каждому режиму).
+	// Ведение открытых позиций (по каждому режиму). Выход ТОЛЬКО по стопу или таймауту 72ч
+	// (reclaim-выход удалён решением автора 2026-08-24: срезает ~0.6 п.п./сделку, d6-multitf).
 	for (const mode of MODES) {
 		const openTrade = ctx.openBySymbol.get(keyOf(mode.id, symbol))
 		if (openTrade == null || openTrade.outcome !== 'open') continue
@@ -178,7 +180,6 @@ async function processSymbol(symbol: string, ctx: Ctx): Promise<{ newSignals: nu
 			const bar = closed[k]!
 			openTrade.mfeR = Math.max(openTrade.mfeR ?? 0, (bar.high - openTrade.entry!) / openTrade.riskDist)
 			if (bar.low <= openTrade.stop) finishTrade(openTrade, bar, openTrade.stop, 'stop')
-			else if (k > entryIdx && bar.close >= openTrade.targetRefLevel) finishTrade(openTrade, bar, bar.close, 'reclaim')
 			else if (k - entryIdx >= HOLD_MAX - 1) finishTrade(openTrade, bar, bar.close, 'timeout')
 		}
 	}
@@ -328,9 +329,10 @@ async function main(): Promise<void> {
 		`Прогон: ${astana(new Date().toISOString())} (время Астаны, UTC+5). Мониторинг: ${universe.length} символов.`,
 		'',
 		`**Как читать.** Режимы — это только ПОРОГ срабатывания сигнала (SAFE строгий, RISK мягкий);`,
-		`сделка у всех одинаковая: лонг на открытии следующего часа, стоп под минимумом флаша, выход`,
-		`по возврату цены или максимум через 72 часа. Одно сильное событие триггерит сразу несколько`,
-		`режимов — в торговле это ОДНА позиция. «Упущен» = сигнал найден позже часа входа (для статистики, не сделка).`,
+		`сделка у всех одинаковая: лонг на открытии следующего часа, стоп под минимумом флаша,`,
+		`выход ТОЛЬКО по стопу или через 72 часа (reclaim убран 24.08 — срезал прибыль). Одно сильное`,
+		`событие триггерит сразу несколько режимов — в торговле это ОДНА позиция. «Упущен» = сигнал`,
+		`найден позже часа входа (для статистики, не сделка).`,
 		'',
 		`Новых сигналов за прогон: ${newSignals} (упущено: ${newMissed}). Всего событий: ${events.length}; открытых позиций: ${[...openBySymbol.values()].filter((t) => t.outcome === 'open').length}.`,
 		`Завершённых сделок: ${resolved.length}; WR ${resolved.length ? (winsN / resolved.length * 100).toFixed(1) : '—'}%; средняя net ${meanNet != null ? (meanNet * 100).toFixed(3) + '%' : '—'}%.`,
@@ -342,15 +344,15 @@ async function main(): Promise<void> {
 		...perMode,
 		'',
 		'## Последние события (одна строка = одно событие)',
-		'| время (Астана) | символ | режимы | вход | стоп | цель | упущен |',
-		'|---|---|---|---:|---:|---:|---|',
+		'| время (Астана) | символ | режимы | вход | стоп | упущен |',
+		'|---|---|---|---:|---:|---|',
 		...events.slice(0, 15).map((group) => {
 			const s = group[0]!
 			const modes = group.map((g) => g.mode).sort((a, b) => modeOrder.get(a)! - modeOrder.get(b)!).join('+')
-			return `| ${astana(s.signalBarCloseUtc)} | ${s.symbol.replace('USDT', '')} | ${modes} | ${s.entry ?? '—'} | ${s.stop.toPrecision(6)} | ${s.targetRefLevel.toPrecision(6)} | ${s.missed ? 'да' : 'нет'} |`
+			return `| ${astana(s.signalBarCloseUtc)} | ${s.symbol.replace('USDT', '')} | ${modes} | ${s.entry ?? '—'} | ${s.stop.toPrecision(6)} | ${s.missed ? 'да' : 'нет'} |`
 		}),
 		'',
-		'_Вход: TradingView → актив → 1h → бар времени закрытия → вход по открытию следующего бара. Время — Астана (UTC+5)._',
+		'_Вход: TradingView → актив → 1h → бар времени закрытия → вход по открытию следующего бара. Выход: стоп или 72ч. Время — Астана (UTC+5)._',
 	]
 	writeFileSync(resolve(STATE_DIR, 'report.md'), md.join('\n'))
 	console.log('\n' + md.slice(2, 10).join('\n'))
