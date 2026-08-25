@@ -1,0 +1,69 @@
+{
+  "studyId": "d6-apex-b",
+  "generatedAt": "2026-08-25T10:00:12.798Z",
+  "preregistrationSha256": "d70ac21b5bb29a6f37e9cb0bc6d464f5fdc1b874e6001cd95502925556493b5a",
+  "manifestSha256": "e877614c3b7f55170ba1b73a291226922c46bb13bdafac6a1374c351b1ae6bf4",
+  "eventsTotal": 324,
+  "universe": [
+    "1000PEPEUSDT",
+    "AAVEUSDT",
+    "ARBUSDT",
+    "AVAXUSDT",
+    "BOMEUSDT",
+    "ENAUSDT",
+    "ENSUSDT",
+    "ICPUSDT",
+    "LDOUSDT",
+    "ONDOUSDT",
+    "OPUSDT",
+    "STXUSDT",
+    "SUIUSDT",
+    "TRBUSDT",
+    "ZECUSDT",
+    "ZENUSDT"
+  ],
+  "variants": [
+    {
+      "id": "deep",
+      "classN": 120,
+      "restN": 204,
+      "classMean": 0.034397878808807306,
+      "restMean": -0.006861487856856098,
+      "delta": 0.041259366665663405,
+      "ci": {
+        "lower": -0.03447286346309711,
+        "upper": 0.09782045326419163
+      },
+      "gate": true,
+      "verdict": "KILL"
+    },
+    {
+      "id": "inner",
+      "classN": 149,
+      "restN": 175,
+      "classMean": 0.022635313624266473,
+      "restMean": -0.0036837702614712603,
+      "delta": 0.026319083885737733,
+      "ci": {
+        "lower": -0.03720603774766036,
+        "upper": 0.07620028690944476
+      },
+      "gate": true,
+      "verdict": "KILL"
+    },
+    {
+      "id": "mean",
+      "classN": 233,
+      "restN": 91,
+      "classMean": 0.017901796104171582,
+      "restMean": -0.01585842371443677,
+      "delta": 0.033760219818608356,
+      "ci": {
+        "lower": -0.010661570660608048,
+        "upper": 0.07437882442792401
+      },
+      "gate": true,
+      "verdict": "KILL"
+    }
+  ]
+}
