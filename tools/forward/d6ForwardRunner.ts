@@ -16,6 +16,8 @@
  * Запуск: npx tsx tools/forward/d6ForwardRunner.ts
  */
 import { existsSync, mkdirSync, appendFileSync, readFileSync, writeFileSync, renameSync } from 'node:fs'
+import { detectDopplerCascades, dopplerAtr200 } from '../../src/core/signals/DopplerEngine.js'
+import type { Candle } from '../../src/models/price/Candle.js'
 import { resolve } from 'node:path'
 
 const STATE_DIR = 'tmp/forward/d6'
@@ -99,18 +101,6 @@ function causalOi(klines: Kline[], oi: Map<number, number>): Array<number | null
 	return out
 }
 
-function arrowAtrLocal(candles: Kline[]): Array<number | null> {
-	const tr = candles.map((c, i) => i === 0 ? c.high - c.low : Math.max(c.high - c.low, Math.abs(c.high - candles[i - 1]!.close), Math.abs(c.low - candles[i - 1]!.close)))
-	const out: Array<number | null> = []
-	let sum = 0
-	for (let i = 0; i < candles.length; i++) {
-		sum += tr[i]!
-		if (i >= 200) sum -= tr[i - 200]!
-		out.push(i >= 199 ? sum / 200 : null)
-	}
-	return out
-}
-
 interface SignalRecord {
 	mode: string
 	symbol: string
@@ -164,8 +154,6 @@ async function processSymbol(symbol: string, ctx: Ctx): Promise<{ newSignals: nu
 	const nowFloor = Math.floor(Date.now() / HOUR) * HOUR
 	const closed = klines.filter((k) => k.openTime + HOUR <= nowFloor)
 	const oi = causalOi(closed, await fetchOi(symbol, closed[0]!.openTime))
-	const closes = closed.map((k) => k.close)
-	const atrArr = arrowAtrLocal(closed)
 	let newSignals = 0
 	let newMissed = 0
 
@@ -184,26 +172,19 @@ async function processSymbol(symbol: string, ctx: Ctx): Promise<{ newSignals: nu
 		}
 	}
 
-	// Детекция новых событий по каждому режиму.
+	// Детекция новых событий по каждому режиму — через ядро DopplerEngine
+	// (единственный источник логики; паритет с раннерами покрыт тестами dopplerEngine.test.ts).
+	const series: Candle[] = closed.map((k) => ({ timestamp: k.openTime, open: k.open, high: k.high, low: k.low, close: k.close, volume: 0 }))
+	const atrArr = dopplerAtr200(series)
 	for (const mode of MODES) {
 		const lastSigMs = ctx.lastSignalPerKey.get(keyOf(mode.id, symbol)) ?? Number.NEGATIVE_INFINITY
-		let lastAdmittedOffset = -Infinity
-		for (let i = WINDOW_BARS; i < closed.length; i++) {
-			const bar = closed[i]!
+		const events = detectDopplerCascades(series, oi, atrArr, { oiDrop: mode.oiDrop, priceDrop: mode.priceDrop, windowBars: WINDOW_BARS, gapBars: GAP_BARS, holdBars: HOLD_MAX, stopAtrMult: 0.5 })
+		for (const ev of events) {
+			const bar = closed[ev.index]!
+			// Меж-прогонный min-gap: последний журнальный сигнал режима занимает слот (8ч).
 			if (bar.openTime <= lastSigMs) continue
 			if (bar.openTime - lastSigMs < GAP_BARS * HOUR) continue
-			const oiNow = oi[i]
-			const oiPast = oi[i - WINDOW_BARS]!
-			if (oiNow == null || oiPast == null || oiPast <= 0) continue
-			if (!(oiNow / oiPast - 1 <= mode.oiDrop && closes[i]! / closes[i - WINDOW_BARS]! - 1 <= mode.priceDrop)) continue
-			if (i - lastAdmittedOffset < GAP_BARS) continue
-			lastAdmittedOffset = i
-			const atr = atrArr[i]!
-			if (!(Number.isFinite(atr) && atr > 0)) continue
-			const lows = closed.slice(i - WINDOW_BARS + 1, i + 1).map((k) => k.low)
-			const stop = Math.min(...lows) - 0.5 * atr
-			const refLevel = closes[i - WINDOW_BARS]!
-			const entryBar = closed[i + 1]
+			const entryBar = closed[ev.entryIndex]
 			const missed = Date.now() > bar.openTime + HOUR + 15 * 60_000
 			const sig: SignalRecord = {
 				mode: mode.id,
@@ -213,11 +194,11 @@ async function processSymbol(symbol: string, ctx: Ctx): Promise<{ newSignals: nu
 				detectedAtUtc: new Date().toISOString(),
 				missed,
 				entryPlanUtc: new Date(bar.openTime + HOUR).toISOString(),
-				entry: entryBar?.open ?? null,
-				stop,
-				targetRefLevel: refLevel,
-				riskDist: (entryBar?.open ?? NaN) - stop,
-				atr,
+				entry: ev.entryOpen,
+				stop: ev.stop,
+				targetRefLevel: closed[ev.index - WINDOW_BARS]!.close,
+				riskDist: ev.riskDist,
+				atr: ev.atr,
 			}
 			ctx.allSignals.push(sig)
 			newSignals++
@@ -226,7 +207,7 @@ async function processSymbol(symbol: string, ctx: Ctx): Promise<{ newSignals: nu
 			const openKey = keyOf(mode.id, symbol)
 			if (!missed && entryBar != null && !ctx.openBySymbol.has(openKey)) {
 				const trade: TradeRecord = { ...sig, outcome: 'open', exitUtc: null, exitPrice: null, mfeR: (entryBar.high - entryBar.open) / sig.riskDist, netPct: null }
-				if (entryBar.low <= stop) finishTrade(trade, entryBar, stop, 'stop')
+				if (entryBar.low <= ev.stop) finishTrade(trade, entryBar, ev.stop, 'stop')
 				ctx.openBySymbol.set(openKey, trade)
 				ctx.allTrades.push(trade)
 				appendFileSync(ctx.tradesPath, JSON.stringify(trade) + '\n')

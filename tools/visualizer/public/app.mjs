@@ -12,6 +12,7 @@ import { renderZones, wireZonesPanel, moveZoneFocus, zoneHoverHtml } from './pan
 import { renderConfirmation, wireConfirmationPanel, moveConfirmation } from './panels/confirmation.mjs'
 import { renderLab, wireLabPanel, moveLab, exitLabVisuals } from './panels/lab.mjs'
 import { renderConfigPanel, setEngineDefaults, wireConfigPanel } from './panels/config.mjs'
+import { wireDopplerPanel, refreshDopplerData, renderDopplerPanel } from './panels/doppler.mjs'
 import { drawIndicatorLayers, selectSignalArrowAt, signalArrowTooltip, updateSignalArrowHud, wireIndicatorSettings } from './panels/indicators.mjs'
 import { wirePalette, openPalette, closePalette, paletteOpen, setPaletteSymbols } from './lib/palette.mjs'
 
@@ -142,6 +143,7 @@ async function load() {
 	try {
 		const json = await fetchAnalyze()
 		S.data = json
+		refreshDopplerData().then(() => renderDopplerPanel()).catch(() => {})
 		S.selectedId = null
 		S.poiFocusId = null
 		S.confIndex = 0
@@ -318,6 +320,7 @@ function init() {
 	wireConfirmationPanel(activateMode, deactivateMode)
 	wireLabPanel(activateMode, deactivateMode)
 	wireConfigPanel()
+	wireDopplerPanel()
 	wireIndicatorSettings(redraw)
 	wirePalette()
 	wireSections()

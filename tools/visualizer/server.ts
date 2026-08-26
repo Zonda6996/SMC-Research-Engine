@@ -20,6 +20,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, extname, resolve } from 'node:path'
+import { gzipSync } from 'node:zlib'
 import { runAnalysis } from '../../src/core/analysis/runAnalysis.js'
 import { detectLiquidityPoi, LIQUIDITY_POI_CONFIG, LIQUIDITY_POI_VERSION } from '../../src/core/confirmation/LiquidityPoiCalibration.js'
 import { detectLiquidityHeatmap, heatmapConfigForTf, LIQUIDITY_HEATMAP_VERSION } from '../../src/core/liquidity/LiquidityHeatmapEngine.js'
@@ -41,6 +42,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const PUBLIC_DIR = join(__dirname, 'public')
 const PORT = 7788
 
+// Тихие краши долгоживущего сервера обязаны оставлять след (Track C, 2026-08-24).
+process.on('uncaughtException', (e) => { console.error('[uncaughtException]', e?.stack ?? e); process.exit(1) })
+process.on('unhandledRejection', (e) => { console.error('[unhandledRejection]', e instanceof Error ? e.stack : e) })
+
 const MIME: Record<string, string> = {
 	'.html': 'text/html; charset=utf-8',
 	'.js': 'application/javascript; charset=utf-8',
@@ -59,6 +64,10 @@ const dataCache = new Map<string, {
 	/** §14.1: раздельные ряды refined/simplified (архивы + API-хвост). */
 	ltfRefined: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 	ltfSimplified: Awaited<ReturnType<typeof fetchCandlesPaginated>>
+	/** Track C: мемо собранных payload-ов по ключу конфигов движков (тёплый путь без пересчёта). */
+	memo: Map<string, Record<string, unknown>>
+	/** Track C: runAnalysis детерминирован по свечам — считаем один раз на набор данных. */
+	snapshot: ReturnType<typeof runAnalysis>
 }>()
 const DATA_TTL_LIVE = 90_000
 const DATA_TTL_HIST = 60 * 60 * 1000
@@ -258,9 +267,15 @@ function loadFixtureCandles(): import('../../src/models/price/Candle.js').Candle
 	return JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8'))
 }
 
-function sendJson(res: ServerResponse, status: number, data: unknown) {
-	const body = JSON.stringify(data)
-	res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' })
+function sendJson(req: IncomingMessage, res: ServerResponse, status: number, data: unknown) {
+	const t0 = Date.now()
+	const json = JSON.stringify(data)
+	const ms = Date.now() - t0
+	if (ms > 500) console.log(`[sendJson] stringify ${ms}ms, ${(json.length / 1e6).toFixed(1)}MB`)
+	const acceptsGzip = String(req.headers['accept-encoding'] ?? '').includes('gzip')
+	const body = acceptsGzip ? gzipSync(Buffer.from(json), { level: 6 }) : Buffer.from(json)
+	if (ms > 500) console.log(`[sendJson] total ${Date.now() - t0}ms`)
+	res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', ...(acceptsGzip ? { 'Content-Encoding': 'gzip' } : {}) })
 	res.end(body)
 }
 
@@ -497,11 +512,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
 	if (url.pathname === '/api/symbols') {
 		try {
-			sendJson(res, 200, { symbols: await fetchTopSymbols() })
+			sendJson(req, res, 200, { symbols: await fetchTopSymbols() })
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err)
 			console.error('[api/symbols] error:', message)
-			sendJson(res, 500, { error: message })
+			sendJson(req, res, 500, { error: message })
 		}
 		return
 	}
@@ -552,8 +567,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 			let ltfSimplified: Awaited<ReturnType<typeof fetchCandlesPaginated>>
 			let snapshot: ReturnType<typeof runAnalysis>
 			if (cachedData && Date.now() - cachedData.at < ttl) {
-				({ candles, ltf5m, heatmapAux, ltfRefined, ltfSimplified } = cachedData)
-				snapshot = runAnalysis(candles)
+				({ candles, ltf5m, heatmapAux, ltfRefined, ltfSimplified, snapshot } = cachedData)
 			} else {
 				candles = useFixture ? loadFixtureCandles() : await fetchCandlesPaginated(symbol, timeframe, limit, market, untilMs)
 				snapshot = runAnalysis(candles)
@@ -588,7 +602,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 					withArchive(simplifiedTf, ltfSimplified, 'simplified'),
 				])
 				if (!useFixture) {
-					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltfRefined, ltfSimplified })
+					dataCache.set(cacheKey, { at: Date.now(), candles, ltf5m, heatmapAux, ltfRefined, ltfSimplified, snapshot, memo: new Map<string, Record<string, unknown>>() })
 					// Потолок кэша: держим последние 8 наборов (каждый — десятки МБ 5m-свечей).
 					while (dataCache.size > 8) dataCache.delete(dataCache.keys().next().value as string)
 				}
@@ -608,6 +622,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				? 'contraction'
 				: 'off'
 			const heatmapPools = detectLiquidityHeatmap(snapshot.candles, { ...hmBase, ...hmOverrides }, heatmapAux ?? undefined)
+
+		// Track C: весь тяжёлый конвейер ниже детерминирован по данным+конфигам — мемоизируем
+		// собранный payload на время жизни кэша данных (тёплый путь = только сериализация).
+		const engineKey = JSON.stringify({ apexParams, arrowMode, filterMode, hmOverrides, poiOverrides, confOverrides })
+		const memo = cachedData?.memo
+		const memoHit = memo?.get(engineKey) as Record<string, unknown> | undefined
+		console.log(`[analyze] memo ${memoHit ? 'HIT' : (memo ? `MISS key=${engineKey}` : 'no-memo')}, dataCache.size=${dataCache.size}`)
+		if (memoHit) {
+			sendJson(req, res, 200, memoHit)
+			return
+		}
+
 			// §14.1/§16.19: зоны общие, но каждый confirmation engine получает свой TF.
 			// §16.21: per-TF профиль зон (иерархия слоёв пользователя) под UI-overrides; 4h = дефолты.
 			const poiProfile = liquidityPoiProfileForTf(htfMs)
@@ -671,8 +697,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				}
 			}
 
-			sendJson(res, 200, {
-				strategy: {
+				const payload = {
+			strategy: {
 					version: FORWARD_VERSION,
 					benchmarks: BATTLE_CONFIG.benchmarks,
 					bigbar: 'diagnostic-only',
@@ -711,11 +737,42 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 				events: snapshot.events,
 				protectedSegments: buildProtectedSegments(snapshot),
 				trades: buildTrades(snapshot, ltf5m, htfMs),
-			})
+			}
+			;(cachedData?.memo ?? dataCache.get(cacheKey)?.memo)?.set(engineKey, payload)
+			sendJson(req, res, 200, payload)
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err)
 			console.error('[api/analyze] error:', message)
-			sendJson(res, 500, { error: message })
+			sendJson(req, res, 500, { error: message })
+		}
+		return
+	}
+
+	// Doppler (D6): живой журнал форварда + статистика книг из терминальных артефактов (слой Doppler).
+	if (url.pathname === '/api/doppler') {
+		try {
+			const q = new URLSearchParams(url.search)
+			const raw = (q.get('symbol') ?? '').replace(/[^A-Z0-9]/gi, '').toUpperCase()
+			const root = resolve(__dirname, '../..')
+			const journalDir = resolve(root, 'tmp/forward/d6')
+			const readJsonl = (p: string): Record<string, unknown>[] => existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l) as Record<string, unknown>) : []
+			const signals = readJsonl(join(journalDir, 'signals.jsonl'))
+			const trades = readJsonl(join(journalDir, 'trades.jsonl'))
+			const pickedSignals = raw ? signals.filter((s) => String(s.symbol) === raw) : signals
+			const pickedTrades = raw ? trades.filter((t) => String(t.symbol) === raw) : trades
+			const readArtifact = (p: string): Record<string, unknown> | null => existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) as Record<string, unknown> : null
+			sendJson(req, res, 200, {
+				generatedAt: new Date().toISOString(),
+				symbol: raw,
+				journal: { signals: pickedSignals, trades: pickedTrades, totals: { signals: signals.length, trades: trades.length } },
+				stats: {
+					macro: readArtifact(resolve(root, 'ci-results/d6-multitf-results.json')),
+					flash: readArtifact(resolve(root, 'ci-results/d6-flash-results.json')),
+					partial: readArtifact(resolve(root, 'ci-results/d6-partial-results.json')),
+				},
+			})
+		} catch (err) {
+			sendJson(req, res, 500, { error: err instanceof Error ? err.message : String(err) })
 		}
 		return
 	}
@@ -723,7 +780,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 	// Статика из public/.
 	const filePath = join(PUBLIC_DIR, url.pathname === '/' ? 'index.html' : url.pathname)
 	if (!existsSync(filePath)) {
-		sendJson(res, 404, { error: `Not found: ${url.pathname}` })
+		sendJson(req, res, 404, { error: `Not found: ${url.pathname}` })
 		return
 	}
 
