@@ -1,9 +1,10 @@
 // panels/doppler.mjs — панель Doppler (D6): книги × ТФ × режимы + живой журнал форварда.
 // Данные: /api/doppler (журнал tmp/forward/d6 + терминальные артефакты ci-results).
-import { $, esc, time } from '../lib/format.mjs'
-import { setMarkers, clearOverlays } from '../lib/chart.mjs'
+import { $, esc } from '../lib/format.mjs'
+import { chart, line as chartLine, setMarkers } from '../lib/chart.mjs'
 
 let cache = null
+let myOverlays = []
 
 async function ensureData() {
 	if (cache) return cache
@@ -65,13 +66,27 @@ function renderMarkers() {
 	const symbol = String(window.S?.data?.dataset?.symbol ?? '').replace(/[^A-Z0-9]/gi, '').toUpperCase()
 	if (!symbol || !cache) return
 	const signals = (cache.journal.signals || []).filter((s) => String(s.symbol) === symbol)
-	const marks = signals.map((s) => ({
-		time: Math.floor(new Date(s.signalBarCloseUtc).getTime() / 1000),
-		position: 'belowBar',
-		color: s.missed ? '#888888' : '#26a69a',
-		shape: 'arrowUp',
-		text: `${s.mode}${s.missed ? ' (упущен)' : ''}`,
-	}))
+	const trades = (cache.journal.trades || []).filter((t) => String(t.symbol) === symbol)
+	// 1) Линии сделок: уровень входа (тил) и стоп (красный пунктир) от входа до выхода.
+	for (const s of myOverlays) { try { chart.removeSeries(s) } catch {} }
+	myOverlays = []
+	const sec = (iso) => Math.floor(new Date(iso).getTime() / 1000)
+	for (const t of trades) {
+		if (t.entry == null) continue
+		const t0 = sec(t.entryPlanUtc)
+		const t1 = t.exitUtc ? sec(t.exitUtc) : Math.floor(Date.now() / 1000)
+		myOverlays.push(chartLine([{ time: t0, value: t.entry }, { time: t1, value: t.entry }], { color: '#26a69a', lineWidth: 1 }))
+		myOverlays.push(chartLine([{ time: t0, value: t.stop }, { time: t1, value: t.stop }], { color: '#ef5350', lineWidth: 1, lineStyle: 2 }))
+		if (t.exitPrice != null && t.exitUtc) myOverlays.push(chartLine([{ time: t1 - 3600, value: t.exitPrice }, { time: t1 + 3600, value: t.exitPrice }], { color: t.outcome === 'stop' ? '#ef5350' : '#b39ddb', lineWidth: 1, lineStyle: 0 }))
+	}
+	// 2) Маркеры: сигнал (стрелка под баром) + выход (над баром).
+	const marks = []
+	for (const s of signals) marks.push({ time: sec(s.signalBarCloseUtc), position: 'belowBar', color: s.missed ? '#888888' : '#26a69a', shape: 'arrowUp', text: `${s.mode}${s.missed ? ' (упущен)' : ''}` })
+	for (const t of trades) {
+		if (!t.exitUtc || t.exitPrice == null) continue
+		marks.push({ time: sec(t.exitUtc), position: 'aboveBar', color: t.outcome === 'stop' ? '#ef5350' : '#b39ddb', shape: 'arrowDown', text: `${t.mode}: ${t.outcome}` })
+	}
+	marks.sort((a, b) => a.time - b.time)
 	try { setMarkers(marks) } catch (e) { console.error('doppler markers:', e) }
 }
 
@@ -88,11 +103,11 @@ export function wireDopplerPanel() {
 		await ensureData()
 		renderStats()
 		renderEvents()
+		renderMarkers()
 	})
 	for (const id of ['dopplerBook', 'dopplerTf', 'dopplerMode']) $(id).addEventListener('change', renderStats)
 	$('dopplerMarkers').addEventListener('click', async () => {
 		await ensureData()
-		try { clearOverlays() } catch {}
 		renderMarkers()
 		renderEvents()
 	})

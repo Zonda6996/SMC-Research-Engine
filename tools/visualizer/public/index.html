@@ -127,7 +127,29 @@
 			</section>
 
 			<!-- Подтверждение -->
-			<section class="section mode" id="confPanel">
+			<!-- Doppler (D6) -->
+			<section class="section" id="dopplerPanel">
+				<div class="section-head"><div class="head-titles"><h2>Doppler (D6 Cascade)</h2><div class="head-sub">книги × ТФ × режимы: статистика и живой журнал</div></div><span class="chevron"></span></div>
+				<div class="section-body">
+					<div class="btn-row" style="align-items:center;gap:8px;flex-wrap:wrap">
+						<label style="display:flex;align-items:center;gap:4px">Книга
+							<select id="dopplerBook" class="sm"><option value="macro">Macro (8ч фикс)</option><option value="flash">Flash (пропорц.)</option></select>
+						</label>
+						<label style="display:flex;align-items:center;gap:4px">ТФ
+							<select id="dopplerTf" class="sm"><option>5m</option><option>15m</option><option>30m</option><option selected>1h</option><option>2h</option><option>4h</option></select>
+						</label>
+						<label style="display:flex;align-items:center;gap:4px">Режим
+							<select id="dopplerMode" class="sm"><option value="STANDARD">STANDARD</option><option value="SAFE">SAFE</option><option value="RISK">RISK</option></select>
+						</label>
+						<button class="btn btn-primary sm" id="dopplerRefresh">Обновить</button>
+						<button class="btn btn-ghost sm" id="dopplerMarkers">Сделки на график</button>
+					</div>
+					<div id="dopplerStats" style="margin-top:8px;font-size:12px"></div>
+					<div id="dopplerEvents" style="margin-top:8px;font-size:12px;max-height:260px;overflow:auto"></div>
+				</div>
+			</section>
+
+			<section class="section collapsed mode" id="confPanel">
 				<div class="section-head" data-toggle="confToggle"><div class="head-titles"><h2>Подтверждение</h2><div class="head-sub">simplified / refined · лестница §14.1</div></div><button class="btn btn-outline sm" id="confToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="confControls">
@@ -153,7 +175,7 @@
 			</section>
 
 			<!-- Heatmap -->
-			<section class="section mode" id="hmPanel">
+			<section class="section collapsed mode" id="hmPanel">
 				<div class="section-head" data-toggle="hmToggle"><div class="head-titles"><h2>Heatmap ликвидаций</h2><div class="head-sub">2.0 · OI · бины ликвидаций</div></div><button class="btn btn-outline sm" id="hmToggle">Показать</button></div>
 				<div class="section-body">
 					<div class="hidden" id="hmControls">
@@ -174,7 +196,7 @@
 			</section>
 
 			<!-- Decision Lab -->
-			<section class="section mode" id="labPanel">
+			<section class="section mode" id="labPanel" style="display:none"><!-- C1: убран из интерфейса -->
 				<div class="section-head" data-toggle="labToggle"><div class="head-titles"><h2>Decision Lab</h2><div class="head-sub">141/200/241 · ручная разметка решений</div></div><button class="btn btn-outline sm" id="labToggle">Открыть</button></div>
 				<div class="section-body">
 					<div class="hidden" id="labControls">
@@ -221,28 +243,6 @@
 						</div>
 						<details class="help"><summary>Справка по Lab</summary><p>Только structurally-active сетки; WAIT/+1 открывают по одной закрытой свече, TAKE/SKIP фиксируются до REVEAL, исход считается по 5m.</p></details>
 					</div>
-				</div>
-			</section>
-
-			<!-- Doppler (D6) -->
-			<section class="section" id="dopplerPanel">
-				<div class="section-head"><div class="head-titles"><h2>Doppler (D6 Cascade)</h2><div class="head-sub">книги × ТФ × режимы: статистика и живой журнал</div></div><span class="chevron"></span></div>
-				<div class="section-body">
-					<div class="btn-row" style="align-items:center;gap:8px;flex-wrap:wrap">
-						<label style="display:flex;align-items:center;gap:4px">Книга
-							<select id="dopplerBook" class="sm"><option value="macro">Macro (8ч фикс)</option><option value="flash">Flash (пропорц.)</option></select>
-						</label>
-						<label style="display:flex;align-items:center;gap:4px">ТФ
-							<select id="dopplerTf" class="sm"><option>5m</option><option>15m</option><option>30m</option><option selected>1h</option><option>2h</option><option>4h</option></select>
-						</label>
-						<label style="display:flex;align-items:center;gap:4px">Режим
-							<select id="dopplerMode" class="sm"><option value="STANDARD">STANDARD</option><option value="SAFE">SAFE</option><option value="RISK">RISK</option></select>
-						</label>
-						<button class="btn btn-primary sm" id="dopplerRefresh">Обновить</button>
-						<button class="btn btn-ghost sm" id="dopplerMarkers">Маркеры на график</button>
-					</div>
-					<div id="dopplerStats" style="margin-top:8px;font-size:12px"></div>
-					<div id="dopplerEvents" style="margin-top:8px;font-size:12px;max-height:260px;overflow:auto"></div>
 				</div>
 			</section>
 
